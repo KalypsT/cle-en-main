@@ -19,7 +19,7 @@
         "neighbourhoods": { "centreHistorique": 1, "paters": 0.6 },
         "otherNeighbourhoods": 0
       },
-      "budget": { "start": 120000, "monthlyIncome": 3000, "max": 200000 },
+      "budget": { "start": 150000, "monthlyIncome": 15000, "max": 300000 },
       "estimationErrorStdDev": 0.03,
       "minBargain": 0.04,
       "dailyReaction": 0.5,
