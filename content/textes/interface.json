@@ -121,7 +121,20 @@
     "movedOutOfHome": "Vous quittez votre résidence principale.",
     "propertyTaxCharged": "Taxe foncière prélevée : {amount}.",
     "taxAssessed": "Bilan fiscal {year} : {amount} d'impôt sur vos loyers, prélevé sur 12 mois.",
-    "taxRefund": "Bilan fiscal {year} : votre déficit foncier vous fait économiser {amount}."
+    "taxRefund": "Bilan fiscal {year} : votre déficit foncier vous fait économiser {amount}.",
+    "freshStart": "Nouveau départ : vous voilà de retour à Dole, salarié, locataire, avec {savings} d'épargne.",
+    "gameOver": "Faillite : la partie est terminée.",
+    "titleEarned": "Nouveau titre : {title} !",
+    "achievementEarned": "Succès débloqué : {achievement}.",
+    "challengeOffered": "{giver} vous lance un défi.",
+    "challengeWon": "Défi réussi ! {text}",
+    "challengeLost": "Défi manqué. {text}",
+    "offMarketOffered": "Un agent vous propose un bien hors marché, rien que pour vous pendant quelques jours.",
+    "bankMeetingPlanned": "Rendez-vous avec {banker} planifié dans l'agenda.",
+    "selfRepairPlanned": "Réparation planifiée dans l'agenda, sur votre temps libre.",
+    "yourProperty": "votre bien",
+    "yourTenant": "votre locataire",
+    "theArtisan": "l'artisan"
   },
   "refusals": {
     "bank.unknown": "Cette banque n'existe pas.",
@@ -137,7 +150,7 @@
     "listing.unknown": "Cette annonce n'est plus en ligne.",
     "visit.alreadyDone": "Vous avez déjà visité ce bien.",
     "visit.alreadyPlanned": "Cette visite est déjà prévue dans votre agenda.",
-    "time.noSlot": "Aucun créneau libre pour cette visite dans les deux semaines.",
+    "time.noSlot": "Aucun créneau libre dans les deux semaines.",
     "offer.invalidAmount": "Ce montant n'est pas valable.",
     "offer.pending": "Le vendeur n'a pas encore répondu à votre offre.",
     "offer.tooMany": "Le vendeur ne veut plus entendre parler de vous.",
@@ -184,7 +197,14 @@
     "works.occupied": "Ces gros travaux exigent un logement vide.",
     "works.noHazard": "Aucun imprévu n'attend votre décision.",
     "copro.noMeeting": "Aucune assemblée générale n'est prévue.",
-    "copro.unknownResolution": "Cette résolution n'est pas à l'ordre du jour."
+    "copro.unknownResolution": "Cette résolution n'est pas à l'ordre du jour.",
+    "agenda.unknown": "Cette action n'est plus dans l'agenda.",
+    "agenda.invalidDay": "Choisissez un jour à venir, dans les deux semaines.",
+    "event.unknown": "Cet événement n'attend plus de réponse.",
+    "event.unknownChoice": "Ce choix n'existe pas.",
+    "challenge.none": "Aucun défi en cours.",
+    "challenge.alreadyAccepted": "Défi déjà accepté.",
+    "game.over": "La partie est terminée."
   },
   "errors": {
     "importFailed": "Ce fichier ne contient pas une partie valide.",

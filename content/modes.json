@@ -1,0 +1,41 @@
+{
+  "defaultModeId": "classic",
+  "modes": [
+    {
+      "id": "serene",
+      "name": "Serein",
+      "description": "Moins d'imprévus, des rivaux plus lents, des banquiers vite confiants. Une faillite n'est jamais la fin : on repart avec toute sa réputation. Retours en arrière illimités.",
+      "incidentFactor": 0.7,
+      "hazardFactor": 0.7,
+      "rivalFactor": 0.75,
+      "trustGainFactor": 1.3,
+      "bankruptcy": "freshStart",
+      "freshStart": { "savings": 5000, "reputationShare": 1, "trustPenalty": -10 },
+      "rewinds": null
+    },
+    {
+      "id": "classic",
+      "name": "Classique",
+      "description": "Le jeu tel qu'il a été pensé. Après une faillite, nouveau départ avec 5 000 € et la moitié de sa réputation. Trois retours en arrière par partie.",
+      "incidentFactor": 1,
+      "hazardFactor": 1,
+      "rivalFactor": 1,
+      "trustGainFactor": 1,
+      "bankruptcy": "freshStart",
+      "freshStart": { "savings": 5000, "reputationShare": 0.5, "trustPenalty": -20 },
+      "rewinds": 3
+    },
+    {
+      "id": "demanding",
+      "name": "Exigeant",
+      "description": "Plus d'imprévus, des rivaux plus vifs, des banquiers longs à convaincre. La faillite met fin à la partie, et le temps ne revient jamais en arrière.",
+      "incidentFactor": 1.2,
+      "hazardFactor": 1.2,
+      "rivalFactor": 1.25,
+      "trustGainFactor": 0.75,
+      "bankruptcy": "gameOver",
+      "freshStart": null,
+      "rewinds": 0
+    }
+  ]
+}

@@ -15,6 +15,10 @@ export interface Volumes {
 export interface Settings {
   /** Pause the game when a decision with a short deadline arrives. */
   autoPause: boolean;
+  /** ×4 while nothing waits for the player, back to ×1 at the next decision (docs/02, 2.3). */
+  autoSpeed: boolean;
+  /** Show the short review on the 1st of each month (the yearly one always shows). */
+  monthlyReview: boolean;
   /** Clair, Sombre, Automatique (dark during the game's night), Selon le téléphone (docs/04, 4.2). */
   theme: ThemeChoice;
   /** Graphics of the street: automatic lowers it on slow phones. */
@@ -29,6 +33,8 @@ export const THEMES: readonly ThemeChoice[] = ['light', 'dark', 'auto', 'system'
 export const QUALITIES: readonly QualityChoice[] = ['auto', 'high', 'economy'];
 const DEFAULTS: Settings = {
   autoPause: true,
+  autoSpeed: true,
+  monthlyReview: true,
   theme: 'system',
   quality: 'auto',
   showFps: false,
@@ -47,6 +53,9 @@ export function loadSettings(): Settings {
     const volumes: Partial<Volumes> = parsed.volumes ?? {};
     return {
       autoPause: typeof parsed.autoPause === 'boolean' ? parsed.autoPause : DEFAULTS.autoPause,
+      autoSpeed: typeof parsed.autoSpeed === 'boolean' ? parsed.autoSpeed : DEFAULTS.autoSpeed,
+      monthlyReview:
+        typeof parsed.monthlyReview === 'boolean' ? parsed.monthlyReview : DEFAULTS.monthlyReview,
       theme: THEMES.includes(parsed.theme as ThemeChoice)
         ? (parsed.theme as ThemeChoice)
         : DEFAULTS.theme,

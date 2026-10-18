@@ -1,5 +1,8 @@
 import { music } from '@cle/content';
 import { FORMAT_VERSION } from '@cle/engine';
+import { useEffect, useState } from 'react';
+import { exportJournal } from '../storage/files.ts';
+import { type JournalEntry, readJournal, type SlotId } from '../storage/saves.ts';
 import { QUALITIES, THEMES, type Volumes } from '../settings.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { format, t } from '../texts.ts';
@@ -11,6 +14,16 @@ const VOLUMES: readonly (keyof Volumes)[] = ['music', 'ambience', 'effects'];
 export function SettingsScreen() {
   const { state, act, settings, setSettings, save, exportGame, slot } = useGame();
   const nav = useNav();
+  const [journal, setJournal] = useState<JournalEntry[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    readJournal(slot as SlotId)
+      .then((entries) => live && setJournal(entries))
+      .catch(() => live && setJournal([]));
+    return () => {
+      live = false;
+    };
+  }, [slot]);
   return (
     <div className="screen">
       <ScreenHeader title={t.settings.heading} onBack={nav.pop} />
@@ -24,6 +37,10 @@ export function SettingsScreen() {
           {t.settings.export}
         </button>
         <p className="small muted">{t.settings.exportHint}</p>
+        <button type="button" className="button" onClick={() => nav.push({ name: 'rewind' })}>
+          {t.settings.rewind}
+        </button>
+        <p className="small muted">{t.settings.rewindHint}</p>
       </Card>
       <Card title={t.settings.time}>
         <Switch
@@ -31,6 +48,18 @@ export function SettingsScreen() {
           hint={t.settings.autoPauseHint}
           checked={settings.autoPause}
           onChange={(autoPause) => setSettings({ ...settings, autoPause })}
+        />
+        <Switch
+          label={t.settings.autoSpeed}
+          hint={t.settings.autoSpeedHint}
+          checked={settings.autoSpeed}
+          onChange={(autoSpeed) => setSettings({ ...settings, autoSpeed })}
+        />
+        <Switch
+          label={t.settings.monthlyReview}
+          hint={t.settings.monthlyReviewHint}
+          checked={settings.monthlyReview}
+          onChange={(monthlyReview) => setSettings({ ...settings, monthlyReview })}
         />
       </Card>
       <Card title={t.settings.tutorial}>
@@ -106,6 +135,17 @@ export function SettingsScreen() {
         {Object.values(music.slots).every((tracks) => tracks.length === 0) && (
           <p className="small muted">{t.settings.noMusic}</p>
         )}
+      </Card>
+      <Card title={t.settings.journal}>
+        <p className="small muted">{t.settings.journalHint}</p>
+        <button
+          type="button"
+          className="button"
+          disabled={!journal || journal.length === 0}
+          onClick={() => journal && exportJournal(state, journal)}
+        >
+          {format(t.settings.exportJournal, { count: journal?.length ?? 0 })}
+        </button>
       </Card>
       <p className="tiny muted">{format(t.settings.version, { version: FORMAT_VERSION })}</p>
     </div>

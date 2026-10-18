@@ -67,6 +67,8 @@ export type PendingDecision = {
   | { kind: 'vacant'; propertyId: string }
   | { kind: 'renegotiation'; loanId: string; marketPercent: number }
   | { kind: 'cashAlert'; lowest: Cents }
+  | { kind: 'catalogEvent'; instanceId: string; eventId: string }
+  | { kind: 'challengeOffer'; challengeId: string }
 );
 
 type DecisionBody = PendingDecision extends infer D
@@ -229,11 +231,34 @@ export function pendingDecisions(content: GameContent, state: GameState): Pendin
     list.push({ kind: 'cashAlert', lowest: forecast.lowest, deadlineDay: forecast.lowestDay });
   }
 
+  for (const instance of state.catalog.pending) {
+    list.push({
+      kind: 'catalogEvent',
+      instanceId: instance.id,
+      eventId: instance.eventId,
+      deadlineDay: instance.deadlineDay,
+    });
+  }
+  const challenge = state.progress.challenge;
+  if (challenge && !challenge.accepted) {
+    list.push({
+      kind: 'challengeOffer',
+      challengeId: challenge.id,
+      deadlineDay: challenge.deadlineDay,
+    });
+  }
+
   const autoPause = new Set<DecisionKind>(content.decisions.autoPause);
+  const serious = new Set(content.decisions.seriousIncidents);
+  const pauses = (decision: DecisionBody): boolean => {
+    if (decision.kind === 'catalogEvent') {
+      return content.events.find((event) => event.id === decision.eventId)?.pause ?? false;
+    }
+    if (decision.kind === 'incident' && serious.has(decision.kindId)) return true;
+    return autoPause.has(decision.kind);
+  };
   return list
-    .map(
-      (decision) => ({ ...decision, autoPause: autoPause.has(decision.kind) }) as PendingDecision,
-    )
+    .map((decision) => ({ ...decision, autoPause: pauses(decision) }) as PendingDecision)
     .sort(
       (a, b) =>
         (a.deadlineDay ?? Number.POSITIVE_INFINITY) - (b.deadlineDay ?? Number.POSITIVE_INFINITY),
@@ -260,6 +285,10 @@ export function decisionKey(decision: PendingDecision): string {
       return `${decision.kind}:${decision.loanId}`;
     case 'cashAlert':
       return decision.kind;
+    case 'catalogEvent':
+      return `${decision.kind}:${decision.instanceId}`;
+    case 'challengeOffer':
+      return `${decision.kind}:${decision.challengeId}`;
     case 'candidates':
     case 'coproVote':
     case 'incident':

@@ -1,4 +1,13 @@
-import type { DpeLabel, Epoch, ItemKind, LeaseType, SpaceKind, Tier, Trade } from './content.ts';
+import type {
+  AdviceKind,
+  DpeLabel,
+  Epoch,
+  ItemKind,
+  LeaseType,
+  SpaceKind,
+  Tier,
+  Trade,
+} from './content.ts';
 import type { CalendarDate } from './calendar.ts';
 import type { Clock } from './clock.ts';
 import type { Cents } from './money.ts';
@@ -7,7 +16,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 7;
+export const FORMAT_VERSION = 8;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -441,13 +450,126 @@ export interface RivalState {
   projects: RivalProject[];
 }
 
-export interface AgendaItem {
+interface AgendaBase {
   id: string;
-  kind: 'visit';
-  listingId: string;
   /** Day number the action is planned on. */
   day: number;
   minutes: number;
+}
+
+/** An action planned on a later day (docs/03-systemes/01, « L'agenda léger »). */
+export type AgendaItem = AgendaBase &
+  (
+    | { kind: 'visit'; listingId: string }
+    | { kind: 'bankMeeting'; bankId: string }
+    /** The player repairs a tenant's incident himself. */
+    | { kind: 'selfRepair'; propertyId: string }
+  );
+
+/** A catalogue event waiting for the player's answer (docs/03-systemes/07). */
+export interface CatalogEventInstance {
+  id: string;
+  /** Event of content/evenements/. */
+  eventId: string;
+  day: number;
+  /** The default choice applies on this day. */
+  deadlineDay: number;
+  /** Variant of the text. */
+  textIndex: number;
+  /** Target property; null for game-wide events. */
+  propertyId: string | null;
+  /** Values of the text variables, fixed when the event fires. */
+  vars: {
+    tenant: string | null;
+    artisanId: string | null;
+    neighbourhoodId: string;
+    cityId: string;
+    rivalId: string;
+  };
+  /** Signed amount of each choice (or of the event without choices), drawn when it fires. */
+  amounts: Record<string, Cents>;
+}
+
+/** An anecdote heard recently, for the street bubbles and the news. */
+export interface AnecdoteNote {
+  anecdoteId: string;
+  day: number;
+  textIndex: number;
+  propertyId: string | null;
+  vars: {
+    tenant: string | null;
+    artisanId: string | null;
+    neighbourhoodId: string;
+    cityId: string;
+    rivalId: string;
+  };
+}
+
+export interface CatalogState {
+  pending: CatalogEventInstance[];
+  /** Last day each event fired, by event id (its cooldown). */
+  lastDay: Record<string, number>;
+  /** Most recent anecdotes, newest last. */
+  anecdotes: AnecdoteNote[];
+}
+
+/** A challenge offered or accepted (docs/02, section 2.10). */
+export interface ChallengeState {
+  id: string;
+  offeredDay: number;
+  /** Day the offer lapses (not accepted) or the challenge fails (accepted). */
+  deadlineDay: number;
+  accepted: boolean;
+  /** Value of the goal's stat when accepted. */
+  baseline: number;
+}
+
+export interface ProgressState {
+  /** Titles held, in the order earned. */
+  titles: { id: string; day: number }[];
+  achievements: { id: string; day: number }[];
+  /** Counters of content/schemas/progression.ts (`rivalBeaten.<rival>` for a keyed one). */
+  counters: Record<string, number>;
+  records: {
+    /** Best capital gain on a sale (price net of fees, minus the cost of the property and its works). */
+    bestCapitalGain: Cents;
+    biggestWorks: Cents;
+    bestMonth: Cents;
+    maxNetWorth: Cents;
+  };
+  /** Trouble this year (forced sale, procedure, eviction, indecent let): no quiet year. */
+  troubledYear: boolean;
+  challenge: ChallengeState | null;
+  challengeHistory: { id: string; day: number; won: boolean }[];
+  /** No challenge is offered before this day. */
+  nextChallengeDay: number;
+}
+
+export type ChronicleKind =
+  | 'start'
+  | 'firstPurchase'
+  | 'firstLease'
+  | 'firstWorks'
+  | 'firstSale'
+  | 'homeBought'
+  | 'title'
+  | 'achievement'
+  | 'challengeWon'
+  | 'challengeLost'
+  | 'majorEvent'
+  | 'forcedSale'
+  | 'bankrupt'
+  | 'freshStart'
+  | 'gameOver'
+  | 'rewind'
+  | 'record';
+
+/** A step of the career (« Chronique »). `ref` names a title, achievement, challenge or event. */
+export interface ChronicleEntry {
+  day: number;
+  kind: ChronicleKind;
+  ref: string | null;
+  amount: Cents | null;
 }
 
 /** The whole world. Must stay plain JSON data: no classes, no functions. */
@@ -482,6 +604,43 @@ export interface GameState {
   history: MonthlyPoint[];
   /** Last monthly statement, for the short monthly review. */
   lastStatement: MonthlyStatement | null;
+  /** Game mode (content/modes.json). */
+  modeId: string;
+  /** Rewinds used so far: kept across rewinds (docs/02, section 2.7). */
+  rewinds: number;
+  /** Bankruptcy in a mode without fresh start: the game is over. */
+  gameOver: { day: number } | null;
+  progress: ProgressState;
+  chronicle: ChronicleEntry[];
+  catalog: CatalogState;
+  /** Last yearly review with Yvon Tableur, built on the 1st of January. */
+  lastYearReview: YearReview | null;
+}
+
+/** A piece of Yvon's advice; the interface picks the text (content/textes/yvon.json). */
+export interface Advice {
+  kind: AdviceKind;
+  propertyId?: string | undefined;
+  amount?: Cents | undefined;
+  year?: number | undefined;
+  ratio?: number | undefined;
+}
+
+export interface YearReview {
+  year: number;
+  netWorthStart: Cents;
+  netWorthEnd: Cents;
+  /** Sum of the monthly statements of the year. */
+  cashFlow: Cents;
+  /** Rents of the leases at each month start, summed (charges excluded). */
+  rents: Cents;
+  reputationStart: number;
+  reputationEnd: number;
+  rentTax: Cents | null;
+  accountantFees: Cents;
+  titles: string[];
+  achievements: string[];
+  advice: Advice[];
 }
 
 export interface MonthlyPoint {
@@ -492,6 +651,9 @@ export interface MonthlyPoint {
   debt: Cents;
   /** Net flow of the month's statement (0 for the starting point). */
   cashFlow: Cents;
+  /** Rents of the current leases, charges excluded. */
+  monthlyRent: Cents;
+  reputation: number;
 }
 
 export interface MonthlyStatement {

@@ -48,8 +48,12 @@ describe('descent towards bankruptcy', () => {
     expect(sale.price).toBe(Math.round(value * (1 - content.credit.distress.forcedSaleDiscount)));
     expect(ctx.state.properties).toEqual([]);
     expect(ctx.state.loans).toEqual([]);
-    expect(ctx.state.player.balance).toBe(-100_000 + sale.net);
     expect(ctx.state.banks[content.start.accountBankId]?.trust).toBeLessThan(trustBefore);
+    // The sale does not cover the loan: bankruptcy, then the Classique fresh start.
+    expect(-100_000 + sale.net).toBeLessThan(0);
+    expect(ctx.events.map((e) => e.type)).toEqual(
+      expect.arrayContaining(['forcedSale', 'bankrupt', 'freshStart']),
+    );
   });
 
   it('declares bankruptcy when the net worth stays negative without any property', () => {
@@ -63,11 +67,58 @@ describe('descent towards bankruptcy', () => {
       },
     });
     runDailyDistress(ctx);
-    expect(ctx.events).toEqual([{ type: 'bankrupt', netWorth: -500_000 }]);
-    expect(ctx.state.player.bankruptDay).toBe(ctx.today);
+    expect(ctx.events[0]).toEqual({ type: 'bankrupt', netWorth: -500_000 });
+    expect(ctx.state.chronicle.map((entry) => entry.kind)).toContain('bankrupt');
+  });
+
+  it('starts again in the same world in Classique mode (docs/02, section 2.6)', () => {
+    const start = newGame();
+    const classic = content.modes.modes.find((mode) => mode.id === 'classic')?.freshStart;
+    const ctx = systemContext({
+      ...start,
+      player: {
+        ...start.player,
+        balance: -500_000,
+        reputation: 40,
+        overdraftDays: content.credit.distress.forcedSaleAfterOverdraftDays,
+      },
+      progress: {
+        ...start.progress,
+        titles: [...start.progress.titles, { id: 'firstInvestor', day: 1 }],
+      },
+    });
+    runDailyDistress(ctx);
+    expect(ctx.events.at(-1)).toEqual({
+      type: 'freshStart',
+      savings: (classic?.savings ?? 0) * 100,
+      reputation: Math.round(40 * (classic?.reputationShare ?? 0)),
+    });
+    const { state } = ctx;
+    expect(state.player.balance).toBe((classic?.savings ?? 0) * 100);
+    expect(state.player.bankruptDay).toBeNull();
+    expect(state.player.employed).toBe(true);
+    expect(state.loans).toEqual([]);
+    expect(state.progress.titles.map((t) => t.id)).toContain('firstInvestor');
+    expect(state.progress.counters.freshStarts).toBe(1);
+    expect(state.listings).toEqual(start.listings);
     // Only once.
-    const again = systemContext(ctx.state);
+    const again = systemContext(state);
     runDailyDistress(again);
     expect(again.events).toEqual([]);
+  });
+
+  it('ends the game in Exigeant mode', () => {
+    const start = newGame({ modeId: 'demanding' });
+    const ctx = systemContext({
+      ...start,
+      player: {
+        ...start.player,
+        balance: -500_000,
+        overdraftDays: content.credit.distress.forcedSaleAfterOverdraftDays,
+      },
+    });
+    runDailyDistress(ctx);
+    expect(ctx.events.map((e) => e.type)).toEqual(['bankrupt', 'gameOver']);
+    expect(ctx.state.gameOver).toEqual({ day: ctx.today });
   });
 });

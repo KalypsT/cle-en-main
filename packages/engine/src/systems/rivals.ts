@@ -3,6 +3,7 @@ import { type Cents, toCents } from '../money.ts';
 import { hashNormal, nextFloat, nextRange } from '../random.ts';
 import type { GameState, Listing, Property, RivalState } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { modeOf } from './modes.ts';
 import { listingFor, removeListing } from './listings.ts';
 import { netWorth } from './net-worth.ts';
 import { realValue } from './valuation.ts';
@@ -40,11 +41,11 @@ export function findRival(content: GameContent, rivalId: string): Rival | undefi
 export function aggressiveness(content: GameContent, state: GameState): number {
   const rules = content.rivalRules;
   const steps = Math.max(0, netWorth(content, state)) / toCents(rules.netWorthStep);
-  return Math.min(rules.max, 1 + rules.perStep * steps);
+  return Math.min(rules.max, 1 + rules.perStep * steps) * modeOf(content, state).rivalFactor;
 }
 
 /** Interest of a rival for a property, 0 when it does not fit its preferences. */
-function interest(content: GameContent, rival: Rival, property: Property): number {
+export function interest(content: GameContent, rival: Rival, property: Property): number {
   const preferences = rival.preferences;
   if (!rival.cities.includes(property.cityId)) return 0;
   if (!preferences.kinds.includes(property.kind)) return 0;

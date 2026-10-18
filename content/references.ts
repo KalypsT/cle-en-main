@@ -9,6 +9,16 @@ import type { Rival, RivalsFile } from './schemas/rivals.ts';
 import type { LivingCosts, Start } from './schemas/start.ts';
 import type { Artisan, ArtisansFile, WorksRules, WorksTexts } from './schemas/works.ts';
 import type { WorldRules } from './schemas/world.ts';
+import type { Anecdote, CatalogEvent, RhythmRules } from './schemas/events.ts';
+import type { CalendarRules, ModesFile } from './schemas/modes.ts';
+import type {
+  Achievement,
+  ChallengesFile,
+  ProgressionRules,
+  StatCondition,
+  Title,
+  YvonTexts,
+} from './schemas/progression.ts';
 
 export interface GameContent {
   start: Start;
@@ -32,6 +42,21 @@ export interface GameContent {
   decisions: DecisionRules;
   /** Moments, seasons, weather and streets (milestone 5): read by queries only. */
   world: WorldRules;
+  /** Game modes and their coefficients (docs/02, section 2.5). */
+  modes: ModesFile;
+  /** Public and school holidays (the full agenda, milestone 6). */
+  calendar: CalendarRules;
+  rhythm: RhythmRules;
+  /** Reputation, records, chronicle. */
+  progression: ProgressionRules;
+  titles: Title[];
+  achievements: Achievement[];
+  challenges: ChallengesFile;
+  /** The catalogue of events, every family together. */
+  events: CatalogEvent[];
+  anecdotes: Anecdote[];
+  /** Yvon Tableur's advice at the yearly review. */
+  yvon: YvonTexts;
   /** Generated city data, by city id. */
   cities: Record<string, CityData>;
 }
@@ -113,6 +138,82 @@ export function checkReferences(content: GameContent): string[] {
   problems.push(...checkRentingReferences(content));
   problems.push(...checkWorksReferences(content));
   problems.push(...checkWorldReferences(content));
+  problems.push(...checkProgressionReferences(content));
+  return problems;
+}
+
+function checkProgressionReferences(content: GameContent): string[] {
+  const problems: string[] = [];
+  const modeIds = new Set(content.modes.modes.map((mode) => mode.id));
+  if (!modeIds.has(content.modes.defaultModeId)) {
+    problems.push(`modes.json : mode par défaut inconnu « ${content.modes.defaultModeId} »`);
+  }
+  const bankIds = new Set(content.banks.map((bank) => bank.id));
+  const rivalIds = new Set(content.rivals.map((rival) => rival.id));
+  const jobIds = new Set(content.jobs.map((job) => job.id));
+  const checkStats = (file: string, conditions: readonly StatCondition[] | undefined) => {
+    for (const condition of conditions ?? []) {
+      if (condition.stat === 'bankTrust' && !bankIds.has(condition.key ?? '')) {
+        problems.push(`${file} : banque inconnue « ${condition.key} »`);
+      }
+      if (condition.stat === 'rivalBeaten' && !rivalIds.has(condition.key ?? '')) {
+        problems.push(`${file} : rival inconnu « ${condition.key} »`);
+      }
+    }
+  };
+  const titleIds = new Set(content.titles.map((title) => title.id));
+  if (!content.titles.some((title) => title.step === 0)) {
+    problems.push('titres.json : aucun titre de départ (étape 0)');
+  }
+  for (const title of content.titles) {
+    checkStats('titres.json', title.conditions);
+    for (const required of title.requiresAny) {
+      if (!titleIds.has(required))
+        problems.push(`titres.json : titre requis inconnu « ${required} »`);
+    }
+  }
+  for (const achievement of content.achievements) checkStats('succes.json', achievement.conditions);
+  for (const challenge of content.challenges.challenges) {
+    checkStats('defis.json', challenge.conditions);
+    checkStats('defis.json', [{ ...challenge.goal, min: 0 }]);
+  }
+  const eventIds = new Set<string>();
+  for (const event of content.events) {
+    const file = `evenements (${event.id})`;
+    if (eventIds.has(event.id)) problems.push(`${file} : id en double entre deux fichiers`);
+    eventIds.add(event.id);
+    checkStats(file, event.conditions.stats);
+    for (const jobId of event.conditions.jobs ?? []) {
+      if (!jobIds.has(jobId)) problems.push(`${file} : métier inconnu « ${jobId} »`);
+    }
+    const effects = [...(event.effects ?? []), ...(event.choices ?? []).flatMap((c) => c.effects)];
+    for (const effect of effects) {
+      if (effect.type === 'trust' && effect.bankId && !bankIds.has(effect.bankId)) {
+        problems.push(`${file} : banque inconnue « ${effect.bankId} »`);
+      }
+      const needsProperty = ['satisfaction', 'item', 'tenantNotice', 'rent', 'worksDelay'];
+      if (needsProperty.includes(effect.type) && event.target === 'none') {
+        problems.push(`${file} : l'effet « ${effect.type} » demande un bien ciblé`);
+      }
+      if (effect.type === 'priceIndex' || effect.type === 'priceTrend') {
+        if (effect.scope === 'neighbourhood' && event.target === 'none') {
+          problems.push(`${file} : un effet sur le quartier demande un bien ciblé`);
+        }
+      }
+      if (effect.type === 'rentMoney' && event.target !== 'lease') {
+        problems.push(`${file} : une part du loyer demande un bail`);
+      }
+    }
+  }
+  const motivation = content.progression.effects.offMarketMotivationId;
+  if (!content.market.motivations.some((m) => m.id === motivation)) {
+    problems.push(`progression.json : motivation inconnue « ${motivation} »`);
+  }
+  for (const incidentId of content.decisions.seriousIncidents) {
+    if (!content.renting.incidents.some((incident) => incident.id === incidentId)) {
+      problems.push(`decisions.json : incident inconnu « ${incidentId} »`);
+    }
+  }
   return problems;
 }
 

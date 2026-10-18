@@ -17,8 +17,11 @@ const freeTimeSchema = z.discriminatedUnion('kind', [
       weekendMinutes: minutes,
       /** Free time per day during school holidays, when it differs. */
       schoolHolidayMinutes: minutes.optional(),
-      /** Regular extra days off (RTT); the exact rhythm is still to calibrate. */
-      regularDaysOff: z.boolean().optional(),
+      /** RTT: the first given weekday of each month is free (1 = Monday … 5 = Friday). */
+      rtt: z
+        .object({ weekday: z.number().int().min(1).max(5), minutes })
+        .strict()
+        .optional(),
       /** Works on Saturdays. */
       worksSaturday: z.boolean().optional(),
     })

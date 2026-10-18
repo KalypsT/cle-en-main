@@ -50,12 +50,12 @@
     "freeTimeRegular": "Temps libre : {weekday} en semaine, {weekend} le week-end",
     "freeTimeShifts": "Temps libre : {work} les jours de garde, {rest} les jours de repos",
     "mode": "Mode de partie",
-    "classic": "Classique",
-    "classicDescription": "Imprévus et rivaux normaux, nouveau départ en cas de faillite.",
-    "modesLater": "Les modes Serein et Exigeant arriveront plus tard.",
     "tutorial": "Didacticiel de Gérard Prudhomme",
     "tutorialHint": "Il vous accompagne jusqu'au premier achat, sans jamais vous bloquer.",
-    "start": "Commencer à Dole"
+    "start": "Commencer à Dole",
+    "rewinds": "Retours en arrière : {count}",
+    "rewindsUnlimited": "Retours en arrière illimités",
+    "noRewinds": "Aucun retour en arrière"
   },
   "status": {
     "balance": "Trésorerie",
@@ -68,7 +68,9 @@
     "autoPaused": "Pause : une décision vous attend.",
     "cashAlert": "Trésorerie : passage sous zéro prévu {when} ({amount}).",
     "overdraft": "Découvert : {amount}. Les agios courent chaque jour.",
-    "bankrupt": "Faillite : votre patrimoine net est resté négatif."
+    "bankrupt": "Faillite : votre patrimoine net est resté négatif.",
+    "autoSpeed": "accéléré",
+    "autoSpeedHint": "Accélération automatique : rien ne presse."
   },
   "tabs": {
     "street": "Rue",
@@ -137,7 +139,9 @@
       "copro": "Assemblée",
       "works": "Travaux {percent} %",
       "sold": "Vendu",
-      "compromis": "Compromis"
+      "compromis": "Compromis",
+      "event": "Événement",
+      "anecdote": "…"
     },
     "moments": {
       "morning": "matin",
@@ -278,6 +282,7 @@
       "bankMarginPercent": "Marge de la banque",
       "profilePercent": "Votre profil (métier)",
       "trustPercent": "Confiance du banquier",
+      "reputationPercent": "Réputation et titres",
       "ratePercent": "Taux proposé"
     },
     "loanRefusals": {
@@ -503,7 +508,9 @@
       "dpeWarning": "DPE : location bientôt interdite",
       "vacant": "Logement vide : à louer, à rénover ou à vendre",
       "renegotiation": "Renégociation possible : le marché est à {rate}",
-      "cashAlert": "Trésorerie : passage sous zéro prévu ({amount})"
+      "cashAlert": "Trésorerie : passage sous zéro prévu ({amount})",
+      "catalogEvent": "Événement : à vous de décider",
+      "challengeOffer": "Défi de {giver}"
     }
   },
   "map": {
@@ -539,7 +546,9 @@
     "saved": "Partie sauvegardée.",
     "export": "Exporter la partie",
     "quit": "Retour à l'écran titre",
-    "comingLater": "Plus tard"
+    "comingLater": "Plus tard",
+    "yearReview": "Bilan annuel",
+    "rewind": "Revenir en arrière"
   },
   "settings": {
     "heading": "Réglages",
@@ -582,7 +591,16 @@
     "volume": "{label} : {percent} %",
     "soundHint": "Le son démarre au premier toucher de l'écran.",
     "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
-    "version": "Format de sauvegarde v{version}"
+    "version": "Format de sauvegarde v{version}",
+    "autoSpeed": "Accélération automatique",
+    "autoSpeedHint": "Quand rien ne presse, le temps passe en ×4, puis revient en ×1 à la prochaine décision.",
+    "monthlyReview": "Afficher le bilan chaque mois",
+    "monthlyReviewHint": "Le bilan annuel avec Yvon Tableur s'affiche toujours.",
+    "rewind": "Revenir en arrière",
+    "rewindHint": "Un point de sauvegarde le 1er de chaque mois, les 6 derniers sont gardés.",
+    "journal": "Journal de partie",
+    "journalHint": "Les événements et vos décisions, gardés sur ce téléphone seulement, pour comprendre ce qui a été trop facile ou trop difficile.",
+    "exportJournal": "Exporter le journal ({count} lignes)"
   },
   "avatar": {
     "label": "Avatar de {name}"
@@ -612,5 +630,236 @@
     "seeWorks": "Voir le chantier",
     "ordinary": "Vous ne possédez rien dans ce bâtiment : ses habitants vivent leur vie.",
     "gone": "Ce bâtiment n'est plus dans la rue."
+  },
+  "event": {
+    "heading": "Événement",
+    "families": {
+      "market": "Marché",
+      "tenants": "Locataires",
+      "artisans": "Artisans",
+      "bank": "Banque",
+      "copro": "Copropriété",
+      "city": "Ville",
+      "france": "France"
+    },
+    "deadline": "Sans réponse {when}, ce choix s'appliquera : « {choice} ».",
+    "freeTime": "{duration} de temps libre",
+    "gone": "Cet événement est passé.",
+    "chosen": "C'est noté."
+  },
+  "challenge": {
+    "heading": "Défi",
+    "from": "De la part de {giver}",
+    "accept": "Relever le défi",
+    "decline": "Décliner",
+    "answerBy": "Répondre {when}",
+    "until": "À réussir avant le {date}",
+    "reward": "Récompense : +{points} de réputation",
+    "penalty": "En cas d'échec : {points} de réputation",
+    "progress": "Progression : {current} / {target}",
+    "none": "Aucun défi en cours. Les personnages en lancent deux ou trois par an.",
+    "history": "Défis passés",
+    "won": "Réussi",
+    "lost": "Manqué",
+    "accepted": "Défi accepté !"
+  },
+  "progression": {
+    "heading": "Progression",
+    "tabs": {
+      "titles": "Titres",
+      "achievements": "Succès",
+      "challenges": "Défis",
+      "chronicle": "Chronique"
+    },
+    "reputation": "Réputation",
+    "reputationValue": "{value} / 100",
+    "reputationHint": "Elle compte pour les banques, les agents et les artisans. Elle monte avec les achats, les rénovations, les locataires satisfaits ; elle baisse avec les impayés mal gérés et les ventes forcées.",
+    "reputationEffects": "Vos avantages : {margin} sur les taux des banques.",
+    "offMarket": "Les agents vous proposent des biens hors marché.",
+    "currentTitle": "Titre actuel",
+    "branches": {
+      "both": "Les deux branches",
+      "landlord": "Branche Bailleur",
+      "dealer": "Branche Marchand de biens"
+    },
+    "step": "Étape {step}",
+    "held": "Obtenu le {date}",
+    "locked": "À venir",
+    "later": "Arrive avec un prochain jalon",
+    "perk": "Avantage : {perk}",
+    "achievementsCount": "{count} / {total} succès",
+    "secret": "Succès secret",
+    "earned": "Obtenu le {date}",
+    "achievementProgress": "{current} / {target}",
+    "chronicleEmpty": "La chronique commence.",
+    "mode": "Mode {mode}",
+    "rewindsLeft": "Retours en arrière restants : {count}",
+    "rewindsUnlimited": "Retours en arrière illimités"
+  },
+  "stats": {
+    "purchases": "Biens achetés",
+    "bargainPurchases": "Bonnes affaires (10 % sous l'estimation)",
+    "homeBought": "Résidence principale",
+    "sales": "Reventes",
+    "salesWithGain": "Reventes avec plus-value",
+    "worksDone": "Chantiers terminés",
+    "bigWorksDone": "Chantiers d'au moins 10 000 €",
+    "dpeClassesGained": "Classes DPE gagnées",
+    "dpeGToB": "Rénovations de G à B",
+    "passoiresFixed": "Passoires rénovées",
+    "leasesSigned": "Baux signés",
+    "incidentsRepaired": "Incidents réparés",
+    "diyTasks": "Travaux faits soi-même",
+    "bankMeetings": "Rendez-vous bancaires",
+    "refinances": "Crédits rachetés",
+    "loansRepaid": "Crédits remboursés",
+    "forcedSales": "Ventes forcées",
+    "procedures": "Procédures",
+    "evictions": "Expulsions",
+    "eventChoices": "Événements décidés",
+    "anecdotes": "Anecdotes entendues",
+    "challengesWon": "Défis réussis",
+    "rivalBeaten": "Affaires soufflées à un rival",
+    "positiveStreak": "Mois positifs d'affilée",
+    "bestPositiveStreak": "Meilleure série de mois positifs",
+    "rentTaxFreeYears": "Années sans impôt sur les loyers",
+    "quietYears": "Années tranquilles",
+    "freshStarts": "Nouveaux départs",
+    "rewinds": "Retours en arrière",
+    "netWorth": "Patrimoine net (€)",
+    "balance": "Compte courant (€)",
+    "debt": "Dettes (€)",
+    "properties": "Biens possédés",
+    "letProperties": "Biens loués",
+    "passoires": "Passoires possédées",
+    "cities": "Villes",
+    "reputation": "Réputation",
+    "monthlyRent": "Loyers par mois (€)",
+    "bankTrust": "Confiance du banquier",
+    "yearsPlayed": "Années de jeu"
+  },
+  "chronicle": {
+    "start": "Arrivée à Dole : locataire d'un petit T2, de grands projets.",
+    "firstPurchase": "Premier achat, pour {amount}.",
+    "firstLease": "Premier locataire, {amount} par mois.",
+    "firstWorks": "Premier chantier terminé ({amount}).",
+    "firstSale": "Première revente.",
+    "homeBought": "Installation dans sa résidence principale.",
+    "title": "Nouveau titre : {title}.",
+    "achievement": "Succès : {achievement}.",
+    "challengeWon": "Défi de {giver} réussi.",
+    "challengeLost": "Défi de {giver} manqué.",
+    "majorEvent": "{event}",
+    "forcedSale": "Vente forcée par la banque ({amount}).",
+    "bankrupt": "Faillite.",
+    "freshStart": "Nouveau départ, avec {amount}.",
+    "gameOver": "Fin de partie.",
+    "rewind": "Retour en arrière (depuis le {date}).",
+    "record": "Record : plus belle plus-value, {amount}."
+  },
+  "statistics": {
+    "heading": "Statistiques",
+    "netWorth": "Patrimoine net",
+    "rents": "Loyers par mois",
+    "debt": "Endettement",
+    "cashFlow": "Bilan mensuel",
+    "reputation": "Réputation",
+    "records": "Records",
+    "bestCapitalGain": "Plus belle plus-value",
+    "biggestWorks": "Plus beau chantier",
+    "bestMonth": "Meilleur mois",
+    "maxNetWorth": "Patrimoine net le plus haut",
+    "counters": "Compteurs",
+    "empty": "Les courbes se remplissent au 1er de chaque mois.",
+    "chartLabel": "{label}, depuis le début de la partie"
+  },
+  "agenda": {
+    "heading": "Agenda",
+    "intro": "Votre semaine. Une action demandée sans assez de temps libre se place au premier créneau disponible.",
+    "free": "{duration} de temps libre",
+    "nothing": "Rien de prévu",
+    "kinds": {
+      "work": "Jour travaillé",
+      "weekend": "Week-end",
+      "publicHoliday": "Jour férié",
+      "rtt": "RTT",
+      "schoolHoliday": "Vacances scolaires"
+    },
+    "items": {
+      "visit": "Visite : {label}",
+      "bankMeeting": "Rendez-vous : {banker}",
+      "selfRepair": "Réparation : {label}"
+    },
+    "minutes": "{duration}",
+    "later": "Reporter d'un jour",
+    "cancel": "Annuler",
+    "moved": "Action reportée.",
+    "cancelled": "Action annulée."
+  },
+  "review": {
+    "monthHeading": "Bilan au {date}",
+    "groups": {
+      "income": "Revenus (salaire, loyers)",
+      "home": "Loyer et vie courante",
+      "loans": "Mensualités",
+      "properties": "Charges des biens",
+      "taxes": "Impôts",
+      "bank": "Agios"
+    },
+    "net": "Solde du mois",
+    "balance": "Compte courant",
+    "netWorth": "Patrimoine net",
+    "change": "{amount} depuis le mois dernier",
+    "reputation": "Réputation : {value} ({change})",
+    "rents": "Loyers : {amount} par mois",
+    "streak": "{count} mois positif(s) d'affilée",
+    "newTitles": "Nouveau titre",
+    "newAchievements": "Succès débloqués",
+    "continue": "Continuer",
+    "seeYear": "Voir le bilan annuel",
+    "yearHeading": "Bilan de l'année {year}",
+    "yvon": "Yvon Tableur, comptable",
+    "yearNetWorth": "Patrimoine net : {start} → {end}",
+    "yearCashFlow": "Solde de l'année",
+    "yearRents": "Loyers encaissés (hors charges)",
+    "yearTax": "Impôt sur les loyers",
+    "yearNoTax": "Pas de loyers imposés",
+    "yearAccountant": "Honoraires d'Yvon",
+    "yearReputation": "Réputation : {start} → {end}",
+    "yearTitles": "Titres de l'année",
+    "yearAchievements": "Succès de l'année",
+    "noYearReview": "Le premier bilan annuel arrive le 1er janvier.",
+    "noMonthReview": "Le premier bilan arrive le 1er du mois prochain."
+  },
+  "celebration": {
+    "title": "Nouveau titre !",
+    "perk": "Avantage : {perk}",
+    "continue": "Merci !",
+    "achievement": "Succès débloqué"
+  },
+  "rewind": {
+    "heading": "Revenir en arrière",
+    "intro": "Reprendre la partie au 1er d'un des derniers mois. La partie en cours sera remplacée.",
+    "left": "Retours restants : {count}",
+    "unlimited": "Retours illimités (mode Serein)",
+    "none": "Mode Exigeant : le temps ne revient jamais en arrière.",
+    "noneLeft": "Vous avez utilisé tous vos retours en arrière.",
+    "empty": "Pas encore de point : le premier est pris le 1er du mois prochain.",
+    "point": "1er {month} {year}",
+    "netWorth": "Patrimoine net : {amount}",
+    "go": "Revenir à ce point",
+    "confirm": "Revenir au {date} ? Tout ce qui s'est passé depuis sera perdu.",
+    "done": "Retour au {date}."
+  },
+  "fresh": {
+    "heading": "Nouveau départ",
+    "text": "La banque a tout vendu, et cela n'a pas suffi. Vous restez à Dole, salarié, locataire d'un petit T2, avec {savings} d'épargne. Vos titres, vos succès, votre chronique et votre carnet d'artisans vous suivent ; votre réputation est à {reputation}.",
+    "continue": "Repartir"
+  },
+  "gameOver": {
+    "heading": "Fin de partie",
+    "text": "Faillite en mode Exigeant : la partie s'arrête le {date}. Votre chronique et vos statistiques restent consultables.",
+    "chronicle": "Voir la chronique",
+    "quit": "Retour à l'écran titre"
   }
 }

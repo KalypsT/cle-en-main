@@ -16,10 +16,13 @@ export function LineChart({
   series,
   xLabels,
   title,
+  formatTick = formatKilo,
 }: {
   series: Series[];
   xLabels: [string, string];
   title: string;
+  /** Labels of the vertical axis (amounts in cents by default). */
+  formatTick?: (value: number) => string;
 }) {
   const all = series.flatMap((s) => s.values);
   const count = Math.max(...series.map((s) => s.values.length));
@@ -41,7 +44,7 @@ export function LineChart({
           <g key={tick}>
             <line x1={PAD.left} x2={WIDTH - PAD.right} y1={y(tick)} y2={y(tick)} stroke="#e3d9c6" />
             <text x={PAD.left - 6} y={y(tick) + 4} textAnchor="end" fontSize="10" fill="#6e6658">
-              {formatKilo(tick)}
+              {formatTick(tick)}
             </text>
           </g>
         ))}

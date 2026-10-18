@@ -21,6 +21,22 @@ import worksJson from './travaux.json' with { type: 'json' };
 import worksTextsJson from './textes/travaux.json' with { type: 'json' };
 import worldJson from './monde.json' with { type: 'json' };
 import musicJson from './musique.json' with { type: 'json' };
+import modesJson from './modes.json' with { type: 'json' };
+import calendarJson from './calendrier.json' with { type: 'json' };
+import rhythmJson from './rythme.json' with { type: 'json' };
+import progressionJson from './progression.json' with { type: 'json' };
+import titlesJson from './titres.json' with { type: 'json' };
+import achievementsJson from './succes.json' with { type: 'json' };
+import challengesJson from './defis.json' with { type: 'json' };
+import anecdotesJson from './anecdotes.json' with { type: 'json' };
+import yvonJson from './textes/yvon.json' with { type: 'json' };
+import marketEventsJson from './evenements/marche.json' with { type: 'json' };
+import tenantEventsJson from './evenements/locataires.json' with { type: 'json' };
+import artisanEventsJson from './evenements/artisans.json' with { type: 'json' };
+import bankEventsJson from './evenements/banque.json' with { type: 'json' };
+import coproEventsJson from './evenements/copropriete.json' with { type: 'json' };
+import cityEventsJson from './evenements/ville.json' with { type: 'json' };
+import franceEventsJson from './evenements/france.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
 import { decisionRulesSchema } from './schemas/decisions.ts';
@@ -37,6 +53,15 @@ import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
 import { musicSchema } from './schemas/music.ts';
 import { worldRulesSchema } from './schemas/world.ts';
+import { anecdotesFileSchema, eventsFileSchema, rhythmRulesSchema } from './schemas/events.ts';
+import { calendarRulesSchema, modesFileSchema } from './schemas/modes.ts';
+import {
+  achievementsFileSchema,
+  challengesFileSchema,
+  progressionRulesSchema,
+  titlesFileSchema,
+  yvonTextsSchema,
+} from './schemas/progression.ts';
 
 export type { GameContent } from './references.ts';
 export type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
@@ -88,6 +113,31 @@ export type { Moment, Season, Weather, WorldRules } from './schemas/world.ts';
 export { MOMENTS, SEASONS, WEATHERS } from './schemas/world.ts';
 export type { Music, MusicSlot } from './schemas/music.ts';
 export { MUSIC_SLOTS } from './schemas/music.ts';
+export type {
+  Anecdote,
+  CatalogEvent,
+  EventChoice,
+  EventConditions,
+  EventEffect,
+  EventFamily,
+  EventTarget,
+  RhythmRules,
+} from './schemas/events.ts';
+export { ANECDOTE_SPEAKERS, EVENT_FAMILIES, EVENT_TARGETS } from './schemas/events.ts';
+export type { CalendarRules, Mode, ModesFile } from './schemas/modes.ts';
+export type {
+  Achievement,
+  AdviceKind,
+  Challenge,
+  ChallengeGiver,
+  ChallengesFile,
+  ProgressionRules,
+  Stat,
+  StatCondition,
+  Title,
+  YvonTexts,
+} from './schemas/progression.ts';
+export { ADVICE_KINDS, CHALLENGE_GIVERS, KEYED_STATS, STATS } from './schemas/progression.ts';
 export { checkReferences };
 
 const jobsFile = jobsFileSchema.parse(jobsJson);
@@ -116,6 +166,24 @@ export const gameContent: GameContent = {
   worksTexts: worksTextsSchema.parse(worksTextsJson),
   decisions: decisionRulesSchema.parse(decisionsJson),
   world: worldRulesSchema.parse(worldJson),
+  modes: modesFileSchema.parse(modesJson),
+  calendar: calendarRulesSchema.parse(calendarJson),
+  rhythm: rhythmRulesSchema.parse(rhythmJson),
+  progression: progressionRulesSchema.parse(progressionJson),
+  titles: titlesFileSchema.parse(titlesJson).titles,
+  achievements: achievementsFileSchema.parse(achievementsJson).achievements,
+  challenges: challengesFileSchema.parse(challengesJson),
+  events: [
+    marketEventsJson,
+    tenantEventsJson,
+    artisanEventsJson,
+    bankEventsJson,
+    coproEventsJson,
+    cityEventsJson,
+    franceEventsJson,
+  ].flatMap((file) => eventsFileSchema.parse(file).events),
+  anecdotes: anecdotesFileSchema.parse(anecdotesJson).anecdotes,
+  yvon: yvonTextsSchema.parse(yvonJson),
   cities: { dole: cityDataSchema.parse(doleJson) },
 };
 

@@ -1,5 +1,5 @@
 import { timeSettings } from '@cle/content';
-import type { GameEvent, GameState } from '@cle/engine';
+import { type GameEvent, type GameState, toIsoDate } from '@cle/engine';
 import { useCallback, useEffect, useState } from 'react';
 import { AudioMixer } from './audio/mixer.ts';
 import { engine } from './engine.ts';
@@ -11,7 +11,15 @@ import { TitleScreen } from './screens/TitleScreen.tsx';
 import { GameSession } from './session/game-session.ts';
 import { loadSettings, type Settings } from './settings.ts';
 import { exportGame } from './storage/files.ts';
-import { loadFromSlot, saveToSlot, type SlotId } from './storage/saves.ts';
+import {
+  appendJournal,
+  type Checkpoint,
+  dropCheckpointsFrom,
+  type JournalEntry,
+  loadFromSlot,
+  saveToSlot,
+  type SlotId,
+} from './storage/saves.ts';
 import { t, texts } from './texts.ts';
 import { useTheme } from './theme.ts';
 
@@ -22,6 +30,15 @@ type Screen =
   | { name: 'game'; slot: SlotId; session: GameSession };
 
 const NOTICE_DURATION_MS = 3000;
+/** Engine events too frequent to be worth keeping in the game log. */
+const UNLOGGED: ReadonlySet<GameEvent['type']> = new Set([
+  'dayStarted',
+  'weekendStarted',
+  'propertyPricesUpdated',
+  'marketRateChanged',
+]);
+/** The game log is written by batches. */
+const JOURNAL_BATCH = 200;
 
 /**
  * End-to-end tests open the game with `?e2e`: a fixed seed and start date, a
@@ -74,9 +91,14 @@ export function App() {
   }, [notice]);
 
   const save = useCallback(
-    async (slot: SlotId, state: GameState, silent = false) => {
+    async (
+      slot: SlotId,
+      state: GameState,
+      silent = false,
+      options: { checkpoint?: boolean; fresh?: boolean } = {},
+    ) => {
       try {
-        await saveToSlot(slot, state);
+        await saveToSlot(slot, state, options);
         if (!silent) notify(t.menu.saved);
       } catch {
         notify(texts.errors.saveFailed);
@@ -85,23 +107,59 @@ export function App() {
     [notify],
   );
 
-  // Read by the session at each new decision: the switch applies at once.
+  // Read by the session at each new decision or frame: the switches apply at once.
   const autoPause = useCallback(() => loadSettings().autoPause, []);
+  const autoSpeed = useCallback(() => loadSettings().autoSpeed, []);
 
   const play = useCallback(
     (slot: SlotId, state: GameState) => {
-      // Automatic save on the first day of each month (docs/02, section 2.7).
+      let journal: JournalEntry[] = [];
+      const log = (current: GameState, kind: JournalEntry['kind'], data: unknown) =>
+        journal.push({
+          hour: current.clock.elapsedHours,
+          date: toIsoDate(current.clock.date),
+          kind,
+          data,
+        });
+      const flush = () => {
+        const batch = journal;
+        journal = [];
+        void appendJournal(slot, batch).catch(() => undefined);
+      };
       const onEvents = (events: GameEvent[], current: GameState) => {
-        if (events.some((event) => event.type === 'monthStarted')) void save(slot, current, true);
+        for (const event of events) if (!UNLOGGED.has(event.type)) log(current, 'event', event);
+        // Automatic save and rewind point on the first day of each month (docs/02, section 2.7).
+        if (events.some((event) => event.type === 'monthStarted')) {
+          void save(slot, current, true, { checkpoint: true });
+          flush();
+        } else if (journal.length >= JOURNAL_BATCH) flush();
       };
       const session = new GameSession(state, onEvents, {
         autoPause,
+        autoSpeed,
+        onAction: (action, current) => log(current, 'action', action),
         ...(E2E ? { realSecondsPerGameDay: E2E_SECONDS_PER_DAY, initialSpeed: 0 } : {}),
       });
       setScreen({ name: 'game', slot, session });
     },
-    [save, autoPause],
+    [save, autoPause, autoSpeed],
   );
+
+  /** Goes back to a monthly point (docs/02, section 2.7); later points are dropped. */
+  const rewind = async (slot: SlotId, current: GameState, checkpoint: Checkpoint) => {
+    try {
+      const result = engine.rewind(current, engine.loadGame(checkpoint.game));
+      if (!result.ok) {
+        notify(texts.errors.loadFailed);
+        return;
+      }
+      await dropCheckpointsFrom(slot, checkpoint.date);
+      await save(slot, result.state, true);
+      play(slot, result.state);
+    } catch {
+      notify(texts.errors.loadFailed);
+    }
+  };
 
   const startNewGame = async (slot: SlotId, choices: NewGameChoices) => {
     const state = engine.createGame({
@@ -112,8 +170,9 @@ export function App() {
       name: choices.name,
       avatar: choices.avatar,
       tutorial: choices.tutorial,
+      modeId: choices.modeId,
     });
-    await save(slot, state, true);
+    await save(slot, state, true, { fresh: true });
     play(slot, state);
   };
 
@@ -127,7 +186,7 @@ export function App() {
   };
 
   const importGame = async (slot: SlotId, state: GameState) => {
-    await save(slot, state, true);
+    await save(slot, state, true, { fresh: true });
     play(slot, state);
   };
 
@@ -161,6 +220,9 @@ export function App() {
           slot={screen.slot}
           onSave={(silent) => void save(screen.slot, screen.session.getSnapshot().state, silent)}
           onExport={() => exportGame(screen.session.getSnapshot().state)}
+          onRewind={(checkpoint) =>
+            void rewind(screen.slot, screen.session.getSnapshot().state, checkpoint)
+          }
           onQuit={() => setScreen({ name: 'title' })}
           notify={notify}
           settings={settings}

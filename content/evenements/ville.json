@@ -1,0 +1,543 @@
+{
+  "events": [
+    {
+      "id": "busLine",
+      "family": "city",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.015,
+      "cooldownDays": 1825,
+      "pause": false,
+      "texts": [
+        "Une ligne de bus à haut niveau de service desservira bientôt le quartier {quartier}."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "neighbourhood",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "factoryClosure",
+      "family": "city",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.015,
+      "cooldownDays": 1825,
+      "pause": false,
+      "texts": ["Coup dur à {ville} : une usine de 300 salariés ferme ses portes."],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "city",
+          "percent": -1.5
+        }
+      ]
+    },
+    {
+      "id": "urbanRenewal",
+      "family": "city",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.015,
+      "cooldownDays": 1825,
+      "pause": false,
+      "texts": [
+        "Le quartier {quartier} est retenu pour un programme de rénovation urbaine : places, arbres, éclairage."
+      ],
+      "effects": [
+        {
+          "type": "priceIndex",
+          "scope": "neighbourhood",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "newSchool",
+      "family": "city",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.015,
+      "cooldownDays": 1825,
+      "pause": false,
+      "texts": [
+        "Une nouvelle école ouvrira à la rentrée près de {bien}. Les familles regardent le quartier {quartier} de plus près."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "neighbourhood",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "musicFestival",
+      "family": "city",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "months": [6, 7]
+      },
+      "chancePerMonth": 0.75,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": ["Festival de musique à {ville} ce week-end : la ville cherche des bénévoles."],
+      "choices": [
+        {
+          "id": "volunteer",
+          "label": "Être bénévole (3 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 180
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            }
+          ],
+          "outcome": "Vous avez tenu la buvette et serré des mains."
+        },
+        {
+          "id": "enjoy",
+          "label": "Profiter en simple spectateur",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "enjoy"
+    },
+    {
+      "id": "roadworks",
+      "family": "city",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Travaux de voirie devant {bien} pour trois mois. {locataire} se plaint des marteaux-piqueurs."
+      ],
+      "effects": [
+        {
+          "type": "satisfaction",
+          "delta": -4
+        }
+      ]
+    },
+    {
+      "id": "mayorWishes",
+      "family": "city",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "months": [1],
+        "stats": [
+          {
+            "stat": "reputation",
+            "min": 25
+          }
+        ]
+      },
+      "chancePerMonth": 1,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "Le maire de {ville} vous invite à la cérémonie des vœux. Galette et discours de 45 minutes."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y aller (2 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "reputation",
+              "delta": 3
+            }
+          ],
+          "outcome": "Vous avez eu la fève. Et une poignée de main du maire."
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "heritageLabel",
+      "family": "city",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.01,
+      "cooldownDays": 3650,
+      "pause": false,
+      "texts": [
+        "Le quartier {quartier} obtient un label « patrimoine remarquable ». Les touristes arrivent avec leurs perches à selfie."
+      ],
+      "effects": [
+        {
+          "type": "priceIndex",
+          "scope": "neighbourhood",
+          "percent": 1.5
+        }
+      ]
+    },
+    {
+      "id": "newSupermarket",
+      "family": "city",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.015,
+      "cooldownDays": 1825,
+      "pause": false,
+      "texts": [
+        "Une supérette ouvre au coin de la rue de {bien}. Les voisins sont ravis, surtout pour le pain."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "neighbourhood",
+          "percent": 0.5
+        }
+      ]
+    },
+    {
+      "id": "flood",
+      "family": "city",
+      "target": "owned",
+      "kind": "mishap",
+      "conditions": {
+        "months": [11, 12, 1, 2, 3]
+      },
+      "chancePerMonth": 0.02,
+      "cooldownDays": 1095,
+      "pause": true,
+      "texts": ["Le Doubs est sorti de son lit : la cave de {bien} est inondée."],
+      "choices": [
+        {
+          "id": "company",
+          "label": "Appeler une entreprise de pompage ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -700,
+                "max": -300
+              }
+            }
+          ]
+        },
+        {
+          "id": "diy",
+          "label": "Pomper soi-même (3 h, {montant})",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 180
+            },
+            {
+              "type": "money",
+              "euros": {
+                "min": -100,
+                "max": -50
+              }
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre la décrue",
+          "effects": [
+            {
+              "type": "item",
+              "item": "floors",
+              "delta": -1
+            },
+            {
+              "type": "item",
+              "item": "walls",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 2,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "storm",
+      "family": "city",
+      "target": "owned",
+      "kind": "mishap",
+      "conditions": {
+        "months": [10, 11, 12, 1, 2, 3],
+        "propertyKinds": ["house", "building"]
+      },
+      "chancePerMonth": 0.025,
+      "cooldownDays": 730,
+      "pause": true,
+      "texts": [
+        "Tempête cette nuit sur {ville} : des tuiles de {bien} ont fini dans le jardin du voisin."
+      ],
+      "choices": [
+        {
+          "id": "roofer",
+          "label": "Couvreur en urgence ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -500,
+                "max": -200
+              }
+            }
+          ]
+        },
+        {
+          "id": "claim",
+          "label": "Déclarer à l'assurance (1 h, franchise {montant})",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "money",
+              "euros": {
+                "min": -200,
+                "max": -100
+              }
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre",
+          "effects": [
+            {
+              "type": "item",
+              "item": "roof",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "fibre",
+      "family": "city",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.02,
+      "cooldownDays": 3650,
+      "pause": false,
+      "texts": [
+        "La fibre optique arrive dans la rue de {bien}. {locataire} demande le raccordement."
+      ],
+      "choices": [
+        {
+          "id": "connect",
+          "label": "Faire raccorder ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -200,
+                "max": -100
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 5
+            }
+          ]
+        },
+        {
+          "id": "nothing",
+          "label": "Plus tard",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -2
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 7,
+      "defaultChoice": "nothing"
+    },
+    {
+      "id": "localPortrait",
+      "family": "city",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "reputation",
+            "min": 30
+          }
+        ]
+      },
+      "chancePerMonth": 0.05,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "Le journal local veut faire votre portrait : « le nouvel investisseur qui fait parler de lui »."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter l'interview (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "reputation",
+              "delta": 3
+            }
+          ],
+          "outcome": "La photo n'est pas terrible, mais l'article est flatteur."
+        },
+        {
+          "id": "decline",
+          "label": "Rester discret",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "insulationGrant",
+      "family": "city",
+      "target": "owned",
+      "kind": "opportunity",
+      "conditions": {
+        "dpe": ["E", "F", "G"]
+      },
+      "chancePerMonth": 0.04,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "La ville de {ville} lance une aide à l'isolation des logements énergivores. {bien} est éligible."
+      ],
+      "choices": [
+        {
+          "id": "apply",
+          "label": "Monter le dossier (2 h, +{montant})",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "money",
+              "euros": {
+                "min": 600,
+                "max": 1500
+              }
+            }
+          ],
+          "outcome": "Subvention accordée. Le formulaire faisait 14 pages."
+        },
+        {
+          "id": "skip",
+          "label": "Laisser passer",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 7,
+      "defaultChoice": "skip"
+    },
+    {
+      "id": "highSpeedTrain",
+      "family": "city",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.01,
+      "cooldownDays": 3650,
+      "pause": false,
+      "texts": [
+        "Plus de trains directs entre {ville} et Paris : les citadins découvrent qu'on vit très bien ici."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "city",
+          "percent": 1.5
+        }
+      ]
+    },
+    {
+      "id": "christmasMarket",
+      "family": "city",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "months": [12],
+        "stats": [
+          {
+            "stat": "reputation",
+            "min": 15
+          }
+        ]
+      },
+      "chancePerMonth": 1,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": ["Le marché de Noël de {ville} cherche un sponsor pour son chalet de vin chaud."],
+      "choices": [
+        {
+          "id": "sponsor",
+          "label": "Sponsoriser ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -200,
+                "max": -150
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            }
+          ],
+          "outcome": "Votre nom figure sur le chalet, entre deux guirlandes."
+        },
+        {
+          "id": "no",
+          "label": "Non merci",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "no"
+    }
+  ]
+}

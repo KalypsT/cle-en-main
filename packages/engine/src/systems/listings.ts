@@ -256,9 +256,11 @@ function removeListing(ctx: SystemContext, listingId: string): void {
   if (ctx.state.favorites.includes(listingId)) {
     ctx.state.favorites = ctx.state.favorites.filter((id) => id !== listingId);
   }
-  const planned = ctx.state.agenda.filter((item) => item.listingId === listingId);
+  const isVisit = (item: GameState['agenda'][number]) =>
+    item.kind === 'visit' && item.listingId === listingId;
+  const planned = ctx.state.agenda.filter(isVisit);
   if (planned.length === 0) return;
-  ctx.state.agenda = ctx.state.agenda.filter((item) => item.listingId !== listingId);
+  ctx.state.agenda = ctx.state.agenda.filter((item) => !isVisit(item));
   for (const item of planned) ctx.events.push({ type: 'visitCancelled', listingId, day: item.day });
 }
 

@@ -524,7 +524,11 @@ export function investor(profile: InvestorProfile): Strategy {
     for (const candidate of found) {
       if (planned >= profile.visitsPerDay) break;
       const { listing } = candidate;
-      if (listing.visited || state.agenda.some((item) => item.listingId === listing.id)) continue;
+      if (
+        listing.visited ||
+        state.agenda.some((item) => item.kind === 'visit' && item.listingId === listing.id)
+      )
+        continue;
       // Only worth a visit if the bot could finance it at the asking price.
       const price = Math.min(listing.askingPrice, candidate.estimate);
       if (!plan(api, price, listing.id, 0, candidate.works, candidate.rentAfter)) continue;

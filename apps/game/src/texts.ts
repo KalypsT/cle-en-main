@@ -1,9 +1,14 @@
 import { gameContent, screenTexts, uiTexts } from '@cle/content';
 import {
+  type AnecdoteNote,
   type CalendarDate,
+  type CatalogEventInstance,
   type Cents,
+  type ChronicleEntry,
   fromDayNumber,
   type GameEvent,
+  type GameState,
+  NO_CHOICE,
   type Property,
   toDayNumber,
   weekdayOf,
@@ -226,8 +231,106 @@ export function rivalName(rivalId: string): string {
   return gameContent.rivals.find((rival) => rival.id === rivalId)?.name ?? rivalId;
 }
 
+export function titleName(titleId: string): string {
+  return gameContent.titles.find((title) => title.id === titleId)?.name ?? titleId;
+}
+
+export function achievementName(achievementId: string): string {
+  return gameContent.achievements.find((a) => a.id === achievementId)?.name ?? achievementId;
+}
+
+export function findChallenge(challengeId: string) {
+  return gameContent.challenges.challenges.find((challenge) => challenge.id === challengeId);
+}
+
+export function giverName(challengeId: string): string {
+  const challenge = findChallenge(challengeId);
+  return challenge ? gameContent.challenges.givers[challenge.giver] : challengeId;
+}
+
+export function findCatalogEvent(eventId: string) {
+  return gameContent.events.find((event) => event.id === eventId);
+}
+
+/** Values of the variables of an event or an anecdote (docs/03-systemes/07). */
+function catalogValues(
+  state: GameState | undefined,
+  note: Pick<CatalogEventInstance, 'vars' | 'propertyId'>,
+  amount: Cents | undefined,
+): Record<string, string> {
+  const { events } = texts;
+  const property = note.propertyId
+    ? state?.properties.find((owned) => owned.property.id === note.propertyId)?.property
+    : undefined;
+  const account = gameContent.start.accountBankId;
+  return {
+    bien: property ? propertyLabel(property) : events.yourProperty,
+    locataire: note.vars.tenant ?? events.yourTenant,
+    quartier: neighbourhoodName(note.vars.cityId, note.vars.neighbourhoodId),
+    ville: cityName(note.vars.cityId),
+    artisan: note.vars.artisanId ? artisanName(note.vars.artisanId) : events.theArtisan,
+    banquier: bankerName(account),
+    rival: rivalName(note.vars.rivalId),
+    montant: formatEuros(Math.abs(amount ?? 0)),
+  };
+}
+
+/** The text of a catalogue event, its variables filled in. */
+export function catalogText(state: GameState | undefined, instance: CatalogEventInstance): string {
+  const event = findCatalogEvent(instance.eventId);
+  const template = event?.texts[instance.textIndex] ?? event?.texts[0] ?? '';
+  return format(template, catalogValues(state, instance, instance.amounts[NO_CHOICE]));
+}
+
+/** A choice's label (or outcome) with its amount. */
+export function choiceText(
+  state: GameState | undefined,
+  instance: CatalogEventInstance,
+  choiceId: string,
+  field: 'label' | 'outcome' = 'label',
+): string | null {
+  const choice = findCatalogEvent(instance.eventId)?.choices?.find((c) => c.id === choiceId);
+  const template = choice?.[field];
+  return template
+    ? format(template, catalogValues(state, instance, instance.amounts[choiceId]))
+    : null;
+}
+
+export function anecdoteText(state: GameState | undefined, note: AnecdoteNote): string {
+  const anecdote = gameContent.anecdotes.find((a) => a.id === note.anecdoteId);
+  const template = anecdote?.texts[note.textIndex] ?? anecdote?.texts[0] ?? '';
+  return format(template, catalogValues(state, note, 0));
+}
+
+/** A line of the career chronicle. */
+export function chronicleText(entry: ChronicleEntry): string {
+  const templates = t.chronicle;
+  const values = {
+    amount: entry.amount === null ? '' : formatEuros(Math.abs(entry.amount)),
+    title: entry.ref ? titleName(entry.ref) : '',
+    achievement: entry.ref ? achievementName(entry.ref) : '',
+    giver: entry.ref ? giverName(entry.ref) : '',
+    event: entry.ref ? (findCatalogEvent(entry.ref)?.texts[0] ?? '') : '',
+    date: entry.ref ?? '',
+  };
+  if (entry.kind === 'majorEvent') {
+    return format(values.event, { ville: cityName(gameContent.start.cityId) });
+  }
+  if (entry.kind === 'rewind' && entry.ref) {
+    const date = /^(\d+)-(\d+)-(\d+)$/.exec(entry.ref);
+    if (date) {
+      values.date = formatGameDate({
+        year: Number(date[1]),
+        month: Number(date[2]),
+        day: Number(date[3]),
+      });
+    }
+  }
+  return format(templates[entry.kind], values);
+}
+
 /** Text for an engine event, or null when the event is not shown to the player. */
-export function describeEvent(event: GameEvent): string | null {
+export function describeEvent(event: GameEvent, state?: GameState): string | null {
   const { events } = texts;
   switch (event.type) {
     case 'dayStarted':
@@ -390,6 +493,42 @@ export function describeEvent(event: GameEvent): string | null {
         count: event.revealedItems.length,
         amount: formatMoney(event.cost),
       });
+    case 'freshStart':
+      return format(events.freshStart, { savings: formatMoney(event.savings) });
+    case 'gameOver':
+      return events.gameOver;
+    case 'titleEarned':
+      return format(events.titleEarned, { title: titleName(event.titleId) });
+    case 'achievementEarned':
+      return format(events.achievementEarned, {
+        achievement: achievementName(event.achievementId),
+      });
+    case 'challengeOffered':
+      return format(events.challengeOffered, { giver: giverName(event.challengeId) });
+    case 'challengeWon':
+      return format(events.challengeWon, { text: findChallenge(event.challengeId)?.success ?? '' });
+    case 'challengeLost':
+      return format(events.challengeLost, {
+        text: findChallenge(event.challengeId)?.failure ?? '',
+      });
+    case 'catalogEventStarted':
+    case 'catalogEventHappened':
+      return catalogText(state, event.event);
+    case 'catalogEventResolved':
+      return choiceText(state, event.event, event.choiceId, 'outcome');
+    case 'anecdote':
+      return anecdoteText(state, event.anecdote);
+    case 'offMarketOffered':
+      return events.offMarketOffered;
+    case 'bankMeetingPlanned':
+      return format(events.bankMeetingPlanned, { banker: bankerName(event.bankId) });
+    case 'selfRepairPlanned':
+      return events.selfRepairPlanned;
+    case 'reputationChanged':
+    case 'challengeAccepted':
+    case 'challengeDeclined':
+    case 'agendaMoved':
+    case 'agendaCancelled':
     case 'marketRateChanged':
     case 'propertyPricesUpdated':
     case 'listingPriceDropped':

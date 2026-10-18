@@ -229,5 +229,11 @@ export function quietContent(): GameContent {
   quiet.renting.leaseTypes.furnished.monthlyDepartureProbability = 0;
   quiet.renting.lifeEvents.yearlyProbability = 0;
   quiet.renting.damages.probability = 0;
+  // Milestone 6: no catalogue events, anecdotes, challenges nor off-market offers.
+  quiet.events = [];
+  quiet.rhythm.events.anecdoteChancePerDay = 0;
+  quiet.challenges.chancePerDay = 0;
+  quiet.progression.effects.offMarketChancePerMonth = 0;
+  for (const title of quiet.titles) title.perks = {};
   return quiet;
 }

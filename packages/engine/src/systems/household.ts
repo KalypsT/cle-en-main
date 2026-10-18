@@ -1,10 +1,11 @@
 import { findJob, type GameContent } from '../content.ts';
-import { type CalendarDate, isWeekend, toDayNumber } from '../calendar.ts';
+import { type CalendarDate, toDayNumber } from '../calendar.ts';
 import type { StatementLine } from '../events.ts';
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat } from '../random.ts';
 import type { GameState, PlayerState } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { dayKind } from './holidays.ts';
 
 /** Expected monthly salary (average, bonuses included); 0 without a job. */
 export function expectedSalary(content: GameContent, player: PlayerState): Cents {
@@ -27,10 +28,20 @@ export function livingCosts(content: GameContent, player: PlayerState): Cents {
 export function dailyFreeTime(content: GameContent, state: GameState, date: CalendarDate): number {
   const { player } = state;
   if (!player.employed) return content.unemployedFreeTimeMinutes;
-  const freeTime = findJob(content, player.jobId).freeTime;
+  const job = findJob(content, player.jobId);
+  const freeTime = job.freeTime;
   if (freeTime.kind === 'regular') {
-    // School holidays and RTT days arrive with the full agenda (milestone 6).
-    return isWeekend(date) ? freeTime.weekendMinutes : freeTime.weekdayMinutes;
+    switch (dayKind(content, job, date)) {
+      case 'schoolHoliday':
+        return Math.max(freeTime.schoolHolidayMinutes ?? 0, freeTime.weekendMinutes);
+      case 'weekend':
+      case 'publicHoliday':
+        return freeTime.weekendMinutes;
+      case 'rtt':
+        return freeTime.rtt?.minutes ?? freeTime.weekendMinutes;
+      case 'work':
+        return freeTime.weekdayMinutes;
+    }
   }
   const index = toDayNumber(date) - toDayNumber(state.startDate);
   const cycle = freeTime.cycle;

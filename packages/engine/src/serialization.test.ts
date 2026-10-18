@@ -5,6 +5,7 @@ import v3Save from '../test/fixtures/save-v3-milestone-1b.json' with { type: 'js
 import v4Save from '../test/fixtures/save-v4-milestone-1c.json' with { type: 'json' };
 import v5Save from '../test/fixtures/save-v5-milestone-2.json' with { type: 'json' };
 import v6Save from '../test/fixtures/save-v6-milestone-3.json' with { type: 'json' };
+import v7Save from '../test/fixtures/save-v7-milestone-5.json' with { type: 'json' };
 import { advanceToNextMonth, content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -242,6 +243,45 @@ describe('migrations', () => {
     expect(later.history).toHaveLength(1);
     expect(later.lastStatement?.lines.length).toBeGreaterThan(0);
     // A v7 save round-trips.
+    expect(engine.loadGame(serializeGame(later))).toEqual(later);
+  });
+
+  it('upgrades a milestone 5 save (version 7): mode, progression, catalogue and agenda', () => {
+    const v7 = JSON.stringify(v7Save);
+    const original = JSON.parse(v7) as {
+      player: { balance: number; reputation: number };
+      properties: unknown[];
+      agenda: { listingId: string }[];
+      history: unknown[];
+    };
+    const migrated = engine.loadGame(v7);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.modeId).toBe(content.modes.defaultModeId);
+    expect(migrated.rewinds).toBe(0);
+    expect(migrated.gameOver).toBeNull();
+    expect(migrated.player.balance).toBe(original.player.balance);
+    expect(migrated.properties).toHaveLength(original.properties.length);
+    // A planned visit keeps its listing.
+    expect(migrated.agenda[0]).toMatchObject({
+      kind: 'visit',
+      listingId: original.agenda[0]?.listingId,
+    });
+    // The curve gains its new columns.
+    expect(migrated.history).toHaveLength(original.history.length);
+    expect(migrated.history[0]).toMatchObject({
+      monthlyRent: 0,
+      reputation: original.player.reputation,
+    });
+    // The starting title, counters from what is owned, an empty catalogue.
+    expect(migrated.progress.titles.map((title) => title.id)).toEqual(['ambitiousTenant']);
+    expect(migrated.progress.counters.purchases).toBe(original.properties.length);
+    expect(migrated.catalog).toEqual({ pending: [], lastDay: {}, anecdotes: [] });
+    expect(migrated.chronicle[0]?.kind).toBe('start');
+    // Titles and achievements already deserved come on the next day.
+    const later = engine.advanceHours(migrated, 24).state;
+    expect(later.progress.titles.map((title) => title.id)).toContain('firstInvestor');
+    expect(later.progress.achievements.map((a) => a.id)).toContain('firstStone');
+    // A v8 save round-trips.
     expect(engine.loadGame(serializeGame(later))).toEqual(later);
   });
 });

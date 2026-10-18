@@ -43,6 +43,7 @@ const RATE_KEYS = [
   'bankMarginPercent',
   'profilePercent',
   'trustPercent',
+  'reputationPercent',
 ] as const;
 
 function signedPercent(value: number): string {

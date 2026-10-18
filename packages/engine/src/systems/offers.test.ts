@@ -97,6 +97,8 @@ describe('offers', () => {
     state = act(state, { type: 'market/offer', listingId: listing.id, amount: 100_000 }).state;
     expect(refuse(state, 100_000)).toBe('offer.pending');
     state = advanceDays(state, 2).state;
+    // Another buyer may have taken it in the meantime.
+    if (!state.listings.some((l) => l.id === listing.id && !l.offer)) return;
     state = act(state, { type: 'market/offer', listingId: listing.id, amount: 100_000 }).state;
     state = advanceDays(state, 2).state;
     if (state.listings.some((l) => l.id === listing.id && !l.offer)) {

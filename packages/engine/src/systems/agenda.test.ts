@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { act, advanceDays, content, engine, newGame, systemContext } from '../../test/helpers.ts';
 import { visitMinutes } from './agenda.ts';
+import { toDayNumber } from '../calendar.ts';
 
 describe('visits', () => {
   it('visits now when free time allows and reveals some defects', () => {
@@ -61,5 +62,36 @@ describe('visits', () => {
       content.market.defects.find((d) => d.id === 'humidity')?.revealChanceOnVisit ?? 0;
     expect(found / total).toBeGreaterThan(chance - 0.08);
     expect(found / total).toBeLessThan(chance + 0.08);
+  });
+});
+
+describe('agenda: move and cancel (milestone 6)', () => {
+  it('moves a planned visit to another day with free time, or cancels it', () => {
+    const start = newGame();
+    const tired = { ...start, player: { ...start.player, freeTimeMinutes: 0 } };
+    const listing = tired.listings[0];
+    if (!listing) throw new Error('No listing');
+    const planned = engine.dispatch(tired, { type: 'market/visit', listingId: listing.id });
+    if (!planned.ok) throw new Error(planned.reason.code);
+    const item = planned.state.agenda[0];
+    if (!item) throw new Error('Nothing planned');
+    const today = toDayNumber(start.clock.date);
+    expect(
+      engine.dispatch(planned.state, { type: 'agenda/move', itemId: item.id, day: today }),
+    ).toMatchObject({ ok: false, reason: { code: 'agenda.invalidDay' } });
+    const moved = engine.dispatch(planned.state, {
+      type: 'agenda/move',
+      itemId: item.id,
+      day: item.day + 1,
+    });
+    if (!moved.ok) throw new Error(moved.reason.code);
+    expect(moved.state.agenda[0]?.day).toBe(item.day + 1);
+    const week = engine.agendaWeek(moved.state);
+    expect(week).toHaveLength(7);
+    expect(week.find((d) => d.day === item.day + 1)?.planned).toHaveLength(1);
+    const cancelled = engine.dispatch(moved.state, { type: 'agenda/cancel', itemId: item.id });
+    if (!cancelled.ok) throw new Error(cancelled.reason.code);
+    expect(cancelled.state.agenda).toEqual([]);
+    expect(cancelled.events).toEqual([{ type: 'agendaCancelled', itemId: item.id }]);
   });
 });

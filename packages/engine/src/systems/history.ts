@@ -32,5 +32,12 @@ export function monthlyPoint(
     balance: state.player.balance,
     debt: state.loans.reduce((sum, loan) => sum + loan.remaining, 0),
     cashFlow,
+    monthlyRent: currentMonthlyRent(state),
+    reputation: state.player.reputation,
   };
+}
+
+/** Rents of the current leases, charges excluded. */
+export function currentMonthlyRent(state: GameState): Cents {
+  return state.properties.reduce((sum, owned) => sum + (owned.lease?.monthlyRent ?? 0), 0);
 }

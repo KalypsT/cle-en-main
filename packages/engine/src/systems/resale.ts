@@ -165,6 +165,7 @@ function closeSale(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
     price,
     agencyFees,
     ...proceeds,
+    gain: price - agencyFees - owned.acquisitionCost - owned.worksForCapitalGains,
   });
   if (buyerId) rivalAcquired(ctx, buyerId, owned.property, price);
 }

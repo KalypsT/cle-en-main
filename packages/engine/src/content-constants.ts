@@ -1,4 +1,6 @@
+import type { ChronicleKind } from './state.ts';
 import type {
+  AdviceKind,
   Condition,
   DpeLabel,
   Epoch,
@@ -57,6 +59,46 @@ export const WEATHERS = [
   'fog',
 ] as const satisfies readonly Weather[];
 
+export const ADVICE_KINDS = [
+  'netWorthUp',
+  'netWorthDown',
+  'goodYear',
+  'badYear',
+  'taxFree',
+  'bigTax',
+  'betterRegime',
+  'autoRegime',
+  'deficitCarry',
+  'dpeBan',
+  'vacancy',
+  'lowReserve',
+  'highDebt',
+  'renegotiate',
+  'noProperty',
+  'firstYear',
+] as const satisfies readonly AdviceKind[];
+
+/** Kinds of chronicle entries (state.ts). */
+export const CHRONICLE_KINDS = [
+  'start',
+  'firstPurchase',
+  'firstLease',
+  'firstWorks',
+  'firstSale',
+  'homeBought',
+  'title',
+  'achievement',
+  'challengeWon',
+  'challengeLost',
+  'majorEvent',
+  'forcedSale',
+  'bankrupt',
+  'freshStart',
+  'gameOver',
+  'rewind',
+  'record',
+] as const satisfies readonly ChronicleKind[];
+
 type Exhaustive<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 type Assert<T extends true> = T;
 export type ConstantsMatchContent = [
@@ -68,4 +110,6 @@ export type ConstantsMatchContent = [
   Assert<Exhaustive<(typeof MOMENTS)[number], Moment>>,
   Assert<Exhaustive<(typeof SEASONS)[number], Season>>,
   Assert<Exhaustive<(typeof WEATHERS)[number], Weather>>,
+  Assert<Exhaustive<(typeof ADVICE_KINDS)[number], AdviceKind>>,
+  Assert<Exhaustive<(typeof CHRONICLE_KINDS)[number], ChronicleKind>>,
 ];
