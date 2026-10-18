@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import type { Bubble, StreetBuilding } from '@cle/engine';
+import { type Bubble, type StreetBuilding, toDayNumber } from '@cle/engine';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -94,11 +94,19 @@ export function StreetWorld({ active }: { active: boolean }) {
   const [neighbourhoodId, setNeighbourhoodId] = useState(
     memory.neighbourhoodId ?? homeNeighbourhood,
   );
+  // Recomputed only when what the street shows changes: not at every hour of the clock.
+  const { clock, listings, properties, purchases, rivals, seed } = state;
+  const day = toDayNumber(clock.date);
+  const ambience = useMemo(
+    () => engine.ambience(state, cityId),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [day, clock.hour, seed, cityId],
+  );
   const streets = useMemo(
     () => engine.streets(state, cityId, neighbourhoodId),
-    [state, cityId, neighbourhoodId],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [listings, properties, purchases, rivals, seed, day, ambience.moment, cityId, neighbourhoodId],
   );
-  const ambience = useMemo(() => engine.ambience(state, cityId), [state, cityId]);
   const layout = useMemo(() => layoutStreets(streets, cityId), [streets, cityId]);
   const rootRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
@@ -160,6 +168,8 @@ export function StreetWorld({ active }: { active: boolean }) {
   }, []);
 
   useEffect(() => {
+    // Hidden street: nothing to draw; the data is given again when it shows.
+    if (!active) return;
     // Next frame: the theme (and so the accent colour) is applied by App after this effect.
     const frame = requestAnimationFrame(() =>
       sceneRef.current?.setData({
@@ -176,7 +186,7 @@ export function StreetWorld({ active }: { active: boolean }) {
       }),
     );
     return () => cancelAnimationFrame(frame);
-  }, [layout, ambience, neighbourhoodId, state.seed, settings.theme]);
+  }, [active, layout, ambience, neighbourhoodId, state.seed, settings.theme]);
 
   // A new property (just bought): show its neighbourhood and centre it.
   const ownedIds = state.properties.map((owned) => owned.property.id).join(',');

@@ -234,17 +234,30 @@ export class StreetScene {
     const previous = this.data;
     this.data = data;
     this.random = decorRandom(data.seed);
-    const staticKey = JSON.stringify([
-      data.layout.streets.map((s) => [
-        s.street.id,
-        s.street.weather,
-        s.buildings.map((b) => [b.building, b.x]),
-      ]),
+    // Only what the static drawing shows: a new bubble or works percentage redraws nothing.
+    const buildingKey = (laid: LaidStreet['buildings'][number]) => {
+      const b = laid.building;
+      const forSale = b.role === 'listing' || b.bubbles.some((bubble) => bubble.kind === 'forSale');
+      return [
+        b.id,
+        laid.x,
+        b.role,
+        b.facadeState,
+        b.newWindows,
+        b.scaffolding,
+        b.tarp,
+        forSale,
+      ].join(':');
+    };
+    const staticKey = [
+      data.layout.streets
+        .map((s) => `${s.street.id}/${s.street.weather}/${s.buildings.map(buildingKey).join(',')}`)
+        .join('|'),
       data.season,
       data.christmas,
       data.accent,
       data.neighbourhoodId,
-    ]);
+    ].join('#');
     if (staticKey !== this.staticKey) {
       this.staticKey = staticKey;
       this.buildStatic();
