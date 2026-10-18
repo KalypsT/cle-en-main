@@ -1,0 +1,78 @@
+{
+  "app": {
+    "name": "Clé en main !",
+    "shortName": "Clé en main",
+    "description": "Jeu de gestion immobilière en temps réel, à Dole et ailleurs."
+  },
+  "title": {
+    "tagline": "Bâtissez votre patrimoine, un bien après l'autre.",
+    "newGame": "Nouvelle partie",
+    "continue": "Continuer"
+  },
+  "slots": {
+    "newGameHeading": "Où ranger cette partie ?",
+    "continueHeading": "Reprendre une partie",
+    "slotLabel": "Emplacement {number}",
+    "empty": "Vide",
+    "gameDate": "Partie au {date}",
+    "savedAt": "Sauvegardée le {date} à {time}",
+    "start": "Commencer ici",
+    "load": "Charger",
+    "import": "Importer un fichier",
+    "confirmOverwrite": "L'emplacement {number} contient déjà une partie. La remplacer ?",
+    "back": "Retour"
+  },
+  "game": {
+    "speedControls": "Vitesse du temps",
+    "pause": "Pause",
+    "speed": "×{speed}",
+    "save": "Sauvegarder",
+    "saved": "Partie sauvegardée.",
+    "export": "Exporter",
+    "menu": "Menu",
+    "demoHeading": "Démonstration du moteur",
+    "rollDie": "Lancer un dé",
+    "lastRoll": "Dernier lancer : {value}",
+    "noRollYet": "Aucun lancer pour l'instant.",
+    "latestEvent": "Dernier événement : {event}"
+  },
+  "calendar": {
+    "weekdays": ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"],
+    "months": [
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre"
+    ],
+    "date": "{weekday} {day} {month} {year}",
+    "time": "{hour} h"
+  },
+  "events": {
+    "dayStarted": "Nouveau jour : {date}",
+    "weekendStarted": "C'est le week-end !",
+    "monthStarted": "Nouveau mois : {month} {year}",
+    "yearStarted": "Bonne année {year} !"
+  },
+  "refusals": {
+    "demo.invalidSides": "Un dé doit avoir au moins deux faces."
+  },
+  "errors": {
+    "importFailed": "Ce fichier ne contient pas une partie valide.",
+    "loadFailed": "Impossible de charger cette partie.",
+    "saveFailed": "La sauvegarde a échoué.",
+    "storageUnavailable": "Le stockage du navigateur est indisponible : les sauvegardes ne fonctionneront pas."
+  },
+  "pwa": {
+    "offlineReady": "Le jeu est prêt à fonctionner hors ligne.",
+    "updateAvailable": "Une nouvelle version est disponible.",
+    "reload": "Mettre à jour"
+  }
+}

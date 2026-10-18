@@ -1,0 +1,5 @@
+{
+  "startHour": 8,
+  "realSecondsPerGameDay": 20,
+  "speeds": [1, 2, 4]
+}
