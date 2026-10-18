@@ -19,6 +19,11 @@
   },
   "overdraftAnnualPercent": 16,
   "minRentalHistoryMonthsWithoutSalary": 24,
+  "distress": {
+    "forcedSaleAfterOverdraftDays": 90,
+    "forcedSaleDiscount": 0.2,
+    "forcedSaleTrust": -15
+  },
   "renegotiation": {
     "thresholdPercent": 0.7,
     "feesShareOfRemaining": 0.03,

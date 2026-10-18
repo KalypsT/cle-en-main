@@ -6,7 +6,7 @@ import type { RngState } from './random.ts';
 import type { LoanDecision } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 3;
+export const FORMAT_VERSION = 4;
 
 export interface PlayerState {
   jobId: string;
@@ -25,6 +25,8 @@ export interface PlayerState {
   reputation: number;
   /** Months with rental income, used by banks once the player has no salary. */
   rentalHistoryMonths: number;
+  /** Day number of the bankruptcy (net worth still negative after forced sales). */
+  bankruptDay: number | null;
 }
 
 export interface BankRelation {
@@ -158,6 +160,8 @@ export type SaleMode = 'agency' | 'self';
 
 export interface SaleOffer {
   id: string;
+  /** Rival making the offer; null for an anonymous household. */
+  buyerId: string | null;
   amount: Cents;
   /** Most the buyer would accept on a counter-offer (hidden). */
   buyerMax: Cents;
@@ -172,7 +176,14 @@ export interface SaleState {
   listedDay: number;
   offers: SaleOffer[];
   /** Accepted offer, waiting for the deed. */
-  agreement: { price: Cents; deedDay: number } | null;
+  agreement: { price: Cents; deedDay: number; buyerId: string | null } | null;
+}
+
+/** Provisional lease of milestone 1c (docs/03-systemes/04): one tenant, one rent. */
+export interface Lease {
+  /** Rent paid by the tenant, before the owner's costs. */
+  monthlyRent: Cents;
+  startDay: number;
 }
 
 export interface OwnedProperty {
@@ -182,6 +193,23 @@ export interface OwnedProperty {
   acquisitionCost: Cents;
   purchaseDate: CalendarDate;
   sale: SaleState | null;
+  lease: Lease | null;
+  /** Without a lease, the next tenant arrives on this day (if the property can be let). */
+  vacantUntilDay: number;
+}
+
+/** A property a marchand de biens renovates before selling it again. */
+export interface RivalProject {
+  property: Property;
+  /** Day number it goes back on the market. */
+  resaleDay: number;
+}
+
+/** A named rival: only a budget and a few projects, no full simulation of its wealth. */
+export interface RivalState {
+  budget: Cents;
+  purchases: number;
+  projects: RivalProject[];
 }
 
 export interface AgendaItem {
@@ -210,4 +238,6 @@ export interface GameState {
   purchases: Purchase[];
   properties: OwnedProperty[];
   agenda: AgendaItem[];
+  /** Named rivals, by id (content/rivaux.json). */
+  rivals: Record<string, RivalState>;
 }

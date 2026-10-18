@@ -1,0 +1,91 @@
+{
+  "aggressiveness": {
+    "netWorthStep": 100000,
+    "perStep": 0.1,
+    "max": 1.6
+  },
+  "rivals": [
+    {
+      "id": "delaporte",
+      "name": "Monique Delaporte",
+      "strategy": "Petites surfaces près des gares, très rapide sur les bonnes affaires.",
+      "personality": "Retraitée redoutable, polie et implacable.",
+      "active": true,
+      "cities": ["dole"],
+      "preferences": {
+        "kinds": ["apartment"],
+        "maxSurface": 45,
+        "conditions": ["toRefresh", "good", "renovated"],
+        "neighbourhoods": { "centreHistorique": 1, "paters": 0.5 },
+        "otherNeighbourhoods": 0
+      },
+      "budget": { "start": 120000, "monthlyIncome": 3000, "max": 200000 },
+      "estimationErrorStdDev": 0.03,
+      "minBargain": 0.05,
+      "dailyReaction": 0.5,
+      "costShare": 0.075,
+      "resaleOffers": {
+        "minBargain": 0.04,
+        "dailyReaction": 0.3,
+        "offerShare": { "min": 0.97, "max": 1 }
+      },
+      "flip": null
+    },
+    {
+      "id": "martinot",
+      "name": "Les frères Martinot",
+      "strategy": "Marchands de biens : achètent pour rénover et revendre.",
+      "personality": "Bruyants, toujours deux à parler en même temps.",
+      "active": true,
+      "cities": ["dole"],
+      "preferences": {
+        "kinds": ["apartment", "house", "building"],
+        "maxSurface": 400,
+        "conditions": ["ruin", "toRenovate"],
+        "neighbourhoods": {},
+        "otherNeighbourhoods": 1
+      },
+      "budget": { "start": 250000, "monthlyIncome": 15000, "max": 400000 },
+      "estimationErrorStdDev": 0.05,
+      "minBargain": 0.08,
+      "dailyReaction": 0.25,
+      "costShare": 0.075,
+      "resaleOffers": {
+        "minBargain": 0.08,
+        "dailyReaction": 0.2,
+        "offerShare": { "min": 0.9, "max": 0.97 }
+      },
+      "flip": {
+        "months": { "min": 4, "max": 9 },
+        "conditionAfter": "renovated",
+        "motivationId": "martinotResale"
+      }
+    },
+    {
+      "id": "horizon",
+      "name": "SCI Horizon Patrimoine",
+      "strategy": "Arrive plus tard dans la partie, achète des immeubles entiers à Dijon et Besançon.",
+      "personality": "Fonds impersonnel : « nous reviendrons vers vous ».",
+      "active": false,
+      "cities": ["dole"],
+      "preferences": {
+        "kinds": ["building"],
+        "maxSurface": 2000,
+        "conditions": ["toRefresh", "good", "renovated"],
+        "neighbourhoods": {},
+        "otherNeighbourhoods": 1
+      },
+      "budget": { "start": 2000000, "monthlyIncome": 100000, "max": 5000000 },
+      "estimationErrorStdDev": 0.02,
+      "minBargain": 0.03,
+      "dailyReaction": 0.3,
+      "costShare": 0.075,
+      "resaleOffers": {
+        "minBargain": 0.03,
+        "dailyReaction": 0.2,
+        "offerShare": { "min": 0.95, "max": 1 }
+      },
+      "flip": null
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import { FORMAT_VERSION, type GameState } from './state.ts';
 import { initialBankRelations } from './systems/banking.ts';
 import { seedListings } from './systems/listings.ts';
 import { initialCityMarkets } from './systems/prices.ts';
+import { initialRivals } from './systems/rivals.ts';
 
 /** What a migration may read besides the old save. */
 export interface MigrationContext {
@@ -85,6 +86,40 @@ export const MIGRATIONS: MigrationRegistry = {
       content.start.cityId,
     );
     return state as unknown as Record<string, unknown>;
+  },
+  /**
+   * Version 3 (milestone 1b) had no rivals, no rents and no bankruptcy. Owned
+   * properties find a tenant from the next day, offers and agreements came
+   * from households, and the rivals start with their initial budgets.
+   */
+  3: (raw, { content }) => {
+    const clock = raw.clock as GameState['clock'];
+    const today = toDayNumber(clock.date);
+    const properties = (raw.properties as Record<string, unknown>[]).map((owned) => {
+      const sale = owned.sale as Record<string, unknown> | null;
+      return {
+        ...owned,
+        sale: sale && {
+          ...sale,
+          offers: (sale.offers as Record<string, unknown>[]).map((offer) => ({
+            ...offer,
+            buyerId: null,
+          })),
+          agreement: sale.agreement && {
+            ...(sale.agreement as Record<string, unknown>),
+            buyerId: null,
+          },
+        },
+        lease: null,
+        vacantUntilDay: today + 1,
+      };
+    });
+    return {
+      ...raw,
+      player: { ...(raw.player as Record<string, unknown>), bankruptDay: null },
+      properties,
+      rivals: initialRivals(content),
+    };
   },
 };
 
@@ -213,6 +248,7 @@ const gameStateSchema = z
         freeTimeMinutes: z.number().int().min(0),
         reputation: z.number().min(0).max(100),
         rentalHistoryMonths: z.number().int().min(0),
+        bankruptDay: day.nullable(),
       })
       .strict(),
     banks: z.record(
@@ -325,6 +361,7 @@ const gameStateSchema = z
                 z
                   .object({
                     id: z.string(),
+                    buyerId: z.string().nullable(),
                     amount: cents.positive(),
                     buyerMax: cents.positive(),
                     expiresDay: day,
@@ -332,10 +369,15 @@ const gameStateSchema = z
                   })
                   .strict(),
               ),
-              agreement: z.object({ price: cents.positive(), deedDay: day }).strict().nullable(),
+              agreement: z
+                .object({ price: cents.positive(), deedDay: day, buyerId: z.string().nullable() })
+                .strict()
+                .nullable(),
             })
             .strict()
             .nullable(),
+          lease: z.object({ monthlyRent: cents.positive(), startDay: day }).strict().nullable(),
+          vacantUntilDay: day,
         })
         .strict(),
     ),
@@ -347,6 +389,16 @@ const gameStateSchema = z
           listingId: z.string(),
           day,
           minutes: z.number().int().min(0),
+        })
+        .strict(),
+    ),
+    rivals: z.record(
+      z.string(),
+      z
+        .object({
+          budget: cents,
+          purchases: z.number().int().min(0),
+          projects: z.array(z.object({ property: propertySchema, resaleDay: day }).strict()),
         })
         .strict(),
     ),

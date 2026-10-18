@@ -49,6 +49,10 @@ export function bankerName(bankId: string): string {
   return gameContent.banks.find((bank) => bank.id === bankId)?.banker.name ?? bankId;
 }
 
+export function rivalName(rivalId: string): string {
+  return gameContent.rivals.find((rival) => rival.id === rivalId)?.name ?? rivalId;
+}
+
 /** Text for an engine event, or null when the event is not shown to the player. */
 export function describeEvent(event: GameEvent): string | null {
   const { events } = texts;
@@ -83,7 +87,9 @@ export function describeEvent(event: GameEvent): string | null {
     case 'listingPublished':
       return events.listingPublished;
     case 'listingSold':
-      return events.listingSold;
+      return event.buyer === 'rival'
+        ? format(events.listingSoldToRival, { rival: rivalName(event.rivalId) })
+        : events.listingSold;
     case 'visitDone':
       return events.visitDone;
     case 'visitPlanned':
@@ -103,13 +109,26 @@ export function describeEvent(event: GameEvent): string | null {
     case 'deedSigned':
       return events.deedSigned;
     case 'saleOfferReceived':
-      return format(events.saleOfferReceived, { amount: formatMoney(event.amount) });
+      return event.buyerId
+        ? format(events.saleOfferFromRival, {
+            rival: rivalName(event.buyerId),
+            amount: formatMoney(event.amount),
+          })
+        : format(events.saleOfferReceived, { amount: formatMoney(event.amount) });
     case 'saleAgreed':
       return format(events.saleAgreed, { price: formatMoney(event.price) });
     case 'saleFellThrough':
       return events.saleFellThrough;
     case 'propertySold':
       return format(events.propertySold, { net: formatMoney(event.net) });
+    case 'propertyLet':
+      return format(events.propertyLet, { rent: formatMoney(event.monthlyRent) });
+    case 'tenantLeft':
+      return events.tenantLeft;
+    case 'forcedSale':
+      return format(events.forcedSale, { price: formatMoney(event.price) });
+    case 'bankrupt':
+      return events.bankrupt;
     case 'marketRateChanged':
     case 'propertyPricesUpdated':
     case 'listingPriceDropped':

@@ -74,6 +74,7 @@
     "resigned": "Vous avez démissionné.",
     "listingPublished": "Nouvelle annonce en ligne.",
     "listingSold": "Une annonce vient d'être vendue à un autre acheteur.",
+    "listingSoldToRival": "Vendu à {rival}.",
     "visitDone": "Visite terminée.",
     "visitPlanned": "Visite prévue dans votre agenda.",
     "offerAccepted": "Offre acceptée !",
@@ -84,9 +85,14 @@
     "purchaseCancelled": "L'achat est annulé.",
     "deedSigned": "Acte signé : le bien est à vous !",
     "saleOfferReceived": "Offre reçue : {amount}.",
+    "saleOfferFromRival": "{rival} vous fait une offre : {amount}.",
     "saleAgreed": "Vente conclue à {price}.",
     "saleFellThrough": "L'acheteur s'est désisté.",
-    "propertySold": "Bien vendu : {net} nets sur votre compte."
+    "propertySold": "Bien vendu : {net} nets sur votre compte.",
+    "propertyLet": "Un locataire s'installe : {rent} par mois.",
+    "tenantLeft": "Votre locataire a donné son congé.",
+    "forcedSale": "Vente forcée par la banque : {price}.",
+    "bankrupt": "Faillite : même après les ventes forcées, vos dettes dépassent votre patrimoine."
   },
   "refusals": {
     "bank.unknown": "Cette banque n'existe pas.",

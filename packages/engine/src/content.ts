@@ -11,6 +11,7 @@ import type {
   MarketRules,
   Motivation,
   NeighbourhoodData,
+  Rival,
 } from '@cle/content';
 
 export type {
@@ -26,6 +27,7 @@ export type {
   MarketRules,
   Motivation,
   NeighbourhoodData,
+  Rival,
 };
 
 export function findJob(content: GameContent, jobId: string): Job {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import v1Save from '../test/fixtures/save-v1-milestone-0.json' with { type: 'json' };
 import v2Save from '../test/fixtures/save-v2-milestone-1a.json' with { type: 'json' };
+import v3Save from '../test/fixtures/save-v3-milestone-1b.json' with { type: 'json' };
 import { content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -9,6 +10,7 @@ import {
   SaveFormatError,
   serializeGame,
 } from './serialization.ts';
+import { toDayNumber } from './calendar.ts';
 import { FORMAT_VERSION } from './state.ts';
 
 const context = { content };
@@ -97,5 +99,39 @@ describe('migrations', () => {
     // Deterministic, and the game keeps running.
     expect(engine.loadGame(v2)).toEqual(migrated);
     expect(engine.advanceHours(migrated, 24 * 40).state.listings.length).toBeGreaterThan(0);
+  });
+
+  it('upgrades a milestone 1b save (version 3): rivals, tenants and household buyers', () => {
+    const v3 = JSON.stringify(v3Save);
+    const original = JSON.parse(v3) as {
+      clock: { date: { year: number; month: number; day: number } };
+      player: { balance: number };
+      properties: { property: { id: string }; sale: Record<string, unknown> }[];
+    };
+    const migrated = engine.loadGame(v3);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.player.balance).toBe(original.player.balance);
+    expect(migrated.player.bankruptDay).toBeNull();
+    expect(Object.keys(migrated.rivals)).toEqual(content.rivals.map((rival) => rival.id));
+    const owned = migrated.properties[0];
+    expect(owned?.property.id).toBe(original.properties[0]?.property.id);
+    expect(owned?.lease).toBeNull();
+    expect(owned?.vacantUntilDay).toBe(toDayNumber(original.clock.date) + 1);
+
+    // Offers and agreements of a version 3 save came from households.
+    const withOffer = JSON.parse(v3) as typeof original;
+    const sale = withOffer.properties[0]?.sale;
+    if (!sale) throw new Error('The fixture has a property for sale');
+    sale.offers = [
+      { id: 'offer-x', amount: 100_000, buyerMax: 101_000, expiresDay: 0, counterAmount: null },
+    ];
+    sale.agreement = { price: 100_000, deedDay: 0 };
+    const upgraded = engine.loadGame(JSON.stringify(withOffer)).properties[0]?.sale;
+    expect(upgraded?.offers[0]?.buyerId).toBeNull();
+    expect(upgraded?.agreement?.buyerId).toBeNull();
+
+    // The migrated game keeps running: the tenant moves in.
+    const later = engine.advanceHours(migrated, 24 * 3).state;
+    expect(later.properties[0]?.lease?.monthlyRent).toBeGreaterThan(0);
   });
 });

@@ -112,13 +112,23 @@ function motivationOf(content: GameContent, id: string): Motivation {
 
 /** A new listing; `ageDays` back-dates the listings already online at game start. */
 export function generateListing(ctx: SystemContext, cityId: string, ageDays = 0): Listing {
-  const { content, state } = ctx;
-  const rules = content.market;
   const property = generateProperty(ctx, cityId);
   const motivationId = pickWeighted(
-    state.rng,
-    Object.fromEntries(rules.motivations.map((m) => [m.id, m.weight])),
+    ctx.state.rng,
+    Object.fromEntries(ctx.content.market.motivations.map((m) => [m.id, m.weight])),
   );
+  return listingFor(ctx, property, motivationId, ageDays);
+}
+
+/** Puts a property on the market for a seller with the given motivation. */
+export function listingFor(
+  ctx: SystemContext,
+  property: Property,
+  motivationId: string,
+  ageDays = 0,
+): Listing {
+  const { content, state } = ctx;
+  const rules = content.market;
   const motivation = motivationOf(content, motivationId);
   const factor = nextRange(state.rng, motivation.priceFactor.min, motivation.priceFactor.max);
   const { errorStdDev, errorMax } = rules.pricing;

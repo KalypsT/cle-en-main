@@ -1,0 +1,1841 @@
+{
+  "formatVersion": 3,
+  "seed": 77,
+  "rng": [
+    2683382413,
+    1214013263,
+    3093156428,
+    989907718
+  ],
+  "startDate": {
+    "year": 2026,
+    "month": 10,
+    "day": 18
+  },
+  "clock": {
+    "date": {
+      "year": 2027,
+      "month": 1,
+      "day": 20
+    },
+    "hour": 8,
+    "elapsedHours": 2256
+  },
+  "nextId": 272,
+  "player": {
+    "jobId": "civilServant",
+    "employed": true,
+    "balance": 1079460,
+    "overdraftDays": 0,
+    "overdraftInterestThisMonth": 0,
+    "monthlyRent": 52000,
+    "freeTimeMinutes": 150,
+    "reputation": 10,
+    "rentalHistoryMonths": 0
+  },
+  "banks": {
+    "tirelire": {
+      "trust": 61.6,
+      "relationshipMonths": 3,
+      "lastMeetingDay": null
+    },
+    "fougueux": {
+      "trust": 60,
+      "relationshipMonths": 0,
+      "lastMeetingDay": null
+    },
+    "rigueur": {
+      "trust": 60,
+      "relationshipMonths": 0,
+      "lastMeetingDay": null
+    },
+    "zeroPapier": {
+      "trust": 60,
+      "relationshipMonths": 0,
+      "lastMeetingDay": null
+    }
+  },
+  "market": {
+    "ratePercent": 3.51,
+    "cyclePhase": 0.03679836285300552,
+    "laggedRatePercent": 3.60333,
+    "cities": {
+      "dole": {
+        "centreHistorique": {
+          "priceIndex": 1.021390816480614,
+          "trendPercent": 3.445618638139572
+        },
+        "mesnilsPasteur": {
+          "priceIndex": 1.0224622841832698,
+          "trendPercent": 2.6585467706690333
+        },
+        "paters": {
+          "priceIndex": 1.0126318810304349,
+          "trendPercent": 1.9006883108285273
+        },
+        "plumontValFleuri": {
+          "priceIndex": 1.0094974899945306,
+          "trendPercent": 1.6631401797361423
+        },
+        "azans": {
+          "priceIndex": 1.009055820321064,
+          "trendPercent": 2.8956064195585234
+        }
+      }
+    }
+  },
+  "loans": [
+    {
+      "id": "loan-179",
+      "bankId": "tirelire",
+      "principal": 4500000,
+      "ratePercent": 4,
+      "durationMonths": 240,
+      "monthlyPayment": 27270,
+      "remaining": 4475419,
+      "paymentsMade": 2,
+      "startDate": {
+        "year": 2026,
+        "month": 11,
+        "day": 21
+      },
+      "renegotiationSuggested": false,
+      "propertyId": "property-57"
+    }
+  ],
+  "listings": [
+    {
+      "id": "listing-12",
+      "property": {
+        "id": "property-11",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 57,
+        "rooms": 3,
+        "floor": 2,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 74100,
+        "monthlyCharges": 12500
+      },
+      "titleId": "potential",
+      "motivationId": "growingFamily",
+      "askingPrice": 8600000,
+      "initialAskingPrice": 9100000,
+      "publishedDay": 20699,
+      "publicDay": 20699,
+      "lastPriceDropDay": 20745,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-22",
+      "property": {
+        "id": "property-21",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 62,
+        "rooms": 3,
+        "floor": 4,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "D",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 80600,
+        "monthlyCharges": 13600
+      },
+      "titleId": "bright",
+      "motivationId": "divorce",
+      "askingPrice": 12000000,
+      "initialAskingPrice": 13700000,
+      "publishedDay": 20703,
+      "publicDay": 20703,
+      "lastPriceDropDay": 20808,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-86",
+      "property": {
+        "id": "property-85",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 56,
+        "rooms": 2,
+        "floor": 0,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "D",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "humidity",
+            "revealed": false
+          },
+          {
+            "id": "plumbing",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          },
+          {
+            "id": "noisyNeighbours",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 72800,
+        "monthlyCharges": 12300
+      },
+      "titleId": "investor",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 7700000,
+      "initialAskingPrice": 8700000,
+      "publishedDay": 20706,
+      "publicDay": 20706,
+      "lastPriceDropDay": 20811,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-48",
+      "property": {
+        "id": "property-47",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 77,
+        "rooms": 3,
+        "floor": 5,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 100100,
+        "monthlyCharges": 16900
+      },
+      "titleId": "noAgency",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 13100000,
+      "initialAskingPrice": 14200000,
+      "publishedDay": 20707,
+      "publicDay": 20707,
+      "lastPriceDropDay": 20782,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-102",
+      "property": {
+        "id": "property-101",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "house",
+        "surface": 142,
+        "rooms": 6,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "D",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 156200,
+        "monthlyCharges": 0
+      },
+      "titleId": "potential",
+      "motivationId": "investor",
+      "askingPrice": 26900000,
+      "initialAskingPrice": 30500000,
+      "publishedDay": 20711,
+      "publicDay": 20711,
+      "lastPriceDropDay": 20816,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-38",
+      "property": {
+        "id": "property-37",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 49,
+        "rooms": 2,
+        "floor": 0,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "noisyNeighbours",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 63700,
+        "monthlyCharges": 10800
+      },
+      "titleId": "rare",
+      "motivationId": "investor",
+      "askingPrice": 8500000,
+      "initialAskingPrice": 9700000,
+      "publishedDay": 20714,
+      "publicDay": 20714,
+      "lastPriceDropDay": 20819,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-70",
+      "property": {
+        "id": "property-69",
+        "cityId": "dole",
+        "neighbourhoodId": "azans",
+        "kind": "house",
+        "surface": 108,
+        "rooms": 5,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "E",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 118800,
+        "monthlyCharges": 0
+      },
+      "titleId": "favourite",
+      "motivationId": "growingFamily",
+      "askingPrice": 22800000,
+      "initialAskingPrice": 23600000,
+      "publishedDay": 20720,
+      "publicDay": 20720,
+      "lastPriceDropDay": 20765,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-108",
+      "property": {
+        "id": "property-107",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 69,
+        "rooms": 3,
+        "floor": 4,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "E",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 89700,
+        "monthlyCharges": 15200
+      },
+      "titleId": "investor",
+      "motivationId": "growingFamily",
+      "askingPrice": 10500000,
+      "initialAskingPrice": 11700000,
+      "publishedDay": 20727,
+      "publicDay": 20727,
+      "lastPriceDropDay": 20802,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-36",
+      "property": {
+        "id": "property-35",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 87,
+        "rooms": 4,
+        "floor": 2,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "noisyNeighbours",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 113100,
+        "monthlyCharges": 19100
+      },
+      "titleId": "noAgency",
+      "motivationId": "divorce",
+      "askingPrice": 14900000,
+      "initialAskingPrice": 14900000,
+      "publishedDay": 20728,
+      "publicDay": 20728,
+      "lastPriceDropDay": 20728,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-116",
+      "property": {
+        "id": "property-115",
+        "cityId": "dole",
+        "neighbourhoodId": "mesnilsPasteur",
+        "kind": "house",
+        "surface": 76,
+        "rooms": 3,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "E",
+        "condition": "renovated",
+        "defects": [],
+        "annualPropertyTax": 83600,
+        "monthlyCharges": 0
+      },
+      "titleId": "bright",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 12800000,
+      "initialAskingPrice": 13500000,
+      "publishedDay": 20734,
+      "publicDay": 20734,
+      "lastPriceDropDay": 20779,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-82",
+      "property": {
+        "id": "property-81",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 26,
+        "rooms": 1,
+        "floor": 2,
+        "lots": [],
+        "epoch": "from1989to2005",
+        "dpe": "D",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 33800,
+        "monthlyCharges": 5700
+      },
+      "titleId": "noAgency",
+      "motivationId": "growingFamily",
+      "askingPrice": 5700000,
+      "initialAskingPrice": 6100000,
+      "publishedDay": 20739,
+      "publicDay": 20739,
+      "lastPriceDropDay": 20784,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-100",
+      "property": {
+        "id": "property-99",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 42,
+        "rooms": 2,
+        "floor": 5,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "D",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "heating",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 54600,
+        "monthlyCharges": 9200
+      },
+      "titleId": "rare",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 6100000,
+      "initialAskingPrice": 6700000,
+      "publishedDay": 20739,
+      "publicDay": 20739,
+      "lastPriceDropDay": 20814,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-118",
+      "property": {
+        "id": "property-117",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "house",
+        "surface": 378,
+        "rooms": 17,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "D",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 415800,
+        "monthlyCharges": 0
+      },
+      "titleId": "bright",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 69500000,
+      "initialAskingPrice": 76900000,
+      "publishedDay": 20745,
+      "publicDay": 20745,
+      "lastPriceDropDay": 20820,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-122",
+      "property": {
+        "id": "property-121",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 88,
+        "rooms": 4,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "F",
+        "condition": "renovated",
+        "defects": [],
+        "annualPropertyTax": 96800,
+        "monthlyCharges": 0
+      },
+      "titleId": "investor",
+      "motivationId": "growingFamily",
+      "askingPrice": 19600000,
+      "initialAskingPrice": 21700000,
+      "publishedDay": 20746,
+      "publicDay": 20746,
+      "lastPriceDropDay": 20821,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-128",
+      "property": {
+        "id": "property-127",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 38,
+        "rooms": 2,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "E",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 41800,
+        "monthlyCharges": 0
+      },
+      "titleId": "noAgency",
+      "motivationId": "alpacas",
+      "askingPrice": 6700000,
+      "initialAskingPrice": 6900000,
+      "publishedDay": 20749,
+      "publicDay": 20749,
+      "lastPriceDropDay": 20794,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-132",
+      "property": {
+        "id": "property-131",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 72,
+        "rooms": 3,
+        "floor": 4,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 93600,
+        "monthlyCharges": 15800
+      },
+      "titleId": "authentic",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 10000000,
+      "initialAskingPrice": 10600000,
+      "publishedDay": 20751,
+      "publicDay": 20751,
+      "lastPriceDropDay": 20796,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-142",
+      "property": {
+        "id": "property-141",
+        "cityId": "dole",
+        "neighbourhoodId": "plumontValFleuri",
+        "kind": "house",
+        "surface": 96,
+        "rooms": 4,
+        "floor": null,
+        "lots": [],
+        "epoch": "after2012",
+        "dpe": "B",
+        "condition": "renovated",
+        "defects": [],
+        "annualPropertyTax": 105600,
+        "monthlyCharges": 0
+      },
+      "titleId": "rare",
+      "motivationId": "growingFamily",
+      "askingPrice": 26100000,
+      "initialAskingPrice": 28200000,
+      "publishedDay": 20758,
+      "publicDay": 20758,
+      "lastPriceDropDay": 20833,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-144",
+      "property": {
+        "id": "property-143",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 74,
+        "rooms": 3,
+        "floor": 2,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "D",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 96200,
+        "monthlyCharges": 16300
+      },
+      "titleId": "rare",
+      "motivationId": "growingFamily",
+      "askingPrice": 15200000,
+      "initialAskingPrice": 15200000,
+      "publishedDay": 20758,
+      "publicDay": 20758,
+      "lastPriceDropDay": 20758,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-156",
+      "property": {
+        "id": "property-155",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 59,
+        "rooms": 3,
+        "floor": 3,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "C",
+        "condition": "toRenovate",
+        "defects": [],
+        "annualPropertyTax": 76700,
+        "monthlyCharges": 13000
+      },
+      "titleId": "bright",
+      "motivationId": "transfer",
+      "askingPrice": 10100000,
+      "initialAskingPrice": 10600000,
+      "publishedDay": 20764,
+      "publicDay": 20764,
+      "lastPriceDropDay": 20809,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-158",
+      "property": {
+        "id": "property-157",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 90,
+        "rooms": 4,
+        "floor": 0,
+        "lots": [],
+        "epoch": "from1989to2005",
+        "dpe": "C",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 117000,
+        "monthlyCharges": 19800
+      },
+      "titleId": "moveIn",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 17500000,
+      "initialAskingPrice": 17500000,
+      "publishedDay": 20767,
+      "publicDay": 20767,
+      "lastPriceDropDay": 20767,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-160",
+      "property": {
+        "id": "property-159",
+        "cityId": "dole",
+        "neighbourhoodId": "azans",
+        "kind": "house",
+        "surface": 111,
+        "rooms": 5,
+        "floor": null,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "D",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "humidity",
+            "revealed": false
+          },
+          {
+            "id": "wiring",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 122100,
+        "monthlyCharges": 0
+      },
+      "titleId": "investor",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 17700000,
+      "initialAskingPrice": 18800000,
+      "publishedDay": 20767,
+      "publicDay": 20767,
+      "lastPriceDropDay": 20812,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-166",
+      "property": {
+        "id": "property-165",
+        "cityId": "dole",
+        "neighbourhoodId": "azans",
+        "kind": "house",
+        "surface": 107,
+        "rooms": 5,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          },
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 117700,
+        "monthlyCharges": 0
+      },
+      "titleId": "rare",
+      "motivationId": "inheritance",
+      "askingPrice": 21000000,
+      "initialAskingPrice": 21700000,
+      "publishedDay": 20772,
+      "publicDay": 20772,
+      "lastPriceDropDay": 20817,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-172",
+      "property": {
+        "id": "property-171",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 44,
+        "rooms": 2,
+        "floor": 3,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "D",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 57200,
+        "monthlyCharges": 9700
+      },
+      "titleId": "investor",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 9800000,
+      "initialAskingPrice": 10100000,
+      "publishedDay": 20772,
+      "publicDay": 20772,
+      "lastPriceDropDay": 20817,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-174",
+      "property": {
+        "id": "property-173",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 61,
+        "rooms": 3,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "E",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "roof",
+            "revealed": false
+          },
+          {
+            "id": "wiring",
+            "revealed": false
+          },
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 67100,
+        "monthlyCharges": 0
+      },
+      "titleId": "authentic",
+      "motivationId": "growingFamily",
+      "askingPrice": 11000000,
+      "initialAskingPrice": 11500000,
+      "publishedDay": 20772,
+      "publicDay": 20772,
+      "lastPriceDropDay": 20817,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-176",
+      "property": {
+        "id": "property-175",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 142,
+        "rooms": 6,
+        "floor": 5,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "C",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 184600,
+        "monthlyCharges": 31200
+      },
+      "titleId": "bright",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 20600000,
+      "initialAskingPrice": 21800000,
+      "publishedDay": 20772,
+      "publicDay": 20772,
+      "lastPriceDropDay": 20817,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-178",
+      "property": {
+        "id": "property-177",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "apartment",
+        "surface": 99,
+        "rooms": 4,
+        "floor": 1,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "D",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 128700,
+        "monthlyCharges": 21800
+      },
+      "titleId": "potential",
+      "motivationId": "inheritance",
+      "askingPrice": 14500000,
+      "initialAskingPrice": 15200000,
+      "publishedDay": 20776,
+      "publicDay": 20776,
+      "lastPriceDropDay": 20821,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-181",
+      "property": {
+        "id": "property-180",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 92,
+        "rooms": 4,
+        "floor": 1,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 119600,
+        "monthlyCharges": 20200
+      },
+      "titleId": "investor",
+      "motivationId": "investor",
+      "askingPrice": 17700000,
+      "initialAskingPrice": 18500000,
+      "publishedDay": 20778,
+      "publicDay": 20778,
+      "lastPriceDropDay": 20823,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-183",
+      "property": {
+        "id": "property-182",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 72,
+        "rooms": 3,
+        "floor": 3,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "E",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 93600,
+        "monthlyCharges": 15800
+      },
+      "titleId": "moveIn",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 14800000,
+      "initialAskingPrice": 15300000,
+      "publishedDay": 20780,
+      "publicDay": 20780,
+      "lastPriceDropDay": 20825,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-193",
+      "property": {
+        "id": "property-192",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 78,
+        "rooms": 3,
+        "floor": 0,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "D",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 101400,
+        "monthlyCharges": 17200
+      },
+      "titleId": "potential",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 12700000,
+      "initialAskingPrice": 13300000,
+      "publishedDay": 20785,
+      "publicDay": 20785,
+      "lastPriceDropDay": 20830,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-195",
+      "property": {
+        "id": "property-194",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 81,
+        "rooms": 4,
+        "floor": 3,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 105300,
+        "monthlyCharges": 17800
+      },
+      "titleId": "investor",
+      "motivationId": "investor",
+      "askingPrice": 15200000,
+      "initialAskingPrice": 16000000,
+      "publishedDay": 20787,
+      "publicDay": 20787,
+      "lastPriceDropDay": 20832,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-197",
+      "property": {
+        "id": "property-196",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 33,
+        "rooms": 1,
+        "floor": 5,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "C",
+        "condition": "ruin",
+        "defects": [
+          {
+            "id": "humidity",
+            "revealed": false
+          },
+          {
+            "id": "wiring",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          },
+          {
+            "id": "noisyNeighbours",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 42900,
+        "monthlyCharges": 7300
+      },
+      "titleId": "rare",
+      "motivationId": "growingFamily",
+      "askingPrice": 3800000,
+      "initialAskingPrice": 3800000,
+      "publishedDay": 20787,
+      "publicDay": 20787,
+      "lastPriceDropDay": 20787,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-199",
+      "property": {
+        "id": "property-198",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 40,
+        "rooms": 2,
+        "floor": 2,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "D",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 52000,
+        "monthlyCharges": 8800
+      },
+      "titleId": "investor",
+      "motivationId": "investor",
+      "askingPrice": 8000000,
+      "initialAskingPrice": 8300000,
+      "publishedDay": 20788,
+      "publicDay": 20788,
+      "lastPriceDropDay": 20833,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-203",
+      "property": {
+        "id": "property-202",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 72,
+        "rooms": 3,
+        "floor": null,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "C",
+        "condition": "renovated",
+        "defects": [],
+        "annualPropertyTax": 79200,
+        "monthlyCharges": 0
+      },
+      "titleId": "investor",
+      "motivationId": "growingFamily",
+      "askingPrice": 19500000,
+      "initialAskingPrice": 20100000,
+      "publishedDay": 20791,
+      "publicDay": 20791,
+      "lastPriceDropDay": 20836,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-209",
+      "property": {
+        "id": "property-208",
+        "cityId": "dole",
+        "neighbourhoodId": "azans",
+        "kind": "apartment",
+        "surface": 50,
+        "rooms": 2,
+        "floor": 3,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 65000,
+        "monthlyCharges": 11000
+      },
+      "titleId": "rare",
+      "motivationId": "sunnyRetirement",
+      "askingPrice": 11200000,
+      "initialAskingPrice": 11200000,
+      "publishedDay": 20796,
+      "publicDay": 20796,
+      "lastPriceDropDay": 20796,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-211",
+      "property": {
+        "id": "property-210",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "apartment",
+        "surface": 81,
+        "rooms": 4,
+        "floor": 1,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [],
+        "annualPropertyTax": 105300,
+        "monthlyCharges": 17800
+      },
+      "titleId": "investor",
+      "motivationId": "growingFamily",
+      "askingPrice": 15900000,
+      "initialAskingPrice": 15900000,
+      "publishedDay": 20796,
+      "publicDay": 20796,
+      "lastPriceDropDay": 20796,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-213",
+      "property": {
+        "id": "property-212",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 81,
+        "rooms": 4,
+        "floor": 4,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 105300,
+        "monthlyCharges": 17800
+      },
+      "titleId": "potential",
+      "motivationId": "transfer",
+      "askingPrice": 11600000,
+      "initialAskingPrice": 11600000,
+      "publishedDay": 20798,
+      "publicDay": 20798,
+      "lastPriceDropDay": 20798,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-217",
+      "property": {
+        "id": "property-216",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 79,
+        "rooms": 4,
+        "floor": 4,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "E",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 102700,
+        "monthlyCharges": 17400
+      },
+      "titleId": "potential",
+      "motivationId": "growingFamily",
+      "askingPrice": 11800000,
+      "initialAskingPrice": 11800000,
+      "publishedDay": 20800,
+      "publicDay": 20800,
+      "lastPriceDropDay": 20800,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-227",
+      "property": {
+        "id": "property-226",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 34,
+        "rooms": 2,
+        "floor": 5,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "D",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 44200,
+        "monthlyCharges": 7500
+      },
+      "titleId": "bright",
+      "motivationId": "divorce",
+      "askingPrice": 6300000,
+      "initialAskingPrice": 6300000,
+      "publishedDay": 20809,
+      "publicDay": 20809,
+      "lastPriceDropDay": 20809,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-229",
+      "property": {
+        "id": "property-228",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 50,
+        "rooms": 2,
+        "floor": 0,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "E",
+        "condition": "good",
+        "defects": [
+          {
+            "id": "humidity",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 65000,
+        "monthlyCharges": 11000
+      },
+      "titleId": "favourite",
+      "motivationId": "alpacas",
+      "askingPrice": 9400000,
+      "initialAskingPrice": 9400000,
+      "publishedDay": 20810,
+      "publicDay": 20810,
+      "lastPriceDropDay": 20810,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-231",
+      "property": {
+        "id": "property-230",
+        "cityId": "dole",
+        "neighbourhoodId": "plumontValFleuri",
+        "kind": "house",
+        "surface": 90,
+        "rooms": 4,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "E",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 99000,
+        "monthlyCharges": 0
+      },
+      "titleId": "bright",
+      "motivationId": "alpacas",
+      "askingPrice": 17100000,
+      "initialAskingPrice": 17100000,
+      "publishedDay": 20811,
+      "publicDay": 20811,
+      "lastPriceDropDay": 20811,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-235",
+      "property": {
+        "id": "property-234",
+        "cityId": "dole",
+        "neighbourhoodId": "plumontValFleuri",
+        "kind": "house",
+        "surface": 157,
+        "rooms": 7,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "E",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "humidity",
+            "revealed": false
+          },
+          {
+            "id": "roof",
+            "revealed": false
+          },
+          {
+            "id": "wiring",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 172700,
+        "monthlyCharges": 0
+      },
+      "titleId": "rare",
+      "motivationId": "divorce",
+      "askingPrice": 18100000,
+      "initialAskingPrice": 18100000,
+      "publishedDay": 20812,
+      "publicDay": 20812,
+      "lastPriceDropDay": 20812,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-239",
+      "property": {
+        "id": "property-238",
+        "cityId": "dole",
+        "neighbourhoodId": "azans",
+        "kind": "house",
+        "surface": 86,
+        "rooms": 4,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "D",
+        "condition": "good",
+        "defects": [],
+        "annualPropertyTax": 94600,
+        "monthlyCharges": 0
+      },
+      "titleId": "rare",
+      "motivationId": "divorce",
+      "askingPrice": 19600000,
+      "initialAskingPrice": 19600000,
+      "publishedDay": 20815,
+      "publicDay": 20815,
+      "lastPriceDropDay": 20815,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-241",
+      "property": {
+        "id": "property-240",
+        "cityId": "dole",
+        "neighbourhoodId": "azans",
+        "kind": "apartment",
+        "surface": 105,
+        "rooms": 5,
+        "floor": 3,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "D",
+        "condition": "renovated",
+        "defects": [],
+        "annualPropertyTax": 136500,
+        "monthlyCharges": 23100
+      },
+      "titleId": "moveIn",
+      "motivationId": "investor",
+      "askingPrice": 24800000,
+      "initialAskingPrice": 24800000,
+      "publishedDay": 20815,
+      "publicDay": 20815,
+      "lastPriceDropDay": 20815,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-243",
+      "property": {
+        "id": "property-242",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 85,
+        "rooms": 4,
+        "floor": null,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "F",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "humidity",
+            "revealed": false
+          },
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 93500,
+        "monthlyCharges": 0
+      },
+      "titleId": "bright",
+      "motivationId": "testingTheMarket",
+      "askingPrice": 15700000,
+      "initialAskingPrice": 15700000,
+      "publishedDay": 20821,
+      "publicDay": 20821,
+      "lastPriceDropDay": 20821,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-245",
+      "property": {
+        "id": "property-244",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 138,
+        "rooms": 6,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1989to2005",
+        "dpe": "C",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "roof",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 151800,
+        "monthlyCharges": 0
+      },
+      "titleId": "authentic",
+      "motivationId": "divorce",
+      "askingPrice": 25500000,
+      "initialAskingPrice": 25500000,
+      "publishedDay": 20822,
+      "publicDay": 20822,
+      "lastPriceDropDay": 20822,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-249",
+      "property": {
+        "id": "property-248",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 87,
+        "rooms": 4,
+        "floor": 1,
+        "lots": [],
+        "epoch": "from1975to1988",
+        "dpe": "D",
+        "condition": "toRenovate",
+        "defects": [],
+        "annualPropertyTax": 113100,
+        "monthlyCharges": 19100
+      },
+      "titleId": "charming",
+      "motivationId": "growingFamily",
+      "askingPrice": 15000000,
+      "initialAskingPrice": 15000000,
+      "publishedDay": 20824,
+      "publicDay": 20824,
+      "lastPriceDropDay": 20824,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-253",
+      "property": {
+        "id": "property-252",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 118,
+        "rooms": 5,
+        "floor": 4,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "C",
+        "condition": "ruin",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          },
+          {
+            "id": "heating",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 153400,
+        "monthlyCharges": 26000
+      },
+      "titleId": "charming",
+      "motivationId": "growingFamily",
+      "askingPrice": 13800000,
+      "initialAskingPrice": 13800000,
+      "publishedDay": 20830,
+      "publicDay": 20830,
+      "lastPriceDropDay": 20830,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-259",
+      "property": {
+        "id": "property-258",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "apartment",
+        "surface": 50,
+        "rooms": 2,
+        "floor": 0,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "C",
+        "condition": "ruin",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          },
+          {
+            "id": "plumbing",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 65000,
+        "monthlyCharges": 11000
+      },
+      "titleId": "rare",
+      "motivationId": "investor",
+      "askingPrice": 6500000,
+      "initialAskingPrice": 6500000,
+      "publishedDay": 20833,
+      "publicDay": 20833,
+      "lastPriceDropDay": 20833,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-263",
+      "property": {
+        "id": "property-262",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 59,
+        "rooms": 3,
+        "floor": 1,
+        "lots": [],
+        "epoch": "from1948to1974",
+        "dpe": "F",
+        "condition": "toRefresh",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": false
+          }
+        ],
+        "annualPropertyTax": 76700,
+        "monthlyCharges": 13000
+      },
+      "titleId": "authentic",
+      "motivationId": "transfer",
+      "askingPrice": 10700000,
+      "initialAskingPrice": 10700000,
+      "publishedDay": 20833,
+      "publicDay": 20833,
+      "lastPriceDropDay": 20833,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-269",
+      "property": {
+        "id": "property-268",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "house",
+        "surface": 142,
+        "rooms": 6,
+        "floor": null,
+        "lots": [],
+        "epoch": "from1989to2005",
+        "dpe": "C",
+        "condition": "toRenovate",
+        "defects": [],
+        "annualPropertyTax": 156200,
+        "monthlyCharges": 0
+      },
+      "titleId": "authentic",
+      "motivationId": "inheritance",
+      "askingPrice": 24400000,
+      "initialAskingPrice": 24400000,
+      "publishedDay": 20838,
+      "publicDay": 20838,
+      "lastPriceDropDay": 20838,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    },
+    {
+      "id": "listing-271",
+      "property": {
+        "id": "property-270",
+        "cityId": "dole",
+        "neighbourhoodId": "paters",
+        "kind": "house",
+        "surface": 47,
+        "rooms": 2,
+        "floor": null,
+        "lots": [],
+        "epoch": "from2006to2012",
+        "dpe": "B",
+        "condition": "renovated",
+        "defects": [],
+        "annualPropertyTax": 51700,
+        "monthlyCharges": 0
+      },
+      "titleId": "moveIn",
+      "motivationId": "investor",
+      "askingPrice": 16900000,
+      "initialAskingPrice": 16900000,
+      "publishedDay": 20838,
+      "publicDay": 20838,
+      "lastPriceDropDay": 20838,
+      "visited": false,
+      "offersMade": 0,
+      "offer": null
+    }
+  ],
+  "purchases": [],
+  "properties": [
+    {
+      "property": {
+        "id": "property-57",
+        "cityId": "dole",
+        "neighbourhoodId": "centreHistorique",
+        "kind": "apartment",
+        "surface": 27,
+        "rooms": 1,
+        "floor": 2,
+        "lots": [],
+        "epoch": "before1948",
+        "dpe": "F",
+        "condition": "toRenovate",
+        "defects": [
+          {
+            "id": "wiring",
+            "revealed": true
+          },
+          {
+            "id": "plumbing",
+            "revealed": true
+          },
+          {
+            "id": "heating",
+            "revealed": true
+          },
+          {
+            "id": "noisyNeighbours",
+            "revealed": true
+          }
+        ],
+        "annualPropertyTax": 35100,
+        "monthlyCharges": 5900
+      },
+      "purchasePrice": 4500000,
+      "acquisitionCost": 4905000,
+      "purchaseDate": {
+        "year": 2026,
+        "month": 11,
+        "day": 21
+      },
+      "sale": {
+        "askingPrice": 4500000,
+        "mode": "agency",
+        "listedDay": 20778,
+        "offers": [],
+        "agreement": null
+      }
+    }
+  ],
+  "agenda": []
+}

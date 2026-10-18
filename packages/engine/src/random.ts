@@ -108,3 +108,27 @@ export function nextPoisson(state: RngState, lambda: number): number {
   }
   return count;
 }
+
+/**
+ * Stateless float in [0, 1) derived from a seed and a key (FNV-1a, then a
+ * splitmix32 finalizer). Gives a stable draw per (seed, key) without storing
+ * it or advancing the generator: a rival's opinion of a given listing.
+ */
+export function hashFloat(seed: number, key: string): number {
+  let hash = (0x811c9dc5 ^ seed) >>> 0;
+  for (let i = 0; i < key.length; i++) {
+    hash ^= key.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  let z = (hash + 0x9e3779b9) >>> 0;
+  z = Math.imul(z ^ (z >>> 16), 0x21f0aaad);
+  z = Math.imul(z ^ (z >>> 15), 0x735a2d97);
+  return ((z ^ (z >>> 15)) >>> 0) / UINT32_RANGE;
+}
+
+/** Stateless standard normal draw for a (seed, key) pair (Box–Muller on two hashes). */
+export function hashNormal(seed: number, key: string): number {
+  const u1 = 1 - hashFloat(seed, `${key}#1`);
+  const u2 = hashFloat(seed, `${key}#2`);
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}

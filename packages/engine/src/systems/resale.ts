@@ -4,6 +4,7 @@ import { nextFloat, nextRange } from '../random.ts';
 import type { OwnedProperty, SaleMode } from '../state.ts';
 import { refinancingFees } from './banking.ts';
 import type { SystemContext } from './context.ts';
+import { rivalAcquired } from './rivals.ts';
 import { realValue } from './valuation.ts';
 
 export type SaleRefusal =
@@ -82,15 +83,25 @@ export function answerSaleOffer(
     offer.counterAmount = answer.amount;
     return null;
   }
-  agree(ctx, propertyId, owned, offer.amount);
+  agree(ctx, propertyId, owned, offer.amount, offer.buyerId);
   return null;
 }
 
-function agree(ctx: SystemContext, propertyId: string, owned: OwnedProperty, price: Cents) {
+function agree(
+  ctx: SystemContext,
+  propertyId: string,
+  owned: OwnedProperty,
+  price: Cents,
+  buyerId: string | null,
+) {
   const sale = owned.sale;
   if (!sale) return;
   sale.offers = [];
-  sale.agreement = { price, deedDay: ctx.today + ctx.content.market.resale.deedDelayDays };
+  sale.agreement = {
+    price,
+    deedDay: ctx.today + ctx.content.market.resale.deedDelayDays,
+    buyerId,
+  };
   ctx.events.push({ type: 'saleAgreed', propertyId, price, deedDay: sale.agreement.deedDay });
 }
 
@@ -100,19 +111,39 @@ export function saleProceeds(ctx: SystemContext, owned: OwnedProperty, price: Ce
     owned.sale?.mode === 'agency'
       ? Math.round(price * ctx.content.market.resale.agencyFeeShare)
       : 0;
+  return { agencyFees, ...settlement(ctx, owned, price - agencyFees) };
+}
+
+/** Repayment of the property's loans, with their early-repayment fees, out of `received`. */
+function settlement(ctx: SystemContext, owned: OwnedProperty, received: Cents) {
   const loans = ctx.state.loans.filter((loan) => loan.propertyId === owned.property.id);
   const loanRepaid = loans.reduce((sum, loan) => sum + loan.remaining, 0);
   const loanFees = loans.reduce((sum, loan) => sum + refinancingFees(ctx.content, loan), 0);
-  return { agencyFees, loanRepaid, loanFees, net: price - agencyFees - loanRepaid - loanFees };
+  return { loanRepaid, loanFees, net: received - loanRepaid - loanFees };
 }
 
-function closeSale(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
+/** Hands the property over: its loans are repaid and the net amount reaches the account. */
+export function transferProperty(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
   const { state } = ctx;
-  const proceeds = saleProceeds(ctx, owned, price);
+  const proceeds = settlement(ctx, owned, price);
   state.player.balance += proceeds.net;
   state.loans = state.loans.filter((loan) => loan.propertyId !== owned.property.id);
   state.properties = state.properties.filter((p) => p.property.id !== owned.property.id);
-  ctx.events.push({ type: 'propertySold', propertyId: owned.property.id, price, ...proceeds });
+  return proceeds;
+}
+
+function closeSale(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
+  const buyerId = owned.sale?.agreement?.buyerId ?? null;
+  const { agencyFees } = saleProceeds(ctx, owned, price);
+  const proceeds = transferProperty(ctx, owned, price - agencyFees);
+  ctx.events.push({
+    type: 'propertySold',
+    propertyId: owned.property.id,
+    price,
+    agencyFees,
+    ...proceeds,
+  });
+  if (buyerId) rivalAcquired(ctx, buyerId, owned.property, price);
 }
 
 /** Visits, buyer offers and their expiry, counter-offer answers and deeds. */
@@ -125,7 +156,8 @@ export function runDailyResale(ctx: SystemContext): void {
     const propertyId = owned.property.id;
     if (sale.agreement) {
       if (ctx.today < sale.agreement.deedDay) continue;
-      if (nextFloat(state.rng) < rules.buyerWithdrawalChance) {
+      // A rival pays cash: only households can lose their loan.
+      if (sale.agreement.buyerId === null && nextFloat(state.rng) < rules.buyerWithdrawalChance) {
         sale.agreement = null;
         ctx.events.push({ type: 'saleFellThrough', propertyId });
         continue;
@@ -140,7 +172,7 @@ export function runDailyResale(ctx: SystemContext): void {
       if (offer.counterAmount === null) continue;
       if (offer.counterAmount <= offer.buyerMax) {
         ctx.events.push({ type: 'saleCounterAccepted', propertyId, offerId: offer.id });
-        agree(ctx, propertyId, owned, offer.counterAmount);
+        agree(ctx, propertyId, owned, offer.counterAmount, offer.buyerId);
         agreed = true;
         break;
       }
@@ -178,12 +210,19 @@ export function runDailyResale(ctx: SystemContext): void {
     const amount = Math.max(step, Math.floor(raw / step) * step);
     const offer = {
       id: `offer-${state.nextId++}`,
+      buyerId: null,
       amount,
       buyerMax: Math.min(sale.askingPrice, Math.round(amount * (1 + rules.buyerFlexibility))),
       expiresDay: ctx.today + rules.offerValidityDays,
       counterAmount: null,
     };
     sale.offers.push(offer);
-    ctx.events.push({ type: 'saleOfferReceived', propertyId, offerId: offer.id, amount });
+    ctx.events.push({
+      type: 'saleOfferReceived',
+      propertyId,
+      offerId: offer.id,
+      amount,
+      buyerId: null,
+    });
   }
 }
