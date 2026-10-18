@@ -1,0 +1,23 @@
+{
+  "formatVersion": 1,
+  "seed": 20261018,
+  "rng": [91732418, 1506967442, 3793543067, 676357184],
+  "startDate": {
+    "year": 2026,
+    "month": 10,
+    "day": 18
+  },
+  "clock": {
+    "date": {
+      "year": 2027,
+      "month": 10,
+      "day": 18
+    },
+    "hour": 8,
+    "elapsedHours": 8760
+  },
+  "demo": {
+    "rollCount": 12,
+    "lastRoll": 1
+  }
+}

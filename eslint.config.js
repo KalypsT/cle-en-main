@@ -53,7 +53,7 @@ export default tseslint.config(
           message: determinismMessage,
         },
       ],
-      'no-restricted-imports': [
+      '@typescript-eslint/no-restricted-imports': [
         'error',
         {
           patterns: [
@@ -62,8 +62,20 @@ export default tseslint.config(
               message: 'The engine must not depend on the interface.',
             },
           ],
+          paths: [
+            {
+              name: '@cle/content',
+              allowTypeImports: true,
+              message: 'The engine receives its content as a parameter: import types only.',
+            },
+          ],
         },
       ],
     },
+  },
+  {
+    // Tests load the real content to drive the engine.
+    files: ['packages/engine/**/*.test.ts', 'packages/engine/test/**/*.ts'],
+    rules: { '@typescript-eslint/no-restricted-imports': 'off' },
   },
 );

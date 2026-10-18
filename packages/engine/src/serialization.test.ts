@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { advanceHours, createGame, dispatch } from './game.ts';
+import v1Save from '../test/fixtures/save-v1-milestone-0.json' with { type: 'json' };
+import { content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
   type MigrationRegistry,
@@ -9,7 +10,7 @@ import {
 } from './serialization.ts';
 import { FORMAT_VERSION } from './state.ts';
 
-const options = { seed: 77, startDate: { year: 2026, month: 10, day: 18 }, startHour: 8 };
+const context = { content };
 
 function errorCode(fn: () => unknown): string | undefined {
   try {
@@ -23,36 +24,24 @@ function errorCode(fn: () => unknown): string | undefined {
 
 describe('serialization', () => {
   it('round-trips a game and resumes identically', () => {
-    let state = advanceHours(createGame(options), 1000).state;
-    const rolled = dispatch(state, { type: 'demo/rollDie', sides: 20 });
-    if (rolled.ok) state = rolled.state;
+    let state = engine.advanceHours(newGame(), 1000).state;
+    const met = engine.dispatch(state, { type: 'bank/meet', bankId: 'tirelire' });
+    if (met.ok) state = met.state;
 
-    const restored = deserializeGame(serializeGame(state));
+    const restored = engine.loadGame(serializeGame(state));
     expect(restored).toEqual(state);
-
-    const continueGame = (s: typeof state) => {
-      const advanced = advanceHours(s, 500).state;
-      return dispatch(advanced, { type: 'demo/rollDie', sides: 100 });
-    };
-    expect(continueGame(restored)).toEqual(continueGame(state));
+    expect(engine.advanceHours(restored, 2000)).toEqual(engine.advanceHours(state, 2000));
   });
 
   it('rejects broken saves with an error code', () => {
-    const valid = JSON.parse(serializeGame(createGame(options))) as Record<string, unknown>;
-    expect(errorCode(() => deserializeGame('{not json'))).toBe('invalidJson');
-    expect(errorCode(() => deserializeGame('[]'))).toBe('missingVersion');
-    expect(errorCode(() => deserializeGame(JSON.stringify({ ...valid, formatVersion: 999 })))).toBe(
-      'unsupportedVersion',
-    );
-    expect(errorCode(() => deserializeGame(JSON.stringify({ ...valid, formatVersion: 0 })))).toBe(
-      'missingMigration',
-    );
-    expect(errorCode(() => deserializeGame(JSON.stringify({ ...valid, seed: 'abc' })))).toBe(
-      'invalidState',
-    );
-    expect(errorCode(() => deserializeGame(JSON.stringify({ ...valid, extra: true })))).toBe(
-      'invalidState',
-    );
+    const valid = JSON.parse(serializeGame(newGame())) as Record<string, unknown>;
+    const load = (value: unknown) => () => deserializeGame(JSON.stringify(value), context);
+    expect(errorCode(() => deserializeGame('{not json', context))).toBe('invalidJson');
+    expect(errorCode(load([]))).toBe('missingVersion');
+    expect(errorCode(load({ ...valid, formatVersion: 999 }))).toBe('unsupportedVersion');
+    expect(errorCode(load({ ...valid, formatVersion: 0 }))).toBe('missingMigration');
+    expect(errorCode(load({ ...valid, seed: 'abc' }))).toBe('invalidState');
+    expect(errorCode(load({ ...valid, extra: true }))).toBe('invalidState');
   });
 });
 
@@ -62,21 +51,26 @@ describe('migrations', () => {
       1: (raw) => ({ ...raw, coins: 0 }),
       2: ({ coins, ...rest }) => ({ ...rest, wallet: { coins } }),
     };
-    expect(migrateRaw({ formatVersion: 1, name: 'a' }, 3, registry)).toEqual({
+    expect(migrateRaw({ formatVersion: 1, name: 'a' }, context, 3, registry)).toEqual({
       formatVersion: 3,
       name: 'a',
       wallet: { coins: 0 },
     });
   });
 
-  it('upgrades an old save through a fake migration into a valid current state', () => {
-    // Fake version 0 stored the clock as a flat `hoursSinceStart` field.
-    const current = JSON.parse(serializeGame(createGame(options))) as Record<string, unknown>;
-    const { clock, ...rest } = current as { clock: { elapsedHours: number } };
-    const legacy = { ...rest, formatVersion: FORMAT_VERSION - 1, legacyClock: clock };
-    const registry: MigrationRegistry = {
-      [FORMAT_VERSION - 1]: ({ legacyClock, ...raw }) => ({ ...raw, clock: legacyClock }),
-    };
-    expect(deserializeGame(JSON.stringify(legacy), registry)).toEqual(current);
+  it('upgrades a milestone 0 save (version 1) to the current format', () => {
+    const v1 = JSON.stringify(v1Save);
+    const migrated = engine.loadGame(v1);
+    const original = JSON.parse(v1) as { clock: unknown; rng: unknown; seed: number };
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.clock).toEqual(original.clock);
+    expect(migrated.rng).toEqual(original.rng);
+    expect(migrated.player.jobId).toBe(content.start.defaultJobId);
+    expect(migrated.loans).toEqual([]);
+    expect('demo' in migrated).toBe(false);
+    // The migrated game keeps running.
+    expect(engine.advanceHours(migrated, 24 * 40).state.clock.elapsedHours).toBe(
+      migrated.clock.elapsedHours + 24 * 40,
+    );
   });
 });
