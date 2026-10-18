@@ -320,6 +320,12 @@ export function runDailyRentalListings(ctx: SystemContext): void {
     const rental = owned.rental;
     if (!rental) continue;
     const propertyId = owned.property.id;
+    // A sale is agreed: the buyer gets the property empty.
+    if (owned.sale?.agreement) {
+      owned.rental = null;
+      ctx.events.push({ type: 'rentalWithdrawn', propertyId });
+      continue;
+    }
     const block = lettingBlock(content, owned.property, ctx.today);
     if (block) {
       owned.rental = null;

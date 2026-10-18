@@ -230,6 +230,24 @@ describe('candidates and move-in', () => {
   });
 });
 
+describe('a sale agreed', () => {
+  it('takes the property off the rental market', () => {
+    const ctx = systemContext(list(owner()));
+    const owned = ctx.state.properties[0];
+    if (!owned) throw new Error('No property');
+    owned.sale = {
+      askingPrice: 90_000_00,
+      mode: 'self',
+      listedDay: ctx.today,
+      offers: [],
+      agreement: { price: 90_000_00, deedDay: ctx.today + 60, buyerId: null },
+    };
+    runDailyRentalListings(ctx);
+    expect(owned.rental).toBeNull();
+    expect(ctx.events).toContainEqual({ type: 'rentalWithdrawn', propertyId: PROPERTY });
+  });
+});
+
 describe('main residence', () => {
   it('stops the home rent and the landlord insurance, and back', () => {
     const state = owner();
