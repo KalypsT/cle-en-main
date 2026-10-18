@@ -1,5 +1,7 @@
 # 3.4 Location
 
+> **Location provisoire du jalon 1c** (en attendant ce chapitre, au jalon 2) : pour que les bots puissent mesurer l'équilibrage, chaque bien possédé trouve seul un locataire après une vacance tirée au hasard (15 à 75 jours), au loyer au m² de son quartier (`data/cities/`), modulé par l'état (un bien en ruine ne se loue pas) et par l'indice des prix (élasticité 0,5). Le locataire part avec une probabilité de 3 % par mois. Le propriétaire encaisse le loyer le 1er du mois, moins une **part forfaitaire de 30 %** qui représente ce que le jalon 2 facturera pour de vrai (charges de copropriété, taxe foncière, entretien, impôt). Les banques retiennent 70 % des loyers en cours. Pas de bail, de candidature, d'agence ni d'incident. Valeurs dans `content/location.json`.
+
 ## Mettre en location
 
 Deux types de bail dès le départ (colocation et location courte durée au jalon 8) :

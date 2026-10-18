@@ -16,6 +16,7 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "bots": "pnpm --filter @cle/bots start",
+    "bots:series": "pnpm --filter @cle/bots series",
     "validate-content": "pnpm --filter @cle/content validate"
   },
   "devDependencies": {

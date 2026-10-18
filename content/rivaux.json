@@ -14,14 +14,14 @@
       "cities": ["dole"],
       "preferences": {
         "kinds": ["apartment"],
-        "maxSurface": 45,
+        "maxSurface": 50,
         "conditions": ["toRefresh", "good", "renovated"],
-        "neighbourhoods": { "centreHistorique": 1, "paters": 0.5 },
+        "neighbourhoods": { "centreHistorique": 1, "paters": 0.6 },
         "otherNeighbourhoods": 0
       },
       "budget": { "start": 120000, "monthlyIncome": 3000, "max": 200000 },
       "estimationErrorStdDev": 0.03,
-      "minBargain": 0.05,
+      "minBargain": 0.04,
       "dailyReaction": 0.5,
       "costShare": 0.075,
       "resaleOffers": {

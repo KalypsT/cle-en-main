@@ -51,9 +51,11 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 | `pnpm lint` | ESLint, puis vérification Prettier |
 | `pnpm format` | Reformater avec Prettier |
 | `pnpm validate-content` | Valider tous les JSON de `content/` avec leurs schémas zod |
-| `pnpm bots --seed 1 --days 3650` | Simuler une partie sans interface et afficher un résumé |
+| `pnpm bots --seed 1 --days 3650 [--bot chasseur]` | Simuler une partie sans interface (jouée par un bot avec `--bot`) et afficher un résumé |
+| `pnpm bots:series --games 1000 --years 10 --out rapport.md` | Rapport d'équilibrage : chaque bot joue la série (parallèle sur les cœurs), comparé aux cibles du chapitre 08 |
 | `pnpm --filter @cle/data-tools build-city dole` | Régénérer `data/cities/dole.json` depuis les sources publiques (téléchargements en cache dans `tools/data/.cache/`) |
 
+- **Rapport d'équilibrage** : 1 000 parties × 5 bots prennent une vingtaine de minutes sur 4 cœurs ; `--games 100` suffit pour un premier coup d'œil. Le dernier rapport complet est rangé dans `packages/bots/rapports/`.
 - **Graine dorée** : si un changement de règle modifie la partie de référence, relancer `pnpm --filter @cle/engine exec vitest run -u`, vérifier le diff de `packages/engine/test/golden/` et l'expliquer dans la PR.
 - **Nouveau fichier de contenu** : écrire son schéma dans `content/schemas/`, le déclarer dans `content/registry.ts` (sinon `validate-content` échoue), l'exporter depuis `content/index.ts`.
 - **Format de sauvegarde** : incrémenter `FORMAT_VERSION` (`packages/engine/src/state.ts`), ajouter la migration dans `MIGRATIONS` (`serialization.ts`) et son test.

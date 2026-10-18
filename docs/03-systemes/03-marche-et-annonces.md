@@ -87,3 +87,17 @@ Trois rivaux nommés, chacun avec une stratégie, un budget, des villes préfér
 - Ils proposent parfois une **affaire**, pas toujours honnête.
 - Leur agressivité dépend du mode de partie et augmente quand le joueur grandit.
 - Ils restent peu nombreux (3) et lisibles : pas de simulation économique complète de leur patrimoine, seulement un budget, des préférences et des règles de décision.
+
+### Les rivaux au jalon 1c
+
+Contenu dans `content/rivaux.json`, système `packages/engine/src/systems/rivals.ts`.
+
+- **Chaque jour, avant les autres acheteurs**, chaque rival actif parcourt les annonces publiques (pas celles sur lesquelles le joueur a une offre en cours). Il juge la valeur avec sa propre erreur d'estimation, **fixe pour un bien donné** : attendre ne lui donne pas une nouvelle chance de se tromper. Il achète au prix affiché si l'écart dépasse son seuil, avec une probabilité quotidienne (sa vivacité × son intérêt pour le quartier × l'agressivité), et si son budget le permet. L'annonce affiche alors « Vendu à Mme Delaporte ».
+- **Budget** : un capital de départ, un revenu mensuel et un plafond. Un achat coûte le prix plus 7,5 % de frais. C'est toute la « comptabilité » d'un rival.
+- **Monique Delaporte** : appartements de 50 m² au plus, en bon état ou à rafraîchir, au Centre historique (la gare de Dole-Ville y est) et, un peu moins, aux Paters ; seuil de 4 %, très vive.
+- **Les frères Martinot** : tout bien en ruine ou à rénover, dans toute la ville, sous un seuil de 8 %. Ils le « rénovent » pendant 4 à 9 mois, puis le remettent en vente, rénové et sans défaut, comme une nouvelle annonce (motivation « Rénové par les frères Martinot »). Leur budget récupère le prix affiché (la revente n'est pas simulée). Les enchères, où ils font grimper les prix, arriveront avec les enchères judiciaires.
+- **SCI Horizon Patrimoine** : décrite, mais inactive jusqu'au jalon 8.
+- **Offres sur les biens du joueur** : un rival qui voit dans un bien en vente une bonne affaire (selon ses préférences et son seuil) fait une offre de 90 à 100 % du prix demandé, valable 3 jours. Il accepte une contre-proposition tant que le prix reste une bonne affaire à ses yeux. Il paie comptant : il ne se désiste pas avant l'acte. Les Martinot rénovent et remettent en vente ce qu'ils achètent au joueur.
+- **Agressivité** : 1 au départ, +0,1 par tranche de 100 000 € de patrimoine net du joueur, plafonnée à 1,6. Le coefficient du mode de partie arrivera avec les modes (jalon 6), comme les « affaires pas toujours honnêtes » (événements).
+- Les **acheteurs anonymes** (ménages) restent : ils emportent les annonces au prix du marché, les rivaux les bonnes affaires.
+
