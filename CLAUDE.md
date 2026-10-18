@@ -53,7 +53,7 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 | `pnpm validate-content` | Valider tous les JSON de `content/` avec leurs schémas zod |
 | `pnpm bots --seed 1 --days 3650` | Simuler une partie sans interface et afficher un résumé |
 
-- **Graine dorée** : si un changement de règle modifie la partie de référence, relancer `pnpm --filter @cle/engine test -- -u`, vérifier le diff de `packages/engine/test/golden/` et l'expliquer dans la PR.
+- **Graine dorée** : si un changement de règle modifie la partie de référence, relancer `pnpm --filter @cle/engine exec vitest run -u`, vérifier le diff de `packages/engine/test/golden/` et l'expliquer dans la PR.
 - **Nouveau fichier de contenu** : écrire son schéma dans `content/schemas/`, le déclarer dans `content/registry.ts` (sinon `validate-content` échoue), l'exporter depuis `content/index.ts`.
 - **Format de sauvegarde** : incrémenter `FORMAT_VERSION` (`packages/engine/src/state.ts`), ajouter la migration dans `MIGRATIONS` (`serialization.ts`) et son test.
 - **Playwright avec un Chromium déjà installé** : `PW_CHROMIUM_PATH=/chemin/vers/chrome pnpm test:e2e`.
