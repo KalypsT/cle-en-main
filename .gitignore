@@ -157,3 +157,6 @@ test-results/
 
 # Data scripts download cache
 tools/data/.cache/
+
+# Screenshots of CAPTURES=1 pnpm test:e2e (generated locally, not versioned)
+docs/captures/
