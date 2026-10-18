@@ -55,6 +55,16 @@ export interface BotSummary {
     realRegimeShare: number;
     furnishedShare: number;
   };
+  works: {
+    /** Means per game. */
+    projects: number;
+    cost: number;
+    hazardsPerProject: number;
+    dpeClassesGained: number;
+    sales: number;
+    /** Share of the properties held at the end that are classed E to G. */
+    passoireShare: number;
+  };
 }
 
 export interface TargetCheck {
@@ -151,6 +161,24 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
     ),
     byJob,
     renting: rentingSummary(games),
+    works: {
+      projects: mean(games.map((g) => g.worksProjects)),
+      cost: mean(games.map((g) => g.worksCost)),
+      hazardsPerProject:
+        games.reduce((sum, g) => sum + g.hazards, 0) /
+        Math.max(
+          1,
+          games.reduce((sum, g) => sum + g.worksProjects, 0),
+        ),
+      dpeClassesGained: mean(games.map((g) => g.dpeClassesGained)),
+      sales: mean(games.map((g) => g.sales)),
+      passoireShare:
+        games.reduce((sum, g) => sum + g.finalPassoires, 0) /
+        Math.max(
+          1,
+          games.reduce((sum, g) => sum + g.finalProperties, 0),
+        ),
+    },
   };
 }
 
@@ -300,6 +328,34 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
       ok: null,
     });
   }
+  const dealer = get('marchand');
+  if (dealer && inactive) {
+    list.push({
+      label: 'Le Marchand de biens fait des plus-values',
+      target: 'médiane à 10 ans au-dessus de celle de l’Inactif ; information : reventes',
+      measured: `${money(dealer.netWorth.p50[last] ?? 0)} contre ${money(inactive.netWorth.p50[last] ?? 0)} ; ${num(dealer.works.sales)} reventes par partie, ${money(dealer.renting.capitalGainsTax)} d’impôt sur les plus-values`,
+      ok: (dealer.netWorth.p50[last] ?? 0) > (inactive.netWorth.p50[last] ?? 0),
+    });
+  }
+  const premium = get('renovateur');
+  if (premium) {
+    const others = (['prudent', 'levier', 'chasseur', 'marchand'] as const)
+      .map((id) => get(id))
+      .filter((s): s is BotSummary => s !== undefined);
+    const bestOther = others.sort(
+      (a, b) => (b.netWorth.p50[last] ?? 0) - (a.netWorth.p50[last] ?? 0),
+    )[0];
+    if (bestOther) {
+      const ours = premium.netWorth.p50[last] ?? 0;
+      const theirs = bestOther.netWorth.p50[last] ?? 0;
+      list.push({
+        label: 'Le Rénovateur premium n’écrase pas les autres',
+        target: 'médiane à 10 ans sous 1,1 × la meilleure médiane des autres investisseurs',
+        measured: `${money(ours)} contre ${money(theirs)} (${BOT_NAMES[bestOther.botId]})`,
+        ok: ours < 1.1 * theirs,
+      });
+    }
+  }
   const best = [...summaries.values()].sort(
     (a, b) => (b.netWorth.p50[last] ?? 0) - (a.netWorth.p50[last] ?? 0),
   )[0];
@@ -442,6 +498,31 @@ export function formatReport(report: Report, title: string): string {
         money(s.renting.capitalGainsTax),
         pct(s.renting.realRegimeShare),
         pct(s.renting.furnishedShare),
+      ]),
+    ),
+    '',
+    '## Travaux',
+    '',
+    'Moyennes par partie : chantiers terminés, leur coût, imprévus par chantier, classes DPE gagnées, reventes ; part des biens détenus à la fin classés E, F ou G.',
+    '',
+    table(
+      [
+        'Bot',
+        'Chantiers',
+        'Coût des travaux',
+        'Imprévus/chantier',
+        'Classes DPE gagnées',
+        'Reventes',
+        'Passoires à la fin',
+      ],
+      summaries.map((s) => [
+        name(s),
+        num(s.works.projects),
+        money(s.works.cost),
+        num(s.works.hazardsPerProject),
+        num(s.works.dpeClassesGained),
+        num(s.works.sales),
+        pct(s.works.passoireShare),
       ]),
     ),
     '',

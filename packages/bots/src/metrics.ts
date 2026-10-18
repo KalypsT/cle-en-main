@@ -1,5 +1,7 @@
 import {
   debtRatio,
+  type DpeLabel,
+  DPE_LABELS,
   type Engine,
   type GameEvent,
   type GameState,
@@ -10,6 +12,7 @@ import {
 const DAYS_PER_YEAR = 365;
 const BAILLEUR_LET_PROPERTIES = 3;
 const SEASONED_NET_WORTH = 250_000_00;
+const PASSOIRES: readonly DpeLabel[] = ['E', 'F', 'G'];
 
 /** What one game tells the balancing report. Amounts in euros, durations in days. */
 export interface GameMetrics {
@@ -62,6 +65,13 @@ export interface GameMetrics {
   assessedPropertyYears: number;
   realRegimeYears: number;
   furnishedYears: number;
+  /** Works (milestone 3): projects completed, their cost (euros), hazards, DPE classes gained. */
+  worksProjects: number;
+  worksCost: number;
+  hazards: number;
+  dpeClassesGained: number;
+  /** Properties classed E to G at the end. */
+  finalPassoires: number;
 }
 
 const euros = (cents: number) => Math.round(cents / 100);
@@ -119,6 +129,11 @@ export class MetricsRecorder {
       assessedPropertyYears: 0,
       realRegimeYears: 0,
       furnishedYears: 0,
+      worksProjects: 0,
+      worksCost: 0,
+      hazards: 0,
+      dpeClassesGained: 0,
+      finalPassoires: 0,
     };
   }
 
@@ -206,6 +221,17 @@ export class MetricsRecorder {
         case 'bankrupt':
           m.bankruptDay = this.day(state);
           break;
+        case 'worksCompleted':
+          m.worksProjects += 1;
+          m.worksCost += euros(event.cost);
+          m.dpeClassesGained += Math.max(
+            0,
+            DPE_LABELS.indexOf(event.dpeBefore) - DPE_LABELS.indexOf(event.dpeAfter),
+          );
+          break;
+        case 'worksHazard':
+          m.hazards += 1;
+          break;
         default:
           break;
       }
@@ -219,6 +245,9 @@ export class MetricsRecorder {
     m.finalBalance = euros(state.player.balance);
     m.finalDebt = euros(state.loans.reduce((sum, loan) => sum + loan.remaining, 0));
     m.finalProperties = state.properties.length;
+    m.finalPassoires = state.properties.filter((owned) =>
+      PASSOIRES.includes(owned.property.dpe),
+    ).length;
     m.finalMonthlyRent = euros(
       state.properties.reduce((sum, owned) => sum + (owned.lease?.monthlyRent ?? 0), 0),
     );

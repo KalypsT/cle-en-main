@@ -26,3 +26,7 @@ export { type Estimate, type ValueBreakdown } from './systems/valuation.ts';
 export { visibleReliability } from './systems/tenants.ts';
 export { type CapitalGain, type RegimeEstimate } from './systems/taxes.ts';
 export { type RentalTerms, type RentRefusal } from './systems/renting.ts';
+export { type HazardChoice, type ItemChoice, type WorksRefusal } from './systems/works.ts';
+export { type CatalogItem, type PlannedTask, type WorksEstimate } from './systems/works-view.ts';
+export { conditionLabel, itemId } from './systems/dwelling.ts';
+export { DPE_LABELS, TIERS } from './content-constants.ts';
