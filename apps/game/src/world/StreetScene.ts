@@ -87,6 +87,8 @@ const PEOPLE = { morning: 7, day: 11, evening: 8, night: 3 } as const;
 const CARS = { morning: 2, day: 3, evening: 2, night: 1 } as const;
 const MARGIN = 80;
 const FRAME_SAMPLES = 120;
+/** Frames needed before judging the speed (a slow phone gives few per second). */
+const MIN_SAMPLES = 20;
 
 export class StreetScene {
   private app: Application | null = null;
@@ -633,7 +635,11 @@ export class StreetScene {
     if (Math.abs(cameraDx) > 0) this.updateTarget();
 
     // Light: ease towards the target.
-    this.light = blendLight(this.light, this.target, Math.min(1, dt * 1.5));
+    // The colours ease in; night (stars, moon) follows the target at once.
+    this.light = {
+      ...blendLight(this.light, this.target, Math.min(1, dt * 1.5)),
+      night: this.target.night,
+    };
     this.lit.tint = this.light.tint;
     const skyKey = `${this.light.skyTop}-${this.light.skyBottom}`;
     if (skyKey !== this.skyKey) {
@@ -712,7 +718,7 @@ export class StreetScene {
   private recordFrame(deltaMS: number): void {
     this.frameTimes.push(deltaMS);
     if (this.frameTimes.length > FRAME_SAMPLES) this.frameTimes.shift();
-    if (!this.autoQuality || this.frameTimes.length < FRAME_SAMPLES || this.quality === 0) return;
+    if (!this.autoQuality || this.frameTimes.length < MIN_SAMPLES || this.quality === 0) return;
     // Degrade when frames stay slow for 3 seconds (target: 45 fps at least).
     const mean = this.frameTimes.reduce((sum, value) => sum + value, 0) / this.frameTimes.length;
     const limit = 1000 / Math.min(45, QUALITY[this.quality].maxFps - 5);

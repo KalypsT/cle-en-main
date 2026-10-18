@@ -1,0 +1,16 @@
+{
+  "folder": "musique",
+  "slots": {
+    "day": [],
+    "evening": [],
+    "night": [],
+    "celebration": []
+  },
+  "slotByMoment": {
+    "morning": "day",
+    "day": "day",
+    "evening": "evening",
+    "night": "night"
+  },
+  "crossfadeSeconds": 3
+}

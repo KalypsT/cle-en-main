@@ -61,3 +61,14 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **3 emplacements** de partie.
 - **Export et import** d'une partie en fichier (changement de téléphone).
 - Points de retour en arrière (voir [02-boucle-et-progression.md](02-boucle-et-progression.md#27-le-retour-en-arrière)).
+
+## 4.9 La Rue (jalon 5)
+
+- **La rue vivante** remplit l'onglet Rue : les rues du quartier sont posées bout à bout et l'on glisse du doigt de l'une à l'autre (les flèches autour du nom de la rue font de même). Le quartier se choisit en haut à gauche. Les rues de chaque quartier sont décrites dans `content/monde.json` (noms réels de Dole, à vérifier sur place et modifiables sans toucher au code).
+- **Les bâtiments** : des immeubles et maisons ordinaires (tirés des époques et du mélange appartements/maisons du quartier), plus les biens du joueur, les annonces, les biens sous compromis et les chantiers des rivaux, glissés entre eux à une place stable.
+- **Les bulles** ouvrent les fiches existantes : « À vendre » (annonce), « Compromis », « Panne », « Impayé », « Imprévu », « Travaux 25 % », « 2 offre(s) », « 3 candidat(s) », « Assemblée », « Vendu », « À louer ». Deux au plus par bâtiment, les plus urgentes d'abord.
+- **Toucher un bâtiment** ouvre sa **coupe** : les logements étage par étage, le logement du joueur (ou l'annonce) cerclé de sa couleur avec ses pièces, leur usure et les artisans au travail ; toucher le logement ouvre sa fiche. La liste des pièces et de leur état suit le dessin.
+- **Le tableau de bord du jalon 4 n'est pas perdu** : il devient un **tiroir** sous la rue. Fermé, il montre le bonjour, le patrimoine net et le solde du mois ; ouvert (toucher la poignée), les opportunités, les décisions et les nouvelles. Sur grand écran, il reste ouvert dans la colonne de droite, la rue à gauche.
+- **Panorama** : téléphone tourné, la Rue passe en plein écran avec une barre d'état réduite (date, heure, vitesse) ; les autres écrans demandent de revenir en portrait.
+- **Thème** : Clair, Sombre, Automatique (sombre pendant la nuit du jeu), Selon le téléphone (par défaut).
+- **Réglages de la rue** : qualité graphique (Automatique, Haute, Économie) et compteur d'images par seconde, pour vérifier la fluidité sur le téléphone.

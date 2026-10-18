@@ -556,7 +556,32 @@
     "tutorialOn": "Afficher le didacticiel",
     "tutorialRestart": "Recommencer le didacticiel",
     "theme": "Thème",
-    "themeLight": "Clair (le thème sombre arrivera plus tard)",
+    "themes": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "auto": "Automatique",
+      "system": "Selon le téléphone"
+    },
+    "themeHint": "Automatique : sombre pendant la nuit du jeu.",
+    "street": "Rue",
+    "quality": "Qualité graphique",
+    "qualities": {
+      "auto": "Automatique",
+      "high": "Haute",
+      "economy": "Économie"
+    },
+    "qualityHint": "Automatique baisse les détails (passants, pluie, résolution) si le téléphone peine à suivre.",
+    "showFps": "Afficher les images par seconde",
+    "showFpsHint": "Pour vérifier la fluidité de la rue.",
+    "sound": "Son",
+    "volumes": {
+      "music": "Musique",
+      "ambience": "Ambiances",
+      "effects": "Effets"
+    },
+    "volume": "{label} : {percent} %",
+    "soundHint": "Le son démarre au premier toucher de l'écran.",
+    "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
     "version": "Format de sauvegarde v{version}"
   },
   "avatar": {

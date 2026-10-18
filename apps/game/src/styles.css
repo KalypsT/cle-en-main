@@ -1,6 +1,7 @@
 /*
- * Palette and tokens (docs/05-direction-artistique.md, section 5.2).
- * Light theme only; the dark theme arrives with milestone 5.
+ * Palette and tokens (docs/05-direction-artistique.md, section 5.2), light
+ * theme. The dark theme (docs/04, 4.2) redefines the colours below under
+ * :root[data-theme='dark'], set by src/theme.ts.
  */
 :root {
   /* Warm ivory background, shared with the street. */
@@ -25,6 +26,13 @@
   --brick-soft: #f8e0d9;
   --green: #2e7a3a;
   --green-soft: #e1f0dd;
+  --amber-line: #efd9a8;
+  --brick-line: #eec2b6;
+  --teal-line: #b9ddd6;
+  --translucent: rgb(255 253 248 / 94%);
+  --sky: #dfe9ee;
+  --pavement: #cfc8b8;
+  --map-ground: #eef0e6;
 
   /* Energy classes. */
   --dpe-a: #1e8a3b;
@@ -56,6 +64,37 @@
   background: var(--ivory);
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+}
+
+:root[data-theme='dark'] {
+  --ivory: #16171b;
+  --ivory-deep: #212329;
+  --surface: #1d1f24;
+  --border: #2f323a;
+  --border-strong: #41454f;
+  --text: #ecebe6;
+  --muted: #aaa496;
+  --faint: #7d786c;
+  --teal: #3fb3a8;
+  --teal-strong: #79d3c9;
+  --teal-soft: #16322f;
+  --on-teal: #0d1513;
+  --amber: #f0b45a;
+  --amber-soft: #392c15;
+  --brick: #f0806a;
+  --brick-soft: #3b1f1a;
+  --green: #84cf8c;
+  --green-soft: #1a301d;
+  --amber-line: #5a4520;
+  --brick-line: #5c3027;
+  --teal-line: #275a54;
+  --translucent: rgb(29 31 36 / 94%);
+  --sky: #2b3450;
+  --pavement: #3a3a40;
+  --map-ground: #23262b;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 14px rgb(0 0 0 / 30%);
+
+  color-scheme: dark;
 }
 
 * {
@@ -259,17 +298,17 @@ select {
 
 .card.tinted-amber {
   background: var(--amber-soft);
-  border-color: #efd9a8;
+  border-color: var(--amber-line);
 }
 
 .card.tinted-brick {
   background: var(--brick-soft);
-  border-color: #eec2b6;
+  border-color: var(--brick-line);
 }
 
 .card.tinted-teal {
   background: var(--teal-soft);
-  border-color: #b9ddd6;
+  border-color: var(--teal-line);
 }
 
 .card-heading {
@@ -772,7 +811,7 @@ select {
   width: 100%;
   min-height: var(--tap);
   padding: 8px 12px;
-  border: 1px solid #efd9a8;
+  border: 1px solid var(--amber-line);
   border-radius: 12px;
   background: var(--amber-soft);
   color: var(--amber);
@@ -783,7 +822,7 @@ select {
 }
 
 .alert-banner.brick {
-  border-color: #eec2b6;
+  border-color: var(--brick-line);
   background: var(--brick-soft);
   color: var(--brick);
 }
@@ -862,7 +901,7 @@ select {
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: rgb(255 253 248 / 94%);
+  background: var(--translucent);
   backdrop-filter: blur(6px);
   box-shadow: var(--shadow);
 }
@@ -961,7 +1000,7 @@ select {
   gap: 12px;
   margin: var(--gap) var(--gap) 0;
   padding: 12px;
-  border: 1px solid #b9ddd6;
+  border: 1px solid var(--teal-line);
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -1054,7 +1093,7 @@ select {
   width: 100%;
   height: auto;
   border-radius: var(--radius);
-  background: #dfe9ee;
+  background: var(--sky);
 }
 
 .state-dots {
@@ -1087,7 +1126,7 @@ select {
   height: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: #eef0e6;
+  background: var(--map-ground);
   touch-action: manipulation;
 }
 
@@ -1256,21 +1295,33 @@ select {
 
 /* On the « Rue » tab the page does not scroll: the street fills the screen. */
 .shell.street-mode {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
 }
 
 .shell.street-mode .street-stage {
-  flex: 1;
+  grid-row: 2;
+  grid-column: 1;
   min-height: 0;
   /* The closed dashboard drawer sits under the street, above the tabs. */
   margin-bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom) + var(--drawer-peek));
 }
 
+/* Gérard's bubble and the drawer float over the street, under its header. */
 .shell.street-mode .content {
-  flex: none;
-  padding: 0;
+  z-index: 5;
+  grid-row: 2;
+  grid-column: 1;
+  align-self: start;
+  padding: 52px 0 0;
+  pointer-events: none;
+}
+
+.shell.street-mode .content > * {
+  pointer-events: auto;
 }
 
 .street-world {
@@ -1778,4 +1829,16 @@ select {
   display: block;
   height: 100%;
   background: var(--teal);
+}
+
+.volume {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.volume input {
+  width: 100%;
+  min-height: var(--tap);
+  accent-color: var(--teal);
 }

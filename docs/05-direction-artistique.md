@@ -31,11 +31,14 @@ Le code assemble étages, fenêtres, toits, volets, portes, balcons et commerces
 
 Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : panneau « À vendre », échafaudage, bâche, fenêtres neuves après travaux.
 
+**Réalisation (jalon 5)** : avant 1948, pierre calcaire dorée, chaînes d'angle, corniche, hautes fenêtres à volets doux, toits de tuiles à deux pans ou à la Mansart avec lucarnes ; 1948-1974, enduit clair, fenêtres carrées et volets roulants ; 1975-1988, résidences à balcons filants et toits plats ; 1989-2005, enduits pastel et toits à quatre pans ; après 2005, blanc et bardage, grandes baies, panneaux solaires sur certains pavillons. Les commerces ont un store et une enseigne (noms dans `content/textes/ecrans.json`). L'usure de la façade (taches, fissure) suit l'état des postes visibles du bien (façade, fenêtres, toiture, parties communes). Le centre historique de Dole montre le clocher de la Collégiale en silhouette, et une rue longe le canal des Tanneurs.
+
 ## 5.4 Lumière, météo et saisons
 
 - **Quatre moments** : matin, jour, soir, nuit, avec les fenêtres et les lampadaires qui s'allument.
 - **Météo** : soleil, nuages, pluie, neige, brouillard sur la Saône et le Doubs.
 - **Saisons** : fleurs au printemps, terrasses en été, feuilles en automne, neige et décorations de Noël en hiver.
+- **Réalisation (jalon 5)** : heures des moments, dates des saisons et de Noël, probabilités de la météo par saison et durée d'un temps (1 à 3 jours) dans `content/monde.json`. La météo est calculée par le moteur, sans rien stocker ; le brouillard ne reste que sur les quais, hors du milieu de la journée. Les fenêtres s'allument selon l'heure (réveil, retour du travail, coucher), les lampadaires à partir du soir.
 
 ## 5.5 Les personnages
 
@@ -67,6 +70,8 @@ L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-e
   - **4 emplacements** : matin et journée, soirée, nuit, bilans et célébrations (chaque emplacement peut accueillir plusieurs morceaux) ;
   - le jeu fonctionne sans musique tant qu'elle n'est pas fournie.
 - **Trois volumes séparés** : musique, ambiances, effets.
+- **Réalisation (jalon 5)** : ambiances et effets **synthétisés par le code** (Web Audio) : rumeur de la ville selon le moment, pluie, clapotis des quais, oiseaux le matin, grillons les nuits d'été, marteau et perceuse près d'un chantier, cloches à midi (trois coups), « ka-ching » quand des loyers arrivent au bilan du mois, tampon à la signature d'un compromis, d'un acte ou d'une vente, perceuse au lancement d'un chantier. Le son démarre au premier toucher (règle des navigateurs).
+- **Ajouter la musique** : déposer les fichiers MP3 ou OGG dans `apps/game/public/musique/<emplacement>/` (`day` pour le matin et la journée, `evening`, `night`, `celebration`) et inscrire leurs noms dans `content/musique.json`. Ils sont mis en cache pour le hors-ligne (12 Mo au plus par fichier). L'emplacement des célébrations joue 90 secondes au passage du Nouvel An, en attendant les bilans et les titres du jalon 6.
 
 ## 5.9 Les maquettes
 

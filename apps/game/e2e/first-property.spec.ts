@@ -5,6 +5,7 @@ import {
   openGame,
   pause,
   speed,
+  streetReady,
   t,
   tab,
   tutorial,
@@ -99,4 +100,14 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   await capture(page, '15-decisions');
   await speed(page, 4);
   await pause(page);
+
+  // Milestone 5: the property in its street, marked with the player's colour.
+  await tab(page, 'street');
+  await streetReady(page);
+  const mine = page.getByText(t.street.myProperty);
+  await expect(mine).toBeVisible();
+  await capture(page, '09-rue-mon-bien', 'jalon-5');
+  await page.locator('.street-building', { has: mine }).locator('.street-hit').click();
+  await expect(page.getByTestId('unit-player')).toBeVisible();
+  await capture(page, '10-coupe-mon-bien', 'jalon-5');
 });

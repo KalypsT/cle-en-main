@@ -20,6 +20,7 @@ import artisansJson from './artisans.json' with { type: 'json' };
 import worksJson from './travaux.json' with { type: 'json' };
 import worksTextsJson from './textes/travaux.json' with { type: 'json' };
 import worldJson from './monde.json' with { type: 'json' };
+import musicJson from './musique.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
 import { decisionRulesSchema } from './schemas/decisions.ts';
@@ -34,6 +35,7 @@ import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
+import { musicSchema } from './schemas/music.ts';
 import { worldRulesSchema } from './schemas/world.ts';
 
 export type { GameContent } from './references.ts';
@@ -84,6 +86,8 @@ export type {
 export { ITEM_KINDS, SPACE_KINDS, TIERS, TRADES } from './schemas/works.ts';
 export type { Moment, Season, Weather, WorldRules } from './schemas/world.ts';
 export { MOMENTS, SEASONS, WEATHERS } from './schemas/world.ts';
+export type { Music, MusicSlot } from './schemas/music.ts';
+export { MUSIC_SLOTS } from './schemas/music.ts';
 export { checkReferences };
 
 const jobsFile = jobsFileSchema.parse(jobsJson);
@@ -123,6 +127,8 @@ if (referenceProblems.length > 0) {
 export const jobs = gameContent.jobs;
 export const timeSettings = timeSettingsSchema.parse(timeJson);
 export const uiTexts = uiTextsSchema.parse(uiTextsJson);
+/** Music slots (interface only: the engine never plays sound). */
+export const music = musicSchema.parse(musicJson);
 
 screenTextsSchema.parse(screenTextsJson);
 /** Texts of the management screens, typed by the file itself. */

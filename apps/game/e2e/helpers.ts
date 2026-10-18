@@ -1,4 +1,6 @@
 import { expect, type Page } from '@playwright/test';
+import { gameContent, timeSettings } from '@cle/content';
+import { createEngine, serializeGame } from '@cle/engine';
 import { fileURLToPath } from 'node:url';
 import screens from '../../../content/textes/ecrans.json' with { type: 'json' };
 import tutorialTexts from '../../../content/textes/didacticiel.json' with { type: 'json' };
@@ -72,14 +74,51 @@ export async function waitForDecision(page: Page, kind: string, timeout = 90_000
 }
 
 /** Where `CAPTURES=1 pnpm test:e2e` writes the 390 × 844 screenshots. */
-const CAPTURES_DIR = fileURLToPath(new URL('../../../docs/captures/jalon-4/', import.meta.url));
+const CAPTURES_DIR = fileURLToPath(new URL('../../../docs/captures/', import.meta.url));
 
 /** A screenshot of the screen as the player sees it, only when CAPTURES is set. */
-export async function capture(page: Page, name: string) {
+export async function capture(page: Page, name: string, milestone = 'jalon-4') {
   if (!process.env.CAPTURES) return;
   await page.screenshot({
-    path: `${CAPTURES_DIR}${name}.png`,
+    path: `${CAPTURES_DIR}${milestone}/${name}.png`,
     scale: 'css',
     animations: 'disabled',
   });
+}
+
+/**
+ * A game saved at a given hour, built by the engine itself and imported like
+ * a player's file: the clock of the end-to-end tests runs too fast to stop it
+ * at a precise hour.
+ */
+export async function importGameAt(page: Page, hour: number, slot = 1) {
+  const engine = createEngine(gameContent);
+  let state = engine.createGame({
+    seed: 20261018,
+    startDate: { year: 2026, month: 10, day: 18 },
+    startHour: timeSettings.startHour,
+    name: 'Thibaud',
+    tutorial: false,
+  });
+  const hours = (hour - state.clock.hour + 24) % 24;
+  state = engine.advanceHours(state, hours).state;
+  await page.getByRole('button', { name: ui.title.continue }).click();
+  const chooser = page.waitForEvent('filechooser');
+  await page.getByTestId(`slot-${slot}`).getByRole('button', { name: ui.slots.import }).click();
+  await (
+    await chooser
+  ).setFiles({
+    name: 'nuit.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(serializeGame(state)),
+  });
+  await expect(page.getByTestId('game-date')).toBeVisible();
+  await pause(page);
+}
+
+/** The street drew its first frames (WebGL, or PixiJS's canvas renderer). */
+export async function streetReady(page: Page) {
+  await expect(page.getByTestId('street').locator('.street-canvas canvas')).toBeVisible();
+  // Give the passers-by and the light a moment to settle.
+  await page.waitForTimeout(800);
 }

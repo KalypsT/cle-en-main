@@ -55,6 +55,14 @@ cle-en-main/
 - L'interface **ne calcule rien** : elle lit l'état du moteur et envoie des actions.
 - Mise en page adaptative : portrait sur téléphone, deux colonnes sur grand écran, panorama pour la rue en paysage.
 - PWA installable, fonctionnant hors ligne.
+- **Monde vivant (jalon 5)**, dans `apps/game/src/world/` :
+  - le moteur fournit des **requêtes en lecture seule** (`engine.ambience`, `engine.streets`, `engine.section`, `engine.building`, dans `packages/engine/src/systems/world.ts`) : moment de la journée, saison, météo, rues d'un quartier avec leurs bâtiments et leurs bulles, coupe d'un bâtiment. Elles lisent `content/monde.json` et des hachages stables de la graine et des identifiants : rien n'est ajouté à la sauvegarde, rien n'est tiré dans le générateur de la partie ;
+  - `facade.ts` décrit une façade par modules, `shapes.ts` la traduit en formes simples, dessinées en PixiJS dans la rue et en SVG sur les fiches (même bâtiment des deux côtés) ;
+  - `StreetScene.ts` (PixiJS 8, WebGL avec repli sur le rendu Canvas de PixiJS) dessine ciel, silhouette de la ville, façades, mobilier urbain, lumières, passants, voitures, oiseaux et météo ; une couche HTML défilante au-dessus porte les bulles et un bouton par bâtiment (accessibles, testables) ;
+  - la scène est créée une fois par partie et mise en pause hors de l'onglet Rue ou quand l'application passe en arrière-plan ;
+  - **qualité graphique** Haute, Économie ou Automatique : en automatique, si les images restent plus lentes que 45 par seconde pendant 3 secondes, la scène baisse d'un cran (résolution, nombre de passants et de particules, 30 images par seconde au plus) ; « réduire les animations » du téléphone fige les passants et la météo ;
+  - la coupe (`screens/SectionScreen.tsx`) est un SVG dessiné par le code, avec un bouton par logement.
+- **Son (jalon 5)**, dans `apps/game/src/audio/` : un mixeur Web Audio à trois volumes (musique, ambiances, effets), démarré au premier toucher. Ambiances et effets sont **synthétisés** (aucun fichier) ; la musique lit les fichiers déclarés dans `content/musique.json`, mis en cache par le service worker.
 
 ## 7.5 Les sauvegardes
 
@@ -70,7 +78,7 @@ cle-en-main/
 - **Moteur** : tests unitaires Vitest par système, plus des **parties de référence** (« graines dorées ») dont le résultat après N années est figé et vérifié.
 - **Contenu** : validation par schémas à chaque compilation.
 - **Bots** : lancés en CI sur un échantillon de graines, avec alerte si une cible d'équilibrage est dépassée.
-- **Interface** : un test Playwright vérifie que le jeu démarre, qu'une partie se crée et qu'une sauvegarde se recharge.
+- **Interface** : des tests Playwright vérifient que le jeu démarre, qu'une partie se crée et qu'une sauvegarde se recharge, le parcours jusqu'au premier bien loué (jalon 4) et le monde vivant (jalon 5 : rue, bulle, coupe, nuit, thème sombre, panorama, mesure indicative de la fluidité). `CAPTURES=1 pnpm test:e2e` range les captures en 390 × 844 dans `docs/captures/`.
 
 ## 7.7 Le déploiement
 

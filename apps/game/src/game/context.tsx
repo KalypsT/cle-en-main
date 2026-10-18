@@ -1,5 +1,6 @@
 import type { GameAction, GameEvent, GameState } from '@cle/engine';
 import { createContext, useContext } from 'react';
+import type { AudioMixer } from '../audio/mixer.ts';
 import type { GameSession, SessionSnapshot } from '../session/game-session.ts';
 import type { Settings } from '../settings.ts';
 
@@ -43,6 +44,7 @@ export interface GameContextValue {
   exportGame: () => void;
   quit: () => void;
   slot: number;
+  audio: AudioMixer;
 }
 
 export const GameContext = createContext<GameContextValue | null>(null);

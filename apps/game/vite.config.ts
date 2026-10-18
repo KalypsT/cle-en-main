@@ -36,7 +36,8 @@ export default defineConfig({
         start_url: '.',
         scope: '.',
         display: 'standalone',
-        orientation: 'portrait',
+        // Portrait everywhere, except the « Rue » that turns into a panorama (docs/04, 4.1).
+        orientation: 'any',
         background_color: BACKGROUND_COLOR,
         theme_color: THEME_COLOR,
         icons: [
@@ -51,7 +52,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Music loops (content/musique.json) are precached too: the game works offline.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,mp3,ogg}'],
+        maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         cleanupOutdatedCaches: true,
       },
     }),

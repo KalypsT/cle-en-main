@@ -59,6 +59,9 @@ export function bubbleLabel(bubble: Bubble): string {
   });
 }
 
+/** Strikes of the bells at the hours of content/monde.json (discreet: not the whole hour). */
+const BELL_STRIKES = 3;
+
 const ALERT_BUBBLES = new Set(['hazard', 'incident', 'arrears']);
 const BUBBLE_ICONS: Record<Bubble['kind'], IconName> = {
   hazard: 'alert',
@@ -82,7 +85,7 @@ function buildingName(building: StreetBuilding): string {
 }
 
 export function StreetWorld({ active }: { active: boolean }) {
-  const { state, settings } = useGame();
+  const { state, settings, audio } = useGame();
   const nav = useNav();
   const cityId = gameContent.start.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
@@ -157,37 +160,61 @@ export function StreetWorld({ active }: { active: boolean }) {
   }, []);
 
   useEffect(() => {
-    sceneRef.current?.setData({
-      layout,
-      hour: ambience.hour,
-      moment: ambience.moment,
-      season: ambience.season,
-      christmas: ambience.christmas,
-      accent: cssAccent(),
-      shopNames: t.street.shops,
-      forSaleText: t.street.forSaleSign,
-      neighbourhoodId,
-      seed: state.seed,
-    });
+    // Next frame: the theme (and so the accent colour) is applied by App after this effect.
+    const frame = requestAnimationFrame(() =>
+      sceneRef.current?.setData({
+        layout,
+        hour: ambience.hour,
+        moment: ambience.moment,
+        season: ambience.season,
+        christmas: ambience.christmas,
+        accent: cssAccent(),
+        shopNames: t.street.shops,
+        forSaleText: t.street.forSaleSign,
+        neighbourhoodId,
+        seed: state.seed,
+      }),
+    );
+    return () => cancelAnimationFrame(frame);
   }, [layout, ambience, neighbourhoodId, state.seed, settings.theme]);
 
-  // Back to where the player was in this neighbourhood, or to his first property.
-  useLayoutEffect(() => {
-    memory.neighbourhoodId = neighbourhoodId;
-    const scroll = scrollRef.current;
-    if (!scroll) return;
-    const saved = memory.scroll[neighbourhoodId];
-    if (saved !== undefined) {
-      scroll.scrollLeft = saved;
-      return;
+  // A new property (just bought): show its neighbourhood and centre it.
+  const ownedIds = state.properties.map((owned) => owned.property.id).join(',');
+  const [seenOwned, setSeenOwned] = useState(ownedIds);
+  const [focus, setFocus] = useState<string | null>(null);
+  if (ownedIds !== seenOwned) {
+    setSeenOwned(ownedIds);
+    const known = new Set(seenOwned.split(','));
+    const fresh = state.properties.find((owned) => !known.has(owned.property.id));
+    if (fresh) {
+      setFocus(fresh.property.id);
+      setNeighbourhoodId(fresh.property.neighbourhoodId);
     }
-    const mine = layout.streets
-      .flatMap((street) => street.buildings)
-      .find((item) => item.building.role === 'owned');
-    scroll.scrollLeft = mine ? Math.max(0, mine.x * scale - size.width / 3) : 0;
-    // Only when the neighbourhood changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [neighbourhoodId]);
+  }
+
+  // Back to where the player was in this neighbourhood, or to his first property.
+  const shown = useRef<{ neighbourhoodId: string | null; focus: string | null }>({
+    neighbourhoodId: null,
+    focus: null,
+  });
+  useLayoutEffect(() => {
+    const scroll = scrollRef.current;
+    // Hidden (another tab): wait until the street shows to place it.
+    if (!scroll || !active || scroll.clientWidth === 0) return;
+    if (shown.current.neighbourhoodId === neighbourhoodId && shown.current.focus === focus) return;
+    const newFocus = focus !== shown.current.focus ? focus : null;
+    shown.current = { neighbourhoodId, focus };
+    memory.neighbourhoodId = neighbourhoodId;
+    const buildings = layout.streets.flatMap((street) => street.buildings);
+    const target = newFocus
+      ? buildings.find((item) => item.building.propertyId === newFocus)
+      : memory.scroll[neighbourhoodId] === undefined
+        ? buildings.find((item) => item.building.role === 'owned')
+        : undefined;
+    scroll.scrollLeft = target
+      ? Math.max(0, (target.x + target.spec.width / 2) * scale - size.width / 2)
+      : (memory.scroll[neighbourhoodId] ?? 0);
+  }, [neighbourhoodId, focus, layout, scale, size.width, active]);
 
   useEffect(() => {
     if (!settings.showFps || !active) return;
@@ -219,6 +246,19 @@ export function StreetWorld({ active }: { active: boolean }) {
 
   const street = layout.streets[current] ?? layout.streets[0];
   const weather = street?.street.weather ?? ambience.weather;
+  const quay = street?.street.quay ?? false;
+  const works = street?.buildings.some((item) => item.building.scaffolding) ?? false;
+
+  // Ambiences only while the street is on screen.
+  useEffect(() => {
+    audio.setScene(
+      active ? { moment: ambience.moment, weather, season: ambience.season, quay, works } : null,
+    );
+  }, [audio, active, ambience.moment, ambience.season, weather, quay, works]);
+  useEffect(() => () => audio.setScene(null), [audio]);
+  useEffect(() => {
+    if (active && ambience.bells) audio.bells(BELL_STRIKES);
+  }, [audio, active, ambience.bells, ambience.hour]);
   const top = (item: LaidBuilding) =>
     offsetY + (GROUND_Y - item.spec.wallHeight - item.spec.roof.height) * scale;
 
