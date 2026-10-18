@@ -29,7 +29,19 @@ export { type RentalTerms, type RentRefusal } from './systems/renting.ts';
 export { type HazardChoice, type ItemChoice, type WorksRefusal } from './systems/works.ts';
 export { type CatalogItem, type PlannedTask, type WorksEstimate } from './systems/works-view.ts';
 export { conditionLabel, itemId } from './systems/dwelling.ts';
-export { DPE_LABELS, TIERS } from './content-constants.ts';
+export { DPE_LABELS, MOMENTS, SEASONS, TIERS, WEATHERS } from './content-constants.ts';
+export {
+  type Ambience,
+  type Bubble,
+  type BubbleKind,
+  type BubbleTarget,
+  type BuildingRole,
+  type SectionRoom,
+  type SectionUnit,
+  type SectionView,
+  type StreetBuilding,
+  type StreetView,
+} from './systems/world.ts';
 export {
   type CashForecast,
   decisionKey,

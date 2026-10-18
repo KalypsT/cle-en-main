@@ -19,6 +19,7 @@ import livingCostsJson from './train-de-vie.json' with { type: 'json' };
 import artisansJson from './artisans.json' with { type: 'json' };
 import worksJson from './travaux.json' with { type: 'json' };
 import worksTextsJson from './textes/travaux.json' with { type: 'json' };
+import worldJson from './monde.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
 import { decisionRulesSchema } from './schemas/decisions.ts';
@@ -33,6 +34,7 @@ import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
+import { worldRulesSchema } from './schemas/world.ts';
 
 export type { GameContent } from './references.ts';
 export type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
@@ -80,6 +82,8 @@ export type {
   WorksTexts,
 } from './schemas/works.ts';
 export { ITEM_KINDS, SPACE_KINDS, TIERS, TRADES } from './schemas/works.ts';
+export type { Moment, Season, Weather, WorldRules } from './schemas/world.ts';
+export { MOMENTS, SEASONS, WEATHERS } from './schemas/world.ts';
 export { checkReferences };
 
 const jobsFile = jobsFileSchema.parse(jobsJson);
@@ -107,6 +111,7 @@ export const gameContent: GameContent = {
   artisans: artisansFile.artisans,
   worksTexts: worksTextsSchema.parse(worksTextsJson),
   decisions: decisionRulesSchema.parse(decisionsJson),
+  world: worldRulesSchema.parse(worldJson),
   cities: { dole: cityDataSchema.parse(doleJson) },
 };
 

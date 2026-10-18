@@ -18,14 +18,17 @@ import type {
   LeaseType,
   LifeEventRule,
   MarketRules,
+  Moment,
   Motivation,
   NeighbourhoodData,
   ResolutionRule,
   Rival,
+  Season,
   SpaceKind,
   TenantProfile,
   Tier,
   Trade,
+  Weather,
 } from '@cle/content';
 
 export type {
@@ -48,14 +51,17 @@ export type {
   LeaseType,
   LifeEventRule,
   MarketRules,
+  Moment,
   Motivation,
   NeighbourhoodData,
   ResolutionRule,
   Rival,
+  Season,
   SpaceKind,
   TenantProfile,
   Tier,
   Trade,
+  Weather,
 };
 
 export function findJob(content: GameContent, jobId: string): Job {

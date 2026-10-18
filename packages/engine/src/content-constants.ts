@@ -1,4 +1,13 @@
-import type { Condition, DpeLabel, Epoch, LeaseType, Tier } from './content.ts';
+import type {
+  Condition,
+  DpeLabel,
+  Epoch,
+  LeaseType,
+  Moment,
+  Season,
+  Tier,
+  Weather,
+} from './content.ts';
 
 /**
  * Enumerations the save schema checks. The engine imports only types from
@@ -32,6 +41,22 @@ export const CONDITIONS = [
 export const LEASE_TYPES = ['bare', 'furnished'] as const satisfies readonly LeaseType[];
 export const TIERS = ['eco', 'standard', 'premium'] as const satisfies readonly Tier[];
 
+/** Moments of the day, seasons and weathers of the living world, in order. */
+export const MOMENTS = ['morning', 'day', 'evening', 'night'] as const satisfies readonly Moment[];
+export const SEASONS = [
+  'spring',
+  'summer',
+  'autumn',
+  'winter',
+] as const satisfies readonly Season[];
+export const WEATHERS = [
+  'sun',
+  'clouds',
+  'rain',
+  'snow',
+  'fog',
+] as const satisfies readonly Weather[];
+
 type Exhaustive<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 type Assert<T extends true> = T;
 export type ConstantsMatchContent = [
@@ -40,4 +65,7 @@ export type ConstantsMatchContent = [
   Assert<Exhaustive<(typeof CONDITIONS)[number], Condition>>,
   Assert<Exhaustive<(typeof LEASE_TYPES)[number], LeaseType>>,
   Assert<Exhaustive<(typeof TIERS)[number], Tier>>,
+  Assert<Exhaustive<(typeof MOMENTS)[number], Moment>>,
+  Assert<Exhaustive<(typeof SEASONS)[number], Season>>,
+  Assert<Exhaustive<(typeof WEATHERS)[number], Weather>>,
 ];

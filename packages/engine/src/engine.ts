@@ -75,6 +75,7 @@ import {
 } from './systems/taxes.ts';
 import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
 import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.ts';
+import { ambience, section, streets } from './systems/world.ts';
 import {
   answerHazard,
   artisanDiscount,
@@ -567,6 +568,14 @@ export function createEngine(content: GameContent) {
       const property = findAnyProperty(state, id);
       return property ? mapPosition(content, property) : null;
     },
+    /** Moment of the day, season, weather, Christmas and bells of a city (the living world). */
+    ambience: (state: GameState, cityId: string) => ambience(content, state, cityId),
+    /** Streets of a neighbourhood with their buildings and bubbles, left to right. */
+    streets: (state: GameState, cityId: string, neighbourhoodId: string) =>
+      streets(content, state, cityId, neighbourhoodId),
+    /** Cross-section of a building of the street: flats or floors, rooms, artisans at work. */
+    section: (state: GameState, cityId: string, neighbourhoodId: string, buildingId: string) =>
+      section(content, state, cityId, neighbourhoodId, buildingId),
     /** Artisans of a city the player can call, with his history with each. */
     artisans: (state: GameState, cityId: string) =>
       knownArtisans(content, state, cityId).map((artisan) => ({
