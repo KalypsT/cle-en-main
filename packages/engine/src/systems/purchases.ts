@@ -9,7 +9,9 @@ import {
   recordRefusedApplication,
 } from './banking.ts';
 import type { SystemContext } from './context.ts';
+import { freezeItems, itemId } from './dwelling.ts';
 import { removeListing } from './listings.ts';
+import { monthsToDays } from './renting.ts';
 
 export type PurchaseRefusal =
   | 'purchase.unknown'
@@ -79,16 +81,17 @@ export function loanRequestFor(
   bankId: string,
   amount: Cents,
   durationYears: number,
+  works: Cents = 0,
 ): LoanRequest {
   const fees = purchaseFees(ctx, purchase.price, true);
   const cash = Math.max(0, ctx.state.player.balance) + purchase.deposit;
-  const needed = purchase.price + fees.notary + fees.bank - amount;
+  const needed = purchase.price + works + fees.notary + fees.bank - amount;
   return {
     bankId,
     amount,
     durationYears,
     price: purchase.price,
-    works: 0,
+    works,
     contribution: Math.min(cash, needed),
   };
 }
@@ -100,6 +103,7 @@ function answerApplication(ctx: SystemContext, purchase: Purchase, application: 
     application.bankId,
     application.amount,
     application.durationYears,
+    application.works,
   );
   const decision = evaluateLoan(ctx.content, ctx.state, request);
   application.decision = decision;
@@ -126,6 +130,7 @@ export function requestLoan(
   bankId: string,
   amount: Cents,
   durationYears: number,
+  works: Cents = 0,
 ): PurchaseRefusal | null {
   const purchase = findPurchase(ctx, purchaseId);
   if (!purchase) return 'purchase.unknown';
@@ -134,6 +139,7 @@ export function requestLoan(
   const bank = findBank(ctx.content, bankId);
   if (!bank) return 'bank.unknown';
   if (!Number.isInteger(amount) || amount <= 0) return 'loan.invalidAmount';
+  if (!Number.isInteger(works) || works < 0) return 'loan.invalidAmount';
   if (purchase.applications.some((a) => a.bankId === bankId && a.decision === null)) {
     return 'purchase.applicationPending';
   }
@@ -141,6 +147,7 @@ export function requestLoan(
     id: `application-${ctx.state.nextId++}`,
     bankId,
     amount,
+    works,
     durationYears,
     responseDay: ctx.today + bank.responseDelayDays,
     decision: null,
@@ -218,11 +225,19 @@ function acceptedOffer(purchase: Purchase): LoanOffer | null {
   return decision && decision.decision !== 'refused' ? decision.offer : null;
 }
 
-/** Cash the player must hold on the deed day, deposit and loan deducted. */
+/** Part of the accepted loan set aside for the works (the works envelope). */
+export function worksEnvelope(purchase: Purchase): Cents {
+  const application = purchase.applications.find((a) => a.id === purchase.acceptedApplicationId);
+  const offer = acceptedOffer(purchase);
+  return offer && application ? Math.min(application.works, offer.amount) : 0;
+}
+
+/** Cash the player must hold on the deed day, deposit and loan (works envelope aside) deducted. */
 export function cashDueAtDeed(ctx: Pick<SystemContext, 'content'>, purchase: Purchase): Cents {
   const offer = acceptedOffer(purchase);
   const fees = purchaseFees(ctx, purchase.price, offer !== null);
-  return purchase.price + fees.notary + fees.bank - purchase.deposit - (offer?.amount ?? 0);
+  const lent = (offer?.amount ?? 0) - worksEnvelope(purchase);
+  return purchase.price + fees.notary + fees.bank - purchase.deposit - lent;
 }
 
 function signDeed(ctx: SystemContext, purchase: Purchase): void {
@@ -236,9 +251,16 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
   }
   const fees = purchaseFees(ctx, purchase.price, offer !== null);
   const loan = offer ? grantLoan(ctx, offer, purchase.property.id) : null;
-  state.player.balance -= purchase.price + fees.notary + fees.bank - purchase.deposit;
+  const envelope = worksEnvelope(purchase);
+  state.player.balance -= purchase.price + fees.notary + fees.bank - purchase.deposit + envelope;
   const discovered = purchase.property.defects.filter((d) => !d.revealed).map((d) => d.id);
   for (const defect of purchase.property.defects) defect.revealed = true;
+  // The new owner sees every item.
+  const discoveredItems = purchase.property.items.filter((item) => !item.known).map(itemId);
+  purchase.property.items = purchase.property.items.map((item) =>
+    item.known ? item : { ...item, known: true },
+  );
+  purchase.property.items = freezeItems(purchase.property.items);
   state.purchases = state.purchases.filter((p) => p.id !== purchase.id);
   state.properties.push({
     property: purchase.property,
@@ -250,7 +272,25 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
     lease: null,
     furniture: null,
     taxRegime: 'auto',
-    furnishedTax: { deferredDepreciation: 0, deficitCarry: 0, buildingDepreciationDeducted: 0 },
+    furnishedTax: {
+      deferredDepreciation: 0,
+      deficitCarry: 0,
+      buildingDepreciationDeducted: 0,
+      works: [],
+    },
+    quotes: [],
+    works: null,
+    worksFund:
+      loan && envelope > 0
+        ? {
+            amount: envelope,
+            loanId: loan.id,
+            untilDay: ctx.today + monthsToDays(ctx.content.credit.worksEnvelopeMonths),
+          }
+        : null,
+    worksForCapitalGains: 0,
+    coproMeeting: null,
+    coproCalls: [],
   });
   ctx.events.push({
     type: 'deedSigned',
@@ -261,6 +301,8 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
     bankFees: fees.bank,
     loanId: loan?.id ?? null,
     discoveredDefects: discovered,
+    discoveredItems,
+    worksEnvelope: envelope,
   });
 }
 

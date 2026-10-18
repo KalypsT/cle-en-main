@@ -3,6 +3,7 @@ import { nextFloat } from '../random.ts';
 import type { AgendaItem, Listing } from '../state.ts';
 import type { SystemContext } from './context.ts';
 import { dailyFreeTime } from './household.ts';
+import { freezeItems, itemId } from './dwelling.ts';
 import { findListing } from './listings.ts';
 
 export type VisitRefusal =
@@ -24,8 +25,23 @@ function visit(ctx: SystemContext, listing: Listing): void {
       revealed.push(defect.id);
     }
   }
+  // Rooms are plain to see; technical elements only sometimes.
+  const revealedItems: string[] = [];
+  listing.property.items = listing.property.items.map((item) => {
+    if (item.known) return item;
+    const chance = ctx.content.works.items[item.kind].revealOnVisit;
+    if (chance < 1 && nextFloat(ctx.state.rng) >= chance) return item;
+    revealedItems.push(itemId(item));
+    return { ...item, known: true };
+  });
+  listing.property.items = freezeItems(listing.property.items);
   listing.visited = true;
-  ctx.events.push({ type: 'visitDone', listingId: listing.id, revealedDefects: revealed });
+  ctx.events.push({
+    type: 'visitDone',
+    listingId: listing.id,
+    revealedDefects: revealed,
+    revealedItems,
+  });
 }
 
 /**

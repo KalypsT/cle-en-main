@@ -20,6 +20,8 @@ function input(overrides: Partial<TaxInput>): TaxInput {
     choice: 'auto',
     rents: 6_000_00,
     costs: 1_000_00,
+    works: 0,
+    energyRenovation: false,
     interest: 2_000_00,
     buildingDepreciation: 0,
     depreciation: 0,
@@ -75,6 +77,21 @@ describe('bare lets, real regime', () => {
       regimes('micro'),
     );
     expect(next.total).toBe(0);
+  });
+
+  it('deducts works in a bare let, with the doubled ceiling for an energy renovation', () => {
+    const works = input({ rents: 6_000_00, costs: 1_000_00, interest: 0, works: 30_000_00 });
+    const plain = computeTax(content, 2027, SALARY, [], [works], regimes('real'));
+    expect(plain.assessment.deficitOnSalary).toBe(10_700_00);
+    const energy = { ...works, energyRenovation: true };
+    const doubled = computeTax(content, 2027, SALARY, [], [energy], regimes('real'));
+    expect(doubled.assessment.deficitOnSalary).toBe(21_400_00);
+    // The measure ends with 2027.
+    const late = computeTax(content, 2028, SALARY, [], [energy], regimes('real'));
+    expect(late.assessment.deficitOnSalary).toBe(10_700_00);
+    // Micro-foncier: the works change nothing.
+    const micro = computeTax(content, 2027, SALARY, [], [works], regimes('micro'));
+    expect(micro.assessment.deficitOnSalary).toBe(0);
   });
 
   it('keeps the interest part of a deficit for the rents only', () => {
@@ -184,6 +201,23 @@ describe('capital gains', () => {
     );
   });
 
+  it('replaces the flat works allowance by the real works when they are higher', () => {
+    // Works not deducted from the rents (micro regime, or a vacant home): 20 000 €.
+    const { state, owned } = sellerAt(2036, { worksForCapitalGains: 20_000_00 });
+    const real = capitalGainsTax({ content, state }, owned, 120_000_00);
+    expect(real.gain).toBe(120_000_00 - (80_000_00 + 6_800_00 + 20_000_00));
+    // Below the flat 15 % (12 000 €), the flat allowance stays.
+    const low = sellerAt(2036, { worksForCapitalGains: 5_000_00 });
+    expect(capitalGainsTax({ content, state: low.state }, low.owned, 120_000_00).gain).toBe(
+      120_000_00 - (80_000_00 + 6_800_00 + 12_000_00),
+    );
+    // Real works count even before five years.
+    const early = sellerAt(2028, { worksForCapitalGains: 20_000_00 });
+    expect(capitalGainsTax({ content, state: early.state }, early.owned, 120_000_00).gain).toBe(
+      120_000_00 - (80_000_00 + 6_800_00 + 20_000_00),
+    );
+  });
+
   it('exempts the income tax after 22 years and everything after 30', () => {
     const at22 = sellerAt(2048);
     const t22 = capitalGainsTax({ content, state: at22.state }, at22.owned, 200_000_00);
@@ -198,6 +232,7 @@ describe('capital gains', () => {
         deferredDepreciation: 0,
         deficitCarry: 0,
         buildingDepreciationDeducted: 5_000_00,
+        works: [],
       },
     });
     expect(capitalGainsTax({ content, state }, owned, 100_000_00).gain).toBe(

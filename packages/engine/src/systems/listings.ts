@@ -11,6 +11,7 @@ import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextNormal, nextPoisson, nextRange, pickWeighted } from '../random.ts';
 import type { GameState, Listing, Property, PropertyKind } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { conditionLabel, drawDwelling } from './dwelling.ts';
 import { defectProbability, dwellingKindOf, realValue } from './valuation.ts';
 
 const DAYS_PER_MONTH = 30;
@@ -71,24 +72,39 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
   const epoch = pickWeighted<Epoch>(state.rng, neighbourhood.epochShares[dwelling]);
   const dpe = pickWeighted<DpeLabel>(state.rng, city.commune.dpeByEpoch[dwelling][epoch]);
   const condition = pickWeighted<Condition>(state.rng, rules.conditionWeights[epoch]);
+  const rooms =
+    kind === 'building' ? lots.reduce((sum, lot) => sum + lot.rooms, 0) : roomsFor(surface);
+  const structure = drawDwelling(
+    content,
+    state.rng,
+    { kind, surface, rooms, lots, epoch, dpe },
+    condition,
+  );
   const defects = rules.defects
-    .filter(
-      (rule) => nextFloat(state.rng) < defectProbability(content, rule, kind, epoch, condition),
-    )
+    .filter((rule) => nextFloat(state.rng) < defectProbability(rule, kind, epoch))
     .map((rule) => ({ id: rule.id, revealed: false }));
   const tax = rules.ownership.propertyTaxPerM2[kind];
+  const copro = content.works.copro;
   return {
     id: `property-${state.nextId++}`,
     cityId,
     neighbourhoodId: neighbourhood.id,
     kind,
     surface,
-    rooms: kind === 'building' ? lots.reduce((sum, lot) => sum + lot.rooms, 0) : roomsFor(surface),
+    rooms,
     floor,
     lots,
     epoch,
     dpe,
-    condition,
+    ...structure,
+    copro:
+      kind === 'apartment'
+        ? {
+            lots: nextInt(state.rng, copro.lots.min, copro.lots.max),
+            meetingMonth: nextInt(state.rng, 1, 12),
+          }
+        : null,
+    postponedHazards: [],
     defects,
     annualPropertyTax: toCents(Math.round(surface * tax)),
     monthlyCharges:
@@ -135,8 +151,9 @@ export function listingFor(
   const error = Math.max(-errorMax, Math.min(errorMax, errorStdDev * nextNormal(state.rng)));
   const value = realValue(content, state, property).value;
   const askingPrice = roundPrice(content, value * factor * (1 + error));
+  const condition = conditionLabel(content, property);
   const titles = content.listingTexts.titles.filter(
-    (title) => !title.conditions || title.conditions.includes(property.condition),
+    (title) => !title.conditions || title.conditions.includes(condition),
   );
   const title = titles[nextInt(state.rng, 0, titles.length - 1)] ?? content.listingTexts.titles[0];
   const published = ctx.today - ageDays;

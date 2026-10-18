@@ -4,7 +4,7 @@ import type { GameEvent, StatementLine } from '../src/events.ts';
 import { annuityPayment } from '../src/money.ts';
 import type { GameState, OwnedProperty } from '../src/state.ts';
 import { toDayNumber } from '../src/calendar.ts';
-import { quietContent } from './helpers.ts';
+import { dwelling, quietContent } from './helpers.ts';
 
 /**
  * Milestone 2 acceptance test (docs/09): the cash flow of one property must
@@ -69,7 +69,7 @@ function setup(): GameState {
   });
   const today = toDayNumber(state.clock.date);
   const owned: OwnedProperty = {
-    property: {
+    property: dwelling({
       id: 'property-t2',
       cityId: 'dole',
       neighbourhoodId: 'centreHistorique',
@@ -80,11 +80,10 @@ function setup(): GameState {
       lots: [],
       epoch: 'from1948to1974',
       dpe: 'D',
-      condition: 'good',
       defects: [],
       annualPropertyTax: PROPERTY_TAX,
       monthlyCharges: CHARGES,
-    },
+    }),
     purchasePrice: PRICE,
     acquisitionCost: PRICE + 6_000_00 + 800_00,
     purchaseDate: { year: 2026, month: 12, day: 15 },
@@ -119,7 +118,18 @@ function setup(): GameState {
     },
     furniture: null,
     taxRegime: 'auto',
-    furnishedTax: { deferredDepreciation: 0, deficitCarry: 0, buildingDepreciationDeducted: 0 },
+    furnishedTax: {
+      deferredDepreciation: 0,
+      deficitCarry: 0,
+      buildingDepreciationDeducted: 0,
+      works: [],
+    },
+    quotes: [],
+    works: null,
+    worksFund: null,
+    worksForCapitalGains: 0,
+    coproMeeting: null,
+    coproCalls: [],
   };
   state.properties = [owned];
   state.loans = [

@@ -32,6 +32,8 @@ function emptyLedger(owned: OwnedProperty | null): PropertyLedger {
     regime: owned?.taxRegime ?? 'auto',
     rents: 0,
     costs: 0,
+    works: 0,
+    energyRenovation: false,
     interest: 0,
     sold: false,
   };
@@ -59,6 +61,19 @@ export function addRent(state: GameState, owned: OwnedProperty, amount: Cents): 
 
 export function addCost(state: GameState, owned: OwnedProperty, amount: Cents): void {
   if (!isHome(state, owned)) ledgerOf(state, owned).costs += amount;
+}
+
+/**
+ * Works paid on a property. At the yearly review they are deducted (bare
+ * let, real regime), depreciated (furnished, real regime) or kept for the
+ * capital gain (micro regimes, vacant property, main residence).
+ */
+export function addWorks(state: GameState, owned: OwnedProperty, amount: Cents): void {
+  if (isHome(state, owned)) {
+    owned.worksForCapitalGains += amount;
+    return;
+  }
+  ledgerOf(state, owned).works += amount;
 }
 
 export function initialTaxState(year: number): GameState['tax'] {
@@ -110,6 +125,10 @@ export interface TaxInput {
   choice: TaxRegimeChoice;
   rents: Cents;
   costs: Cents;
+  /** Works paid this year: deducted in a bare let at the real regime. */
+  works: Cents;
+  /** Works of an energy renovation: doubled deficit ceiling. */
+  energyRenovation: boolean;
   interest: Cents;
   /** Furnished, real regime: this year's depreciation, building part and total. */
   buildingDepreciation: Cents;
@@ -168,7 +187,7 @@ export function computeTax(
       properties.push({ ...propertyKey(input), regime: 'micro', taxable });
     } else {
       const fees = Math.round(bareFees / realBare.length);
-      const taxable = input.rents - input.costs - input.interest - fees;
+      const taxable = input.rents - input.costs - input.works - input.interest - fees;
       foncier += taxable;
       incomeBeforeInterest += input.rents;
       realInterest += input.interest;
@@ -194,8 +213,11 @@ export function computeTax(
     // lowers the salary, within a yearly ceiling.
     const deficit = -foncier;
     const fromInterest = Math.min(deficit, Math.max(0, realInterest - incomeBeforeInterest));
+    // Doubled ceiling the year an energy renovation is paid (until the end of the measure).
+    const energy = rules.landlordDeficit.energyRenovation;
+    const doubled = year <= energy.untilYear && realBare.some((input) => input.energyRenovation);
     deficitOnSalary = Math.min(
-      toCents(rules.landlordDeficit.globalCeiling),
+      toCents(doubled ? energy.ceiling : rules.landlordDeficit.globalCeiling),
       deficit - fromInterest,
     );
     const carry = deficit - deficitOnSalary;
@@ -350,6 +372,13 @@ export function taxInputs(content: GameContent, state: GameState, yearEndDay: nu
         ((owned.acquisitionCost * rules.buildingShare) / rules.buildingYears) *
           yearShareOwned(purchaseDay, yearStartDay, yearEndDay),
       );
+      // Works are depreciated like the building (and added back to the capital gain alike).
+      const taxYear = state.tax.year;
+      for (const batch of owned.furnishedTax.works) {
+        if (batch.year <= taxYear && taxYear < batch.year + rules.worksYears) {
+          buildingDepreciation += Math.round(batch.amount / rules.worksYears);
+        }
+      }
       depreciation = buildingDepreciation;
       const furniture = owned.furniture;
       if (furniture && (yearEndDay - furniture.boughtDay) / DAYS_PER_YEAR <= rules.furnitureYears) {
@@ -365,6 +394,8 @@ export function taxInputs(content: GameContent, state: GameState, yearEndDay: nu
       choice: owned?.taxRegime ?? ledger.regime,
       rents: ledger.rents,
       costs: ledger.costs,
+      works: ledger.works,
+      energyRenovation: ledger.energyRenovation,
       interest: ledger.interest,
       buildingDepreciation,
       depreciation,
@@ -383,10 +414,20 @@ export function closeTaxYear(ctx: SystemContext): void {
   const result = bestTax(content, tax.year, tax.salary, tax.landlordDeficits, inputs);
   for (const owned of state.properties) {
     const carry = result.furnished[owned.property.id];
-    if (!carry) continue;
-    owned.furnishedTax.deferredDepreciation = carry.deferredDepreciation;
-    owned.furnishedTax.deficitCarry = carry.deficitCarry;
-    owned.furnishedTax.buildingDepreciationDeducted += carry.buildingDepreciationUsed;
+    if (carry) {
+      owned.furnishedTax.deferredDepreciation = carry.deferredDepreciation;
+      owned.furnishedTax.deficitCarry = carry.deficitCarry;
+      owned.furnishedTax.buildingDepreciationDeducted += carry.buildingDepreciationUsed;
+    }
+    const ledger = tax.ledgers[owned.property.id];
+    if (!ledger || ledger.works === 0) continue;
+    const assessed = result.assessment.properties.find((p) => p.propertyId === owned.property.id);
+    if (assessed?.regime === 'real' && assessed.category === 'bare') continue;
+    // Not deducted from the rents: depreciated if let furnished, and counted in the capital gain.
+    if (assessed?.regime === 'real') {
+      owned.furnishedTax.works.push({ amount: ledger.works, year: tax.year });
+    }
+    owned.worksForCapitalGains += ledger.works;
   }
   const fees = result.assessment.accountantFees;
   state.player.balance -= fees;
@@ -487,7 +528,11 @@ export function capitalGainsTax(
     owned.acquisitionCost - price,
     Math.round(price * rules.acquisitionFeesFlatShare),
   );
-  const works = years >= rules.worksFlatMinYears ? Math.round(price * rules.worksFlatShare) : 0;
+  // Real works (not deducted from the rents) replace the flat allowance when they are higher.
+  const ledger = state.tax.ledgers[owned.property.id];
+  const pending = ledger && ledger.category !== 'bare' ? ledger.works : 0;
+  const flat = years >= rules.worksFlatMinYears ? Math.round(price * rules.worksFlatShare) : 0;
+  const works = Math.max(flat, owned.worksForCapitalGains + pending);
   const base = price + fees + works - owned.furnishedTax.buildingDepreciationDeducted;
   const gain = Math.max(0, received - base);
   const tax =

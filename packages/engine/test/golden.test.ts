@@ -55,6 +55,14 @@ function playReferenceGame() {
     }
     if (state.clock.hour === 18) {
       for (const owned of state.properties) {
+        if (eventCounts.worksStarted === undefined && !owned.works) {
+          tryAction({
+            type: 'works/start',
+            propertyId: owned.property.id,
+            quoteIds: [],
+            diy: [{ itemId: 'living.walls', tier: 'eco' }],
+          });
+        }
         if (!owned.lease && !owned.rental) {
           const quote = engine.rentQuote(state, owned.property.id, 'bare');
           if (quote && !quote.block) {
@@ -136,5 +144,6 @@ describe('golden seed', () => {
     expect(result.state.properties).toHaveLength(1);
     expect(result.eventCounts.tenantMovedIn).toBeGreaterThanOrEqual(1);
     expect(result.eventCounts.taxAssessed).toBe(1);
+    expect(result.eventCounts.worksCompleted).toBe(1);
   });
 });

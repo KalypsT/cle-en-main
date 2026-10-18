@@ -1,25 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import { content, newGame, systemContext } from '../../test/helpers.ts';
+import { content, dwelling, newGame, systemContext, withState } from '../../test/helpers.ts';
 import type { Property } from '../state.ts';
 import { generateProperty } from './listings.ts';
 import { estimateValue, realValue } from './valuation.ts';
 
-function sampleProperty(overrides: Partial<Property> = {}): Property {
+function sampleProperty(overrides: Partial<Property> = {}, state = 3): Property {
   return {
-    id: 'property-test',
-    cityId: 'dole',
-    neighbourhoodId: 'centreHistorique',
-    kind: 'apartment',
-    surface: 60,
-    rooms: 3,
-    floor: 1,
-    lots: [],
-    epoch: 'before1948',
-    dpe: 'D',
-    condition: 'toRefresh',
-    defects: [],
-    annualPropertyTax: 0,
-    monthlyCharges: 0,
+    ...dwelling(
+      {
+        id: 'property-test',
+        cityId: 'dole',
+        neighbourhoodId: 'centreHistorique',
+        kind: 'apartment',
+        surface: 60,
+        rooms: 3,
+        floor: 1,
+        lots: [],
+        epoch: 'before1948',
+        dpe: 'D',
+        defects: [],
+        annualPropertyTax: 0,
+        monthlyCharges: 0,
+        ...overrides,
+      },
+      state,
+    ),
     ...overrides,
   };
 }
@@ -52,16 +57,15 @@ describe('valuation', () => {
     }
   });
 
-  it('applies condition, DPE, defects and the price index', () => {
+  it('applies the state of the items, DPE, nuisances and the price index', () => {
     const state = newGame();
     const base = realValue(content, state, sampleProperty()).value;
-    expect(realValue(content, state, sampleProperty({ condition: 'ruin' })).value).toBeLessThan(
-      base,
-    );
+    expect(realValue(content, state, withState(sampleProperty(), 1)).value).toBeLessThan(base);
+    expect(realValue(content, state, withState(sampleProperty(), 5)).value).toBeGreaterThan(base);
     expect(realValue(content, state, sampleProperty({ dpe: 'G' })).value).toBeLessThan(base);
-    const damp = sampleProperty({ defects: [{ id: 'humidity', revealed: false }] });
+    const noisy = sampleProperty({ defects: [{ id: 'noisyNeighbours', revealed: false }] });
     // Values are rounded to the euro.
-    expect(Math.abs(realValue(content, state, damp).value - base * 0.95)).toBeLessThanOrEqual(100);
+    expect(Math.abs(realValue(content, state, noisy).value - base * 0.97)).toBeLessThanOrEqual(100);
     const doubled = systemContext(state).state;
     const centre = doubled.market.cities.dole?.centreHistorique;
     if (centre) centre.priceIndex *= 2;
@@ -79,20 +83,29 @@ describe('valuation', () => {
 
   it('estimates from what the player knows', () => {
     const state = newGame();
-    const hidden = sampleProperty({ defects: [{ id: 'dryRot', revealed: false }] });
+    const base = sampleProperty();
+    // The wiring is dead, and nobody has looked behind the switches yet.
+    const items = base.items.map((item) =>
+      item.kind === 'electricity'
+        ? { ...item, state: 1, known: false }
+        : { ...item, known: item.kind !== 'insulation' },
+    );
+    const hidden = { ...base, items };
     const real = realValue(content, state, hidden).value;
     const blind = estimateValue(content, state, hidden, false);
-    // Hidden defects only count by their probability: the estimate is too optimistic.
+    // Unknown items count at the state the condition suggests: too optimistic here.
     expect(blind.estimate).toBeGreaterThan(real);
     expect(blind.low).toBeLessThan(blind.estimate);
     expect(blind.high).toBeGreaterThan(blind.estimate);
-    const clean = sampleProperty();
-    // A visit that found nothing makes hidden defects less likely.
-    expect(estimateValue(content, state, clean, true).estimate).toBeGreaterThan(
-      estimateValue(content, state, clean, false).estimate,
+    const seen = { ...hidden, items: items.map((item) => ({ ...item, known: true })) };
+    // Once every item is seen, only the chance of noisy neighbours separates them.
+    const sharp = estimateValue(content, state, seen, true).estimate;
+    expect(sharp).toBeLessThan(blind.estimate);
+    expect(Math.abs(sharp / real - 1)).toBeLessThan(0.01);
+    // A visit that found no noisy neighbour makes them less likely.
+    expect(estimateValue(content, state, seen, true).estimate).toBeGreaterThan(
+      estimateValue(content, state, seen, false).estimate,
     );
-    const revealed = sampleProperty({ defects: [{ id: 'dryRot', revealed: true }] });
-    expect(estimateValue(content, state, revealed, true).estimate).toBeLessThan(blind.estimate);
   });
 
   it('sells a whole building below the sum of its flats', () => {

@@ -9,9 +9,11 @@ import { livingCostsSchema, startSchema } from './schemas/start.ts';
 import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
+import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
 
 /** Every content file, by path relative to `content/`, with the schema it must satisfy. */
 export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
+  'artisans.json': artisansFileSchema,
   'banques.json': banksFileSchema,
   'credit.json': creditRulesSchema,
   'fiscalite.json': taxRulesSchema,
@@ -23,9 +25,11 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'taux.json': marketRateSchema,
   'temps.json': timeSettingsSchema,
   'train-de-vie.json': livingCostsSchema,
+  'travaux.json': worksRulesSchema,
   'textes/annonces.json': listingTextsSchema,
   'textes/interface.json': uiTextsSchema,
   'textes/locataires.json': tenantTextsSchema,
+  'textes/travaux.json': worksTextsSchema,
 };
 
 /** Generated city files, by path relative to `data/`. */

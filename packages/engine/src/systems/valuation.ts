@@ -1,5 +1,4 @@
 import {
-  type Condition,
   type DefectRule,
   type DwellingKind,
   type Epoch,
@@ -9,25 +8,26 @@ import {
   type NeighbourhoodData,
 } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
-import type { GameState, Property, PropertyKind } from '../state.ts';
+import type { GameState, Property, PropertyKind, WorkItem } from '../state.ts';
+import {
+  conditionLabel,
+  expectedState,
+  interpolateByState,
+  stateValueFactor,
+  tierShare,
+  valueCeilingPerM2,
+} from './dwelling.ts';
 
 /** Kind whose statistics a property uses: a building is valued flat by flat. */
 export function dwellingKindOf(kind: PropertyKind): DwellingKind {
   return kind === 'house' ? 'house' : 'apartment';
 }
 
-/** Chance that a property of this epoch, condition and kind has a defect. */
-export function defectProbability(
-  content: GameContent,
-  rule: DefectRule,
-  kind: PropertyKind,
-  epoch: Epoch,
-  condition: Condition,
-): number {
+/** Chance that a property of this epoch and kind has a nuisance. */
+export function defectProbability(rule: DefectRule, kind: PropertyKind, epoch: Epoch): number {
   if (!rule.kinds.includes(kind)) return 0;
   const epochMultiplier = rule.epochMultipliers?.[epoch] ?? 1;
-  const conditionMultiplier = content.market.conditions[condition].defectMultiplier;
-  return Math.min(0.95, rule.probability * epochMultiplier * conditionMultiplier);
+  return Math.min(0.95, rule.probability * epochMultiplier);
 }
 
 const floorFactorCache = new WeakMap<GameContent, Map<number, number>>();
@@ -53,7 +53,7 @@ function floorFactor(content: GameContent, floor: number | null): number {
 /**
  * Average of the value factors over the distributions listings are drawn
  * from: dividing by it keeps the average generated value on the observed
- * median price per m² (epoch, DPE, condition, floor and hidden defects).
+ * median price per m² (epoch, DPE, condition, floor and nuisances).
  */
 /** Two-level cache keyed by content, then by strings (valuation runs for every listing daily). */
 function cacheFor<V>(
@@ -72,6 +72,23 @@ function cacheFor<V>(
     byContent.set(first, byFirst);
   }
   return byFirst;
+}
+
+const offsetCache = new WeakMap<GameContent, number>();
+
+/** Mean generation offset of the items, weighted by their value (energy offsets average out). */
+function averageOffset(content: GameContent): number {
+  let cached = offsetCache.get(content);
+  if (cached === undefined) {
+    const rules = Object.values(content.works.items);
+    const total = rules.reduce((sum, rule) => sum + rule.valueWeight, 0);
+    cached =
+      total > 0
+        ? rules.reduce((sum, rule) => sum + rule.valueWeight * rule.generationOffset, 0) / total
+        : 0;
+    offsetCache.set(content, cached);
+  }
+  return cached;
 }
 
 const normalizationCache = new WeakMap<GameContent, Map<string, Map<string, number>>>();
@@ -114,14 +131,16 @@ export function valueNormalization(
     const weights = rules.conditionWeights[epoch];
     const weightTotal = Object.values(weights).reduce((a, b) => a + b, 0);
     let conditions = 0;
-    for (const [condition, weight] of Object.entries(weights) as [Condition, number][]) {
-      let defects = 1;
-      for (const rule of rules.defects) {
-        defects *=
-          1 - defectProbability(content, rule, kind, epoch, condition) * rule.valueImpactShare;
-      }
-      conditions += (weight / weightTotal) * rules.conditions[condition].valueFactor * defects;
+    for (const [condition, weight] of Object.entries(weights) as [keyof typeof weights, number][]) {
+      // Items are drawn around the condition's mean state (see dwelling.drawDwelling).
+      const state = rules.conditions[condition].meanState + averageOffset(content);
+      conditions += (weight / weightTotal) * interpolateByState(content.works.valueByState, state);
     }
+    let defects = 1;
+    for (const rule of rules.defects) {
+      defects *= 1 - defectProbability(rule, kind, epoch) * rule.valueImpactShare;
+    }
+    conditions *= defects;
     total += epochShare * rules.epochFactors[epoch] * dpe * conditions;
   }
   if (kind === 'apartment') {
@@ -142,9 +161,14 @@ export interface ValueBreakdown {
   surfaceFactor: number;
   epochFactor: number;
   dpeFactor: number;
-  conditionFactor: number;
+  /** Factor of the dwelling's weighted state (rooms and elements). */
+  stateFactor: number;
+  /** Bonus of the renovations' tiers, within the neighbourhood's ceiling. */
+  tierFactor: number;
+  /** Share of the tiers' bonus the ceiling lets through (1: all of it). */
+  tierCeilingShare: number;
   floorFactor: number;
-  /** Product of (1 − impact) over the defects counted. */
+  /** Product of (1 − impact) over the nuisances counted. */
   defectsFactor: number;
   normalization: number;
   /** Discount for selling a whole building at once. */
@@ -166,13 +190,15 @@ function surfaceValue(
 }
 
 /**
- * Value of a property with a given factor for its defects. `defectsFactor`
- * lets the estimate replace the hidden defects by their expectation.
+ * Value of a property given the state of its items (`stateOf` lets the
+ * estimate replace unknown items by their expectation) and a factor for its
+ * nuisances.
  */
 function valueWith(
   content: GameContent,
   state: GameState,
   property: Property,
+  stateOf: ((item: WorkItem) => number) | undefined,
   defectsFactor: number,
 ): ValueBreakdown {
   const rules = content.market;
@@ -189,34 +215,51 @@ function valueWith(
   const surfaceFactor = property.surface > 0 ? weightedSurface / property.surface : 1;
   const epochFactor = rules.epochFactors[property.epoch];
   const dpeFactor = rules.dpeFactors[property.dpe];
-  const conditionFactor = rules.conditions[property.condition].valueFactor;
+  const stateFactor = stateValueFactor(content, property, stateOf);
   const floor = floorFactor(content, property.floor);
   const normalization = valueNormalization(content, property.cityId, neighbourhood, property.kind);
   const buildingFactor = property.kind === 'building' ? rules.building.valueFactor : 1;
-  const euros =
+  const base =
     (property.surface *
       median *
       priceIndex *
       surfaceFactor *
       epochFactor *
       dpeFactor *
-      conditionFactor *
+      stateFactor *
       floor *
       defectsFactor *
       buildingFactor) /
     normalization;
+  // Premium in a modest neighbourhood: the bonus stops at the neighbourhood's ceiling.
+  const tiers = tierShare(content, property, 'value', stateOf);
+  let tierFactor = 1 + tiers;
+  let tierCeilingShare = 1;
+  if (tiers > 0) {
+    const ceiling =
+      property.surface *
+      valueCeilingPerM2(content, property) *
+      priceIndex *
+      surfaceFactor *
+      buildingFactor;
+    const bonus = Math.min(base * tiers, Math.max(0, ceiling - base));
+    tierCeilingShare = bonus / (base * tiers);
+    tierFactor = 1 + bonus / base;
+  }
   return {
     medianPricePerM2: median,
     priceIndex,
     surfaceFactor,
     epochFactor,
     dpeFactor,
-    conditionFactor,
+    stateFactor,
+    tierFactor,
+    tierCeilingShare,
     floorFactor: floor,
     defectsFactor,
     normalization,
     buildingFactor,
-    value: toCents(Math.round(euros)),
+    value: toCents(Math.round(base * tierFactor)),
   };
 }
 
@@ -224,7 +267,7 @@ function impactOf(content: GameContent, defectId: string): number {
   return content.market.defects.find((rule) => rule.id === defectId)?.valueImpactShare ?? 0;
 }
 
-/** Real value, hidden defects included: what the market would pay with full knowledge. */
+/** Real value, hidden states and nuisances included: what the market would pay with full knowledge. */
 export function realValue(
   content: GameContent,
   state: GameState,
@@ -234,7 +277,7 @@ export function realValue(
     (product, d) => product * (1 - impactOf(content, d.id)),
     1,
   );
-  return valueWith(content, state, property, defects);
+  return valueWith(content, state, property, undefined, defects);
 }
 
 export interface Estimate {
@@ -244,9 +287,20 @@ export interface Estimate {
   breakdown: ValueBreakdown;
 }
 
+/** The player's view of an item: its state if known, otherwise its expectation. */
+export function believedState(
+  content: GameContent,
+  property: Property,
+): (item: WorkItem) => number {
+  const condition = conditionLabel(content, property);
+  return (item) => (item.known ? item.state : expectedState(content, property, item, condition));
+}
+
 /**
- * Estimate from what the player knows: revealed defects count fully, the
- * others by their probability given what visits have (not) shown.
+ * Estimate from what the player knows: known items at their state, the
+ * others at the expectation of the announced condition; revealed nuisances
+ * count fully, the others by their probability given what visits have (not)
+ * shown.
  */
 export function estimateValue(
   content: GameContent,
@@ -261,20 +315,14 @@ export function estimateValue(
       factor *= 1 - rule.valueImpactShare;
       continue;
     }
-    const prior = defectProbability(
-      content,
-      rule,
-      property.kind,
-      property.epoch,
-      property.condition,
-    );
-    // Bayes: not revealed by a visit makes the defect less likely.
+    const prior = defectProbability(rule, property.kind, property.epoch);
+    // Bayes: not revealed by a visit makes the nuisance less likely.
     const chance = visited
       ? (prior * (1 - rule.revealChanceOnVisit)) / (1 - prior * rule.revealChanceOnVisit)
       : prior;
     factor *= 1 - chance * rule.valueImpactShare;
   }
-  const breakdown = valueWith(content, state, property, factor);
+  const breakdown = valueWith(content, state, property, believedState(content, property), factor);
   const spread = content.market.pricing.estimateSpread;
   return {
     estimate: breakdown.value,

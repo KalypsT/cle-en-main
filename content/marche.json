@@ -14,12 +14,13 @@
     "valueFactor": 0.85
   },
   "conditions": {
-    "ruin": { "valueFactor": 0.62, "defectMultiplier": 2.5 },
-    "toRenovate": { "valueFactor": 0.8, "defectMultiplier": 1.8 },
-    "toRefresh": { "valueFactor": 0.93, "defectMultiplier": 1 },
-    "good": { "valueFactor": 1.03, "defectMultiplier": 0.5 },
-    "renovated": { "valueFactor": 1.12, "defectMultiplier": 0.2 }
+    "ruin": { "meanState": 1.3 },
+    "toRenovate": { "meanState": 2.3 },
+    "toRefresh": { "meanState": 3.1 },
+    "good": { "meanState": 4 },
+    "renovated": { "meanState": 4.7 }
   },
+  "stateStdDev": 0.7,
   "conditionWeights": {
     "before1948": {
       "ruin": 0.08,
@@ -68,65 +69,6 @@
     "after2012": 1.12
   },
   "defects": [
-    {
-      "id": "humidity",
-      "valueImpactShare": 0.05,
-      "probability": 0.12,
-      "revealChanceOnVisit": 0.7,
-      "kinds": ["apartment", "house", "building"],
-      "epochMultipliers": { "before1948": 1.8, "after2012": 0.2 }
-    },
-    {
-      "id": "roof",
-      "valueImpactShare": 0.06,
-      "probability": 0.1,
-      "revealChanceOnVisit": 0.4,
-      "kinds": ["house", "building"],
-      "epochMultipliers": { "before1948": 1.5, "from2006to2012": 0.3, "after2012": 0.1 }
-    },
-    {
-      "id": "wiring",
-      "valueImpactShare": 0.03,
-      "probability": 0.2,
-      "revealChanceOnVisit": 0.6,
-      "kinds": ["apartment", "house", "building"],
-      "epochMultipliers": {
-        "before1948": 1.5,
-        "from1948to1974": 1.3,
-        "from2006to2012": 0.3,
-        "after2012": 0.1
-      }
-    },
-    {
-      "id": "plumbing",
-      "valueImpactShare": 0.03,
-      "probability": 0.12,
-      "revealChanceOnVisit": 0.5,
-      "kinds": ["apartment", "house", "building"]
-    },
-    {
-      "id": "heating",
-      "valueImpactShare": 0.03,
-      "probability": 0.15,
-      "revealChanceOnVisit": 0.7,
-      "kinds": ["apartment", "house", "building"],
-      "epochMultipliers": { "after2012": 0.2 }
-    },
-    {
-      "id": "cracks",
-      "valueImpactShare": 0.08,
-      "probability": 0.04,
-      "revealChanceOnVisit": 0.8,
-      "kinds": ["house", "building"]
-    },
-    {
-      "id": "dryRot",
-      "valueImpactShare": 0.15,
-      "probability": 0.01,
-      "revealChanceOnVisit": 0.3,
-      "kinds": ["apartment", "house", "building"],
-      "epochMultipliers": { "before1948": 2, "from2006to2012": 0.2, "after2012": 0 }
-    },
     {
       "id": "noisyNeighbours",
       "valueImpactShare": 0.03,

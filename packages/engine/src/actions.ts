@@ -1,6 +1,6 @@
 import type { GameEvent } from './events.ts';
 import type { Cents } from './money.ts';
-import type { LeaseType } from './content.ts';
+import type { LeaseType, Trade } from './content.ts';
 import type { GameState, SaleMode, TaxRegimeChoice } from './state.ts';
 import type { VisitRefusal } from './systems/agenda.ts';
 import type { BankActionRefusal } from './systems/banking.ts';
@@ -8,6 +8,8 @@ import type { OfferRefusal } from './systems/offers.ts';
 import type { PurchaseRefusal } from './systems/purchases.ts';
 import type { RentRefusal } from './systems/renting.ts';
 import type { SaleRefusal } from './systems/resale.ts';
+import type { CoproRefusal } from './systems/copro.ts';
+import type { HazardChoice, ItemChoice, WorksRefusal } from './systems/works.ts';
 
 /** Every player or bot decision goes through one of these actions. Amounts are in cents. */
 export type GameAction =
@@ -23,6 +25,8 @@ export type GameAction =
       bankId: string;
       amount: Cents;
       durationYears: number;
+      /** Part of the project that is works (kept in the property's works envelope). */
+      works?: Cents;
     }
   | { type: 'purchase/acceptLoan'; purchaseId: string; applicationId: string }
   | { type: 'purchase/payCash'; purchaseId: string }
@@ -50,7 +54,17 @@ export type GameAction =
   | { type: 'rent/repair'; propertyId: string; method: 'self' | 'artisan' }
   | { type: 'home/moveIn'; propertyId: string }
   | { type: 'home/moveOut' }
-  | { type: 'tax/setRegime'; propertyId: string; regime: TaxRegimeChoice };
+  | { type: 'tax/setRegime'; propertyId: string; regime: TaxRegimeChoice }
+  | { type: 'market/diagnose'; listingId: string; trade: Trade }
+  | { type: 'works/quote'; propertyId: string; artisanId: string; items: ItemChoice[] }
+  | { type: 'works/start'; propertyId: string; quoteIds: string[]; diy: ItemChoice[] }
+  | { type: 'works/hazard'; propertyId: string; choice: HazardChoice }
+  | {
+      type: 'copro/vote';
+      propertyId: string;
+      resolutionId: string;
+      vote: 'for' | 'against';
+    };
 
 export type RefusalCode =
   | BankActionRefusal
@@ -59,6 +73,8 @@ export type RefusalCode =
   | PurchaseRefusal
   | SaleRefusal
   | RentRefusal
+  | WorksRefusal
+  | CoproRefusal
   | 'job.alreadyResigned';
 
 /** Machine-readable refusal; the interface maps `code` to a text from `content/`. */

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { dpeLabelSchema } from './city.ts';
 import { euros, id, share } from './common.ts';
-import { conditionSchema } from './market.ts';
+import { itemKindSchema } from './works.ts';
 
 /** Renting rules (docs/03-systemes/04-location.md). */
 
@@ -16,6 +16,8 @@ const intRange = z
 const months = z.number().int().min(1);
 const minutes = z.number().int().min(0);
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+/** Five values, for states 1 to 5. */
+const byState = z.array(z.number()).length(5);
 
 export const LEASE_TYPES = ['bare', 'furnished'] as const;
 export const leaseTypeSchema = z.enum(LEASE_TYPES);
@@ -89,6 +91,8 @@ const incidentSchema = z
     id,
     /** Monthly chance in a property in good condition. */
     monthlyProbability: share,
+    /** Item whose state makes it more or less frequent. */
+    item: itemKindSchema,
     /** Can the owner fix it himself? */
     selfRepair: z.boolean(),
     selfMinutes: minutes,
@@ -128,8 +132,10 @@ export const rentingRulesSchema = z
     priceIndexElasticity: z.number().min(0),
     /** The city's rents per m² include charges: the recoverable charges are taken out. */
     dataRentsIncludeCharges: z.boolean(),
-    /** Rent factor by condition; 0 means the property is indecent and cannot be let. */
-    conditionFactors: z.record(conditionSchema, z.number().min(0)),
+    /** Rent factor by the dwelling's weighted state (1 to 5, interpolated). */
+    stateRentFactors: byState,
+    /** Below this weighted state, or with a critical item at state 1, the home is indecent. */
+    indecentBelowState: z.number().min(1).max(5),
     dpeFactors: z.record(dpeLabelSchema, z.number().positive()),
     /** Rents the player may ask, as a share of the market rent of the lease type. */
     rentRange: range,
@@ -180,7 +186,8 @@ export const rentingRulesSchema = z
       .object({
         initial: z.number().min(0).max(100),
         base: z.number(),
-        byCondition: z.record(conditionSchema, z.number()),
+        /** Target shift by the dwelling's weighted state (1 to 5, interpolated). */
+        byState,
         /** Points lost per percent of rent above the market (gained below). */
         perPercentOverMarket: z.number().min(0),
         /** Share of the gap to the target closed every month. */
@@ -191,7 +198,8 @@ export const rentingRulesSchema = z
       })
       .strict(),
     incidents: z.array(incidentSchema).min(1),
-    incidentConditionFactors: z.record(conditionSchema, z.number().min(0)),
+    /** Incident multiplier by the state of the incident's item. */
+    incidentStateFactors: byState,
     /** An incident left this long makes the tenant give notice. */
     incidentPatienceDays: z.number().int().min(1),
     unpaid: z

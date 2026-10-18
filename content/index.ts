@@ -13,6 +13,9 @@ import listingTextsJson from './textes/annonces.json' with { type: 'json' };
 import tenantTextsJson from './textes/locataires.json' with { type: 'json' };
 import uiTextsJson from './textes/interface.json' with { type: 'json' };
 import livingCostsJson from './train-de-vie.json' with { type: 'json' };
+import artisansJson from './artisans.json' with { type: 'json' };
+import worksJson from './travaux.json' with { type: 'json' };
+import worksTextsJson from './textes/travaux.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
 import { banksFileSchema, creditRulesSchema, marketRateSchema } from './schemas/credit.ts';
@@ -24,6 +27,7 @@ import { livingCostsSchema, startSchema } from './schemas/start.ts';
 import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
+import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
 
 export type { GameContent } from './references.ts';
 export type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
@@ -54,10 +58,24 @@ export type { Rival, RivalsFile } from './schemas/rivals.ts';
 export type { LivingCosts, Start } from './schemas/start.ts';
 export type { TimeSettings } from './schemas/time.ts';
 export type { UiTexts } from './schemas/ui-texts.ts';
+export type {
+  Artisan,
+  HazardRule,
+  ItemKind,
+  ItemRule,
+  ResolutionRule,
+  SpaceKind,
+  Tier,
+  Trade,
+  WorksRules,
+  WorksTexts,
+} from './schemas/works.ts';
+export { ITEM_KINDS, SPACE_KINDS, TIERS, TRADES } from './schemas/works.ts';
 export { checkReferences };
 
 const jobsFile = jobsFileSchema.parse(jobsJson);
 const rivalsFile = rivalsFileSchema.parse(rivalsJson);
+const artisansFile = artisansFileSchema.parse(artisansJson);
 
 /** Gameplay content handed to the engine. */
 export const gameContent: GameContent = {
@@ -75,6 +93,10 @@ export const gameContent: GameContent = {
   taxes: taxRulesSchema.parse(taxesJson),
   rivalRules: rivalsFile.aggressiveness,
   rivals: rivalsFile.rivals,
+  works: worksRulesSchema.parse(worksJson),
+  trades: artisansFile.trades,
+  artisans: artisansFile.artisans,
+  worksTexts: worksTextsSchema.parse(worksTextsJson),
   cities: { dole: cityDataSchema.parse(doleJson) },
 };
 

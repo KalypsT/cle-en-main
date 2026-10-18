@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { conditionSchema } from './market.ts';
 import { euros, id, share } from './common.ts';
+import { tierSchema } from './works.ts';
 
 /** Named rival investors (docs/03-systemes/03, « Les investisseurs rivaux »). */
 
@@ -60,7 +61,10 @@ const rivalSchema = z
     flip: z
       .object({
         months: range,
-        conditionAfter: conditionSchema,
+        /** Tier of their renovation: every visible item is redone (content/travaux.json). */
+        tier: tierSchema,
+        /** Chance that they also redo an item a visit would not show (« ou presque »). */
+        hiddenWorksShare: share,
         /** Motivation of the listing they publish (content/marche.json). */
         motivationId: id,
       })

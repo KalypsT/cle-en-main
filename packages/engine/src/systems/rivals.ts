@@ -6,6 +6,14 @@ import type { SystemContext } from './context.ts';
 import { listingFor, removeListing } from './listings.ts';
 import { netWorth } from './net-worth.ts';
 import { realValue } from './valuation.ts';
+import {
+  conditionLabel,
+  dpeOf,
+  energyNeeds,
+  freezeItems,
+  itemRule,
+  renovatedItem,
+} from './dwelling.ts';
 
 /**
  * Named rivals (docs/03-systemes/03, « Les investisseurs rivaux »): a budget,
@@ -36,12 +44,12 @@ export function aggressiveness(content: GameContent, state: GameState): number {
 }
 
 /** Interest of a rival for a property, 0 when it does not fit its preferences. */
-function interest(rival: Rival, property: Property): number {
+function interest(content: GameContent, rival: Rival, property: Property): number {
   const preferences = rival.preferences;
   if (!rival.cities.includes(property.cityId)) return 0;
   if (!preferences.kinds.includes(property.kind)) return 0;
   if (property.surface > preferences.maxSurface) return 0;
-  if (!preferences.conditions.includes(property.condition)) return 0;
+  if (!preferences.conditions.includes(conditionLabel(content, property))) return 0;
   return preferences.neighbourhoods[property.neighbourhoodId] ?? preferences.otherNeighbourhoods;
 }
 
@@ -110,10 +118,20 @@ function relistProjects(ctx: SystemContext, rival: Rival, rivalState: RivalState
   if (due.length === 0) return;
   rivalState.projects = rivalState.projects.filter((project) => project.resaleDay > ctx.today);
   for (const project of due) {
+    // Every visible item is redone, the hidden ones only sometimes (« ou presque »).
+    const before = project.property;
+    const items = before.items.map((item) => {
+      const visible = itemRule(ctx.content, item.kind).revealOnVisit >= 1;
+      const redone =
+        itemRule(ctx.content, item.kind).works !== null &&
+        (visible || nextFloat(ctx.state.rng) < flip.hiddenWorksShare);
+      return { ...(redone ? renovatedItem(item, flip.tier) : item), known: false };
+    });
+    const renovated = { ...before, items: freezeItems(items) };
     const property: Property = {
-      ...project.property,
-      condition: flip.conditionAfter,
-      defects: [],
+      ...renovated,
+      dpe: dpeOf(ctx.content, energyNeeds(ctx.content, renovated)),
+      postponedHazards: [],
     };
     const listing = listingFor(ctx, property, flip.motivationId);
     ctx.state.listings.push(listing);
@@ -128,7 +146,7 @@ function relistProjects(ctx: SystemContext, rival: Rival, rivalState: RivalState
 
 function wantsListing(ctx: SystemContext, rival: Rival, listing: Listing): number {
   if (listing.offer || ctx.today < listing.publicDay) return 0;
-  const weight = interest(rival, listing.property);
+  const weight = interest(ctx.content, rival, listing.property);
   if (weight === 0) return 0;
   const estimate = rivalEstimate(ctx, rival, listing.property);
   return estimate / listing.askingPrice - 1 >= rival.minBargain ? weight : 0;
@@ -147,7 +165,7 @@ function offerOnPlayerSales(
     const sale = owned.sale;
     if (!sale || sale.agreement) continue;
     if (sale.offers.some((offer) => offer.buyerId === rival.id)) continue;
-    const weight = interest(rival, owned.property);
+    const weight = interest(ctx.content, rival, owned.property);
     if (weight === 0) continue;
     const estimate = rivalEstimate(ctx, rival, owned.property);
     if (estimate / sale.askingPrice - 1 < rules.minBargain) continue;

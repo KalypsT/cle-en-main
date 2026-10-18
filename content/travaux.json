@@ -1,0 +1,706 @@
+{
+  "items": {
+    "floors": {
+      "scope": "space",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 11,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 1,
+      "energy": null,
+      "works": {
+        "trade": "tiler",
+        "phase": 6,
+        "basis": "space",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 0, "perUnit": 35 },
+            "days": { "fixed": 0.5, "perUnit": 0.08 }
+          },
+          "standard": {
+            "cost": { "fixed": 0, "perUnit": 75 },
+            "days": { "fixed": 1, "perUnit": 0.12 }
+          },
+          "premium": {
+            "cost": { "fixed": 0, "perUnit": 140 },
+            "days": { "fixed": 1, "perUnit": 0.18 }
+          }
+        },
+        "labourShare": 0.45,
+        "occupied": false,
+        "diy": null
+      }
+    },
+    "walls": {
+      "scope": "space",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 15,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 1.3,
+      "energy": null,
+      "works": {
+        "trade": "painter",
+        "phase": 5,
+        "basis": "space",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 0, "perUnit": 70 },
+            "days": { "fixed": 0.5, "perUnit": 0.1 }
+          },
+          "standard": {
+            "cost": { "fixed": 0, "perUnit": 105 },
+            "days": { "fixed": 1, "perUnit": 0.13 }
+          },
+          "premium": {
+            "cost": { "fixed": 0, "perUnit": 170 },
+            "days": { "fixed": 1, "perUnit": 0.2 }
+          }
+        },
+        "labourShare": 0.65,
+        "occupied": true,
+        "diy": {
+          "jobs": null,
+          "minutes": { "fixed": 60, "perUnit": 30 },
+          "quality": { "5": 0.55, "4": 0.35, "3": 0.1 }
+        }
+      }
+    },
+    "joinery": {
+      "scope": "space",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 6,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.6,
+      "energy": null,
+      "works": {
+        "trade": "carpenter",
+        "phase": 6,
+        "basis": "unit",
+        "tiers": {
+          "eco": { "cost": { "fixed": 250, "perUnit": 0 }, "days": { "fixed": 0.5, "perUnit": 0 } },
+          "standard": {
+            "cost": { "fixed": 550, "perUnit": 0 },
+            "days": { "fixed": 0.5, "perUnit": 0 }
+          },
+          "premium": {
+            "cost": { "fixed": 1100, "perUnit": 0 },
+            "days": { "fixed": 1, "perUnit": 0 }
+          }
+        },
+        "labourShare": 0.4,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "kitchen": {
+      "scope": "space",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 18,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.8,
+      "energy": null,
+      "works": {
+        "trade": "kitchenFitter",
+        "phase": 4,
+        "basis": "unit",
+        "tiers": {
+          "eco": { "cost": { "fixed": 3800, "perUnit": 0 }, "days": { "fixed": 3, "perUnit": 0 } },
+          "standard": {
+            "cost": { "fixed": 8500, "perUnit": 0 },
+            "days": { "fixed": 5, "perUnit": 0 }
+          },
+          "premium": {
+            "cost": { "fixed": 18000, "perUnit": 0 },
+            "days": { "fixed": 8, "perUnit": 0 }
+          }
+        },
+        "labourShare": 0.3,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "bathroom": {
+      "scope": "space",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 16,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.8,
+      "energy": null,
+      "works": {
+        "trade": "plumber",
+        "phase": 4,
+        "basis": "unit",
+        "tiers": {
+          "eco": { "cost": { "fixed": 4000, "perUnit": 0 }, "days": { "fixed": 5, "perUnit": 0 } },
+          "standard": {
+            "cost": { "fixed": 7500, "perUnit": 0 },
+            "days": { "fixed": 8, "perUnit": 0 }
+          },
+          "premium": {
+            "cost": { "fixed": 14000, "perUnit": 0 },
+            "days": { "fixed": 12, "perUnit": 0 }
+          }
+        },
+        "labourShare": 0.5,
+        "occupied": false,
+        "diy": null
+      }
+    },
+    "wcUnit": {
+      "scope": "space",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 2,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.6,
+      "energy": null,
+      "works": {
+        "trade": "plumber",
+        "phase": 4,
+        "basis": "unit",
+        "tiers": {
+          "eco": { "cost": { "fixed": 450, "perUnit": 0 }, "days": { "fixed": 1, "perUnit": 0 } },
+          "standard": {
+            "cost": { "fixed": 950, "perUnit": 0 },
+            "days": { "fixed": 1, "perUnit": 0 }
+          },
+          "premium": {
+            "cost": { "fixed": 1900, "perUnit": 0 },
+            "days": { "fixed": 2, "perUnit": 0 }
+          }
+        },
+        "labourShare": 0.4,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "garden": {
+      "scope": "space",
+      "kinds": ["house"],
+      "valueWeight": 3,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 1.2,
+      "energy": null,
+      "works": {
+        "trade": "mason",
+        "phase": 6,
+        "basis": "unit",
+        "tiers": {
+          "eco": { "cost": { "fixed": 1500, "perUnit": 0 }, "days": { "fixed": 2, "perUnit": 0 } },
+          "standard": {
+            "cost": { "fixed": 4000, "perUnit": 0 },
+            "days": { "fixed": 4, "perUnit": 0 }
+          },
+          "premium": {
+            "cost": { "fixed": 10000, "perUnit": 0 },
+            "days": { "fixed": 8, "perUnit": 0 }
+          }
+        },
+        "labourShare": 0.5,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "electricity": {
+      "scope": "dwelling",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 7,
+      "revealOnVisit": 0.6,
+      "generationOffset": 0.3,
+      "critical": true,
+      "wearFactor": 0.4,
+      "energy": null,
+      "works": {
+        "trade": "electrician",
+        "phase": 2,
+        "basis": "surface",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 400, "perUnit": 50 },
+            "days": { "fixed": 2, "perUnit": 0.08 }
+          },
+          "standard": {
+            "cost": { "fixed": 800, "perUnit": 110 },
+            "days": { "fixed": 3, "perUnit": 0.12 }
+          },
+          "premium": {
+            "cost": { "fixed": 1500, "perUnit": 160 },
+            "days": { "fixed": 4, "perUnit": 0.16 }
+          }
+        },
+        "labourShare": 0.55,
+        "occupied": false,
+        "diy": {
+          "jobs": ["electrician"],
+          "minutes": { "fixed": 240, "perUnit": 35 },
+          "quality": { "5": 0.85, "4": 0.15, "3": 0 }
+        }
+      }
+    },
+    "plumbing": {
+      "scope": "dwelling",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 5,
+      "revealOnVisit": 0.5,
+      "generationOffset": 0.3,
+      "critical": true,
+      "wearFactor": 0.5,
+      "energy": null,
+      "works": {
+        "trade": "plumber",
+        "phase": 2,
+        "basis": "surface",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 300, "perUnit": 40 },
+            "days": { "fixed": 2, "perUnit": 0.06 }
+          },
+          "standard": {
+            "cost": { "fixed": 600, "perUnit": 75 },
+            "days": { "fixed": 3, "perUnit": 0.08 }
+          },
+          "premium": {
+            "cost": { "fixed": 1000, "perUnit": 105 },
+            "days": { "fixed": 3, "perUnit": 0.1 }
+          }
+        },
+        "labourShare": 0.55,
+        "occupied": false,
+        "diy": null
+      }
+    },
+    "heating": {
+      "scope": "dwelling",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 7,
+      "revealOnVisit": 0.7,
+      "generationOffset": 0.3,
+      "critical": true,
+      "wearFactor": 0.7,
+      "energy": {
+        "byState": [1.3, 1.15, 1, 0.93, 0.88],
+        "tiers": { "eco": 1.12, "standard": 1, "premium": 0.6 }
+      },
+      "works": {
+        "trade": "heatingEngineer",
+        "phase": 2,
+        "basis": "surface",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 800, "perUnit": 45 },
+            "days": { "fixed": 2, "perUnit": 0.03 }
+          },
+          "standard": {
+            "cost": { "fixed": 4500, "perUnit": 50 },
+            "days": { "fixed": 4, "perUnit": 0.04 }
+          },
+          "premium": {
+            "cost": { "fixed": 11000, "perUnit": 60 },
+            "days": { "fixed": 5, "perUnit": 0.05 }
+          }
+        },
+        "labourShare": 0.35,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "insulation": {
+      "scope": "dwelling",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 3,
+      "revealOnVisit": 0.3,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.2,
+      "energy": {
+        "byState": [1.35, 1.18, 1, 0.88, 0.78],
+        "tiers": { "eco": 1.1, "standard": 1, "premium": 0.82 }
+      },
+      "works": {
+        "trade": "mason",
+        "phase": 3,
+        "basis": "insulation",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 0, "perUnit": 35 },
+            "days": { "fixed": 2, "perUnit": 0.08 }
+          },
+          "standard": {
+            "cost": { "fixed": 0, "perUnit": 70 },
+            "days": { "fixed": 3, "perUnit": 0.12 }
+          },
+          "premium": {
+            "cost": { "fixed": 0, "perUnit": 140 },
+            "days": { "fixed": 5, "perUnit": 0.15 }
+          }
+        },
+        "labourShare": 0.5,
+        "occupied": false,
+        "diy": null
+      }
+    },
+    "windows": {
+      "scope": "dwelling",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 6,
+      "revealOnVisit": 1,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.4,
+      "energy": {
+        "byState": [1.12, 1.06, 1, 0.96, 0.93],
+        "tiers": { "eco": 1.03, "standard": 1, "premium": 0.95 }
+      },
+      "works": {
+        "trade": "carpenter",
+        "phase": 3,
+        "basis": "windows",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 0, "perUnit": 550 },
+            "days": { "fixed": 0.5, "perUnit": 0.3 }
+          },
+          "standard": {
+            "cost": { "fixed": 0, "perUnit": 900 },
+            "days": { "fixed": 0.5, "perUnit": 0.4 }
+          },
+          "premium": {
+            "cost": { "fixed": 0, "perUnit": 1500 },
+            "days": { "fixed": 1, "perUnit": 0.5 }
+          }
+        },
+        "labourShare": 0.35,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "ventilation": {
+      "scope": "dwelling",
+      "kinds": ["apartment", "house", "building"],
+      "valueWeight": 2,
+      "revealOnVisit": 0.6,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.6,
+      "energy": {
+        "byState": [1.1, 1.05, 1, 0.97, 0.95],
+        "tiers": { "eco": 1, "standard": 0.98, "premium": 0.88 }
+      },
+      "works": {
+        "trade": "heatingEngineer",
+        "phase": 2,
+        "basis": "unit",
+        "tiers": {
+          "eco": { "cost": { "fixed": 1200, "perUnit": 0 }, "days": { "fixed": 1, "perUnit": 0 } },
+          "standard": {
+            "cost": { "fixed": 2200, "perUnit": 0 },
+            "days": { "fixed": 2, "perUnit": 0 }
+          },
+          "premium": {
+            "cost": { "fixed": 6500, "perUnit": 0 },
+            "days": { "fixed": 4, "perUnit": 0 }
+          }
+        },
+        "labourShare": 0.45,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "roof": {
+      "scope": "dwelling",
+      "kinds": ["house", "building"],
+      "valueWeight": 6,
+      "revealOnVisit": 0.4,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.4,
+      "energy": {
+        "byState": [1.12, 1.06, 1, 0.98, 0.97],
+        "tiers": { "eco": 1, "standard": 1, "premium": 0.92 }
+      },
+      "works": {
+        "trade": "mason",
+        "phase": 1,
+        "basis": "roof",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 0, "perUnit": 60 },
+            "days": { "fixed": 3, "perUnit": 0.05 }
+          },
+          "standard": {
+            "cost": { "fixed": 0, "perUnit": 150 },
+            "days": { "fixed": 5, "perUnit": 0.08 }
+          },
+          "premium": {
+            "cost": { "fixed": 0, "perUnit": 230 },
+            "days": { "fixed": 7, "perUnit": 0.1 }
+          }
+        },
+        "labourShare": 0.5,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "facade": {
+      "scope": "dwelling",
+      "kinds": ["house", "building"],
+      "valueWeight": 5,
+      "revealOnVisit": 0.9,
+      "generationOffset": 0,
+      "critical": false,
+      "wearFactor": 0.6,
+      "energy": {
+        "byState": [1, 1, 1, 1, 1],
+        "tiers": { "eco": 1, "standard": 1, "premium": 0.8 }
+      },
+      "works": {
+        "trade": "mason",
+        "phase": 1,
+        "basis": "facade",
+        "tiers": {
+          "eco": {
+            "cost": { "fixed": 0, "perUnit": 40 },
+            "days": { "fixed": 3, "perUnit": 0.04 }
+          },
+          "standard": {
+            "cost": { "fixed": 0, "perUnit": 90 },
+            "days": { "fixed": 5, "perUnit": 0.06 }
+          },
+          "premium": {
+            "cost": { "fixed": 0, "perUnit": 190 },
+            "days": { "fixed": 8, "perUnit": 0.1 }
+          }
+        },
+        "labourShare": 0.5,
+        "occupied": true,
+        "diy": null
+      }
+    },
+    "commonParts": {
+      "scope": "copro",
+      "kinds": ["apartment"],
+      "valueWeight": 6,
+      "revealOnVisit": 0.8,
+      "generationOffset": 0.3,
+      "critical": false,
+      "wearFactor": 0.7,
+      "energy": null,
+      "works": null
+    }
+  },
+  "spaces": {
+    "entry": ["floors", "walls", "joinery"],
+    "living": ["floors", "walls", "joinery"],
+    "kitchen": ["floors", "walls", "kitchen"],
+    "bedroom": ["floors", "walls", "joinery"],
+    "bathroom": ["floors", "walls", "bathroom"],
+    "wc": ["walls", "wcUnit"],
+    "garden": ["garden"]
+  },
+  "layout": {
+    "entry": { "share": 0.06, "min": 2, "max": 8 },
+    "kitchen": { "share": 0.12, "min": 5, "max": 14 },
+    "bathroom": { "share": 0.07, "min": 3.5, "max": 8 },
+    "bedroom": { "share": 0.14, "min": 9, "max": 16 },
+    "wc": { "surface": 1.5, "fromSurface": 40 },
+    "livingMinShare": 0.2,
+    "gardenPerM2": 2
+  },
+  "areas": {
+    "insulation": { "apartment": 0.8, "house": 1.3, "building": 1 },
+    "roof": { "apartment": 0.8, "house": 0.8, "building": 0.45 },
+    "facade": { "apartment": 1, "house": 1, "building": 0.6 },
+    "windowsPerM2": 0.09,
+    "minWindows": 2
+  },
+  "cityCostIndex": { "dole": 0.95 },
+  "stateCostFactors": [1.25, 1.1, 1, 0.85, 0.8],
+  "tiers": {
+    "eco": { "value": -0.04, "rent": -0.02, "wear": 0.08, "diyTime": 0.8 },
+    "standard": { "value": 0, "rent": 0, "wear": 0.04, "diyTime": 1 },
+    "premium": { "value": 0.08, "rent": 0.06, "wear": 0.02, "diyTime": 1.4 }
+  },
+  "valueByState": [0.52, 0.68, 0.83, 0.98, 1.12],
+  "valueCeiling": "q3",
+  "wearFloorState": 3,
+  "energy": {
+    "baseByEpoch": {
+      "before1948": 290,
+      "from1948to1974": 320,
+      "from1975to1988": 260,
+      "from1989to2005": 200,
+      "from2006to2012": 150,
+      "after2012": 95
+    },
+    "classMax": { "A": 70, "B": 110, "C": 180, "D": 250, "E": 330, "F": 420, "G": 560 },
+    "generationOffsets": { "A": 1.2, "B": 0.8, "C": 0.4, "D": 0, "E": -0.4, "F": -0.8, "G": -1.2 }
+  },
+  "quotes": { "minutes": 30, "validityDays": 60, "noise": 0.05, "depositShare": 0.3 },
+  "diagnosis": { "cost": 180 },
+  "artisans": {
+    "maxOverrun": 0.3,
+    "maxDelay": 0.8,
+    "imperfection": 0.5,
+    "discountPerJob": 0.01,
+    "maxDiscount": 0.05,
+    "queueCutPerJob": 0.1,
+    "queueCutPerReputation": 0.004,
+    "maxQueueCut": 0.6
+  },
+  "hazards": [
+    {
+      "id": "asbestos",
+      "items": ["floors", "insulation", "roof", "heating", "facade"],
+      "probability": 0.15,
+      "epochMultipliers": {
+        "before1948": 0.6,
+        "from1948to1974": 1.3,
+        "from1975to1988": 1,
+        "from1989to2005": 0.4,
+        "from2006to2012": 0,
+        "after2012": 0
+      },
+      "maxState": 3,
+      "fixedCost": { "min": 400, "max": 800 },
+      "costPerUnit": { "min": 30, "max": 70 },
+      "days": { "min": 7, "max": 15 }
+    },
+    {
+      "id": "lead",
+      "items": ["walls", "joinery"],
+      "probability": 0.3,
+      "epochMultipliers": {
+        "before1948": 1,
+        "from1948to1974": 0,
+        "from1975to1988": 0,
+        "from1989to2005": 0,
+        "from2006to2012": 0,
+        "after2012": 0
+      },
+      "maxState": 3,
+      "fixedCost": { "min": 200, "max": 400 },
+      "costPerUnit": { "min": 15, "max": 35 },
+      "days": { "min": 3, "max": 8 }
+    },
+    {
+      "id": "rottenFloor",
+      "items": ["floors"],
+      "probability": 0.2,
+      "epochMultipliers": {
+        "before1948": 1,
+        "from1948to1974": 0.4,
+        "from1975to1988": 0.1,
+        "from1989to2005": 0,
+        "from2006to2012": 0,
+        "after2012": 0
+      },
+      "maxState": 2,
+      "fixedCost": { "min": 1500, "max": 6000 },
+      "costPerUnit": { "min": 0, "max": 0 },
+      "days": { "min": 5, "max": 15 }
+    },
+    {
+      "id": "wiringOutOfCode",
+      "items": ["kitchen", "bathroom", "walls", "heating"],
+      "probability": 0.25,
+      "epochMultipliers": {
+        "before1948": 1,
+        "from1948to1974": 1,
+        "from1975to1988": 1,
+        "from1989to2005": 1,
+        "from2006to2012": 1,
+        "after2012": 1
+      },
+      "maxState": 5,
+      "requires": { "item": "electricity", "maxState": 2 },
+      "fixedCost": { "min": 1200, "max": 3500 },
+      "costPerUnit": { "min": 0, "max": 0 },
+      "days": { "min": 2, "max": 6 }
+    },
+    {
+      "id": "hiddenDamp",
+      "items": ["walls", "insulation", "floors"],
+      "probability": 0.06,
+      "epochMultipliers": {
+        "before1948": 2,
+        "from1948to1974": 1.2,
+        "from1975to1988": 1,
+        "from1989to2005": 0.7,
+        "from2006to2012": 0.4,
+        "after2012": 0.2
+      },
+      "maxState": 3,
+      "fixedCost": { "min": 1500, "max": 5000 },
+      "costPerUnit": { "min": 0, "max": 0 },
+      "days": { "min": 7, "max": 20 }
+    }
+  ],
+  "hazardDecisionDays": 3,
+  "occupiedSatisfactionPerDay": 1.2,
+  "diyDailyMaxMinutes": 300,
+  "copro": {
+    "lots": { "min": 4, "max": 30 },
+    "noticeDays": 14,
+    "attendMinutes": 120,
+    "resolutionsPerMeeting": { "min": 1, "max": 2 },
+    "resolutions": [
+      {
+        "id": "facadeRenovation",
+        "weight": 3,
+        "costPerM2": { "min": 25, "max": 60 },
+        "months": 12,
+        "support": { "min": 0.3, "max": 0.75 },
+        "commonParts": 2,
+        "energy": 1
+      },
+      {
+        "id": "roofRenovation",
+        "weight": 2,
+        "costPerM2": { "min": 20, "max": 50 },
+        "months": 12,
+        "support": { "min": 0.35, "max": 0.8 },
+        "commonParts": 1,
+        "energy": 0.97
+      },
+      {
+        "id": "elevator",
+        "weight": 1,
+        "costPerM2": { "min": 40, "max": 90 },
+        "months": 24,
+        "support": { "min": 0.2, "max": 0.6 },
+        "commonParts": 1,
+        "energy": 1
+      },
+      {
+        "id": "collectiveBoiler",
+        "weight": 2,
+        "costPerM2": { "min": 15, "max": 35 },
+        "months": 12,
+        "support": { "min": 0.35, "max": 0.75 },
+        "commonParts": 0,
+        "energy": 0.9
+      },
+      {
+        "id": "stairwell",
+        "weight": 3,
+        "costPerM2": { "min": 5, "max": 12 },
+        "months": 6,
+        "support": { "min": 0.45, "max": 0.85 },
+        "commonParts": 1,
+        "energy": 1
+      }
+    ]
+  }
+}

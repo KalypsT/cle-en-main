@@ -34,7 +34,7 @@ const defectSchema = z
     id,
     /** Share of the value lost while the defect is there. */
     valueImpactShare: share,
-    /** Chance that a property has it, before the condition multiplier. */
+    /** Chance that a property has it (nuisances the works cannot fix). */
     probability: share,
     /** Chance that a visit reveals it. */
     revealChanceOnVisit: share,
@@ -72,21 +72,22 @@ export const marketRulesSchema = z
         valueFactor: positive,
       })
       .strict(),
+    /**
+     * Condition announced by the seller: generation draws each item's state
+     * around this mean (content/travaux.json), and the label of a dwelling is
+     * the condition whose mean is closest to its weighted state.
+     */
     conditions: z.record(
       conditionSchema,
-      z
-        .object({
-          valueFactor: positive,
-          /** Multiplier on the chance of hidden defects. */
-          defectMultiplier: z.number().min(0),
-        })
-        .strict(),
+      z.object({ meanState: z.number().min(1).max(5) }).strict(),
     ),
+    /** Spread of an item's state around the mean of its condition. */
+    stateStdDev: z.number().min(0),
     /** Condition weights by construction epoch. */
     conditionWeights: z.record(z.enum(EPOCHS), z.record(conditionSchema, z.number().min(0))),
     dpeFactors: factorsOf(DPE_LABELS),
     epochFactors: factorsOf(EPOCHS),
-    defects: z.array(defectSchema).min(1),
+    defects: z.array(defectSchema),
     pricing: z
       .object({
         /** Standard deviation of the seller's estimation error (share of value). */

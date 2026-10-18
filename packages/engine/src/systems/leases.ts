@@ -18,6 +18,8 @@ import {
   type RentRefusal,
 } from './renting.ts';
 import { addCost, addRent } from './taxes.ts';
+import { interpolateByState, weightedState } from './dwelling.ts';
+import { knownArtisans } from './works.ts';
 
 /** The life of a lease (docs/03-systemes/04, « La vie du bail », « Les impayés »). */
 
@@ -58,7 +60,7 @@ function satisfactionTarget(ctx: SystemContext, owned: OwnedProperty, lease: Lea
   const overPercent = market > 0 ? (lease.monthlyRent / market - 1) * 100 : 0;
   return clampSatisfaction(
     rules.base +
-      rules.byCondition[owned.property.condition] -
+      interpolateByState(rules.byState, weightedState(content, owned.property)) -
       rules.perPercentOverMarket * overPercent,
   );
 }
@@ -330,13 +332,19 @@ function dailyIncident(ctx: SystemContext, owned: OwnedProperty, lease: Lease): 
     }
     return;
   }
-  const factor = rules.incidentConditionFactors[owned.property.condition];
-  const total = rules.incidents.reduce((sum, k) => sum + k.monthlyProbability, 0) * factor;
+  // Each incident is more frequent when its item is worn (the worst one of its kind).
+  const chances = rules.incidents.map((k) => {
+    const worst = owned.property.items
+      .filter((item) => item.kind === k.item)
+      .reduce((min, item) => Math.min(min, item.state), 5);
+    return [
+      k.id,
+      k.monthlyProbability * interpolateByState(rules.incidentStateFactors, worst),
+    ] as const;
+  });
+  const total = chances.reduce((sum, [, chance]) => sum + Number(chance), 0);
   if (nextFloat(state.rng) >= total / DAYS_PER_MONTH) return;
-  const kindId = pickWeighted(
-    state.rng,
-    Object.fromEntries(rules.incidents.map((k) => [k.id, k.monthlyProbability])),
-  );
+  const kindId = pickWeighted(state.rng, Object.fromEntries(chances));
   const kind = rules.incidents.find((k) => k.id === kindId);
   if (!kind) return;
   lease.incident = { id: `incident-${state.nextId++}`, kindId, day: ctx.today, repair: null };
@@ -389,8 +397,15 @@ export function repairIncident(
     finishRepair(ctx, owned, lease, costRange(ctx, kind.selfCost));
     return null;
   }
+  // The cheapest artisan of the trade in the address book.
+  const trade = content.works.items[kind.item].works?.trade;
+  const artisan = trade
+    ? knownArtisans(content, state, owned.property.cityId, trade).sort(
+        (a, b) => a.priceFactor - b.priceFactor,
+      )[0]
+    : undefined;
   const day = ctx.today + nextInt(state.rng, kind.artisanDays.min, kind.artisanDays.max);
-  const cost = costRange(ctx, kind.artisanCost);
+  const cost = Math.round(costRange(ctx, kind.artisanCost) * (artisan?.priceFactor ?? 1));
   if (day <= ctx.today) finishRepair(ctx, owned, lease, cost);
   else incident.repair = { day, cost };
   return null;

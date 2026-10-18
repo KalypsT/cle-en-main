@@ -1,5 +1,6 @@
 import type {
   Agency,
+  Artisan,
   Bank,
   CityData,
   Condition,
@@ -8,19 +9,27 @@ import type {
   DwellingKind,
   Epoch,
   GameContent,
+  HazardRule,
   IncidentRule,
+  ItemKind,
+  ItemRule,
   Job,
   LeaseType,
   LifeEventRule,
   MarketRules,
   Motivation,
   NeighbourhoodData,
+  ResolutionRule,
   Rival,
+  SpaceKind,
   TenantProfile,
+  Tier,
+  Trade,
 } from '@cle/content';
 
 export type {
   Agency,
+  Artisan,
   Bank,
   CityData,
   Condition,
@@ -29,15 +38,22 @@ export type {
   DwellingKind,
   Epoch,
   GameContent,
+  HazardRule,
   IncidentRule,
+  ItemKind,
+  ItemRule,
   Job,
   LeaseType,
   LifeEventRule,
   MarketRules,
   Motivation,
   NeighbourhoodData,
+  ResolutionRule,
   Rival,
+  SpaceKind,
   TenantProfile,
+  Tier,
+  Trade,
 };
 
 export function findJob(content: GameContent, jobId: string): Job {
@@ -76,4 +92,8 @@ export function findTenantProfile(content: GameContent, profileId: string): Tena
   const profile = content.renting.profiles.find((candidate) => candidate.id === profileId);
   if (!profile) throw new RangeError(`Unknown tenant profile ${profileId}`);
   return profile;
+}
+
+export function findArtisan(content: GameContent, artisanId: string): Artisan | undefined {
+  return content.artisans.find((candidate) => candidate.id === artisanId);
 }

@@ -8,6 +8,7 @@ import {
   newGame,
   sampleOwned,
   systemContext,
+  withState,
 } from '../../test/helpers.ts';
 import { toDayNumber } from '../calendar.ts';
 import { deepClone } from '../clone.ts';
@@ -64,7 +65,7 @@ describe('rents', () => {
       property.surface * rentPerM2 * 100 * 0.8 - recoverableCharges(content, property),
     );
     expect(furnished / bare).toBeCloseTo(content.renting.leaseTypes.furnished.rentFactor, 1);
-    expect(marketRent(content, state, { ...property, condition: 'ruin' })).toBe(0);
+    expect(marketRent(content, state, withState(property, 1))).toBe(0);
     const range = rentRange(content, state, property, 'bare');
     expect(range.min).toBeLessThan(range.market);
     expect(range.max).toBeGreaterThan(range.market);
@@ -83,7 +84,7 @@ describe('rents', () => {
     expect(lettingBlock(content, { ...property, dpe: 'G' }, today)).toBe('rent.dpeBanned');
     expect(lettingBlock(content, { ...property, dpe: 'F' }, today)).toBeNull();
     expect(lettingBlock(content, { ...property, dpe: 'F' }, (f ?? 0) + 1)).toBe('rent.dpeBanned');
-    expect(lettingBlock(content, { ...property, condition: 'ruin' }, today)).toBe('rent.indecent');
+    expect(lettingBlock(content, withState(property, 1), today)).toBe('rent.indecent');
   });
 });
 
@@ -107,7 +108,9 @@ describe('offering a property for rent', () => {
     expect(refusal(state, { ...terms, monthlyRent: quote.max + 100 })).toBe('rent.invalidRent');
     expect(refusal(state, { ...terms, agencyId: 'nowhere' } as never)).toBe('agency.unknown');
     expect(refusal(owner({ property: { dpe: 'G' } }))).toBe('rent.dpeBanned');
-    expect(refusal(owner({ property: { condition: 'ruin' } }))).toBe('rent.indecent');
+    expect(
+      refusal(owner({ property: { items: withState(sampleOwned(0).property, 1).items } })),
+    ).toBe('rent.indecent');
     const home = act(state, { type: 'home/moveIn', propertyId: PROPERTY }).state;
     expect(refusal(home)).toBe('rent.isHome');
     expect(refusal(state)).toBeNull();

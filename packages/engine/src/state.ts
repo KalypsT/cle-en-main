@@ -1,4 +1,4 @@
-import type { Condition, DpeLabel, Epoch, LeaseType } from './content.ts';
+import type { DpeLabel, Epoch, ItemKind, LeaseType, SpaceKind, Tier, Trade } from './content.ts';
 import type { CalendarDate } from './calendar.ts';
 import type { Clock } from './clock.ts';
 import type { Cents } from './money.ts';
@@ -6,7 +6,7 @@ import type { RngState } from './random.ts';
 import type { LoanDecision } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 5;
+export const FORMAT_VERSION = 6;
 
 export interface PlayerState {
   jobId: string;
@@ -76,10 +76,43 @@ export interface MarketState {
 
 export type PropertyKind = 'apartment' | 'house' | 'building';
 
+/** A nuisance the works cannot fix (noisy neighbours). */
 export interface Defect {
   id: string;
   /** Known to the player (revealed by a visit, or after buying). */
   revealed: boolean;
+}
+
+/** A room of a dwelling (docs/03-systemes/05, « La structure d'un bien »). */
+export interface Space {
+  /** Unique within the property: `living`, `bedroom2`, `l3-kitchen` for a building's third flat. */
+  id: string;
+  kind: SpaceKind;
+  /** Floor area in m² (a house's garden: its land). */
+  surface: number;
+}
+
+/**
+ * A poste of a room (floors, walls…) or an element of the whole dwelling
+ * (electricity, insulation…). Its id is `${spaceId}.${kind}`, or `${kind}`
+ * for the dwelling's elements (see systems/dwelling.ts).
+ */
+export interface WorkItem {
+  kind: ItemKind;
+  /** Room of the item; null for the dwelling's elements and the common parts. */
+  spaceId: string | null;
+  /** 1 = to redo entirely … 5 = new. */
+  state: number;
+  /** Range of the last renovation (the original fittings count as standard). */
+  tier: Tier;
+  /** The player knows its state (a visit, a diagnosis, or ownership). */
+  known: boolean;
+}
+
+/** A hazard put off during works: it comes back when the item is worked on again. */
+export interface PostponedHazard {
+  hazardId: string;
+  itemId: string;
 }
 
 /** A dwelling or a building, on the market or owned. */
@@ -96,8 +129,15 @@ export interface Property {
   /** Flats of a building; empty otherwise. */
   lots: { surface: number; rooms: number }[];
   epoch: Epoch;
+  /** Energy class, recomputed at the end of works. */
   dpe: DpeLabel;
-  condition: Condition;
+  spaces: Space[];
+  items: WorkItem[];
+  /** Calibrates the energy model on the DPE drawn from the data (primary energy multiplier). */
+  energyFactor: number;
+  /** Co-ownership of an apartment's building; null for houses and whole buildings. */
+  copro: { lots: number; meetingMonth: number } | null;
+  postponedHazards: PostponedHazard[];
   /** Hidden until revealed: they lower the real value. */
   defects: Defect[];
   /** Yearly property tax and monthly co-ownership charges. */
@@ -134,6 +174,8 @@ export interface LoanApplication {
   id: string;
   bankId: string;
   amount: Cents;
+  /** Part of the project that is works: lent into the property's works envelope. */
+  works: Cents;
   durationYears: number;
   /** Day number the bank answers on. */
   responseDay: number;
@@ -270,8 +312,83 @@ export interface FurnishedTaxState {
   deferredDepreciation: Cents;
   /** Deficit carried forward on this property's furnished income. */
   deficitCarry: Cents;
-  /** Building depreciation deducted so far: added back to the capital gain (2025 rule). */
+  /** Building (and works) depreciation deducted so far: added back to the capital gain (2025 rule). */
   buildingDepreciationDeducted: Cents;
+  /** Works paid while let furnished: depreciated from the year they were paid. */
+  works: { amount: Cents; year: number }[];
+}
+
+/** An artisan's quote for some items of a property (docs/03-systemes/05, « Les devis »). */
+export interface Quote {
+  id: string;
+  artisanId: string;
+  items: { itemId: string; tier: Tier; price: Cents; days: number }[];
+  total: Cents;
+  /** Calendar days of work. */
+  days: number;
+  /** First day the artisan can start. */
+  availableDay: number;
+  expiresDay: number;
+}
+
+/** One artisan's part of a project (or the player's own). */
+export interface WorksTask {
+  id: string;
+  /** Null: done by the player. */
+  artisanId: string | null;
+  trade: Trade;
+  phase: number;
+  items: { itemId: string; tier: Tier; price: Cents }[];
+  status: 'waiting' | 'running' | 'done';
+  /** First day the artisan can start. */
+  availableDay: number;
+  /** Planned calendar days (artisan). */
+  days: number;
+  startDay: number | null;
+  /** Day the artisan finishes, delays included (hidden from the player until then). */
+  endDay: number | null;
+  /** Hidden share added to the bill, drawn when the task starts. */
+  overrun: number;
+  /** Already paid as a deposit, deducted from the bill. */
+  deposit: Cents;
+  /** Doing it oneself: free time needed and spent. */
+  minutesNeeded: number;
+  minutesDone: number;
+}
+
+export interface PendingHazard {
+  hazardId: string;
+  taskId: string;
+  itemId: string;
+  cost: Cents;
+  days: number;
+  /** Treated by default from this day. */
+  deadlineDay: number;
+}
+
+export interface WorksProject {
+  id: string;
+  startDay: number;
+  tasks: WorksTask[];
+  /** A hazard waiting for the player's decision: the works are paused. */
+  hazard: PendingHazard | null;
+  dpeBefore: DpeLabel;
+  /** Paid so far: deposits, bills, hazards. */
+  paid: Cents;
+}
+
+export interface CoproMeeting {
+  voteDay: number;
+  /** The player goes (free time spent once) and votes. */
+  attended: boolean;
+  resolutions: {
+    id: string;
+    /** Player's share of the cost. */
+    cost: Cents;
+    /** Share of the other owners in favour (hidden). */
+    support: number;
+    vote: 'for' | 'against' | null;
+  }[];
 }
 
 export interface OwnedProperty {
@@ -288,6 +405,15 @@ export interface OwnedProperty {
   /** Tax regime chosen by the player; 'auto' applies the cheapest. */
   taxRegime: TaxRegimeChoice;
   furnishedTax: FurnishedTaxState;
+  quotes: Quote[];
+  works: WorksProject | null;
+  /** Money lent for works, kept for this property's bills until `untilDay`. */
+  worksFund: { amount: Cents; loanId: string; untilDay: number } | null;
+  /** Works not deducted from the rents: they count in the capital gain (instead of the flat allowance). */
+  worksForCapitalGains: Cents;
+  coproMeeting: CoproMeeting | null;
+  /** Calls for funds voted by the co-ownership, charged monthly. */
+  coproCalls: { monthly: Cents; monthsLeft: number }[];
 }
 
 /** A property a marchand de biens renovates before selling it again. */
@@ -333,6 +459,10 @@ export interface GameState {
   /** Named rivals, by id (content/rivaux.json). */
   rivals: Record<string, RivalState>;
   tax: TaxState;
+  /** The player's history with each artisan (content/artisans.json). */
+  artisans: Record<string, { jobs: number }>;
+  /** Works projects completed, by city: the address book grows with them. */
+  worksDone: Record<string, number>;
 }
 
 /** What one property earned and cost during the tax year, for the yearly assessment. */
@@ -342,8 +472,12 @@ export interface PropertyLedger {
   regime: TaxRegimeChoice;
   /** Rents received, charges excluded (unpaid rents are not income). */
   rents: Cents;
-  /** Deductible costs, interest excluded. */
+  /** Deductible costs, interest and works excluded. */
   costs: Cents;
+  /** Works paid this year (deducted, depreciated or kept for the capital gain at the review). */
+  works: Cents;
+  /** Works of an energy renovation (DPE E–G to A–D): the doubled deficit ceiling applies. */
+  energyRenovation: boolean;
   interest: Cents;
   /** Still owned at the end of the year (depreciation only applies then). */
   sold: boolean;

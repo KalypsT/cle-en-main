@@ -177,6 +177,52 @@ export function describeEvent(event: GameEvent): string | null {
       return format(events.forcedSale, { price: formatMoney(event.price) });
     case 'bankrupt':
       return events.bankrupt;
+    case 'quoteReceived':
+      return format(events.quoteReceived, {
+        amount: formatMoney(event.total),
+        date: formatGameDate(fromDayNumber(event.availableDay)),
+      });
+    case 'worksStarted':
+      return format(events.worksStarted, {
+        amount: formatMoney(event.plannedCost),
+        date: formatGameDate(fromDayNumber(event.plannedEndDay)),
+      });
+    case 'worksHazard':
+      return format(events.worksHazard, {
+        text: gameContent.worksTexts.hazards[event.hazardId] ?? '',
+        amount: formatMoney(event.cost),
+        days: event.days,
+        date: formatGameDate(fromDayNumber(event.deadlineDay)),
+      });
+    case 'worksCompleted':
+      return format(events.worksCompleted, {
+        amount: formatMoney(event.cost),
+        before: event.dpeBefore,
+        after: event.dpeAfter,
+      });
+    case 'worksFundReturned':
+      return format(events.worksFundReturned, { amount: formatMoney(event.amount) });
+    case 'coproMeetingCalled':
+      return format(events.coproMeetingCalled, {
+        date: formatGameDate(fromDayNumber(event.voteDay)),
+        count: event.resolutions.length,
+      });
+    case 'coproMeetingHeld': {
+      const result = event.results[0];
+      if (!result) return null;
+      const verdicts = result.passed
+        ? gameContent.worksTexts.meetingPassed
+        : gameContent.worksTexts.meetingRejected;
+      return format(events.coproMeetingHeld, {
+        resolution: gameContent.worksTexts.resolutions[result.id] ?? result.id,
+        verdict: verdicts[result.textIndex] ?? '',
+      });
+    }
+    case 'diagnosisDone':
+      return format(events.diagnosisDone, {
+        count: event.revealedItems.length,
+        amount: formatMoney(event.cost),
+      });
     case 'marketRateChanged':
     case 'propertyPricesUpdated':
     case 'listingPriceDropped':
@@ -198,6 +244,9 @@ export function describeEvent(event: GameEvent): string | null {
     case 'rentalWithdrawn':
     case 'applicationExpired':
     case 'leaseRenewed':
+    case 'worksTaskStarted':
+    case 'worksTaskDone':
+    case 'worksHazardResolved':
       return null;
   }
 }

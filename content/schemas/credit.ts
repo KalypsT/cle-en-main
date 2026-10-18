@@ -14,6 +14,8 @@ export const creditRulesSchema = z
     maxDurationWithWorksYears: z.number().int().positive(),
     /** Works must be at least this share of the project for the longer duration. */
     worksShareForLongerDuration: share,
+    /** Money lent for works waits on the property; what is left after this is repaid early. */
+    worksEnvelopeMonths: z.number().int().min(1),
     /** A partial agreement is only offered for at least this share of the request. */
     partialAgreementMinShare: share,
     /** Share of rents the banks count as income. */

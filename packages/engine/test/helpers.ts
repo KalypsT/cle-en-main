@@ -4,7 +4,8 @@ import { toDayNumber } from '../src/calendar.ts';
 import { deepClone } from '../src/clone.ts';
 import type { GameEvent } from '../src/events.ts';
 import { createEngine, type CreateGameOptions } from '../src/index.ts';
-import type { GameState, OwnedProperty } from '../src/state.ts';
+import type { GameState, OwnedProperty, Property } from '../src/state.ts';
+import { blankItems, calibrateEnergy, layoutSpaces } from '../src/systems/dwelling.ts';
 import type { SystemContext } from '../src/systems/context.ts';
 
 export const content = gameContent;
@@ -115,30 +116,59 @@ export function buyWithLoan(state: GameState, listingId: string) {
   return { state: deed.state, event: deed.event, purchase };
 }
 
+/** What a property is made of besides its rooms and items. */
+export type PropertyBasics = Omit<
+  Property,
+  'spaces' | 'items' | 'energyFactor' | 'copro' | 'postponedHazards'
+>;
+
+/**
+ * A property with its rooms, every item at `state` (known), and the energy
+ * model calibrated on its DPE: 4 is « bon état », 1 a ruin.
+ */
+export function dwelling(basics: PropertyBasics, state = 4): Property {
+  const spaces = layoutSpaces(content, basics.kind, basics.surface, basics.rooms, basics.lots);
+  const items = blankItems(content, basics.kind, spaces).map((item) => ({ ...item, state }));
+  const property: Property = {
+    ...basics,
+    spaces,
+    items,
+    energyFactor: 1,
+    // No general meeting: tests ask for one explicitly.
+    copro: null,
+    postponedHazards: [],
+  };
+  return { ...property, energyFactor: calibrateEnergy(content, property) };
+}
+
+/** The same property with every item at `state`. */
+export function withState(property: Property, state: number): Property {
+  return { ...property, items: property.items.map((item) => ({ ...item, state })) };
+}
+
 /** A flat owned since mid-December 2026, optionally let bare to a quiet tenant from `day`. */
 export function sampleOwned(
   day: number,
   overrides: { property?: Partial<OwnedProperty['property']>; let?: boolean } = {},
 ): OwnedProperty {
   const rent = 520_00;
+  const property = dwelling({
+    id: 'property-sample',
+    cityId: 'dole',
+    neighbourhoodId: 'centreHistorique',
+    kind: 'apartment',
+    surface: 45,
+    rooms: 2,
+    floor: 1,
+    lots: [],
+    epoch: 'from1948to1974',
+    dpe: 'D',
+    defects: [],
+    annualPropertyTax: 585_00,
+    monthlyCharges: 99_00,
+  });
   return {
-    property: {
-      id: 'property-sample',
-      cityId: 'dole',
-      neighbourhoodId: 'centreHistorique',
-      kind: 'apartment',
-      surface: 45,
-      rooms: 2,
-      floor: 1,
-      lots: [],
-      epoch: 'from1948to1974',
-      dpe: 'D',
-      condition: 'good',
-      defects: [],
-      annualPropertyTax: 585_00,
-      monthlyCharges: 99_00,
-      ...overrides.property,
-    },
+    property: { ...property, ...overrides.property },
     purchasePrice: 80_000_00,
     acquisitionCost: 86_800_00,
     purchaseDate: { year: 2026, month: 12, day: 15 },
@@ -175,7 +205,18 @@ export function sampleOwned(
           },
     furniture: null,
     taxRegime: 'auto',
-    furnishedTax: { deferredDepreciation: 0, deficitCarry: 0, buildingDepreciationDeducted: 0 },
+    furnishedTax: {
+      deferredDepreciation: 0,
+      deficitCarry: 0,
+      buildingDepreciationDeducted: 0,
+      works: [],
+    },
+    quotes: [],
+    works: null,
+    worksFund: null,
+    worksForCapitalGains: 0,
+    coproMeeting: null,
+    coproCalls: [],
   };
 }
 

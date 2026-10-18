@@ -1,9 +1,24 @@
 import { z } from 'zod';
 import { isValidDate, toDayNumber } from './calendar.ts';
-import { CONDITIONS, DPE_LABELS, EPOCHS, LEASE_TYPES } from './content-constants.ts';
-import type { GameContent } from './content.ts';
+import { DPE_LABELS, EPOCHS, LEASE_TYPES, TIERS } from './content-constants.ts';
+import type { Condition, GameContent, ItemKind } from './content.ts';
+import { hashFloat, hashNormal } from './random.ts';
+import {
+  blankItems,
+  calibrateEnergy,
+  clampState,
+  freezeDwelling,
+  itemId,
+  layoutSpaces,
+} from './systems/dwelling.ts';
 import { toCents } from './money.ts';
-import { FORMAT_VERSION, type GameState, type Lease, type OwnedProperty } from './state.ts';
+import {
+  FORMAT_VERSION,
+  type GameState,
+  type Lease,
+  type OwnedProperty,
+  type Property,
+} from './state.ts';
 import { initialBankRelations } from './systems/banking.ts';
 import { seedListings } from './systems/listings.ts';
 import { initialCityMarkets } from './systems/prices.ts';
@@ -167,7 +182,12 @@ export const MIGRATIONS: MigrationRegistry = {
           100,
           oldLease.monthlyRent - recoverableCharges(content, property),
         );
-        const market = marketRent(content, state, property, 'bare');
+        const market = marketRent(
+          content,
+          state,
+          upgradeProperty(content, state.seed, property),
+          'bare',
+        );
         let termDay = oldLease.startDay + monthsToDays(rules.termMonths);
         while (termDay <= today) termDay += monthsToDays(rules.termMonths);
         let anniversaryDay = oldLease.startDay + DAYS_PER_YEAR;
@@ -191,10 +211,18 @@ export const MIGRATIONS: MigrationRegistry = {
         };
         owned.lease = lease;
         state.player.balance += deposit;
-      } else if (!lettingBlock(content, property, today) && !owned.sale?.agreement) {
+      } else if (
+        !lettingBlock(content, upgradeProperty(content, state.seed, property), today) &&
+        !owned.sale?.agreement
+      ) {
         owned.rental = {
           leaseType: 'bare',
-          monthlyRent: marketRent(content, state, property, 'bare'),
+          monthlyRent: marketRent(
+            content,
+            state,
+            upgradeProperty(content, state.seed, property),
+            'bare',
+          ),
           agencyId: null,
           insured: false,
           listedDay: today,
@@ -206,7 +234,170 @@ export const MIGRATIONS: MigrationRegistry = {
     });
     return state as unknown as Record<string, unknown>;
   },
+  /**
+   * Version 5 (milestone 2) had a simplified condition: five global levels
+   * and hidden defects. Each property gets its rooms and items, drawn around
+   * its old condition with stable per-property draws (the world's random
+   * state is untouched); a defect becomes its item at state 1 (humidity and
+   * dry rot a postponed hazard), noisy neighbours stay a nuisance. The
+   * energy model is calibrated on the old DPE. Owned items are known, a
+   * visited listing's rooms too. No works, quotes or meetings yet.
+   */
+  5: (raw, { content }) => {
+    const seed = raw.seed as number;
+    const upgrade = (property: Record<string, unknown>, known: 'all' | 'visible' | 'none') =>
+      upgradeProperty(content, seed, property, known);
+    const listings = (raw.listings as Record<string, unknown>[]).map((listing) => ({
+      ...listing,
+      property: upgrade(
+        listing.property as Record<string, unknown>,
+        listing.visited ? 'visible' : 'none',
+      ),
+    }));
+    const purchases = (raw.purchases as Record<string, unknown>[]).map((purchase) => ({
+      ...purchase,
+      property: upgrade(purchase.property as Record<string, unknown>, 'visible'),
+      applications: (purchase.applications as Record<string, unknown>[]).map((a) => ({
+        ...a,
+        works: 0,
+      })),
+    }));
+    const properties = (raw.properties as Record<string, unknown>[]).map((owned) => ({
+      ...owned,
+      property: upgrade(owned.property as Record<string, unknown>, 'all'),
+      furnishedTax: { ...(owned.furnishedTax as Record<string, unknown>), works: [] },
+      quotes: [],
+      works: null,
+      worksFund: null,
+      worksForCapitalGains: 0,
+      coproMeeting: null,
+      coproCalls: [],
+    }));
+    const rivals = Object.fromEntries(
+      Object.entries(raw.rivals as Record<string, Record<string, unknown>>).map(([id, rival]) => [
+        id,
+        {
+          ...rival,
+          projects: (rival.projects as Record<string, unknown>[]).map((project) => ({
+            ...project,
+            property: upgrade(project.property as Record<string, unknown>, 'none'),
+          })),
+        },
+      ]),
+    );
+    const tax = raw.tax as Record<string, unknown>;
+    const ledgers = Object.fromEntries(
+      Object.entries(tax.ledgers as Record<string, Record<string, unknown>>).map(([id, l]) => [
+        id,
+        { ...l, works: 0, energyRenovation: false },
+      ]),
+    );
+    return {
+      ...raw,
+      listings,
+      purchases,
+      properties,
+      rivals,
+      tax: { ...tax, ledgers },
+      artisans: {},
+      worksDone: {},
+    };
+  },
 };
+
+/** Old defects (version 5) and the item each one becomes at state 1. */
+const DEFECT_ITEMS: Readonly<Record<string, ItemKind>> = {
+  wiring: 'electricity',
+  plumbing: 'plumbing',
+  heating: 'heating',
+  roof: 'roof',
+  cracks: 'facade',
+  dryRot: 'floors',
+};
+const DEFECT_HAZARDS: Readonly<Record<string, string>> = {
+  humidity: 'hiddenDamp',
+  dryRot: 'hiddenDamp',
+};
+
+/**
+ * A version 5 property with rooms and items, drawn around its condition from
+ * stable hashes of the save's seed (a property already in the new format is
+ * returned as is).
+ */
+export function upgradeProperty(
+  content: GameContent,
+  seed: number,
+  old: object,
+  known: 'all' | 'visible' | 'none' = 'all',
+): Property {
+  if ('items' in old && Array.isArray(old.items)) return old as Property;
+  const { condition, defects, ...rest } = old as unknown as Omit<Property, 'items'> & {
+    condition: Condition;
+    defects: { id: string; revealed: boolean }[];
+  };
+  const property = rest as Property;
+  const spaces = layoutSpaces(
+    content,
+    property.kind,
+    property.surface,
+    property.rooms,
+    property.lots,
+  );
+  const mean = content.market.conditions[condition].meanState;
+  const spread = content.market.stateStdDev;
+  const dpeOffset = content.works.energy.generationOffsets[property.dpe];
+  const broken = new Map<ItemKind, boolean>();
+  for (const defect of defects) {
+    let kind = DEFECT_ITEMS[defect.id];
+    if (kind === 'facade' && property.kind === 'apartment') kind = 'commonParts';
+    if (kind) broken.set(kind, defect.revealed || broken.get(kind) === true);
+  }
+  let first = true;
+  const items = blankItems(content, property.kind, spaces).map((item) => {
+    const rule = content.works.items[item.kind];
+    const id = itemId(item);
+    const offset = rule.generationOffset + (rule.energy ? dpeOffset : 0);
+    let state = clampState(
+      Math.round(mean + offset + spread * hashNormal(seed, `${property.id}/${id}`)),
+    );
+    let isKnown = known === 'all' || (known === 'visible' && rule.revealOnVisit >= 1);
+    const defect = broken.get(item.kind);
+    // One item of the defect's kind is the broken one (the first room's floor for dry rot).
+    if (defect !== undefined && (item.spaceId === null || first)) {
+      if (item.spaceId !== null) first = false;
+      state = 1;
+      isKnown = isKnown || defect;
+    }
+    return { ...item, state, known: isKnown };
+  });
+  const view = { ...property, spaces, items, energyFactor: 1 };
+  const livingWalls = items.find((item) => item.kind === 'walls');
+  const postponedHazards = defects
+    .filter((defect) => DEFECT_HAZARDS[defect.id] && livingWalls)
+    .map((defect) => ({
+      hazardId: DEFECT_HAZARDS[defect.id] ?? '',
+      itemId: livingWalls ? itemId(livingWalls) : '',
+    }))
+    .filter((hazard, i, all) => all.findIndex((h) => h.itemId === hazard.itemId) === i);
+  const lots = content.works.copro.lots;
+  return {
+    ...view,
+    energyFactor: calibrateEnergy(content, view),
+    copro:
+      property.kind === 'apartment'
+        ? {
+            lots:
+              lots.min +
+              Math.floor(hashFloat(seed, `${property.id}/lots`) * (lots.max - lots.min + 1)),
+            meetingMonth: 1 + Math.floor(hashFloat(seed, `${property.id}/meeting`) * 12),
+          }
+        : null,
+    postponedHazards,
+    defects: defects.filter((defect) =>
+      content.market.defects.some((rule) => rule.id === defect.id),
+    ),
+  };
+}
 
 export type SaveErrorCode =
   'invalidJson' | 'missingVersion' | 'unsupportedVersion' | 'missingMigration' | 'invalidState';
@@ -231,6 +422,8 @@ const calendarDateSchema = z
 const cents = z.number().int();
 const day = z.number().int();
 
+const tierSchema = z.enum(TIERS);
+
 const propertySchema = z
   .object({
     id: z.string(),
@@ -245,7 +438,52 @@ const propertySchema = z
     ),
     epoch: z.enum(EPOCHS),
     dpe: z.enum(DPE_LABELS),
-    condition: z.enum(CONDITIONS),
+    spaces: z.array(
+      z
+        .object({
+          id: z.string(),
+          kind: z.enum(['entry', 'living', 'kitchen', 'bedroom', 'bathroom', 'wc', 'garden']),
+          surface: z.number().positive(),
+        })
+        .strict(),
+    ),
+    items: z.array(
+      z
+        .object({
+          kind: z.enum([
+            'floors',
+            'walls',
+            'joinery',
+            'kitchen',
+            'bathroom',
+            'wcUnit',
+            'garden',
+            'electricity',
+            'plumbing',
+            'heating',
+            'insulation',
+            'windows',
+            'ventilation',
+            'roof',
+            'facade',
+            'commonParts',
+          ]),
+          spaceId: z.string().nullable(),
+          state: z.number().int().min(1).max(5),
+          tier: tierSchema,
+          known: z.boolean(),
+        })
+        .strict(),
+    ),
+    energyFactor: z.number().positive(),
+    copro: z
+      .object({
+        lots: z.number().int().min(1),
+        meetingMonth: z.number().int().min(1).max(12),
+      })
+      .strict()
+      .nullable(),
+    postponedHazards: z.array(z.object({ hazardId: z.string(), itemId: z.string() }).strict()),
     defects: z.array(z.object({ id: z.string(), revealed: z.boolean() }).strict()),
     annualPropertyTax: cents.min(0),
     monthlyCharges: cents.min(0),
@@ -253,6 +491,79 @@ const propertySchema = z
   .strict();
 
 const leaseTypeSchema = z.enum(LEASE_TYPES);
+const tradeSchema = z.enum([
+  'plumber',
+  'electrician',
+  'mason',
+  'painter',
+  'tiler',
+  'carpenter',
+  'heatingEngineer',
+  'kitchenFitter',
+]);
+
+const quoteSchema = z
+  .object({
+    id: z.string(),
+    artisanId: z.string(),
+    items: z.array(
+      z
+        .object({
+          itemId: z.string(),
+          tier: tierSchema,
+          price: cents.min(0),
+          days: z.number().min(0),
+        })
+        .strict(),
+    ),
+    total: cents.min(0),
+    days: z.number().int().min(0),
+    availableDay: day,
+    expiresDay: day,
+  })
+  .strict();
+
+const worksProjectSchema = z
+  .object({
+    id: z.string(),
+    startDay: day,
+    tasks: z.array(
+      z
+        .object({
+          id: z.string(),
+          artisanId: z.string().nullable(),
+          trade: tradeSchema,
+          phase: z.number().int().min(1),
+          items: z.array(
+            z.object({ itemId: z.string(), tier: tierSchema, price: cents.min(0) }).strict(),
+          ),
+          status: z.enum(['waiting', 'running', 'done']),
+          availableDay: day,
+          days: z.number().int().min(0),
+          startDay: day.nullable(),
+          endDay: day.nullable(),
+          overrun: z.number().min(0),
+          deposit: cents.min(0),
+          minutesNeeded: z.number().int().min(0),
+          minutesDone: z.number().int().min(0),
+        })
+        .strict(),
+    ),
+    hazard: z
+      .object({
+        hazardId: z.string(),
+        taskId: z.string(),
+        itemId: z.string(),
+        cost: cents.min(0),
+        days: z.number().int().min(0),
+        deadlineDay: day,
+      })
+      .strict()
+      .nullable(),
+    dpeBefore: z.enum(DPE_LABELS),
+    paid: cents,
+  })
+  .strict();
 const taxRegimeSchema = z.enum(['auto', 'micro', 'real']);
 
 const tenantSchema = z
@@ -489,6 +800,7 @@ const gameStateSchema = z
                 id: z.string(),
                 bankId: z.string(),
                 amount: cents.positive(),
+                works: cents.min(0),
                 durationYears: z.number().int(),
                 responseDay: day,
                 decision: loanDecisionSchema.nullable(),
@@ -543,8 +855,36 @@ const gameStateSchema = z
               deferredDepreciation: cents.min(0),
               deficitCarry: cents.min(0),
               buildingDepreciationDeducted: cents.min(0),
+              works: z.array(z.object({ amount: cents, year: z.number().int() }).strict()),
             })
             .strict(),
+          quotes: z.array(quoteSchema),
+          works: worksProjectSchema.nullable(),
+          worksFund: z
+            .object({ amount: cents.min(0), loanId: z.string(), untilDay: day })
+            .strict()
+            .nullable(),
+          worksForCapitalGains: cents,
+          coproMeeting: z
+            .object({
+              voteDay: day,
+              attended: z.boolean(),
+              resolutions: z.array(
+                z
+                  .object({
+                    id: z.string(),
+                    cost: cents.min(0),
+                    support: z.number().min(0).max(1),
+                    vote: z.enum(['for', 'against']).nullable(),
+                  })
+                  .strict(),
+              ),
+            })
+            .strict()
+            .nullable(),
+          coproCalls: z.array(
+            z.object({ monthly: cents, monthsLeft: z.number().int().min(0) }).strict(),
+          ),
         })
         .strict(),
     ),
@@ -581,6 +921,8 @@ const gameStateSchema = z
               regime: taxRegimeSchema,
               rents: cents,
               costs: cents,
+              works: cents,
+              energyRenovation: z.boolean(),
               interest: cents.min(0),
               sold: z.boolean(),
             })
@@ -614,6 +956,8 @@ const gameStateSchema = z
           .nullable(),
       })
       .strict(),
+    artisans: z.record(z.string(), z.object({ jobs: z.number().int().min(0) }).strict()),
+    worksDone: z.record(z.string(), z.number().int().min(0)),
   })
   .strict();
 
@@ -676,5 +1020,13 @@ export function deserializeGame(
   if (!parsed.success) {
     throw new SaveFormatError('invalidState', z.prettifyError(parsed.error));
   }
-  return parsed.data;
+  const state: GameState = parsed.data;
+  // Rooms and items are shared between copies of the state once frozen (see clone.ts).
+  for (const listing of state.listings) freezeDwelling(listing.property);
+  for (const purchase of state.purchases) freezeDwelling(purchase.property);
+  for (const owned of state.properties) freezeDwelling(owned.property);
+  for (const rival of Object.values(state.rivals)) {
+    for (const project of rival.projects) freezeDwelling(project.property);
+  }
+  return state;
 }

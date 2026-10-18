@@ -3,6 +3,7 @@ import v1Save from '../test/fixtures/save-v1-milestone-0.json' with { type: 'jso
 import v2Save from '../test/fixtures/save-v2-milestone-1a.json' with { type: 'json' };
 import v3Save from '../test/fixtures/save-v3-milestone-1b.json' with { type: 'json' };
 import v4Save from '../test/fixtures/save-v4-milestone-1c.json' with { type: 'json' };
+import v5Save from '../test/fixtures/save-v5-milestone-2.json' with { type: 'json' };
 import { content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -13,6 +14,7 @@ import {
 } from './serialization.ts';
 import { toDayNumber } from './calendar.ts';
 import { FORMAT_VERSION } from './state.ts';
+import { conditionLabel, dpeOf, energyNeeds, isIndecent } from './systems/dwelling.ts';
 
 const context = { content };
 
@@ -118,7 +120,7 @@ describe('migrations', () => {
     expect(owned?.property.id).toBe(original.properties[0]?.property.id);
     expect(owned?.lease).toBeNull();
     // Version 5: the vacant property is offered for rent (unless the law forbids it).
-    if (owned?.property.dpe !== 'G' && owned?.property.condition !== 'ruin') {
+    if (owned && owned.property.dpe !== 'G' && !isIndecent(content, owned.property)) {
       expect(owned?.rental?.listedDay).toBe(toDayNumber(original.clock.date));
     }
 
@@ -179,5 +181,46 @@ describe('migrations', () => {
     expect(later.events.some((e) => e.type === 'taxAssessed')).toBe(true);
     // Managed by the owner: candidates wait for his answer.
     expect(later.events.some((e) => e.type === 'applicationReceived')).toBe(true);
+  });
+
+  it('upgrades a milestone 2 save (version 5): rooms, items, energy model and works', () => {
+    const v5 = JSON.stringify(v5Save);
+    const original = JSON.parse(v5) as {
+      player: { balance: number };
+      listings: { id: string; visited: boolean; property: { dpe: string } }[];
+      properties: {
+        property: { id: string; dpe: string; condition: string; defects: { id: string }[] };
+        lease: { monthlyRent: number } | null;
+      }[];
+    };
+    const migrated = engine.loadGame(v5);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.player.balance).toBe(original.player.balance);
+    expect(migrated.artisans).toEqual({});
+    expect(migrated.worksDone).toEqual({});
+    const owned = migrated.properties[0];
+    const old = original.properties[0];
+    if (!owned || !old) throw new Error('The fixture has a property');
+    // Same DPE, same lease; every item known to the owner, around the old condition.
+    expect(owned.property.dpe).toBe(old.property.dpe);
+    expect(owned.lease?.monthlyRent).toBe(old.lease?.monthlyRent);
+    expect(owned.property.items.every((item) => item.known)).toBe(true);
+    expect(conditionLabel(content, owned.property)).toBe(old.property.condition);
+    // The model is calibrated on the DPE: no works, no change of class.
+    expect(dpeOf(content, energyNeeds(content, owned.property))).toBe(owned.property.dpe);
+    // Old defects become broken items.
+    expect(old.property.defects.map((d) => d.id)).toContain('wiring');
+    expect(owned.property.items.find((item) => item.kind === 'electricity')?.state).toBe(1);
+    expect(owned.property.defects).toEqual([]);
+    expect(owned).toMatchObject({ quotes: [], works: null, worksFund: null, coproCalls: [] });
+    // A visited listing shows its rooms; the others nothing yet.
+    const visited = migrated.listings.find((l) => l.visited);
+    expect(visited?.property.items.some((item) => item.known)).toBe(true);
+    const unseen = migrated.listings.find((l) => !l.visited);
+    expect(unseen?.property.items.some((item) => item.known)).toBe(false);
+    // Deterministic, and the game keeps running with works.
+    expect(engine.loadGame(v5)).toEqual(migrated);
+    const later = engine.advanceHours(migrated, 24 * 400);
+    expect(later.state.clock.elapsedHours).toBe(migrated.clock.elapsedHours + 24 * 400);
   });
 });
