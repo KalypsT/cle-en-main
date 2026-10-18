@@ -91,7 +91,10 @@ import { believedView } from './systems/dwelling.ts';
 import {
   cashForecast,
   type FinancingInput,
+  listingView,
   mapPosition,
+  neighbourhoodMarkets,
+  portfolio,
   pendingDecisions,
   propertyCashFlow,
   simulateFinancing,
@@ -530,6 +533,8 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? worksPlan(content, state, owned, quoteIds, diy) : null;
     },
+    /** Free time of a whole day today (the status bar shows what is left of it). */
+    dailyFreeTime: (state: GameState) => dailyFreeTime(content, state, state.clock.date),
     /** Decisions waiting for the player, the most urgent first (« Décisions »). */
     pendingDecisions: (state: GameState) => pendingDecisions(content, state),
     /** Monthly flows of an owned property, before income tax. */
@@ -548,6 +553,13 @@ export function createEngine(content: GameContent) {
         ? simulateFinancing(content, state, purchase.property, purchase.price, input)
         : null;
     },
+    /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */
+    listingView: (state: GameState, listingId: string) => listingView(content, state, listingId),
+    /** Prices and rents of a city's neighbourhoods today (the map's colours). */
+    neighbourhoodMarkets: (state: GameState, cityId: string) =>
+      neighbourhoodMarkets(content, state, cityId),
+    /** Net worth, values, debts and cash flows of the « Patrimoine » screen. */
+    portfolio: (state: GameState) => portfolio(content, state),
     /** Expected balance over the next days (alert when it goes below zero). */
     cashForecast: (state: GameState, days?: number) => cashForecast(content, state, days),
     /** Pin of a listing, purchase or owned property on its city map. */

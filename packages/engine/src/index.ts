@@ -35,7 +35,11 @@ export {
   decisionKey,
   type FinancingInput,
   type FinancingSimulation,
+  type ListingView,
+  type Portfolio,
+  type PropertyStatus,
   type MapPoint,
+  type NeighbourhoodMarketView,
   type PendingDecision,
   type PropertyCashFlow,
 } from './systems/ui-queries.ts';

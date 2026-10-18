@@ -13,6 +13,8 @@ import timeJson from './temps.json' with { type: 'json' };
 import listingTextsJson from './textes/annonces.json' with { type: 'json' };
 import tenantTextsJson from './textes/locataires.json' with { type: 'json' };
 import uiTextsJson from './textes/interface.json' with { type: 'json' };
+import screenTextsJson from './textes/ecrans.json' with { type: 'json' };
+import tutorialJson from './textes/didacticiel.json' with { type: 'json' };
 import livingCostsJson from './train-de-vie.json' with { type: 'json' };
 import artisansJson from './artisans.json' with { type: 'json' };
 import worksJson from './travaux.json' with { type: 'json' };
@@ -25,6 +27,7 @@ import { jobsFileSchema } from './schemas/jobs.ts';
 import { listingTextsSchema, marketRulesSchema } from './schemas/market.ts';
 import { rentingRulesSchema, tenantTextsSchema } from './schemas/renting.ts';
 import { rivalsFileSchema } from './schemas/rivals.ts';
+import { screenTextsSchema, tutorialSchema } from './schemas/screens.ts';
 import { livingCostsSchema, startSchema } from './schemas/start.ts';
 import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
@@ -62,6 +65,8 @@ export type { Rival, RivalsFile } from './schemas/rivals.ts';
 export type { LivingCosts, Start } from './schemas/start.ts';
 export type { TimeSettings } from './schemas/time.ts';
 export type { UiTexts } from './schemas/ui-texts.ts';
+export type { Tutorial, TutorialTrigger } from './schemas/screens.ts';
+export { TUTORIAL_TRIGGERS } from './schemas/screens.ts';
 export type {
   Artisan,
   HazardRule,
@@ -113,3 +118,8 @@ if (referenceProblems.length > 0) {
 export const jobs = gameContent.jobs;
 export const timeSettings = timeSettingsSchema.parse(timeJson);
 export const uiTexts = uiTextsSchema.parse(uiTextsJson);
+
+screenTextsSchema.parse(screenTextsJson);
+/** Texts of the management screens, typed by the file itself. */
+export const screenTexts: typeof screenTextsJson = screenTextsJson;
+export const tutorial = tutorialSchema.parse(tutorialJson);

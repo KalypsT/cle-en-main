@@ -1,5 +1,13 @@
 import { type CalendarDate, fromDayNumber, toDayNumber } from '../calendar.ts';
-import { findAgency, findBank, findCity, type DecisionKind, type GameContent } from '../content.ts';
+import {
+  type Condition,
+  findAgency,
+  findBank,
+  findCity,
+  findNeighbourhood,
+  type DecisionKind,
+  type GameContent,
+} from '../content.ts';
 import { annuityPayment, type Cents } from '../money.ts';
 import { hashFloat } from '../random.ts';
 import type { GameState, OwnedProperty, Property } from '../state.ts';
@@ -11,7 +19,9 @@ import {
   type RateQuote,
   requiredContribution,
 } from './banking.ts';
-import { believedView } from './dwelling.ts';
+import { believedView, conditionLabel } from './dwelling.ts';
+import { netWorth } from './net-worth.ts';
+import { dwellingKindOf, type Estimate, estimateValue } from './valuation.ts';
 import { expectedSalary, livingCosts } from './household.ts';
 import { purchaseFees } from './purchases.ts';
 import { cashDueAtDeed } from './purchases.ts';
@@ -324,6 +334,8 @@ export interface FinancingInput {
   contribution?: Cents;
   /** Works financed with the loan. */
   works?: Cents;
+  /** Amount borrowed; when given, the contribution is what the loan leaves to pay. */
+  amount?: Cents;
 }
 
 /** « Financement simulé » of a listing (docs/04, fiche annonce). */
@@ -365,8 +377,12 @@ export function simulateFinancing(
   const works = Math.max(0, input.works ?? 0);
   const fees = purchaseFees({ content }, price, true);
   const minContribution = requiredContribution(content, price);
-  const contribution = Math.max(0, input.contribution ?? minContribution);
-  const loanAmount = Math.max(0, price + works + fees.notary + fees.bank - contribution);
+  const total = price + works + fees.notary + fees.bank;
+  const contribution =
+    input.amount !== undefined
+      ? Math.max(0, total - input.amount)
+      : Math.max(0, input.contribution ?? minContribution);
+  const loanAmount = Math.max(0, total - contribution);
   const rate = quoteRate(content, state, bank, input.durationYears);
   const months = input.durationYears * MONTHS_PER_YEAR;
   const monthlyPayment = loanAmount > 0 ? annuityPayment(loanAmount, rate.ratePercent, months) : 0;
@@ -550,4 +566,139 @@ export function mapPosition(content: GameContent, property: Property): MapPoint 
 /** Game date of a day number, for the interface. */
 export function dateOfDay(day: number): CalendarDate {
   return fromDayNumber(day);
+}
+
+/** What the listings screen and the listing sheet show of a listing. */
+export interface ListingView {
+  pricePerM2: Cents;
+  /** Median price per m² of the neighbourhood for this kind of dwelling, today. */
+  neighbourhoodPricePerM2: Cents;
+  /** Asking price per m² against the neighbourhood (−0,05: 5 % below). */
+  priceGap: number;
+  condition: Condition;
+  /** Market rent, bare let, as the player knows the property. */
+  rent: Cents;
+  /** Yearly rent over the asking price, in percent. */
+  grossYieldPercent: number;
+  knownItems: number;
+  totalItems: number;
+  estimate: Estimate;
+  /** The player's estimate against the asking price (0,08: worth 8 % more than asked). */
+  valueGap: number;
+  /** Published today or yesterday. */
+  isNew: boolean;
+}
+
+export function listingView(
+  content: GameContent,
+  state: GameState,
+  listingId: string,
+): ListingView | null {
+  const listing = state.listings.find((candidate) => candidate.id === listingId);
+  if (!listing) return null;
+  const { property } = listing;
+  const today = toDayNumber(state.clock.date);
+  const neighbourhood = findNeighbourhood(content, property.cityId, property.neighbourhoodId);
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  const median = neighbourhood.sales[dwellingKindOf(property.kind)].pricePerM2.median;
+  const neighbourhoodPricePerM2 = Math.round(median * priceIndex * 100);
+  const pricePerM2 = Math.round(listing.askingPrice / Math.max(1, property.surface));
+  const rent = rentRange(content, state, believedView(content, property), 'bare').market;
+  const estimate = estimateValue(content, state, property, listing.visited);
+  return {
+    pricePerM2,
+    neighbourhoodPricePerM2,
+    priceGap: neighbourhoodPricePerM2 > 0 ? pricePerM2 / neighbourhoodPricePerM2 - 1 : 0,
+    condition: conditionLabel(content, property),
+    rent,
+    grossYieldPercent: listing.askingPrice > 0 ? (rent * 12 * 100) / listing.askingPrice : 0,
+    knownItems: property.items.filter((item) => item.known).length,
+    totalItems: property.items.length,
+    estimate,
+    valueGap: listing.askingPrice > 0 ? estimate.estimate / listing.askingPrice - 1 : 0,
+    isNew: today - listing.publishedDay <= 1,
+  };
+}
+
+/** Prices and rents of a city's neighbourhoods today, for the map. */
+export interface NeighbourhoodMarketView {
+  neighbourhoodId: string;
+  /** Median price per m² of an apartment. */
+  pricePerM2: Cents;
+  /** Rent per m² of a small apartment, charges included. */
+  rentPerM2: Cents;
+  trendPercent: number;
+}
+
+export function neighbourhoodMarkets(
+  content: GameContent,
+  state: GameState,
+  cityId: string,
+): NeighbourhoodMarketView[] {
+  const city = findCity(content, cityId);
+  return city.neighbourhoods.map((neighbourhood) => {
+    const market = state.market.cities[cityId]?.[neighbourhood.id];
+    const priceIndex = market?.priceIndex ?? 1;
+    return {
+      neighbourhoodId: neighbourhood.id,
+      pricePerM2: Math.round(neighbourhood.sales.apartment.pricePerM2.median * priceIndex * 100),
+      rentPerM2: Math.round(
+        neighbourhood.rentPerM2.smallApartment *
+          priceIndex ** content.renting.priceIndexElasticity *
+          100,
+      ),
+      trendPercent: market?.trendPercent ?? 0,
+    };
+  });
+}
+
+export type PropertyStatus =
+  'home' | 'works' | 'sold' | 'forSale' | 'let' | 'listedForRent' | 'vacant';
+
+/** Synthesis of the « Patrimoine » screen. */
+export interface Portfolio {
+  netWorth: Cents;
+  balance: Cents;
+  /** Owned properties at the player's estimate. */
+  propertiesValue: Cents;
+  debt: Cents;
+  /** Net of next month's statement (salary, home, properties, loans, tax). */
+  monthlyBudget: Cents;
+  /** Sum of the properties' monthly cash flows (before income tax). */
+  propertiesCashFlow: Cents;
+  properties: {
+    propertyId: string;
+    value: Cents;
+    cashFlow: PropertyCashFlow;
+    status: PropertyStatus;
+  }[];
+}
+
+export function propertyStatus(state: GameState, owned: OwnedProperty): PropertyStatus {
+  if (state.player.homePropertyId === owned.property.id) return 'home';
+  if (owned.works) return 'works';
+  if (owned.sale?.agreement) return 'sold';
+  if (owned.sale) return 'forSale';
+  if (owned.lease) return 'let';
+  if (owned.rental) return 'listedForRent';
+  return 'vacant';
+}
+
+export function portfolio(content: GameContent, state: GameState): Portfolio {
+  const properties = state.properties.map((owned) => ({
+    propertyId: owned.property.id,
+    value: estimateValue(content, state, owned.property, true).estimate,
+    cashFlow: propertyCashFlow(content, state, owned),
+    status: propertyStatus(state, owned),
+  }));
+  return {
+    netWorth: netWorth(content, state),
+    balance: state.player.balance,
+    propertiesValue: properties.reduce((sum, p) => sum + p.value, 0),
+    debt: state.loans.reduce((sum, loan) => sum + loan.remaining, 0),
+    monthlyBudget: monthlyStatementEstimate(content, state),
+    propertiesCashFlow: properties.reduce((sum, p) => sum + p.cashFlow.net, 0),
+    properties,
+  };
 }

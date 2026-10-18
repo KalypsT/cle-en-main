@@ -6,6 +6,7 @@ import { jobsFileSchema } from './schemas/jobs.ts';
 import { listingTextsSchema, marketRulesSchema } from './schemas/market.ts';
 import { rentingRulesSchema, tenantTextsSchema } from './schemas/renting.ts';
 import { rivalsFileSchema } from './schemas/rivals.ts';
+import { screenTextsSchema, tutorialSchema } from './schemas/screens.ts';
 import { livingCostsSchema, startSchema } from './schemas/start.ts';
 import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
@@ -29,6 +30,8 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'train-de-vie.json': livingCostsSchema,
   'travaux.json': worksRulesSchema,
   'textes/annonces.json': listingTextsSchema,
+  'textes/didacticiel.json': tutorialSchema,
+  'textes/ecrans.json': screenTextsSchema,
   'textes/interface.json': uiTextsSchema,
   'textes/locataires.json': tenantTextsSchema,
   'textes/travaux.json': worksTextsSchema,

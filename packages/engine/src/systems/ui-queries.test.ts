@@ -322,3 +322,52 @@ describe('interface data in the state', () => {
     expect(next.lastStatement?.date).toEqual(next.clock.date);
   });
 });
+
+describe('listing view and portfolio', () => {
+  it('compares a listing with its neighbourhood', () => {
+    const state = newGame();
+    const listing = affordableListing(state);
+    const view = engine.listingView(state, listing.id);
+    if (!view) throw new Error('No view');
+    expect(view.pricePerM2).toBe(Math.round(listing.askingPrice / listing.property.surface));
+    expect(view.neighbourhoodPricePerM2).toBeGreaterThan(0);
+    expect(view.priceGap).toBeCloseTo(view.pricePerM2 / view.neighbourhoodPricePerM2 - 1, 10);
+    expect(view.rent).toBe(engine.rentQuote(state, listing.id, 'bare')?.market);
+    expect(view.grossYieldPercent).toBeCloseTo((view.rent * 1200) / listing.askingPrice, 10);
+    expect(view.estimate).toEqual(engine.estimate(state, listing.id));
+    expect(view.totalItems).toBe(listing.property.items.length);
+    expect(view.valueGap).toBeCloseTo(view.estimate.estimate / listing.askingPrice - 1, 10);
+    expect(engine.listingView(state, 'gone')).toBeNull();
+    // The neighbourhood's price on the map is the listing's reference.
+    const markets = engine.neighbourhoodMarkets(state, 'dole');
+    expect(markets).toHaveLength(content.cities.dole?.neighbourhoods.length ?? 0);
+    if (listing.property.kind === 'apartment') {
+      const market = markets.find((m) => m.neighbourhoodId === listing.property.neighbourhoodId);
+      expect(market?.pricePerM2).toBe(view.neighbourhoodPricePerM2);
+    }
+  });
+
+  it('sums the properties and debts', () => {
+    const start = newGame();
+    const empty = engine.portfolio(start);
+    expect(empty).toMatchObject({
+      netWorth: start.player.balance,
+      balance: start.player.balance,
+      propertiesValue: 0,
+      debt: 0,
+      propertiesCashFlow: 0,
+      properties: [],
+    });
+    const { state, event } = buyWithLoan(start, affordableListing(start).id);
+    if (event.type !== 'deedSigned') throw new Error('Not bought');
+    const summary = engine.portfolio(state);
+    expect(summary.netWorth).toBe(engine.netWorth(state));
+    expect(summary.debt).toBe(state.loans[0]?.remaining);
+    expect(summary.properties).toHaveLength(1);
+    expect(summary.properties[0]).toMatchObject({ propertyId: event.propertyId, status: 'vacant' });
+    expect(summary.propertiesValue).toBe(engine.estimate(state, event.propertyId)?.estimate);
+    // The next statement: the household and the property, loan included.
+    const next = advanceToNextMonth(state).state;
+    expect(summary.monthlyBudget).toBe(next.player.balance - state.player.balance);
+  });
+});

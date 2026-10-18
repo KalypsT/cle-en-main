@@ -46,7 +46,7 @@ export function SlotsScreen({ mode, onNewGame, onLoad, onImport, onBack, notify 
   };
 
   return (
-    <main className="screen">
+    <main className="screen slots-screen">
       <h1 className="screen-heading">
         {mode === 'new' ? texts.slots.newGameHeading : texts.slots.continueHeading}
       </h1>

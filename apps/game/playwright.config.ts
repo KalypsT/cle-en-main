@@ -12,6 +12,8 @@ export default defineConfig({
     baseURL: 'http://localhost:4173/cle-en-main/',
     trace: 'retain-on-failure',
     ...devices['Pixel 7'],
+    // The reference phone screen of the mock-ups (docs/maquettes).
+    viewport: { width: 390, height: 844 },
     ...(executablePath ? { launchOptions: { executablePath } } : {}),
   },
   webServer: {
