@@ -16,7 +16,15 @@ import {
 } from './context.tsx';
 import { StatusBar } from './StatusBar.tsx';
 import { TutorialBubble, tutorialReaction } from './Tutorial.tsx';
+import { AgendaScreen } from '../screens/AgendaScreen.tsx';
 import { AssetsTab } from '../screens/AssetsTab.tsx';
+import { BankScreen } from '../screens/BankScreen.tsx';
+import { ContactsScreen } from '../screens/ContactsScreen.tsx';
+import { CoproScreen } from '../screens/CoproScreen.tsx';
+import { SaleScreen } from '../screens/SaleScreen.tsx';
+import { StatementScreen } from '../screens/StatementScreen.tsx';
+import { TaxesScreen } from '../screens/TaxesScreen.tsx';
+import { WorksScreen } from '../screens/WorksScreen.tsx';
 import { DecisionsTab } from '../screens/DecisionsTab.tsx';
 import { ListingScreen } from '../screens/ListingScreen.tsx';
 import { ListingsScreen } from '../screens/ListingsScreen.tsx';
@@ -221,6 +229,22 @@ function RouteScreen({ route }: { route: Route }) {
       return <PropertyScreen id={route.id} initialTab={route.tab} />;
     case 'rent':
       return <RentScreen id={route.id} />;
+    case 'works':
+      return <WorksScreen id={route.id} />;
+    case 'copro':
+      return <CoproScreen id={route.id} />;
+    case 'sale':
+      return <SaleScreen id={route.id} />;
+    case 'bank':
+      return <BankScreen />;
+    case 'statement':
+      return <StatementScreen />;
+    case 'taxes':
+      return <TaxesScreen />;
+    case 'agenda':
+      return <AgendaScreen />;
+    case 'contacts':
+      return <ContactsScreen />;
     case 'settings':
       return <SettingsScreen />;
   }

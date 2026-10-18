@@ -36,6 +36,7 @@ export {
   type FinancingInput,
   type FinancingSimulation,
   type ListingView,
+  type LoanSimulation,
   type Portfolio,
   type PropertyStatus,
   type MapPoint,

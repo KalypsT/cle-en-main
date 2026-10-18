@@ -51,6 +51,11 @@ export const tutorialSchema = z
             /** Shown only once this happens (the step waits silently before). */
             showOn: z.enum(TUTORIAL_TRIGGERS).optional(),
             next: z.enum(TUTORIAL_TRIGGERS),
+            /** A screen the bubble offers to open, with the button's text. */
+            open: z
+              .object({ screen: z.enum(['statement']), label: text })
+              .strict()
+              .optional(),
           })
           .strict(),
       )

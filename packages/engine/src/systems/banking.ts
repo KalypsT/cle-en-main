@@ -466,6 +466,35 @@ export function refinancingFees(content: GameContent, loan: Loan): Cents {
   return Math.round(loan.remaining * rules.feesShareOfRemaining) + toCents(rules.fixedFees);
 }
 
+/** What a bank would offer today to take a loan over (« renégociation »), without doing it. */
+export function refinanceQuote(
+  content: GameContent,
+  state: GameState,
+  loan: Loan,
+  bank: Bank,
+): {
+  ratePercent: number;
+  monthlyPayment: Cents;
+  fees: Cents;
+  months: number;
+  refusal: 'loan.refinancingRefused' | 'loan.notWorthRefinancing' | null;
+} {
+  const months = remainingMonths(loan);
+  const ratePercent = quoteRate(content, state, bank, remainingYears(content, loan)).ratePercent;
+  const refusal = checkBorrower(content, state, bank)
+    ? 'loan.refinancingRefused'
+    : ratePercent >= loan.ratePercent
+      ? 'loan.notWorthRefinancing'
+      : null;
+  return {
+    ratePercent,
+    monthlyPayment: annuityPayment(loan.remaining, ratePercent, months),
+    fees: refinancingFees(content, loan),
+    months,
+    refusal,
+  };
+}
+
 /** Replaces a loan by a new one at the bank's current rate, over the remaining months. */
 export function refinanceLoan(
   ctx: SystemContext,

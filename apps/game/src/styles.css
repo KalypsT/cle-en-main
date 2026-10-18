@@ -655,7 +655,8 @@ select {
   cursor: pointer;
 }
 
-.option-card[aria-pressed='true'] {
+.option-card[aria-pressed='true'],
+.option-card.selected {
   border-color: var(--teal);
   background: var(--teal-soft);
 }
@@ -1236,4 +1237,9 @@ select {
 
 .items-group[open] summary {
   margin-bottom: 4px;
+}
+
+.works-item {
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
 }

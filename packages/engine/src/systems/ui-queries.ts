@@ -12,6 +12,7 @@ import { annuityPayment, type Cents } from '../money.ts';
 import { hashFloat } from '../random.ts';
 import type { GameState, OwnedProperty, Property } from '../state.ts';
 import {
+  debtRatio,
   evaluateLoan,
   type LoanDecision,
   marketOffer,
@@ -700,5 +701,35 @@ export function portfolio(content: GameContent, state: GameState): Portfolio {
     monthlyBudget: monthlyStatementEstimate(content, state),
     propertiesCashFlow: properties.reduce((sum, p) => sum + p.cashFlow.net, 0),
     properties,
+  };
+}
+
+/** A loan simulated at a bank today (« simulateur » of the bank screen). */
+export interface LoanSimulation {
+  rate: RateQuote;
+  monthlyPayment: Cents;
+  /** Interest and insurance over the whole loan. */
+  totalCost: Cents;
+  /** Debt ratio with this loan on top of the current ones. */
+  debtRatioAfter: number;
+}
+
+export function simulateLoan(
+  content: GameContent,
+  state: GameState,
+  bankId: string,
+  amount: Cents,
+  durationYears: number,
+): LoanSimulation | null {
+  const bank = findBank(content, bankId);
+  if (!bank || amount <= 0 || durationYears <= 0) return null;
+  const rate = quoteRate(content, state, bank, durationYears);
+  const months = durationYears * MONTHS_PER_YEAR;
+  const monthlyPayment = annuityPayment(amount, rate.ratePercent, months);
+  return {
+    rate,
+    monthlyPayment,
+    totalCost: monthlyPayment * months - amount,
+    debtRatioAfter: debtRatio(content, state, monthlyPayment),
   };
 }

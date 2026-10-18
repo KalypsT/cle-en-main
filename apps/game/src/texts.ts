@@ -212,6 +212,7 @@ export function formatPercent(value: number): string {
 }
 
 export function formatDuration(minutes: number): string {
+  if (minutes > 0 && minutes < 60) return format(texts.calendar.minutes, { minutes });
   return format(texts.calendar.duration, {
     hours: Math.floor(minutes / 60),
     minutes: String(minutes % 60).padStart(2, '0'),

@@ -7,7 +7,7 @@ import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
 import { deserializeGame, type MigrationRegistry, MIGRATIONS } from './serialization.ts';
-import { type Avatar, FORMAT_VERSION, type GameState } from './state.ts';
+import { type Avatar, FORMAT_VERSION, type GameState, type SaleMode } from './state.ts';
 import { monthlyPoint, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
@@ -15,9 +15,11 @@ import {
   initialBankRelations,
   type LoanDecision,
   type LoanRequest,
+  debtRatio,
   quoteRate,
   type RateQuote,
   refinanceLoan,
+  refinanceQuote,
   runDailyOverdraft,
   runMonthlyLoanPayments,
   runMonthlyTrust,
@@ -98,6 +100,7 @@ import {
   pendingDecisions,
   propertyCashFlow,
   simulateFinancing,
+  simulateLoan,
 } from './systems/ui-queries.ts';
 import {
   answerSaleOffer,
@@ -560,6 +563,37 @@ export function createEngine(content: GameContent) {
       neighbourhoodMarkets(content, state, cityId),
     /** Net worth, values, debts and cash flows of the « Patrimoine » screen. */
     portfolio: (state: GameState) => portfolio(content, state),
+    /** A loan of `amount` over `durationYears` at a bank today: rate, payment, debt ratio. */
+    simulateLoan: (state: GameState, bankId: string, amount: Cents, durationYears: number) =>
+      simulateLoan(content, state, bankId, amount, durationYears),
+    /** What a bank would offer today to take a loan over, with its fees. */
+    refinanceQuote: (state: GameState, loanId: string, bankId: string) => {
+      const loan = state.loans.find((candidate) => candidate.id === loanId);
+      const bank = content.banks.find((candidate) => candidate.id === bankId);
+      return loan && bank ? refinanceQuote(content, state, loan, bank) : null;
+    },
+    /** Debt ratio today (loan payments over the income the banks retain). */
+    debtRatio: (state: GameState) => debtRatio(content, state),
+    /**
+     * Net proceeds if an owned property sold today at `price` through `mode`
+     * (agency fees, loans and their fees, capital gains tax, tenant's deposit).
+     */
+    saleEstimate: (state: GameState, propertyId: string, price: Cents, mode: SaleMode) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      if (!owned) return null;
+      const sale = owned.sale ?? {
+        askingPrice: price,
+        mode,
+        listedDay: 0,
+        offers: [],
+        agreement: null,
+      };
+      return saleProceeds(
+        context(content, state, []),
+        { ...owned, sale: { ...sale, mode } },
+        price,
+      );
+    },
     /** Expected balance over the next days (alert when it goes below zero). */
     cashForecast: (state: GameState, days?: number) => cashForecast(content, state, days),
     /** Pin of a listing, purchase or owned property on its city map. */

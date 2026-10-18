@@ -1,7 +1,13 @@
 {
   "speakers": {
-    "gerard": { "name": "Gérard Prudhomme", "role": "Banquier, La Tirelire Comtoise" },
-    "yvon": { "name": "Yvon Tableur", "role": "Comptable" }
+    "gerard": {
+      "name": "Gérard Prudhomme",
+      "role": "Banquier, La Tirelire Comtoise"
+    },
+    "yvon": {
+      "name": "Yvon Tableur",
+      "role": "Comptable"
+    }
   },
   "skip": "Passer",
   "disable": "Arrêter le didacticiel",
@@ -60,7 +66,11 @@
       "speaker": "yvon",
       "text": "Yvon Tableur, comptable. Voici votre premier bilan du mois : ce qui est entré, ce qui est sorti. Vous le retrouverez dans le Menu. Les chiffres ne mentent jamais, eux.",
       "showOn": "event:monthlyStatement",
-      "next": "ok"
+      "next": "ok",
+      "open": {
+        "screen": "statement",
+        "label": "Voir le bilan"
+      }
     }
   ]
 }

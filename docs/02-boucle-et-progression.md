@@ -23,7 +23,7 @@
 - Vitesses : **pause, ×1, ×2, ×4**.
 - À **×1**, une journée de jeu dure **environ 20 secondes**. Un mois dure environ 10 minutes, une année environ 2 heures.
 - **Accélération automatique** (activée par défaut, désactivable) : quand aucune décision n'est en attente et que rien n'est prévu, le temps passe en ×4, puis revient en ×1 au prochain événement.
-- **Pause automatique** pour les décisions importantes : offre reçue, incident grave, enchère, assemblée de copropriété.
+- **Pause automatique** pour les décisions importantes : offre reçue, incident grave, enchère, assemblée de copropriété. *Jalon 4 : contre-offre du vendeur, offre d'achat reçue, imprévu de chantier, vote d'AG.*
 
 ## 2.4 La boucle principale
 
@@ -63,6 +63,8 @@ La faillite doit se voir venir et pouvoir s'éviter :
 5. **Faillite** : seulement si le patrimoine net reste négatif après les ventes forcées.
 
 > **Jalon 1c** : la descente est codée jusqu'à la faillite (`content/credit.json`, `distress`). Après **90 jours** de découvert, la banque vend les biens au prix réel moins **20 %**, en commençant par celui qui rapporte le plus de trésorerie, jusqu'à ramener le compte au-dessus de zéro ; chaque vente forcée coûte 15 points de confiance à la banque du compte. Sans bien restant et avec un patrimoine net négatif, le moteur déclare la faillite (`bankrupt`). L'alerte de trésorerie arrive avec l'interface (jalon 4), le nouveau départ au jalon 6.
+
+> **Jalon 4** : l'alerte de trésorerie compte les flux déjà connus sur 30 jours (`content/decisions.json`) : bilan du 1er (salaire moyen, loyer, train de vie, loyers et charges des biens, mensualités, impôt), taxe foncière, actes dont le financement est réglé, factures de chantier à leur fin prévue (après l'enveloppe travaux). Le hasard (impayés, incidents) n'est pas compté. Elle s'affiche en bandeau ambre sous la barre d'état et dans les décisions.
 
 ### Le nouveau départ (mode Classique)
 

@@ -15,7 +15,20 @@
 | Négatif | Rouge brique |
 | Positif | Vert |
 
-Les couleurs ne portent jamais l'information seules : toujours une icône ou un texte. Valeurs exactes définies au jalon 4.
+Les couleurs ne portent jamais l'information seules : toujours une icône ou un texte.
+
+**Valeurs retenues au jalon 4** (thème clair, jetons CSS de `apps/game/src/styles.css`) :
+
+| Rôle | Couleur | Teinte claire (fonds) |
+|---|---|---|
+| Fond ivoire | `#f6f1e6` (surfaces `#fffdf8`, bordures `#e3d9c6`) | — |
+| Texte | `#24262b` (secondaire `#6e6658`) | — |
+| Sarcelle (accent, biens du joueur) | `#0f6f68` | `#dcefeb` |
+| Ambre (alerte) | `#a35a06` | `#fcefd3` |
+| Brique (négatif) | `#b23d27` | `#f8e0d9` |
+| Vert (positif) | `#2e7a3a` | `#e1f0dd` |
+
+Le thème sombre arrive au jalon 5. Les classes énergie gardent les couleurs habituelles de l'étiquette DPE (vert foncé à rouge).
 
 ## 5.3 Les façades, générées par modules
 
@@ -45,7 +58,7 @@ Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : 
   - accessoires contextuels : parapluie sous la pluie, poussette, chien en laisse, vélo, sac de courses, baguette sous le bras ;
   - marche animée par le code (balancement des bras et des jambes).
 - **Personnages nommés** (banquiers, comptable, rivaux, artisans, agences) : **portraits en buste** avec trois expressions (neutre, content, contrarié), dans les dialogues et les notifications.
-- **Avatar du joueur** : composé (visage, coiffure, teint, tenue).
+- **Avatar du joueur** : composé (visage, coiffure, teint, tenue). Au jalon 4, une version simple en SVG : 4 visages, 6 coiffures, 6 teints, 5 tenues ; Gérard et Yvon ont un portrait du même style.
 
 ## 5.6 Les animations
 
@@ -56,7 +69,7 @@ L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-e
 ## 5.7 Typographie
 
 - **Manrope** pour l'interface (lisible, chiffres alignés).
-- **Une police expressive** pour le titre *Clé en main !* et les grands moments (bilans, titres), par exemple **Fraunces**.
+- **Une police expressive** pour le titre *Clé en main !* et les grands moments (bilans, titres) : **Fraunces**, retenue au jalon 4 et embarquée comme Manrope (hors ligne).
 
 ## 5.8 Le son
 
