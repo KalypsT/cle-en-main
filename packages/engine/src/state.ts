@@ -4,11 +4,22 @@ import type { Clock } from './clock.ts';
 import type { Cents } from './money.ts';
 import type { RngState } from './random.ts';
 import type { LoanDecision } from './systems/banking.ts';
+import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 6;
+export const FORMAT_VERSION = 7;
+
+/** The player's composed avatar: an index into each list of content/avatar.json. */
+export interface Avatar {
+  face: number;
+  hair: number;
+  skin: number;
+  outfit: number;
+}
 
 export interface PlayerState {
+  name: string;
+  avatar: Avatar;
   jobId: string;
   employed: boolean;
   /** Current account; negative means overdraft. */
@@ -463,6 +474,30 @@ export interface GameState {
   artisans: Record<string, { jobs: number }>;
   /** Works projects completed, by city: the address book grows with them. */
   worksDone: Record<string, number>;
+  /** Listings the player marked, by id (removed with the listing). */
+  favorites: string[];
+  /** Gérard's tutorial: `step` indexes content/textes/didacticiel.json. */
+  tutorial: { enabled: boolean; step: number };
+  /** One point on the 1st of each month (and at the start): the wealth curve. */
+  history: MonthlyPoint[];
+  /** Last monthly statement, for the short monthly review. */
+  lastStatement: MonthlyStatement | null;
+}
+
+export interface MonthlyPoint {
+  date: CalendarDate;
+  netWorth: Cents;
+  balance: Cents;
+  /** Remaining loans. */
+  debt: Cents;
+  /** Net flow of the month's statement (0 for the starting point). */
+  cashFlow: Cents;
+}
+
+export interface MonthlyStatement {
+  date: CalendarDate;
+  lines: StatementLine[];
+  balance: Cents;
 }
 
 /** What one property earned and cost during the tax year, for the yearly assessment. */

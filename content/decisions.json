@@ -1,0 +1,5 @@
+{
+  "quoteWarningDays": 3,
+  "cashForecastDays": 30,
+  "autoPause": ["counterOffer", "saleOffer", "worksHazard", "coproVote"]
+}

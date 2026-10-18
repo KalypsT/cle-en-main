@@ -303,6 +303,23 @@ export const MIGRATIONS: MigrationRegistry = {
       worksDone: {},
     };
   },
+  /**
+   * Version 6 (milestone 3) had no player identity nor interface data: the
+   * player gets the default name and avatar, the tutorial is off (the game is
+   * already under way), and the wealth curve starts at the next month.
+   */
+  6: (raw, { content }) => ({
+    ...raw,
+    player: {
+      ...(raw.player as Record<string, unknown>),
+      name: content.start.defaultPlayerName,
+      avatar: { face: 0, hair: 0, skin: 0, outfit: 0 },
+    },
+    favorites: [],
+    tutorial: { enabled: false, step: 0 },
+    history: [],
+    lastStatement: null,
+  }),
 };
 
 /** Old defects (version 5) and the item each one becomes at state 1. */
@@ -688,6 +705,35 @@ const loanDecisionSchema = z.discriminatedUnion('decision', [
     .strict(),
 ]);
 
+const amountLine = <K extends string>(kind: K) =>
+  z.object({ kind: z.literal(kind), amount: cents.min(0) }).strict();
+const propertyLine = <K extends string>(kind: K) =>
+  z.object({ kind: z.literal(kind), propertyId: z.string(), amount: cents.min(0) }).strict();
+
+const statementLineSchema = z.discriminatedUnion('kind', [
+  amountLine('salary'),
+  amountLine('rent'),
+  propertyLine('rentalIncome'),
+  propertyLine('propertyCharges'),
+  propertyLine('ownerInsurance'),
+  propertyLine('managementFees'),
+  propertyLine('legalCosts'),
+  propertyLine('coproCall'),
+  amountLine('taxInstalment'),
+  amountLine('taxRefund'),
+  amountLine('livingCosts'),
+  z
+    .object({
+      kind: z.literal('loanPayment'),
+      loanId: z.string(),
+      amount: cents.min(0),
+      interest: cents.min(0),
+      capital: cents.min(0),
+    })
+    .strict(),
+  amountLine('overdraftInterest'),
+]);
+
 const gameStateSchema = z
   .object({
     formatVersion: z.literal(FORMAT_VERSION),
@@ -704,6 +750,15 @@ const gameStateSchema = z
     nextId: z.number().int().min(1),
     player: z
       .object({
+        name: z.string().min(1),
+        avatar: z
+          .object({
+            face: z.number().int().min(0),
+            hair: z.number().int().min(0),
+            skin: z.number().int().min(0),
+            outfit: z.number().int().min(0),
+          })
+          .strict(),
         jobId: z.string(),
         employed: z.boolean(),
         balance: cents,
@@ -958,6 +1013,23 @@ const gameStateSchema = z
       .strict(),
     artisans: z.record(z.string(), z.object({ jobs: z.number().int().min(0) }).strict()),
     worksDone: z.record(z.string(), z.number().int().min(0)),
+    favorites: z.array(z.string()),
+    tutorial: z.object({ enabled: z.boolean(), step: z.number().int().min(0) }).strict(),
+    history: z.array(
+      z
+        .object({
+          date: calendarDateSchema,
+          netWorth: cents,
+          balance: cents,
+          debt: cents.min(0),
+          cashFlow: cents,
+        })
+        .strict(),
+    ),
+    lastStatement: z
+      .object({ date: calendarDateSchema, lines: z.array(statementLineSchema), balance: cents })
+      .strict()
+      .nullable(),
   })
   .strict();
 

@@ -16,6 +16,9 @@ export type GameAction =
   | { type: 'bank/meet'; bankId: string }
   | { type: 'bank/refinance'; loanId: string; bankId: string }
   | { type: 'job/resign' }
+  | { type: 'market/favorite'; listingId: string; favorite: boolean }
+  /** Interface data kept in the save: Gérard's tutorial, on or off, and its step. */
+  | { type: 'tutorial/set'; enabled?: boolean; step?: number }
   | { type: 'market/visit'; listingId: string }
   | { type: 'market/offer'; listingId: string; amount: Cents }
   | { type: 'market/answerCounter'; listingId: string; accept: boolean }
@@ -75,7 +78,8 @@ export type RefusalCode =
   | RentRefusal
   | WorksRefusal
   | CoproRefusal
-  | 'job.alreadyResigned';
+  | 'job.alreadyResigned'
+  | 'tutorial.invalidStep';
 
 /** Machine-readable refusal; the interface maps `code` to a text from `content/`. */
 export interface Refusal {

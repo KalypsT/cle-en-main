@@ -129,6 +129,7 @@ export const uiTextsSchema = z
         'loan.refinancingRefused': text,
         'account.insufficientFunds': text,
         'job.alreadyResigned': text,
+        'tutorial.invalidStep': text,
         'listing.unknown': text,
         'visit.alreadyDone': text,
         'visit.alreadyPlanned': text,

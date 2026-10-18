@@ -4,5 +4,7 @@
   "monthlyRent": 520,
   "reputation": 10,
   "defaultJobId": "civilServant",
+  "defaultPlayerName": "Camille",
+  "maxPlayerNameLength": 24,
   "accountBankId": "tirelire"
 }

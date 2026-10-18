@@ -1,0 +1,553 @@
+import { type CalendarDate, fromDayNumber, toDayNumber } from '../calendar.ts';
+import { findAgency, findBank, findCity, type DecisionKind, type GameContent } from '../content.ts';
+import { annuityPayment, type Cents } from '../money.ts';
+import { hashFloat } from '../random.ts';
+import type { GameState, OwnedProperty, Property } from '../state.ts';
+import {
+  evaluateLoan,
+  type LoanDecision,
+  marketOffer,
+  quoteRate,
+  type RateQuote,
+  requiredContribution,
+} from './banking.ts';
+import { believedView } from './dwelling.ts';
+import { expectedSalary, livingCosts } from './household.ts';
+import { purchaseFees } from './purchases.ts';
+import { cashDueAtDeed } from './purchases.ts';
+import {
+  letBanDay,
+  monthsToDays,
+  ownerInsurance,
+  recoverableCharges,
+  rentRange,
+} from './renting.ts';
+
+/**
+ * Read-only views for the interface (docs/04): what waits for the player,
+ * what each property brings, what a purchase would cost, where things are on
+ * the map. The interface computes nothing itself.
+ */
+
+const MONTHS_PER_YEAR = 12;
+
+/** Something waiting for the player, with its deadline (day number; null: none). */
+export type PendingDecision = {
+  deadlineDay: number | null;
+  /** The game pauses when it appears (content/decisions.json). */
+  autoPause: boolean;
+} & (
+  | { kind: 'counterOffer'; listingId: string; amount: Cents }
+  | { kind: 'loanNeeded'; purchaseId: string }
+  | { kind: 'loanAnswer'; purchaseId: string; applicationIds: string[] }
+  | { kind: 'deedFunds'; purchaseId: string; missing: Cents }
+  | { kind: 'candidates'; propertyId: string; count: number }
+  | {
+      kind: 'saleOffer';
+      propertyId: string;
+      offerId: string;
+      amount: Cents;
+      buyerId: string | null;
+    }
+  | { kind: 'worksHazard'; propertyId: string; hazardId: string; cost: Cents }
+  | { kind: 'coproVote'; propertyId: string; resolutions: number }
+  | { kind: 'incident'; propertyId: string; kindId: string }
+  | { kind: 'quoteExpiring'; propertyId: string; quoteId: string; artisanId: string }
+  | { kind: 'dpeWarning'; propertyId: string }
+  | { kind: 'vacant'; propertyId: string }
+  | { kind: 'renegotiation'; loanId: string; marketPercent: number }
+  | { kind: 'cashAlert'; lowest: Cents }
+);
+
+type DecisionBody = PendingDecision extends infer D
+  ? D extends PendingDecision
+    ? Omit<D, 'autoPause'>
+    : never
+  : never;
+
+/** Every decision waiting for the player, the most urgent first. */
+export function pendingDecisions(content: GameContent, state: GameState): PendingDecision[] {
+  const today = toDayNumber(state.clock.date);
+  const list: DecisionBody[] = [];
+
+  for (const listing of state.listings) {
+    const counter = listing.offer?.counter;
+    if (counter) {
+      list.push({
+        kind: 'counterOffer',
+        listingId: listing.id,
+        amount: counter.amount,
+        deadlineDay: counter.expiresDay,
+      });
+    }
+  }
+
+  for (const purchase of state.purchases) {
+    const chosen = purchase.acceptedApplicationId !== null || purchase.cash;
+    if (!chosen) {
+      const answered = purchase.applications.filter(
+        (application) => application.decision && application.decision.decision !== 'refused',
+      );
+      const waiting = purchase.applications.some((application) => application.decision === null);
+      if (answered.length > 0) {
+        list.push({
+          kind: 'loanAnswer',
+          purchaseId: purchase.id,
+          applicationIds: answered.map((application) => application.id),
+          deadlineDay: purchase.loanDeadlineDay,
+        });
+      } else if (!waiting) {
+        list.push({
+          kind: 'loanNeeded',
+          purchaseId: purchase.id,
+          deadlineDay: purchase.loanDeadlineDay,
+        });
+      }
+    } else {
+      const missing = cashDueAtDeed({ content }, purchase) - state.player.balance;
+      if (missing > 0) {
+        list.push({
+          kind: 'deedFunds',
+          purchaseId: purchase.id,
+          missing,
+          deadlineDay: purchase.deedDay,
+        });
+      }
+    }
+  }
+
+  const dpeHorizon = today + monthsToDays(content.renting.dpe.warningMonths);
+  for (const owned of state.properties) {
+    const propertyId = owned.property.id;
+    const applications = owned.rental?.applications ?? [];
+    if (applications.length > 0) {
+      list.push({
+        kind: 'candidates',
+        propertyId,
+        count: applications.length,
+        deadlineDay: Math.min(...applications.map((application) => application.expiresDay)),
+      });
+    }
+    for (const offer of owned.sale?.offers ?? []) {
+      if (offer.counterAmount !== null) continue;
+      list.push({
+        kind: 'saleOffer',
+        propertyId,
+        offerId: offer.id,
+        amount: offer.amount,
+        buyerId: offer.buyerId,
+        deadlineDay: offer.expiresDay,
+      });
+    }
+    const hazard = owned.works?.hazard;
+    if (hazard) {
+      list.push({
+        kind: 'worksHazard',
+        propertyId,
+        hazardId: hazard.hazardId,
+        cost: hazard.cost,
+        deadlineDay: hazard.deadlineDay,
+      });
+    }
+    const meeting = owned.coproMeeting;
+    if (meeting && meeting.resolutions.some((resolution) => resolution.vote === null)) {
+      list.push({
+        kind: 'coproVote',
+        propertyId,
+        resolutions: meeting.resolutions.length,
+        deadlineDay: meeting.voteDay,
+      });
+    }
+    const incident = owned.lease?.incident;
+    if (incident && !incident.repair) {
+      list.push({
+        kind: 'incident',
+        propertyId,
+        kindId: incident.kindId,
+        deadlineDay: incident.day + content.renting.incidentPatienceDays,
+      });
+    }
+    for (const quote of owned.quotes) {
+      if (owned.works || quote.expiresDay - today > content.decisions.quoteWarningDays) continue;
+      list.push({
+        kind: 'quoteExpiring',
+        propertyId,
+        quoteId: quote.id,
+        artisanId: quote.artisanId,
+        deadlineDay: quote.expiresDay,
+      });
+    }
+    const ban = letBanDay(content, owned.property.dpe);
+    if (
+      ban !== null &&
+      ban > today &&
+      ban <= dpeHorizon &&
+      state.player.homePropertyId !== propertyId
+    ) {
+      list.push({ kind: 'dpeWarning', propertyId, deadlineDay: ban });
+    }
+    if (
+      !owned.lease &&
+      !owned.rental &&
+      !owned.works &&
+      !owned.sale &&
+      state.player.homePropertyId !== propertyId
+    ) {
+      list.push({ kind: 'vacant', propertyId, deadlineDay: null });
+    }
+  }
+
+  for (const loan of state.loans) {
+    if (!loan.renegotiationSuggested) continue;
+    const years = Math.max(
+      1,
+      Math.round((loan.durationMonths - loan.paymentsMade) / MONTHS_PER_YEAR),
+    );
+    const offer = marketOffer(content, state, years);
+    if (offer < loan.ratePercent) {
+      list.push({
+        kind: 'renegotiation',
+        loanId: loan.id,
+        marketPercent: offer,
+        deadlineDay: null,
+      });
+    }
+  }
+
+  const forecast = cashForecast(content, state);
+  if (forecast.lowest < 0 && forecast.lowestDay !== null) {
+    list.push({ kind: 'cashAlert', lowest: forecast.lowest, deadlineDay: forecast.lowestDay });
+  }
+
+  const autoPause = new Set<DecisionKind>(content.decisions.autoPause);
+  return list
+    .map(
+      (decision) => ({ ...decision, autoPause: autoPause.has(decision.kind) }) as PendingDecision,
+    )
+    .sort(
+      (a, b) =>
+        (a.deadlineDay ?? Number.POSITIVE_INFINITY) - (b.deadlineDay ?? Number.POSITIVE_INFINITY),
+    );
+}
+
+/** Stable key of a decision, to tell new ones from those already seen (auto pause). */
+export function decisionKey(decision: PendingDecision): string {
+  switch (decision.kind) {
+    case 'counterOffer':
+      return `${decision.kind}:${decision.listingId}`;
+    case 'loanNeeded':
+    case 'deedFunds':
+      return `${decision.kind}:${decision.purchaseId}`;
+    case 'loanAnswer':
+      return `${decision.kind}:${decision.purchaseId}:${decision.applicationIds.join(',')}`;
+    case 'saleOffer':
+      return `${decision.kind}:${decision.offerId}`;
+    case 'worksHazard':
+      return `${decision.kind}:${decision.propertyId}:${decision.hazardId}`;
+    case 'quoteExpiring':
+      return `${decision.kind}:${decision.quoteId}`;
+    case 'renegotiation':
+      return `${decision.kind}:${decision.loanId}`;
+    case 'cashAlert':
+      return decision.kind;
+    case 'candidates':
+    case 'coproVote':
+    case 'incident':
+    case 'dpeWarning':
+    case 'vacant':
+      return `${decision.kind}:${decision.propertyId}`;
+  }
+}
+
+/** Monthly flows of one owned property, as they run today (before income tax). */
+export interface PropertyCashFlow {
+  /** Rent excluding charges (0 while vacant or unpaid and uninsured). */
+  rent: Cents;
+  recoverableCharges: Cents;
+  charges: Cents;
+  insurance: Cents;
+  managementFees: Cents;
+  coproCalls: Cents;
+  /** Yearly property tax spread over the months. */
+  propertyTax: Cents;
+  loanPayment: Cents;
+  /** Interest part of this month's payment. */
+  loanInterest: Cents;
+  net: Cents;
+}
+
+export function propertyCashFlow(
+  content: GameContent,
+  state: GameState,
+  owned: OwnedProperty,
+): PropertyCashFlow {
+  const { property, lease } = owned;
+  const isHome = state.player.homePropertyId === property.id;
+  const recoverable = lease ? recoverableCharges(content, property) : 0;
+  const rent = lease ? lease.monthlyRent : 0;
+  const due = rent + recoverable;
+  const agency = lease?.agencyId ? findAgency(content, lease.agencyId) : undefined;
+  const managementFees = agency ? Math.round(due * agency.feeShare) : 0;
+  const premium = lease?.insured
+    ? Math.round(due * content.renting.unpaidRentInsurance.premiumShare)
+    : 0;
+  const insurance = (isHome ? 0 : ownerInsurance(content, property)) + premium;
+  const coproCalls = owned.coproCalls.reduce((sum, call) => sum + call.monthly, 0);
+  const propertyTax = Math.round(property.annualPropertyTax / MONTHS_PER_YEAR);
+  const loans = state.loans.filter((loan) => loan.propertyId === property.id);
+  const loanPayment = loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
+  const loanInterest = loans.reduce(
+    (sum, loan) => sum + Math.round((loan.remaining * loan.ratePercent) / 100 / MONTHS_PER_YEAR),
+    0,
+  );
+  const charges = property.monthlyCharges;
+  return {
+    rent,
+    recoverableCharges: recoverable,
+    charges,
+    insurance,
+    managementFees,
+    coproCalls,
+    propertyTax,
+    loanPayment,
+    loanInterest,
+    net: due - charges - insurance - managementFees - coproCalls - propertyTax - loanPayment,
+  };
+}
+
+export interface FinancingInput {
+  bankId: string;
+  durationYears: number;
+  /** Price paid (asking price by default). */
+  price?: Cents;
+  /** Personal money put in; defaults to the fees (the minimum the banks ask). */
+  contribution?: Cents;
+  /** Works financed with the loan. */
+  works?: Cents;
+}
+
+/** « Financement simulé » of a listing (docs/04, fiche annonce). */
+export interface FinancingSimulation {
+  price: Cents;
+  notaryFees: Cents;
+  bankFees: Cents;
+  works: Cents;
+  contribution: Cents;
+  /** Minimum contribution the banks ask: the fees. */
+  minContribution: Cents;
+  loanAmount: Cents;
+  durationYears: number;
+  rate: RateQuote;
+  monthlyPayment: Cents;
+  /** Market rent, bare let, as the player knows the property. */
+  rent: Cents;
+  recoverableCharges: Cents;
+  /** Charges left to the owner, property tax and insurance, per month. */
+  ownerCosts: Cents;
+  /** Rent and charges in, minus the owner's costs and the loan, per month (before tax). */
+  netEffort: Cents;
+  /** Cash left once the contribution is paid. */
+  cashAfter: Cents;
+  /** What the bank would answer today. */
+  decision: LoanDecision;
+}
+
+export function simulateFinancing(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  askingPrice: Cents,
+  input: FinancingInput,
+): FinancingSimulation | null {
+  const bank = findBank(content, input.bankId);
+  if (!bank) return null;
+  const price = input.price ?? askingPrice;
+  const works = Math.max(0, input.works ?? 0);
+  const fees = purchaseFees({ content }, price, true);
+  const minContribution = requiredContribution(content, price);
+  const contribution = Math.max(0, input.contribution ?? minContribution);
+  const loanAmount = Math.max(0, price + works + fees.notary + fees.bank - contribution);
+  const rate = quoteRate(content, state, bank, input.durationYears);
+  const months = input.durationYears * MONTHS_PER_YEAR;
+  const monthlyPayment = loanAmount > 0 ? annuityPayment(loanAmount, rate.ratePercent, months) : 0;
+  const believed = believedView(content, property);
+  const rent = rentRange(content, state, believed, 'bare').market;
+  const recoverable = recoverableCharges(content, property);
+  const ownerCosts =
+    property.monthlyCharges +
+    Math.round(property.annualPropertyTax / MONTHS_PER_YEAR) +
+    ownerInsurance(content, property);
+  const decision = evaluateLoan(content, state, {
+    bankId: bank.id,
+    amount: Math.max(1, loanAmount),
+    durationYears: input.durationYears,
+    price,
+    works,
+    contribution,
+  });
+  return {
+    price,
+    notaryFees: fees.notary,
+    bankFees: fees.bank,
+    works,
+    contribution,
+    minContribution,
+    loanAmount,
+    durationYears: input.durationYears,
+    rate,
+    monthlyPayment,
+    rent,
+    recoverableCharges: recoverable,
+    ownerCosts,
+    netEffort: rent + recoverable - ownerCosts - monthlyPayment,
+    cashAfter: state.player.balance - contribution,
+    decision,
+  };
+}
+
+/** Balance expected over the next days from the flows already known (docs/02, 2.6). */
+export interface CashForecast {
+  days: number;
+  /** Lowest expected balance over the period. */
+  lowest: Cents;
+  /** Day number of that lowest balance; null when nothing changes. */
+  lowestDay: number | null;
+  endBalance: Cents;
+}
+
+/**
+ * Known flows: the monthly statement (salary, home rent, living costs,
+ * rents, charges, insurance, agency fees, calls for funds, loans, tax
+ * instalments), the property tax, deeds and works bills falling due. Chance
+ * (unpaid rents, incidents) is left out.
+ */
+export function cashForecast(
+  content: GameContent,
+  state: GameState,
+  days = content.decisions.cashForecastDays,
+): CashForecast {
+  const today = toDayNumber(state.clock.date);
+  const byDay = new Map<number, Cents>();
+  const add = (day: number, amount: Cents) => byDay.set(day, (byDay.get(day) ?? 0) + amount);
+
+  // Monthly statement.
+  const monthly = monthlyStatementEstimate(content, state);
+  for (let offset = 1; offset <= days; offset++) {
+    if (fromDayNumber(today + offset).day === 1) add(today + offset, monthly);
+  }
+  // Property tax.
+  const { month, day } = content.taxes.propertyTaxDate;
+  const propertyTax = state.properties.reduce((sum, o) => sum + o.property.annualPropertyTax, 0);
+  for (let offset = 1; offset <= days && propertyTax > 0; offset++) {
+    const date = fromDayNumber(today + offset);
+    if (date.month === month && date.day === day) add(today + offset, -propertyTax);
+  }
+  // Deeds whose financing is settled.
+  for (const purchase of state.purchases) {
+    if (!purchase.acceptedApplicationId && !purchase.cash) continue;
+    if (purchase.deedDay > today + days) continue;
+    add(Math.max(today, purchase.deedDay), -cashDueAtDeed({ content }, purchase));
+  }
+  // Works bills, at the planned end of each artisan's task, paid from the works fund first.
+  for (const owned of state.properties) {
+    let fund = owned.worksFund?.amount ?? 0;
+    const tasks = (owned.works?.tasks ?? [])
+      .filter((task) => task.status !== 'done' && task.artisanId !== null)
+      .map((task) => ({
+        day: Math.max(today, (task.startDay ?? task.availableDay) + task.days),
+        bill: task.items.reduce((sum, item) => sum + item.price, 0) - task.deposit,
+      }))
+      .filter((task) => task.day <= today + days)
+      .sort((a, b) => a.day - b.day);
+    for (const task of tasks) {
+      const fromFund = Math.min(fund, task.bill);
+      fund -= fromFund;
+      add(task.day, -(task.bill - fromFund));
+    }
+  }
+
+  let balance = state.player.balance;
+  let lowest = balance;
+  let lowestDay: number | null = null;
+  for (const dayNumber of [...byDay.keys()].sort((a, b) => a - b)) {
+    balance += byDay.get(dayNumber) ?? 0;
+    if (balance < lowest) {
+      lowest = balance;
+      lowestDay = dayNumber;
+    }
+  }
+  return { days, lowest, lowestDay, endBalance: balance };
+}
+
+/** Net of next month's statement, from today's situation (salary at its average). */
+export function monthlyStatementEstimate(content: GameContent, state: GameState): Cents {
+  const { player } = state;
+  let net = expectedSalary(content, player) - player.monthlyRent - livingCosts(content, player);
+  for (const owned of state.properties) {
+    const flow = propertyCashFlow(content, state, owned);
+    // The property tax is charged once a year, not monthly.
+    net += flow.net + flow.loanPayment + flow.propertyTax;
+  }
+  net -= state.loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
+  const { installments } = state.tax;
+  if (installments.remaining > 0) net -= installments.monthly;
+  return net;
+}
+
+/** Point on the city map, in metres from its origin (x east, y north). */
+export interface MapPoint {
+  x: number;
+  y: number;
+}
+
+const MAP_TRIES = 64;
+
+function insidePolygon(point: MapPoint, polygon: readonly (readonly [number, number])[]): boolean {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i] ?? [0, 0];
+    const [xj, yj] = polygon[j] ?? [0, 0];
+    if (yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+/**
+ * Where a property's pin goes on the city map: a point inside its
+ * neighbourhood, drawn from its id (stable, no draw from the game's random
+ * generator). Real addresses may come later.
+ */
+export function mapPosition(content: GameContent, property: Property): MapPoint | null {
+  const city = findCity(content, property.cityId);
+  const neighbourhood = city.neighbourhoods.find((n) => n.id === property.neighbourhoodId);
+  if (!neighbourhood) return null;
+  const outlines = neighbourhood.outlines;
+  const points = outlines.flat();
+  if (points.length === 0) return null;
+  const xs = points.map(([x]) => x);
+  const ys = points.map(([, y]) => y);
+  const box = {
+    minX: Math.min(...xs),
+    maxX: Math.max(...xs),
+    minY: Math.min(...ys),
+    maxY: Math.max(...ys),
+  };
+  for (let attempt = 0; attempt < MAP_TRIES; attempt++) {
+    const point = {
+      x: box.minX + hashFloat(0, `${property.id}#x${attempt}`) * (box.maxX - box.minX),
+      y: box.minY + hashFloat(0, `${property.id}#y${attempt}`) * (box.maxY - box.minY),
+    };
+    if (outlines.some((outline) => insidePolygon(point, outline))) {
+      return { x: Math.round(point.x), y: Math.round(point.y) };
+    }
+  }
+  const first = outlines[0]?.[0];
+  return first ? { x: first[0], y: first[1] } : null;
+}
+
+/** Game date of a day number, for the interface. */
+export function dateOfDay(day: number): CalendarDate {
+  return fromDayNumber(day);
+}

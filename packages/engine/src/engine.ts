@@ -7,7 +7,8 @@ import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
 import { deserializeGame, type MigrationRegistry, MIGRATIONS } from './serialization.ts';
-import { FORMAT_VERSION, type GameState } from './state.ts';
+import { type Avatar, FORMAT_VERSION, type GameState } from './state.ts';
+import { monthlyPoint, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
   holdMeeting,
@@ -88,6 +89,14 @@ import {
 import { worksCatalog, worksEstimate, worksPlan } from './systems/works-view.ts';
 import { believedView } from './systems/dwelling.ts';
 import {
+  cashForecast,
+  type FinancingInput,
+  mapPosition,
+  pendingDecisions,
+  propertyCashFlow,
+  simulateFinancing,
+} from './systems/ui-queries.ts';
+import {
   answerSaleOffer,
   listForSale,
   runDailyResale,
@@ -110,6 +119,11 @@ export interface CreateGameOptions {
   startHour: number;
   /** Defaults to the content's default job. */
   jobId?: string;
+  /** Defaults to the content's default name; trimmed and cut to the maximum length. */
+  name?: string;
+  avatar?: Avatar;
+  /** Gérard's tutorial; on by default. */
+  tutorial?: boolean;
 }
 
 export interface TickResult {
@@ -140,6 +154,8 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     clock: createClock(startDate, startHour),
     nextId: 1,
     player: {
+      name: playerName(content, options.name),
+      avatar: { ...(options.avatar ?? { face: 0, hair: 0, skin: 0, outfit: 0 }) },
       jobId: job.id,
       employed: true,
       balance: toCents(content.start.savings),
@@ -168,9 +184,17 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     tax: initialTaxState(startDate.year),
     artisans: {},
     worksDone: {},
+    favorites: [],
+    tutorial: { enabled: options.tutorial ?? true, step: 0 },
+    history: [],
+    lastStatement: null,
   };
+  if (!isValidAvatar(state.player.avatar)) {
+    throw new RangeError(`Invalid avatar ${JSON.stringify(options.avatar)}`);
+  }
   // The market already has listings on the first day.
   seedListings(context(content, state, []), content.start.cityId);
+  state.history.push(monthlyPoint(content, state, 0));
   // Free time left on the first day, prorated to the hours remaining.
   const fullDay = dailyFreeTime(content, state, startDate);
   state.player.freeTimeMinutes = Math.floor(
@@ -212,6 +236,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
       player.overdraftInterestThisMonth = 0;
     }
     ctx.events.push({ type: 'monthlyStatement', lines, balance: player.balance });
+    ctx.state.lastStatement = { date: { ...ctx.state.clock.date }, lines, balance: player.balance };
   }
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
@@ -226,6 +251,20 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   runDailyResale(ctx);
   runDailyOverdraft(ctx);
   runDailyDistress(ctx);
+  if (monthStarted) {
+    // The wealth curve, once the first day of the month has run.
+    const net = statementNet(ctx.state.lastStatement?.lines ?? []);
+    ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
+  }
+}
+
+function playerName(content: GameContent, name: string | undefined): string {
+  const trimmed = (name ?? '').trim().slice(0, content.start.maxPlayerNameLength);
+  return trimmed === '' ? content.start.defaultPlayerName : trimmed;
+}
+
+function isValidAvatar(avatar: Avatar): boolean {
+  return Object.values(avatar).every((part) => Number.isInteger(part) && part >= 0);
 }
 
 /** The engine bound to its content. Every function is pure: inputs are never mutated. */
@@ -361,6 +400,17 @@ export function createEngine(content: GameContent) {
       case 'copro/vote':
         refusal = voteResolution(ctx, action.propertyId, action.resolutionId, action.vote);
         break;
+      case 'market/favorite':
+        refusal = setFavorite(draft, action.listingId, action.favorite);
+        break;
+      case 'tutorial/set':
+        refusal = null;
+        if (action.enabled !== undefined) draft.tutorial.enabled = action.enabled;
+        if (action.step !== undefined) {
+          if (!Number.isInteger(action.step) || action.step < 0) refusal = 'tutorial.invalidStep';
+          else draft.tutorial.step = action.step;
+        }
+        break;
       case 'job/resign':
         if (!draft.player.employed) {
           refusal = 'job.alreadyResigned';
@@ -480,6 +530,31 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? worksPlan(content, state, owned, quoteIds, diy) : null;
     },
+    /** Decisions waiting for the player, the most urgent first (« Décisions »). */
+    pendingDecisions: (state: GameState) => pendingDecisions(content, state),
+    /** Monthly flows of an owned property, before income tax. */
+    cashFlow: (state: GameState, propertyId: string) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? propertyCashFlow(content, state, owned) : null;
+    },
+    /** Financing of a listing (or a purchase under compromis) with a bank, as simulated today. */
+    simulateFinancing: (state: GameState, id: string, input: FinancingInput) => {
+      const listing = state.listings.find((candidate) => candidate.id === id);
+      if (listing) {
+        return simulateFinancing(content, state, listing.property, listing.askingPrice, input);
+      }
+      const purchase = state.purchases.find((candidate) => candidate.id === id);
+      return purchase
+        ? simulateFinancing(content, state, purchase.property, purchase.price, input)
+        : null;
+    },
+    /** Expected balance over the next days (alert when it goes below zero). */
+    cashForecast: (state: GameState, days?: number) => cashForecast(content, state, days),
+    /** Pin of a listing, purchase or owned property on its city map. */
+    mapPosition: (state: GameState, id: string) => {
+      const property = findAnyProperty(state, id);
+      return property ? mapPosition(content, property) : null;
+    },
     /** Artisans of a city the player can call, with his history with each. */
     artisans: (state: GameState, cityId: string) =>
       knownArtisans(content, state, cityId).map((artisan) => ({
@@ -488,6 +563,13 @@ export function createEngine(content: GameContent) {
         discount: artisanDiscount(content, state, artisan.id),
       })),
   };
+}
+
+function setFavorite(state: GameState, listingId: string, favorite: boolean): RefusalCode | null {
+  if (!state.listings.some((listing) => listing.id === listingId)) return 'listing.unknown';
+  state.favorites = state.favorites.filter((id) => id !== listingId);
+  if (favorite) state.favorites.push(listingId);
+  return null;
 }
 
 function findAnyProperty(state: GameState, id: string) {

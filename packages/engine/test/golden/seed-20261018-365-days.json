@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 6,
+    "formatVersion": 7,
     "seed": 20261018,
     "rng": [
       3994428687,
@@ -24,6 +24,13 @@
     },
     "nextId": 860,
     "player": {
+      "name": "Camille",
+      "avatar": {
+        "face": 0,
+        "hair": 0,
+        "skin": 0,
+        "outfit": 0
+      },
       "jobId": "civilServant",
       "employed": true,
       "balance": 931095,
@@ -2137,6 +2144,200 @@
     "artisans": {},
     "worksDone": {
       "dole": 1
+    },
+    "favorites": [],
+    "tutorial": {
+      "enabled": true,
+      "step": 0
+    },
+    "history": [
+      {
+        "date": {
+          "year": 2026,
+          "month": 10,
+          "day": 18
+        },
+        "netWorth": 1500000,
+        "balance": 1500000,
+        "debt": 0,
+        "cashFlow": 0
+      },
+      {
+        "date": {
+          "year": 2026,
+          "month": 11,
+          "day": 1
+        },
+        "netWorth": 1513000,
+        "balance": 1513000,
+        "debt": 0,
+        "cashFlow": 13000
+      },
+      {
+        "date": {
+          "year": 2026,
+          "month": 12,
+          "day": 1
+        },
+        "netWorth": 1526000,
+        "balance": 1211000,
+        "debt": 0,
+        "cashFlow": 13000
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 1,
+          "day": 1
+        },
+        "netWorth": 1281753,
+        "balance": 961706,
+        "debt": 6283053,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 2,
+          "day": 1
+        },
+        "netWorth": 1315059,
+        "balance": 966907,
+        "debt": 6266048,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 3,
+          "day": 1
+        },
+        "netWorth": 1341924,
+        "balance": 972108,
+        "debt": 6248984,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 4,
+          "day": 1
+        },
+        "netWorth": 1395147,
+        "balance": 977309,
+        "debt": 6231862,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 5,
+          "day": 1
+        },
+        "netWorth": 1448129,
+        "balance": 982510,
+        "debt": 6214681,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 6,
+          "day": 1
+        },
+        "netWorth": 1439550,
+        "balance": 915491,
+        "debt": 6197441,
+        "cashFlow": -33219
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 7,
+          "day": 1
+        },
+        "netWorth": 1430550,
+        "balance": 954492,
+        "debt": 6180142,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 8,
+          "day": 1
+        },
+        "netWorth": 1435910,
+        "balance": 959693,
+        "debt": 6162783,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 9,
+          "day": 1
+        },
+        "netWorth": 1451529,
+        "balance": 964894,
+        "debt": 6145365,
+        "cashFlow": 5201
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 10,
+          "day": 1
+        },
+        "netWorth": 1475908,
+        "balance": 970095,
+        "debt": 6127887,
+        "cashFlow": 5201
+      }
+    ],
+    "lastStatement": {
+      "date": {
+        "year": 2027,
+        "month": 10,
+        "day": 1
+      },
+      "lines": [
+        {
+          "kind": "salary",
+          "amount": 200000
+        },
+        {
+          "kind": "rent",
+          "amount": 52000
+        },
+        {
+          "kind": "livingCosts",
+          "amount": 135000
+        },
+        {
+          "kind": "propertyCharges",
+          "propertyId": "property-53",
+          "amount": 6600
+        },
+        {
+          "kind": "ownerInsurance",
+          "propertyId": "property-53",
+          "amount": 1042
+        },
+        {
+          "kind": "rentalIncome",
+          "propertyId": "property-53",
+          "amount": 38420
+        },
+        {
+          "kind": "loanPayment",
+          "loanId": "loan-207",
+          "amount": 38577,
+          "interest": 21099,
+          "capital": 17478
+        }
+      ],
+      "balance": 970095
     }
   },
   "listings": {

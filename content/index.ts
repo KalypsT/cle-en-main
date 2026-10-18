@@ -1,6 +1,7 @@
 import banksJson from './banques.json' with { type: 'json' };
 import doleJson from '../data/cities/dole.json' with { type: 'json' };
 import creditJson from './credit.json' with { type: 'json' };
+import decisionsJson from './decisions.json' with { type: 'json' };
 import taxesJson from './fiscalite.json' with { type: 'json' };
 import marketJson from './marche.json' with { type: 'json' };
 import jobsJson from './metiers.json' with { type: 'json' };
@@ -18,6 +19,7 @@ import worksJson from './travaux.json' with { type: 'json' };
 import worksTextsJson from './textes/travaux.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
+import { decisionRulesSchema } from './schemas/decisions.ts';
 import { banksFileSchema, creditRulesSchema, marketRateSchema } from './schemas/credit.ts';
 import { jobsFileSchema } from './schemas/jobs.ts';
 import { listingTextsSchema, marketRulesSchema } from './schemas/market.ts';
@@ -54,6 +56,8 @@ export type {
 } from './schemas/renting.ts';
 export { CONTRACTS, LEASE_TYPES } from './schemas/renting.ts';
 export type { TaxRules } from './schemas/taxes.ts';
+export type { DecisionKind, DecisionRules } from './schemas/decisions.ts';
+export { DECISION_KINDS } from './schemas/decisions.ts';
 export type { Rival, RivalsFile } from './schemas/rivals.ts';
 export type { LivingCosts, Start } from './schemas/start.ts';
 export type { TimeSettings } from './schemas/time.ts';
@@ -97,6 +101,7 @@ export const gameContent: GameContent = {
   trades: artisansFile.trades,
   artisans: artisansFile.artisans,
   worksTexts: worksTextsSchema.parse(worksTextsJson),
+  decisions: decisionRulesSchema.parse(decisionsJson),
   cities: { dole: cityDataSchema.parse(doleJson) },
 };
 
