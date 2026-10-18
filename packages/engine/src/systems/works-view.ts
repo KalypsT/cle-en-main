@@ -3,9 +3,9 @@ import type { DpeLabel, GameContent, ItemKind, Tier, Trade } from '../content.ts
 import { TIERS } from '../content-constants.ts';
 import type { Cents } from '../money.ts';
 import type { GameState, OwnedProperty, Property, WorkItem } from '../state.ts';
-import { dpeOf, energyNeeds, itemId, itemRule } from './dwelling.ts';
+import { believedView, dpeOf, energyNeeds, itemId, itemRule } from './dwelling.ts';
 import { lettingBlock, marketRent } from './renting.ts';
-import { believedState, estimateValue } from './valuation.ts';
+import { estimateValue } from './valuation.ts';
 import {
   buildTasks,
   diyAllowed,
@@ -43,10 +43,10 @@ export function worksCatalog(
   state: GameState,
   property: Property,
 ): CatalogItem[] {
-  const believed = believedState(content, property);
-  return property.items.map((item) => {
+  const believed = believedView(content, property).items;
+  return property.items.map((item, i) => {
     const rule = itemRule(content, item.kind);
-    const expected = believed(item);
+    const expected = believed[i]?.state ?? item.state;
     const tiers = Object.fromEntries(
       TIERS.map((tier) => [
         tier,
@@ -104,14 +104,14 @@ function renovatedView(
   property: Property,
   choices: readonly ItemChoice[],
 ): Property {
-  const believed = believedState(content, property);
+  const believed = believedView(content, property).items;
   const chosen = new Map(choices.map((choice) => [choice.itemId, choice.tier]));
-  const items: WorkItem[] = property.items.map((item) => {
+  const items: WorkItem[] = property.items.map((item, i) => {
     const tier = chosen.get(itemId(item));
     if (tier && itemRule(content, item.kind).works) {
       return { ...item, state: 5, tier, known: true };
     }
-    return item.known ? item : { ...item, state: believed(item), known: true };
+    return { ...(believed[i] ?? item), known: true };
   });
   const view = { ...property, items };
   return { ...view, dpe: dpeOf(content, energyNeeds(content, view)) };
@@ -123,14 +123,21 @@ export function worksEstimate(
   property: Property,
   choices: readonly ItemChoice[],
 ): WorksEstimate {
-  const believed = believedState(content, property);
+  const view = believedView(content, property);
   let cost = 0;
   const phases = new Map<number, Map<Trade, number>>();
   for (const choice of choices) {
-    const item = property.items.find((candidate) => itemId(candidate) === choice.itemId);
+    const index = property.items.findIndex((candidate) => itemId(candidate) === choice.itemId);
+    const item = property.items[index];
     const works = item ? itemRule(content, item.kind).works : null;
     if (!item || !works) continue;
-    cost += referenceCost(content, property, item, choice.tier, Math.round(believed(item)));
+    cost += referenceCost(
+      content,
+      property,
+      item,
+      choice.tier,
+      Math.round(view.items[index]?.state ?? item.state),
+    );
     const byTrade = phases.get(works.phase) ?? new Map<Trade, number>();
     byTrade.set(
       works.trade,
@@ -154,7 +161,7 @@ export function worksEstimate(
     energyAfter: Math.round(energyNeeds(content, after)),
     valueBefore: estimateValue(content, state, property, true).estimate,
     valueAfter: estimateValue(content, state, after, true).estimate,
-    rentBefore: marketRent(content, state, property, 'bare', believed),
+    rentBefore: marketRent(content, state, view, 'bare'),
     rentAfter: marketRent(content, state, after, 'bare'),
     blockAfter: lettingBlock(content, after, today),
   };

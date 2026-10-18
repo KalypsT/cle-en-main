@@ -8,10 +8,9 @@ import {
   type NeighbourhoodData,
 } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
-import type { GameState, Property, PropertyKind, WorkItem } from '../state.ts';
+import type { GameState, Property, PropertyKind } from '../state.ts';
 import {
-  conditionLabel,
-  expectedState,
+  believedView,
   interpolateByState,
   stateValueFactor,
   tierShare,
@@ -190,15 +189,13 @@ function surfaceValue(
 }
 
 /**
- * Value of a property given the state of its items (`stateOf` lets the
- * estimate replace unknown items by their expectation) and a factor for its
- * nuisances.
+ * Value of a property given the state of its items (the estimate passes the
+ * player's view of them) and a factor for its nuisances.
  */
 function valueWith(
   content: GameContent,
   state: GameState,
   property: Property,
-  stateOf: ((item: WorkItem) => number) | undefined,
   defectsFactor: number,
 ): ValueBreakdown {
   const rules = content.market;
@@ -215,7 +212,7 @@ function valueWith(
   const surfaceFactor = property.surface > 0 ? weightedSurface / property.surface : 1;
   const epochFactor = rules.epochFactors[property.epoch];
   const dpeFactor = rules.dpeFactors[property.dpe];
-  const stateFactor = stateValueFactor(content, property, stateOf);
+  const stateFactor = stateValueFactor(content, property);
   const floor = floorFactor(content, property.floor);
   const normalization = valueNormalization(content, property.cityId, neighbourhood, property.kind);
   const buildingFactor = property.kind === 'building' ? rules.building.valueFactor : 1;
@@ -232,7 +229,7 @@ function valueWith(
       buildingFactor) /
     normalization;
   // Premium in a modest neighbourhood: the bonus stops at the neighbourhood's ceiling.
-  const tiers = tierShare(content, property, 'value', stateOf);
+  const tiers = tierShare(content, property, 'value');
   let tierFactor = 1 + tiers;
   let tierCeilingShare = 1;
   if (tiers > 0) {
@@ -277,7 +274,7 @@ export function realValue(
     (product, d) => product * (1 - impactOf(content, d.id)),
     1,
   );
-  return valueWith(content, state, property, undefined, defects);
+  return valueWith(content, state, property, defects);
 }
 
 export interface Estimate {
@@ -285,15 +282,6 @@ export interface Estimate {
   low: Cents;
   high: Cents;
   breakdown: ValueBreakdown;
-}
-
-/** The player's view of an item: its state if known, otherwise its expectation. */
-export function believedState(
-  content: GameContent,
-  property: Property,
-): (item: WorkItem) => number {
-  const condition = conditionLabel(content, property);
-  return (item) => (item.known ? item.state : expectedState(content, property, item, condition));
 }
 
 /**
@@ -322,7 +310,7 @@ export function estimateValue(
       : prior;
     factor *= 1 - chance * rule.valueImpactShare;
   }
-  const breakdown = valueWith(content, state, property, believedState(content, property), factor);
+  const breakdown = valueWith(content, state, believedView(content, property), factor);
   const spread = content.market.pricing.estimateSpread;
   return {
     estimate: breakdown.value,

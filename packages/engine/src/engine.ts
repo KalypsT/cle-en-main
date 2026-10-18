@@ -86,6 +86,7 @@ import {
   startWorks,
 } from './systems/works.ts';
 import { worksCatalog, worksEstimate, worksPlan } from './systems/works-view.ts';
+import { believedView } from './systems/dwelling.ts';
 import {
   answerSaleOffer,
   listForSale,
@@ -94,7 +95,6 @@ import {
   updateSale,
 } from './systems/resale.ts';
 import {
-  believedState,
   type Estimate,
   estimateValue,
   realValue,
@@ -433,11 +433,11 @@ export function createEngine(content: GameContent) {
       if (!property) return null;
       const today = toDayNumber(state.clock.date);
       // Before buying, the rent reflects what the player knows of the items.
-      const believed = believedState(content, property);
-      const range = rentRange(content, state, property, leaseType, believed);
+      const believed = believedView(content, property);
+      const range = rentRange(content, state, believed, leaseType);
       return {
         ...range,
-        block: lettingBlock(content, property, today, believed),
+        block: lettingBlock(content, believed, today),
         banDay: letBanDay(content, property.dpe),
         /** Charges left to the owner, property tax and landlord insurance, per month. */
         monthlyOwnerCosts:

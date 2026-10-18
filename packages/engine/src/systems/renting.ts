@@ -16,7 +16,6 @@ import type {
   Property,
   RentalApplication,
   RentalListing,
-  WorkItem,
 } from '../state.ts';
 import {
   heavyWorksInProgress,
@@ -92,23 +91,22 @@ export function recoverableCharges(content: GameContent, property: Property): Ce
 /**
  * Monthly rent a tenant would pay today, charges excluded; 0 if the property
  * is indecent. The city's rents per m² include charges: the recoverable
- * charges are taken out. `stateOf` replaces the true state of the items by
- * what the player believes (rent quotes before buying).
+ * charges are taken out. Rent quotes before buying pass the player's view
+ * of the property (dwelling.believedView).
  */
 export function marketRent(
   content: GameContent,
   state: GameState,
   property: Property,
   leaseType: LeaseType = 'bare',
-  stateOf?: (item: WorkItem) => number,
 ): Cents {
   const rules = content.renting;
-  if (isIndecent(content, property, stateOf)) return 0;
-  const tiers = tierShare(content, property, 'rent', stateOf);
+  if (isIndecent(content, property)) return 0;
+  const tiers = tierShare(content, property, 'rent');
   // The tiers' rent bonus stops where their value bonus does (the neighbourhood's ceiling).
   const ceiling = tiers > 0 ? realValue(content, state, property).tierCeilingShare : 1;
   const factor =
-    interpolateByState(rules.stateRentFactors, weightedState(content, property, stateOf)) *
+    interpolateByState(rules.stateRentFactors, weightedState(content, property)) *
     (1 + tiers * ceiling);
   const lots =
     property.kind === 'building'
@@ -137,9 +135,8 @@ export function rentRange(
   state: GameState,
   property: Property,
   leaseType: LeaseType,
-  stateOf?: (item: WorkItem) => number,
 ): { min: Cents; market: Cents; max: Cents } {
-  const market = marketRent(content, state, property, leaseType, stateOf);
+  const market = marketRent(content, state, property, leaseType);
   const { min, max } = content.renting.rentRange;
   const round = (amount: number) => Math.round(amount / RENT_ROUNDING) * RENT_ROUNDING;
   return { min: round(market * min), market, max: round(market * max) };
@@ -157,9 +154,8 @@ export function lettingBlock(
   content: GameContent,
   property: Property,
   day: number,
-  stateOf?: (item: WorkItem) => number,
 ): 'rent.indecent' | 'rent.dpeBanned' | null {
-  if (isIndecent(content, property, stateOf)) return 'rent.indecent';
+  if (isIndecent(content, property)) return 'rent.indecent';
   const ban = letBanDay(content, property.dpe);
   return ban !== null && day >= ban ? 'rent.dpeBanned' : null;
 }

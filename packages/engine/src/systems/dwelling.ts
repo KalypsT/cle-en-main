@@ -228,30 +228,23 @@ export function expectedState(
   );
 }
 
-/** Weighted state of the dwelling, 1 … 5; `stateOf` may replace the true states (estimates). */
 const stateCache = new WeakMap<Property['items'], number>();
 
-export function weightedState(
-  content: GameContent,
-  property: Property,
-  stateOf?: (item: WorkItem) => number,
-): number {
-  if (!stateOf) {
-    const cached = stateCache.get(property.items);
-    if (cached !== undefined) return cached;
-    const computed = weightedState(content, property, (item) => item.state);
-    stateCache.set(property.items, computed);
-    return computed;
-  }
+/** Weighted state of the dwelling, 1 … 5 (cached per array of items). */
+export function weightedState(content: GameContent, property: Property): number {
+  const cached = stateCache.get(property.items);
+  if (cached !== undefined) return cached;
   const weights = itemWeights(content, property);
   let total = 0;
   let sum = 0;
   property.items.forEach((item, i) => {
     const weight = weights[i] ?? 0;
     total += weight;
-    sum += weight * stateOf(item);
+    sum += weight * item.state;
   });
-  return total > 0 ? sum / total : 3;
+  const state = total > 0 ? sum / total : 3;
+  stateCache.set(property.items, state);
+  return state;
 }
 
 /** Condition announced for a dwelling: the one whose mean state is the closest. */
@@ -269,34 +262,60 @@ export function conditionLabel(content: GameContent, property: Property): Condit
   return best;
 }
 
+const tierCaches = {
+  value: new WeakMap<Property['items'], number>(),
+  rent: new WeakMap<Property['items'], number>(),
+};
+
 /** Weighted bonus (value or rent) of the tiers of the renovated items (state 4 or 5). */
-export function tierShare(
-  content: GameContent,
-  property: Property,
-  key: 'value' | 'rent',
-  stateOf: (item: WorkItem) => number = (item) => item.state,
-): number {
+export function tierShare(content: GameContent, property: Property, key: 'value' | 'rent'): number {
+  const cache = tierCaches[key];
+  const cached = cache.get(property.items);
+  if (cached !== undefined) return cached;
   const weights = itemWeights(content, property);
   let total = 0;
   let sum = 0;
   property.items.forEach((item, i) => {
     const weight = weights[i] ?? 0;
     total += weight;
-    if (stateOf(item) >= 4) sum += weight * content.works.tiers[item.tier][key];
+    if (item.state >= 4) sum += weight * content.works.tiers[item.tier][key];
   });
-  return total > 0 ? sum / total : 0;
+  const share = total > 0 ? sum / total : 0;
+  cache.set(property.items, share);
+  return share;
 }
 
 /** Indecent: too run-down overall, or a critical item (electricity, heating, water) at state 1. */
-export function isIndecent(
-  content: GameContent,
-  property: Property,
-  stateOf: (item: WorkItem) => number = (item) => item.state,
-): boolean {
-  if (weightedState(content, property, stateOf) < content.renting.indecentBelowState) return true;
+export function isIndecent(content: GameContent, property: Property): boolean {
+  if (weightedState(content, property) < content.renting.indecentBelowState) return true;
   return property.items.some(
-    (item) => stateOf(item) < MIN_STATE + 0.5 && itemRule(content, item.kind).critical,
+    (item) => item.state < MIN_STATE + 0.5 && itemRule(content, item.kind).critical,
   );
+}
+
+const believedCache = new WeakMap<Property['items'], WorkItem[]>();
+
+/**
+ * The property as the player sees it: unknown items at the state the
+ * announced condition and the DPE suggest (fractional), known ones as they
+ * are. Cached per array of items.
+ */
+export function believedView(content: GameContent, property: Property): Property {
+  let items = believedCache.get(property.items);
+  if (!items) {
+    if (property.items.every((item) => item.known)) {
+      items = property.items;
+    } else {
+      const condition = conditionLabel(content, property);
+      items = freezeItems(
+        property.items.map((item) =>
+          item.known ? item : { ...item, state: expectedState(content, property, item, condition) },
+        ),
+      );
+    }
+    believedCache.set(property.items, items);
+  }
+  return items === property.items ? property : { ...property, items };
 }
 
 /** Energy needs (kWh/m²/year) before the property's calibration factor. */
@@ -375,12 +394,8 @@ export function drawDwelling(
 }
 
 /** Value factor of the dwelling's state (before the tiers' bonus). */
-export function stateValueFactor(
-  content: GameContent,
-  property: Property,
-  stateOf?: (item: WorkItem) => number,
-): number {
-  return interpolateByState(content.works.valueByState, weightedState(content, property, stateOf));
+export function stateValueFactor(content: GameContent, property: Property): number {
+  return interpolateByState(content.works.valueByState, weightedState(content, property));
 }
 
 /** Ceiling per m² of a neighbourhood for the tiers' bonus. */
