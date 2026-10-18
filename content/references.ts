@@ -1,4 +1,5 @@
 import type { CityData } from './schemas/city.ts';
+import type { DecisionRules } from './schemas/decisions.ts';
 import type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
 import type { Job } from './schemas/jobs.ts';
 import type { ListingTexts, MarketRules } from './schemas/market.ts';
@@ -27,6 +28,7 @@ export interface GameContent {
   trades: ArtisansFile['trades'];
   artisans: Artisan[];
   worksTexts: WorksTexts;
+  decisions: DecisionRules;
   /** Generated city data, by city id. */
   cities: Record<string, CityData>;
 }

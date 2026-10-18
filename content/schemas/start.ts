@@ -8,8 +8,11 @@ export const startSchema = z
     cityId: id,
     monthlyRent: euros,
     reputation: z.number().min(0).max(100),
-    /** Job used until the game creation screen exists (milestone 4). */
+    /** Job preselected on the game creation screen (and used by bots and tests). */
     defaultJobId: id,
+    /** Name of a player who leaves the field empty, and of saves older than version 7. */
+    defaultPlayerName: z.string().min(1),
+    maxPlayerNameLength: z.number().int().min(1),
     /** Bank holding the current account. */
     accountBankId: id,
   })

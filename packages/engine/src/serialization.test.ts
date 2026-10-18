@@ -4,7 +4,8 @@ import v2Save from '../test/fixtures/save-v2-milestone-1a.json' with { type: 'js
 import v3Save from '../test/fixtures/save-v3-milestone-1b.json' with { type: 'json' };
 import v4Save from '../test/fixtures/save-v4-milestone-1c.json' with { type: 'json' };
 import v5Save from '../test/fixtures/save-v5-milestone-2.json' with { type: 'json' };
-import { content, engine, newGame } from '../test/helpers.ts';
+import v6Save from '../test/fixtures/save-v6-milestone-3.json' with { type: 'json' };
+import { advanceToNextMonth, content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
   type MigrationRegistry,
@@ -222,5 +223,25 @@ describe('migrations', () => {
     expect(engine.loadGame(v5)).toEqual(migrated);
     const later = engine.advanceHours(migrated, 24 * 400);
     expect(later.state.clock.elapsedHours).toBe(migrated.clock.elapsedHours + 24 * 400);
+  });
+
+  it('upgrades a milestone 3 save (version 6): name, avatar and interface data', () => {
+    const v6 = JSON.stringify(v6Save);
+    const original = JSON.parse(v6) as { player: { balance: number }; properties: unknown[] };
+    const migrated = engine.loadGame(v6);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.player.name).toBe(content.start.defaultPlayerName);
+    expect(migrated.player.avatar).toEqual({ face: 0, hair: 0, skin: 0, outfit: 0 });
+    expect(migrated.player.balance).toBe(original.player.balance);
+    expect(migrated.properties).toHaveLength(original.properties.length);
+    // A game under way does not start the tutorial again.
+    expect(migrated.tutorial).toEqual({ enabled: false, step: 0 });
+    expect(migrated).toMatchObject({ favorites: [], history: [], lastStatement: null });
+    // The wealth curve and the monthly review fill up from the next month.
+    const later = advanceToNextMonth(migrated).state;
+    expect(later.history).toHaveLength(1);
+    expect(later.lastStatement?.lines.length).toBeGreaterThan(0);
+    // A v7 save round-trips.
+    expect(engine.loadGame(serializeGame(later))).toEqual(later);
   });
 });

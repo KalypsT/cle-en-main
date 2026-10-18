@@ -133,6 +133,7 @@
     "loan.refinancingRefused": "La banque refuse de racheter ce crédit.",
     "account.insufficientFunds": "Votre compte ne suffit pas.",
     "job.alreadyResigned": "Vous avez déjà quitté votre emploi.",
+    "tutorial.invalidStep": "Cette étape du didacticiel n'existe pas.",
     "listing.unknown": "Cette annonce n'est plus en ligne.",
     "visit.alreadyDone": "Vous avez déjà visité ce bien.",
     "visit.alreadyPlanned": "Cette visite est déjà prévue dans votre agenda.",

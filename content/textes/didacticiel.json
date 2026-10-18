@@ -1,0 +1,66 @@
+{
+  "speakers": {
+    "gerard": { "name": "Gérard Prudhomme", "role": "Banquier, La Tirelire Comtoise" },
+    "yvon": { "name": "Yvon Tableur", "role": "Comptable" }
+  },
+  "skip": "Passer",
+  "disable": "Arrêter le didacticiel",
+  "ok": "D'accord",
+  "steps": [
+    {
+      "id": "welcome",
+      "speaker": "gerard",
+      "text": "Bonjour ! Gérard Prudhomme, de La Tirelire Comtoise. Je vous accompagne jusqu'à votre premier achat à Dole. Rien ne presse : mettez le temps en pause quand vous voulez réfléchir.",
+      "next": "ok"
+    },
+    {
+      "id": "spot",
+      "speaker": "gerard",
+      "text": "Commençons par repérer une affaire. Ouvrez les annonces depuis la Rue ou la Carte, et comparez le prix au mètre carré avec celui du quartier.",
+      "next": "screen:listing"
+    },
+    {
+      "id": "visit",
+      "speaker": "gerard",
+      "text": "Avant d'acheter, on visite ! Touchez « Visiter » : cela prend un peu de votre temps libre, mais vous verrez l'état des pièces.",
+      "next": "event:visitDone"
+    },
+    {
+      "id": "simulate",
+      "speaker": "gerard",
+      "text": "Parlons argent. Ouvrez « Simuler le financement » : apport, mensualité, effort mensuel et trésorerie après achat, tout y est.",
+      "next": "screen:financing"
+    },
+    {
+      "id": "offer",
+      "speaker": "gerard",
+      "text": "Si les chiffres tiennent, faites une offre. Un conseil d'ancien : quelques pour cent sous le prix affiché, sans vexer le vendeur. Il répond le lendemain.",
+      "next": "event:offerMade"
+    },
+    {
+      "id": "compromis",
+      "speaker": "gerard",
+      "text": "Offre envoyée ! Si le vendeur accepte, ou si vous acceptez sa contre-offre, le compromis est signé. Sinon, on cherche une autre affaire, ce n'est pas ce qui manque.",
+      "next": "event:compromisSigned"
+    },
+    {
+      "id": "loan",
+      "speaker": "gerard",
+      "text": "Compromis signé, bravo ! Vous avez un délai pour obtenir votre prêt. Ouvrez l'achat depuis les Décisions et demandez un prêt : ma porte est grande ouverte.",
+      "next": "event:loanRequested"
+    },
+    {
+      "id": "deed",
+      "speaker": "gerard",
+      "text": "Votre dossier est entre de bonnes mains. Acceptez l'offre de prêt quand elle arrive ; le notaire s'occupe du reste. Ensuite, il faudra trouver un locataire !",
+      "next": "event:deedSigned"
+    },
+    {
+      "id": "review",
+      "speaker": "yvon",
+      "text": "Yvon Tableur, comptable. Voici votre premier bilan du mois : ce qui est entré, ce qui est sorti. Vous le retrouverez dans le Menu. Les chiffres ne mentent jamais, eux.",
+      "showOn": "event:monthlyStatement",
+      "next": "ok"
+    }
+  ]
+}

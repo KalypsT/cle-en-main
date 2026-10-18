@@ -30,3 +30,17 @@ export { type HazardChoice, type ItemChoice, type WorksRefusal } from './systems
 export { type CatalogItem, type PlannedTask, type WorksEstimate } from './systems/works-view.ts';
 export { conditionLabel, itemId } from './systems/dwelling.ts';
 export { DPE_LABELS, TIERS } from './content-constants.ts';
+export {
+  type CashForecast,
+  decisionKey,
+  type FinancingInput,
+  type FinancingSimulation,
+  type ListingView,
+  type Portfolio,
+  type PropertyStatus,
+  type MapPoint,
+  type NeighbourhoodMarketView,
+  type PendingDecision,
+  type PropertyCashFlow,
+} from './systems/ui-queries.ts';
+export { signedLine, statementNet } from './systems/history.ts';

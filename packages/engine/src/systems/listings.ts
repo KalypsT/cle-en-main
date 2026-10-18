@@ -253,6 +253,9 @@ export function otherBuyerProbability(ctx: SystemContext, listing: Listing): num
 
 function removeListing(ctx: SystemContext, listingId: string): void {
   ctx.state.listings = ctx.state.listings.filter((l) => l.id !== listingId);
+  if (ctx.state.favorites.includes(listingId)) {
+    ctx.state.favorites = ctx.state.favorites.filter((id) => id !== listingId);
+  }
   const planned = ctx.state.agenda.filter((item) => item.listingId === listingId);
   if (planned.length === 0) return;
   ctx.state.agenda = ctx.state.agenda.filter((item) => item.listingId !== listingId);

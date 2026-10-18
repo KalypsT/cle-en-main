@@ -1,6 +1,7 @@
 import banksJson from './banques.json' with { type: 'json' };
 import doleJson from '../data/cities/dole.json' with { type: 'json' };
 import creditJson from './credit.json' with { type: 'json' };
+import decisionsJson from './decisions.json' with { type: 'json' };
 import taxesJson from './fiscalite.json' with { type: 'json' };
 import marketJson from './marche.json' with { type: 'json' };
 import jobsJson from './metiers.json' with { type: 'json' };
@@ -12,17 +13,21 @@ import timeJson from './temps.json' with { type: 'json' };
 import listingTextsJson from './textes/annonces.json' with { type: 'json' };
 import tenantTextsJson from './textes/locataires.json' with { type: 'json' };
 import uiTextsJson from './textes/interface.json' with { type: 'json' };
+import screenTextsJson from './textes/ecrans.json' with { type: 'json' };
+import tutorialJson from './textes/didacticiel.json' with { type: 'json' };
 import livingCostsJson from './train-de-vie.json' with { type: 'json' };
 import artisansJson from './artisans.json' with { type: 'json' };
 import worksJson from './travaux.json' with { type: 'json' };
 import worksTextsJson from './textes/travaux.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
+import { decisionRulesSchema } from './schemas/decisions.ts';
 import { banksFileSchema, creditRulesSchema, marketRateSchema } from './schemas/credit.ts';
 import { jobsFileSchema } from './schemas/jobs.ts';
 import { listingTextsSchema, marketRulesSchema } from './schemas/market.ts';
 import { rentingRulesSchema, tenantTextsSchema } from './schemas/renting.ts';
 import { rivalsFileSchema } from './schemas/rivals.ts';
+import { screenTextsSchema, tutorialSchema } from './schemas/screens.ts';
 import { livingCostsSchema, startSchema } from './schemas/start.ts';
 import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
@@ -54,10 +59,14 @@ export type {
 } from './schemas/renting.ts';
 export { CONTRACTS, LEASE_TYPES } from './schemas/renting.ts';
 export type { TaxRules } from './schemas/taxes.ts';
+export type { DecisionKind, DecisionRules } from './schemas/decisions.ts';
+export { DECISION_KINDS } from './schemas/decisions.ts';
 export type { Rival, RivalsFile } from './schemas/rivals.ts';
 export type { LivingCosts, Start } from './schemas/start.ts';
 export type { TimeSettings } from './schemas/time.ts';
 export type { UiTexts } from './schemas/ui-texts.ts';
+export type { Tutorial, TutorialTrigger } from './schemas/screens.ts';
+export { TUTORIAL_TRIGGERS } from './schemas/screens.ts';
 export type {
   Artisan,
   HazardRule,
@@ -97,6 +106,7 @@ export const gameContent: GameContent = {
   trades: artisansFile.trades,
   artisans: artisansFile.artisans,
   worksTexts: worksTextsSchema.parse(worksTextsJson),
+  decisions: decisionRulesSchema.parse(decisionsJson),
   cities: { dole: cityDataSchema.parse(doleJson) },
 };
 
@@ -108,3 +118,8 @@ if (referenceProblems.length > 0) {
 export const jobs = gameContent.jobs;
 export const timeSettings = timeSettingsSchema.parse(timeJson);
 export const uiTexts = uiTextsSchema.parse(uiTextsJson);
+
+screenTextsSchema.parse(screenTextsJson);
+/** Texts of the management screens, typed by the file itself. */
+export const screenTexts: typeof screenTextsJson = screenTextsJson;
+export const tutorial = tutorialSchema.parse(tutorialJson);
