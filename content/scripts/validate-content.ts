@@ -1,9 +1,16 @@
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dataRegistry } from '../registry.ts';
 import { validateContentDirectory } from '../validation.ts';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const { checked, problems } = await validateContentDirectory(root);
+const content = await validateContentDirectory(root);
+const data = await validateContentDirectory(join(root, '..', 'data'), dataRegistry);
+const checked = [...content.checked, ...data.checked.map((file) => `data/${file}`)];
+const problems = [
+  ...content.problems,
+  ...data.problems.map((problem) => ({ ...problem, file: `data/${problem.file}` })),
+];
 
 if (problems.length === 0) {
   // Cross-file references are checked when the aggregated content is loaded.

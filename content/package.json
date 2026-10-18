@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./schemas/*": "./schemas/*"
   },
   "scripts": {
     "validate": "tsx scripts/validate-content.ts",

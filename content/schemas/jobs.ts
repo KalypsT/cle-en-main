@@ -44,6 +44,19 @@ export const jobSchema = z
     freeTime: freeTimeSchema,
     bankTrust: bankTrustSchema,
     perk: z.string().min(1),
+    /** Gameplay effect of the perk, when it has one. */
+    perkEffects: z
+      .object({
+        /** Extra discount sellers grant (share of the asking price). */
+        negotiationBonusShare: z.number().min(0).max(1).optional(),
+        /** Sees a share of the new listings this many days before everyone else. */
+        listingHeadStart: z
+          .object({ days: z.number().int().positive(), share: z.number().min(0).max(1) })
+          .strict()
+          .optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 

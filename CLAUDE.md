@@ -52,6 +52,7 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 | `pnpm format` | Reformater avec Prettier |
 | `pnpm validate-content` | Valider tous les JSON de `content/` avec leurs schémas zod |
 | `pnpm bots --seed 1 --days 3650` | Simuler une partie sans interface et afficher un résumé |
+| `pnpm --filter @cle/data-tools build-city dole` | Régénérer `data/cities/dole.json` depuis les sources publiques (téléchargements en cache dans `tools/data/.cache/`) |
 
 - **Graine dorée** : si un changement de règle modifie la partie de référence, relancer `pnpm --filter @cle/engine exec vitest run -u`, vérifier le diff de `packages/engine/test/golden/` et l'expliquer dans la PR.
 - **Nouveau fichier de contenu** : écrire son schéma dans `content/schemas/`, le déclarer dans `content/registry.ts` (sinon `validate-content` échoue), l'exporter depuis `content/index.ts`.

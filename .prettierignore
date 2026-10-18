@@ -9,3 +9,4 @@ playwright-report/
 test-results/
 packages/engine/test/golden/
 packages/engine/test/fixtures/
+data/cities/

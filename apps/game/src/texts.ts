@@ -80,7 +80,54 @@ export function describeEvent(event: GameEvent): string | null {
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':
       return events.resigned;
+    case 'listingPublished':
+      return events.listingPublished;
+    case 'listingSold':
+      return events.listingSold;
+    case 'visitDone':
+      return events.visitDone;
+    case 'visitPlanned':
+      return events.visitPlanned;
+    case 'offerAnswered':
+      if (event.answer === 'accepted') return events.offerAccepted;
+      if (event.answer === 'counterOffer') {
+        return format(events.offerCountered, { amount: formatMoney(event.amount) });
+      }
+      return events.offerRefused;
+    case 'compromisSigned':
+      return format(events.compromisSigned, { price: formatMoney(event.price) });
+    case 'loanAnswered':
+      return format(events.loanAnswered, { banker: bankerName(event.bankId) });
+    case 'purchaseCancelled':
+      return events.purchaseCancelled;
+    case 'deedSigned':
+      return events.deedSigned;
+    case 'saleOfferReceived':
+      return format(events.saleOfferReceived, { amount: formatMoney(event.amount) });
+    case 'saleAgreed':
+      return format(events.saleAgreed, { price: formatMoney(event.price) });
+    case 'saleFellThrough':
+      return events.saleFellThrough;
+    case 'propertySold':
+      return format(events.propertySold, { net: formatMoney(event.net) });
     case 'marketRateChanged':
+    case 'propertyPricesUpdated':
+    case 'listingPriceDropped':
+    case 'listingWithdrawn':
+    case 'visitCancelled':
+    case 'offerMade':
+    case 'counterOfferExpired':
+    case 'counterOfferDeclined':
+    case 'compromisImpossible':
+    case 'loanRequested':
+    case 'loanChosen':
+    case 'saleListed':
+    case 'saleWithdrawn':
+    case 'saleVisit':
+    case 'saleVisitMissed':
+    case 'saleOfferExpired':
+    case 'saleCounterAccepted':
+    case 'saleCounterRefused':
       return null;
   }
 }

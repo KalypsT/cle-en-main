@@ -1,0 +1,237 @@
+{
+  "flow": {
+    "listingsPerSale": 1,
+    "initialStockDays": 60,
+    "buildingShare": 0.02
+  },
+  "apartment": {
+    "maxFloor": 5,
+    "floorFactors": { "0": 0.94, "1": 1, "2": 1, "3": 0.98, "4": 0.95, "5": 0.92 }
+  },
+  "building": {
+    "lots": { "min": 2, "max": 6 },
+    "lotSurface": { "min": 28, "max": 70 },
+    "valueFactor": 0.85
+  },
+  "conditions": {
+    "ruin": { "valueFactor": 0.62, "defectMultiplier": 2.5 },
+    "toRenovate": { "valueFactor": 0.8, "defectMultiplier": 1.8 },
+    "toRefresh": { "valueFactor": 0.93, "defectMultiplier": 1 },
+    "good": { "valueFactor": 1.03, "defectMultiplier": 0.5 },
+    "renovated": { "valueFactor": 1.12, "defectMultiplier": 0.2 }
+  },
+  "conditionWeights": {
+    "before1948": {
+      "ruin": 0.08,
+      "toRenovate": 0.32,
+      "toRefresh": 0.32,
+      "good": 0.2,
+      "renovated": 0.08
+    },
+    "from1948to1974": {
+      "ruin": 0.04,
+      "toRenovate": 0.28,
+      "toRefresh": 0.38,
+      "good": 0.24,
+      "renovated": 0.06
+    },
+    "from1975to1988": {
+      "ruin": 0.02,
+      "toRenovate": 0.18,
+      "toRefresh": 0.42,
+      "good": 0.32,
+      "renovated": 0.06
+    },
+    "from1989to2005": {
+      "ruin": 0.01,
+      "toRenovate": 0.08,
+      "toRefresh": 0.38,
+      "good": 0.45,
+      "renovated": 0.08
+    },
+    "from2006to2012": {
+      "ruin": 0,
+      "toRenovate": 0.03,
+      "toRefresh": 0.25,
+      "good": 0.62,
+      "renovated": 0.1
+    },
+    "after2012": { "ruin": 0, "toRenovate": 0, "toRefresh": 0.1, "good": 0.75, "renovated": 0.15 }
+  },
+  "dpeFactors": { "A": 1.08, "B": 1.06, "C": 1.03, "D": 1, "E": 0.97, "F": 0.91, "G": 0.86 },
+  "epochFactors": {
+    "before1948": 1,
+    "from1948to1974": 0.95,
+    "from1975to1988": 0.97,
+    "from1989to2005": 1.02,
+    "from2006to2012": 1.06,
+    "after2012": 1.12
+  },
+  "defects": [
+    {
+      "id": "humidity",
+      "valueImpactShare": 0.05,
+      "probability": 0.12,
+      "revealChanceOnVisit": 0.7,
+      "kinds": ["apartment", "house", "building"],
+      "epochMultipliers": { "before1948": 1.8, "after2012": 0.2 }
+    },
+    {
+      "id": "roof",
+      "valueImpactShare": 0.06,
+      "probability": 0.1,
+      "revealChanceOnVisit": 0.4,
+      "kinds": ["house", "building"],
+      "epochMultipliers": { "before1948": 1.5, "from2006to2012": 0.3, "after2012": 0.1 }
+    },
+    {
+      "id": "wiring",
+      "valueImpactShare": 0.03,
+      "probability": 0.2,
+      "revealChanceOnVisit": 0.6,
+      "kinds": ["apartment", "house", "building"],
+      "epochMultipliers": {
+        "before1948": 1.5,
+        "from1948to1974": 1.3,
+        "from2006to2012": 0.3,
+        "after2012": 0.1
+      }
+    },
+    {
+      "id": "plumbing",
+      "valueImpactShare": 0.03,
+      "probability": 0.12,
+      "revealChanceOnVisit": 0.5,
+      "kinds": ["apartment", "house", "building"]
+    },
+    {
+      "id": "heating",
+      "valueImpactShare": 0.03,
+      "probability": 0.15,
+      "revealChanceOnVisit": 0.7,
+      "kinds": ["apartment", "house", "building"],
+      "epochMultipliers": { "after2012": 0.2 }
+    },
+    {
+      "id": "cracks",
+      "valueImpactShare": 0.08,
+      "probability": 0.04,
+      "revealChanceOnVisit": 0.8,
+      "kinds": ["house", "building"]
+    },
+    {
+      "id": "dryRot",
+      "valueImpactShare": 0.15,
+      "probability": 0.01,
+      "revealChanceOnVisit": 0.3,
+      "kinds": ["apartment", "house", "building"],
+      "epochMultipliers": { "before1948": 2, "from2006to2012": 0.2, "after2012": 0 }
+    },
+    {
+      "id": "noisyNeighbours",
+      "valueImpactShare": 0.03,
+      "probability": 0.08,
+      "revealChanceOnVisit": 0.2,
+      "kinds": ["apartment", "building"]
+    }
+  ],
+  "pricing": { "errorStdDev": 0.06, "errorMax": 0.18, "rounding": 1000, "estimateSpread": 0.08 },
+  "motivations": [
+    {
+      "id": "transfer",
+      "weight": 3,
+      "priceFactor": { "min": 0.95, "max": 1.02 },
+      "flexibility": 0.07
+    },
+    {
+      "id": "inheritance",
+      "weight": 3,
+      "priceFactor": { "min": 0.9, "max": 1.05 },
+      "flexibility": 0.1
+    },
+    { "id": "divorce", "weight": 2, "priceFactor": { "min": 0.93, "max": 1 }, "flexibility": 0.09 },
+    {
+      "id": "sunnyRetirement",
+      "weight": 2,
+      "priceFactor": { "min": 1, "max": 1.08 },
+      "flexibility": 0.05
+    },
+    {
+      "id": "alpacas",
+      "weight": 1,
+      "priceFactor": { "min": 0.92, "max": 0.99 },
+      "flexibility": 0.12
+    },
+    {
+      "id": "growingFamily",
+      "weight": 2,
+      "priceFactor": { "min": 1, "max": 1.06 },
+      "flexibility": 0.05
+    },
+    {
+      "id": "investor",
+      "weight": 2,
+      "priceFactor": { "min": 1.02, "max": 1.1 },
+      "flexibility": 0.04
+    },
+    {
+      "id": "testingTheMarket",
+      "weight": 2,
+      "priceFactor": { "min": 1.06, "max": 1.15 },
+      "flexibility": 0.02
+    },
+    { "id": "debts", "weight": 1, "priceFactor": { "min": 0.85, "max": 0.95 }, "flexibility": 0.12 }
+  ],
+  "lifetime": {
+    "maxDays": 180,
+    "firstPriceDropDays": 45,
+    "priceDropEveryDays": 30,
+    "priceDropShare": { "min": 0.03, "max": 0.06 },
+    "overpricedRatio": 1
+  },
+  "otherBuyers": {
+    "baseDailyProbability": 0.008,
+    "dealSensitivity": 25,
+    "maxDailyProbability": 0.35
+  },
+  "negotiation": {
+    "responseDelayDays": 1,
+    "discountPerMonthOnline": 0.01,
+    "maxDiscount": 0.15,
+    "competitionPenalty": 0.6,
+    "counterBand": 0.05,
+    "counterValidityDays": 3,
+    "maxOffersPerListing": 2
+  },
+  "visit": { "minutes": 60, "travelMinutes": 20, "planningHorizonDays": 14 },
+  "purchase": { "depositShare": 0.05, "loanConditionDays": 14, "deedDelayDays": 30 },
+  "resale": {
+    "agencyFeeShare": 0.05,
+    "selfVisitMinutes": 60,
+    "dailyVisitProbability": 0.12,
+    "agencyVisitMultiplier": 1.5,
+    "priceSensitivity": 15,
+    "offerAfterVisit": 0.35,
+    "offerShare": { "min": 0.92, "max": 1 },
+    "maxShareOfValue": 1.03,
+    "buyerFlexibility": 0.03,
+    "offerValidityDays": 3,
+    "buyerWithdrawalChance": 0.05,
+    "deedDelayDays": 60
+  },
+  "prices": {
+    "trendReversion": 0.05,
+    "longRunTrendPercent": 1.5,
+    "dataTrendWeight": 0.5,
+    "trendVolatilityPercent": 0.25,
+    "monthlyNoisePercent": 0.35,
+    "rateSensitivity": 0.05,
+    "rateLagShare": 0.1,
+    "minIndex": 0.3,
+    "maxIndex": 4
+  },
+  "ownership": {
+    "propertyTaxPerM2": { "apartment": 13, "house": 11, "building": 10 },
+    "coOwnershipChargesPerM2": 2.2
+  }
+}

@@ -169,7 +169,7 @@ export type LoanDecision =
   | { decision: 'accepted'; offer: LoanOffer }
   | { decision: 'partial'; offer: LoanOffer; requestedAmount: Cents }
   | { decision: 'counterOffer'; offer: LoanOffer; requestedDurationYears: number }
-  | { decision: 'refused'; reason: LoanRefusalCode; debtRatioAfter?: number };
+  | { decision: 'refused'; reason: LoanRefusalCode; debtRatioAfter?: number | undefined };
 
 /** Fees the contribution must cover at least: notary, bank file and guarantee. */
 export function requiredContribution(content: GameContent, price: Cents): Cents {
@@ -295,7 +295,11 @@ export function evaluateLoan(
 }
 
 /** Creates the loan of an accepted offer and pays its amount into the current account. */
-export function grantLoan(ctx: SystemContext, offer: LoanOffer): Loan {
+export function grantLoan(
+  ctx: SystemContext,
+  offer: LoanOffer,
+  propertyId: string | null = null,
+): Loan {
   const { state } = ctx;
   const months = offer.durationYears * MONTHS_PER_YEAR;
   const loan: Loan = {
@@ -309,6 +313,7 @@ export function grantLoan(ctx: SystemContext, offer: LoanOffer): Loan {
     paymentsMade: 0,
     startDate: { ...state.clock.date },
     renegotiationSuggested: false,
+    propertyId,
   };
   state.loans.push(loan);
   state.player.balance += offer.amount;
@@ -480,8 +485,15 @@ export function refinanceLoan(
     paymentsMade: 0,
     startDate: { ...state.clock.date },
     renegotiationSuggested: false,
+    propertyId: loan.propertyId,
   };
   state.loans = state.loans.map((other) => (other.id === loan.id ? replacement : other));
   ctx.events.push({ type: 'loanRefinanced', oldLoanId: loan.id, newLoanId: replacement.id, fees });
   return null;
+}
+
+/** A refused loan application lowers the banker's trust. */
+export function recordRefusedApplication(ctx: SystemContext, bankId: string): void {
+  const relation = relationOf(ctx.state, bankId);
+  relation.trust = clampTrust(relation.trust + ctx.content.credit.trust.refusedApplication);
 }

@@ -75,7 +75,10 @@
         "weekendMinutes": 360
       },
       "bankTrust": "mediumLow",
-      "perk": "Négocie mieux les prix d'achat."
+      "perk": "Négocie mieux les prix d'achat.",
+      "perkEffects": {
+        "negotiationBonusShare": 0.03
+      }
     },
     {
       "id": "realEstateAgent",
@@ -89,7 +92,13 @@
         "worksSaturday": true
       },
       "bankTrust": "mediumLow",
-      "perk": "Voit certaines annonces 24 à 48 h avant tout le monde."
+      "perk": "Voit certaines annonces 24 à 48 h avant tout le monde.",
+      "perkEffects": {
+        "listingHeadStart": {
+          "days": 1,
+          "share": 0.4
+        }
+      }
     }
   ]
 }
