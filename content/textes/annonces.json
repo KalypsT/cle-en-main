@@ -1,0 +1,62 @@
+{
+  "kinds": { "apartment": "appartement", "house": "maison", "building": "immeuble de rapport" },
+  "conditions": {
+    "ruin": "à rénover entièrement",
+    "toRenovate": "travaux à prévoir",
+    "toRefresh": "à rafraîchir",
+    "good": "bon état",
+    "renovated": "rénové"
+  },
+  "titles": [
+    {
+      "id": "charming",
+      "text": "Charmant {kind}, {neighbourhood}, idéal bricoleur courageux",
+      "conditions": ["ruin", "toRenovate"]
+    },
+    {
+      "id": "potential",
+      "text": "{kind} {rooms} pièces, potentiel à révéler",
+      "conditions": ["ruin", "toRenovate", "toRefresh"]
+    },
+    {
+      "id": "authentic",
+      "text": "{kind} dans son jus, {neighbourhood}",
+      "conditions": ["toRenovate", "toRefresh"]
+    },
+    { "id": "rare", "text": "Rare ! {kind} {surface} m², {neighbourhood}" },
+    { "id": "bright", "text": "{kind} lumineux de {surface} m², au calme" },
+    {
+      "id": "moveIn",
+      "text": "{kind} {rooms} pièces, à poser ses valises",
+      "conditions": ["good", "renovated"]
+    },
+    {
+      "id": "favourite",
+      "text": "Coup de cœur assuré : {kind}, {neighbourhood}",
+      "conditions": ["good", "renovated"]
+    },
+    { "id": "investor", "text": "Spécial investisseur : {kind} {surface} m²" },
+    { "id": "noAgency", "text": "Particulier vend {kind} {rooms} pièces, {neighbourhood}" }
+  ],
+  "motivations": {
+    "transfer": "Mutation professionnelle, doit vendre avant la rentrée.",
+    "inheritance": "Succession : trois héritiers, quatre avis.",
+    "divorce": "Séparation, chacun veut tourner la page.",
+    "sunnyRetirement": "Part prendre sa retraite au soleil, sans se presser.",
+    "alpacas": "Veut partir élever des alpagas dans le Haut-Jura.",
+    "growingFamily": "Le troisième enfant arrive, il faut plus grand.",
+    "investor": "Investisseur qui arbitre son portefeuille.",
+    "testingTheMarket": "« On teste le marché, on n'est pas pressés. »",
+    "debts": "Doit vendre vite, la banque s'impatiente."
+  },
+  "defects": {
+    "humidity": "Traces d'humidité derrière l'armoire.",
+    "roof": "Toiture fatiguée : quelques tuiles jouent à cache-cache.",
+    "wiring": "Électricité d'époque, fusibles en porcelaine.",
+    "plumbing": "Plomberie qui chante la nuit.",
+    "heating": "Chaudière qui a connu le franc.",
+    "cracks": "Fissures en façade, « c'est juste esthétique ».",
+    "dryRot": "Mérule dans la cave. Aïe.",
+    "noisyNeighbours": "Voisin du dessus batteur amateur."
+  }
+}

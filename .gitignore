@@ -154,3 +154,6 @@ dev-dist/
 coverage/
 playwright-report/
 test-results/
+
+# Data scripts download cache
+tools/data/.cache/

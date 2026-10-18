@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { checkReferences, gameContent, jobs, timeSettings, uiTexts } from './index.ts';
+import { dataRegistry } from './registry.ts';
 import { validateContentDirectory, validateContentText } from './validation.ts';
 
 const schema = z.object({ name: z.string() }).strict();
@@ -21,6 +22,16 @@ describe('content', () => {
     expect(jobs.length).toBeGreaterThan(0);
     expect(timeSettings.speeds).toContain(1);
     expect(uiTexts.calendar.months).toHaveLength(12);
+  });
+
+  it('ships valid generated city data', async () => {
+    const { checked, problems } = await validateContentDirectory(
+      join(import.meta.dirname, '..', 'data'),
+      dataRegistry,
+    );
+    expect(problems).toEqual([]);
+    expect(checked).toContain('cities/dole.json');
+    expect(gameContent.cities.dole?.neighbourhoods).toHaveLength(5);
   });
 
   it('checks references between files', () => {
