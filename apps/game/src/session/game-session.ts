@@ -14,6 +14,11 @@ import { describeEvent } from '../texts.ts';
 
 /** Ignore longer frame gaps (tab in background, debugger) instead of fast-forwarding. */
 const MAX_FRAME_MS = 1000;
+/**
+ * At most one game day per frame: on a slow device, time runs slower instead
+ * of catching up hours that make the next frame slower still.
+ */
+const MAX_HOURS_PER_FRAME = HOURS_PER_DAY;
 /** News kept for the dashboard. */
 const FEED_LENGTH = 30;
 
@@ -126,7 +131,12 @@ export class GameSession {
       this.pendingMs += elapsed * this.snapshot.speed;
       let state = this.snapshot.state;
       const events: GameEvent[] = [];
+      let hours = 0;
       while (this.pendingMs >= this.msPerHour) {
+        if (++hours > MAX_HOURS_PER_FRAME) {
+          this.pendingMs = 0;
+          break;
+        }
         this.pendingMs -= this.msPerHour;
         const result = engine.tick(state);
         state = result.state;

@@ -1,6 +1,7 @@
 /*
- * Palette and tokens (docs/05-direction-artistique.md, section 5.2).
- * Light theme only; the dark theme arrives with milestone 5.
+ * Palette and tokens (docs/05-direction-artistique.md, section 5.2), light
+ * theme. The dark theme (docs/04, 4.2) redefines the colours below under
+ * :root[data-theme='dark'], set by src/theme.ts.
  */
 :root {
   /* Warm ivory background, shared with the street. */
@@ -25,6 +26,13 @@
   --brick-soft: #f8e0d9;
   --green: #2e7a3a;
   --green-soft: #e1f0dd;
+  --amber-line: #efd9a8;
+  --brick-line: #eec2b6;
+  --teal-line: #b9ddd6;
+  --translucent: rgb(255 253 248 / 94%);
+  --sky: #dfe9ee;
+  --pavement: #cfc8b8;
+  --map-ground: #eef0e6;
 
   /* Energy classes. */
   --dpe-a: #1e8a3b;
@@ -42,6 +50,7 @@
   --shadow: 0 1px 2px rgb(60 45 20 / 6%), 0 4px 14px rgb(60 45 20 / 6%);
   --status-height: 112px;
   --tabs-height: 64px;
+  --drawer-peek: 84px;
 
   --font-ui: 'Manrope Variable', system-ui, sans-serif;
   --font-display: 'Fraunces Variable', Georgia, serif;
@@ -55,6 +64,37 @@
   background: var(--ivory);
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+}
+
+:root[data-theme='dark'] {
+  --ivory: #16171b;
+  --ivory-deep: #212329;
+  --surface: #1d1f24;
+  --border: #2f323a;
+  --border-strong: #41454f;
+  --text: #ecebe6;
+  --muted: #aaa496;
+  --faint: #7d786c;
+  --teal: #3fb3a8;
+  --teal-strong: #79d3c9;
+  --teal-soft: #16322f;
+  --on-teal: #0d1513;
+  --amber: #f0b45a;
+  --amber-soft: #392c15;
+  --brick: #f0806a;
+  --brick-soft: #3b1f1a;
+  --green: #84cf8c;
+  --green-soft: #1a301d;
+  --amber-line: #5a4520;
+  --brick-line: #5c3027;
+  --teal-line: #275a54;
+  --translucent: rgb(29 31 36 / 94%);
+  --sky: #2b3450;
+  --pavement: #3a3a40;
+  --map-ground: #23262b;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 14px rgb(0 0 0 / 30%);
+
+  color-scheme: dark;
 }
 
 * {
@@ -258,17 +298,17 @@ select {
 
 .card.tinted-amber {
   background: var(--amber-soft);
-  border-color: #efd9a8;
+  border-color: var(--amber-line);
 }
 
 .card.tinted-brick {
   background: var(--brick-soft);
-  border-color: #eec2b6;
+  border-color: var(--brick-line);
 }
 
 .card.tinted-teal {
   background: var(--teal-soft);
-  border-color: #b9ddd6;
+  border-color: var(--teal-line);
 }
 
 .card-heading {
@@ -771,7 +811,7 @@ select {
   width: 100%;
   min-height: var(--tap);
   padding: 8px 12px;
-  border: 1px solid #efd9a8;
+  border: 1px solid var(--amber-line);
   border-radius: 12px;
   background: var(--amber-soft);
   color: var(--amber);
@@ -782,7 +822,7 @@ select {
 }
 
 .alert-banner.brick {
-  border-color: #eec2b6;
+  border-color: var(--brick-line);
   background: var(--brick-soft);
   color: var(--brick);
 }
@@ -861,7 +901,7 @@ select {
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: rgb(255 253 248 / 94%);
+  background: var(--translucent);
   backdrop-filter: blur(6px);
   box-shadow: var(--shadow);
 }
@@ -960,7 +1000,7 @@ select {
   gap: 12px;
   margin: var(--gap) var(--gap) 0;
   padding: 12px;
-  border: 1px solid #b9ddd6;
+  border: 1px solid var(--teal-line);
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -1053,7 +1093,7 @@ select {
   width: 100%;
   height: auto;
   border-radius: var(--radius);
-  background: #dfe9ee;
+  background: var(--sky);
 }
 
 .state-dots {
@@ -1086,7 +1126,7 @@ select {
   height: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: #eef0e6;
+  background: var(--map-ground);
   touch-action: manipulation;
 }
 
@@ -1236,4 +1276,569 @@ select {
 
 .items-group[open] summary {
   margin-bottom: 4px;
+}
+
+/* ---------- Living street (milestone 5) ---------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.street-stage[hidden] {
+  display: none;
+}
+
+/* On the « Rue » tab the page does not scroll: the street fills the screen. */
+.shell.street-mode {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shell.street-mode .street-stage {
+  grid-row: 2;
+  grid-column: 1;
+  min-height: 0;
+  /* The closed dashboard drawer sits under the street, above the tabs. */
+  margin-bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom) + var(--drawer-peek));
+}
+
+/* Gérard's bubble and the drawer float over the street, under its header. */
+.shell.street-mode .content {
+  z-index: 5;
+  grid-row: 2;
+  grid-column: 1;
+  align-self: start;
+  padding: 52px 0 0;
+  pointer-events: none;
+}
+
+.shell.street-mode .content > * {
+  pointer-events: auto;
+}
+
+.street-world {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ivory-deep);
+  user-select: none;
+}
+
+.street-canvas,
+.street-canvas canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.street-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.street-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.street-track {
+  position: relative;
+  height: 100%;
+}
+
+.street-snap {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  scroll-snap-align: start;
+}
+
+.street-building {
+  position: absolute;
+}
+
+.street-hit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.street-hit:focus-visible {
+  outline-offset: -3px;
+}
+
+.street-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.street-mine {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--teal);
+  color: var(--on-teal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.street-bubbles {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.street-bubble {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgb(20 20 40 / 18%);
+  cursor: pointer;
+  animation: bubble-in 0.35s ease-out;
+}
+
+.street-bubble:last-child::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.street-bubble.mine {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: var(--on-teal);
+}
+
+.street-bubble.alert {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.85);
+  }
+}
+
+.street-header {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.street-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 0 6px 0 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.street-chip select {
+  max-width: 150px;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.street-name {
+  padding: 0 2px;
+}
+
+.street-name button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.street-name button:disabled {
+  opacity: 0.3;
+}
+
+.street-fallback-note,
+.street-fps {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 60px;
+  padding: 6px 10px;
+  border-radius: var(--radius-small);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  pointer-events: none;
+}
+
+.street-fps {
+  right: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dashboard drawer over the street. */
+.street-drawer {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom));
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  width: min(480px, 100%);
+  max-height: 72dvh;
+  padding: 0 var(--gap) 12px;
+  transform: translateX(-50%);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+  box-shadow: 0 -6px 20px rgb(30 25 15 / 12%);
+}
+
+.street-drawer.open {
+  overflow-y: auto;
+}
+
+.drawer-handle {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 0 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.drawer-handle svg {
+  transform: rotate(-90deg);
+  transition: transform 0.2s;
+}
+
+.street-drawer.open .drawer-handle svg {
+  transform: rotate(90deg);
+}
+
+.drawer-grip {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+
+.drawer-peek {
+  align-items: center;
+}
+
+.drawer-figures {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.drawer-body {
+  padding-top: 12px;
+}
+
+.street-drawer.inline {
+  position: static;
+  width: auto;
+  max-height: none;
+  margin: var(--gap);
+  padding-top: var(--gap);
+  transform: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+/* Wide screens: the street on the left, the management on the right (docs/04, 4.1). */
+.app:has(.shell.wide) {
+  max-width: none;
+}
+
+.shell.wide {
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+}
+
+.shell.wide .status-bar {
+  grid-column: 1 / -1;
+}
+
+.shell.wide .street-stage {
+  grid-row: 2;
+  grid-column: 1;
+  min-height: 0;
+}
+
+.shell.wide .content {
+  grid-row: 2;
+  grid-column: 2;
+  min-height: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+}
+
+.shell.wide .tab-bar {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+/* Panorama: a phone held sideways shows the street only (docs/04, 4.1). */
+.app:has(.shell.panorama),
+.app:has(.shell.rotate) {
+  max-width: none;
+}
+
+.shell.panorama .status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.shell.panorama .status-bar > * {
+  pointer-events: auto;
+}
+
+.shell.panorama .status-tiles,
+.shell.panorama .tab-bar,
+.shell.panorama .street-drawer,
+.shell.panorama .street-header {
+  display: none;
+}
+
+.shell.panorama .status-bar .row {
+  justify-content: flex-start;
+  gap: 12px;
+  width: fit-content;
+  padding: 4px 6px 4px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.shell.panorama.street-mode .street-stage {
+  margin-bottom: 0;
+}
+
+.shell.panorama .street-world {
+  height: 100dvh;
+}
+
+.rotate-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--ivory);
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ---------- Cross-section ---------- */
+
+.section-subtitle {
+  margin-top: -8px;
+}
+
+.section-frame {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.section-frame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.section-mine {
+  stroke: var(--teal);
+}
+
+.section-tag {
+  fill: var(--teal-strong);
+  font-size: 10px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fffdf8;
+  stroke-width: 3px;
+}
+
+.section-label {
+  fill: #6e6658;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.section-hit {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.section-hit.neighbour {
+  cursor: default;
+}
+
+.section-tool {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: tool 0.6s ease-in-out infinite alternate;
+}
+
+.section-dust {
+  animation: dust 1.4s ease-out infinite;
+}
+
+@keyframes tool {
+  to {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes dust {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 0;
+    transform: translate(6px, -10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-tool,
+  .section-dust,
+  .street-bubble {
+    animation: none;
+  }
+}
+
+.section-rooms {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section-rooms li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.state-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ivory-deep);
+  overflow: hidden;
+}
+
+.state-bar span {
+  display: block;
+  height: 100%;
+  background: var(--teal);
+}
+
+.volume {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.volume input {
+  width: 100%;
+  min-height: var(--tap);
+  accent-color: var(--teal);
 }

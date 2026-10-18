@@ -1,6 +1,9 @@
-import type { TutorialTrigger } from '@cle/content';
+import { gameContent, music, type TutorialTrigger } from '@cle/content';
 import type { GameAction, GameEvent } from '@cle/engine';
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import type { AudioMixer } from '../audio/mixer.ts';
+import type { EffectName } from '../audio/effects.ts';
+import { engine } from '../engine.ts';
 import type { GameSession } from '../session/game-session.ts';
 import { saveSettings, type Settings } from '../settings.ts';
 import { t, texts } from '../texts.ts';
@@ -26,7 +29,10 @@ import { PropertyScreen } from '../screens/PropertyScreen.tsx';
 import { PurchaseScreen } from '../screens/PurchaseScreen.tsx';
 import { RentScreen } from '../screens/RentScreen.tsx';
 import { SettingsScreen } from '../screens/SettingsScreen.tsx';
+import { SectionScreen } from '../screens/SectionScreen.tsx';
 import { StreetTab } from '../screens/StreetTab.tsx';
+import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
+import { StreetWorld } from '../world/StreetWorld.tsx';
 
 const TABS: { id: TabId; icon: IconName }[] = [
   { id: 'street', icon: 'street' },
@@ -63,7 +69,32 @@ interface Props {
   notify: (message: string) => void;
   settings: Settings;
   onSettings: (settings: Settings) => void;
+  /** Tells whether it is night in the game (the « Automatique » theme). */
+  onNight: (night: boolean) => void;
+  audio: AudioMixer;
 }
+
+/** Interface effects of some engine events (docs/05, 5.8). */
+function effectOf(event: GameEvent): EffectName | null {
+  switch (event.type) {
+    case 'monthlyStatement':
+      return event.lines.some((line) => line.kind === 'rentalIncome' && line.amount > 0)
+        ? 'kaching'
+        : null;
+    case 'compromisSigned':
+    case 'deedSigned':
+    case 'saleAgreed':
+    case 'propertySold':
+      return 'stamp';
+    case 'worksStarted':
+      return 'drill';
+    default:
+      return null;
+  }
+}
+
+/** Celebration music after the new year's review, in real milliseconds. */
+const CELEBRATION_MS = 90_000;
 
 /** The game: status bar, the five tabs and their screens (docs/04, 4.3 and 4.4). */
 export function GameShell({
@@ -75,6 +106,8 @@ export function GameShell({
   notify,
   settings,
   onSettings,
+  onNight,
+  audio,
 }: Props) {
   const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [tab, setTab] = useState<TabId>('street');
@@ -109,8 +142,46 @@ export function GameShell({
     [session, raise],
   );
 
+  const ambience = engine.ambience(snapshot.state, gameContent.start.cityId);
+  const night = ambience.moment === 'night';
+  useEffect(() => onNight(night), [night, onNight]);
+  const [celebrating, setCelebrating] = useState(false);
+  useEffect(
+    () => audio.setMusic(celebrating ? 'celebration' : music.slotByMoment[ambience.moment]),
+    [audio, celebrating, ambience.moment],
+  );
+  useEffect(
+    () =>
+      session.onEvents((events) => {
+        for (const event of events) {
+          const effect = effectOf(event);
+          if (effect) audio.effect(effect);
+          if (event.type === 'yearStarted') setCelebrating(true);
+        }
+      }),
+    [session, audio],
+  );
+  useEffect(() => {
+    if (!celebrating) return;
+    const timer = setTimeout(() => setCelebrating(false), CELEBRATION_MS);
+    return () => clearTimeout(timer);
+  }, [celebrating]);
+
   const stack = stacks[tab];
   const route = stack.at(-1);
+  const wide = useMediaQuery(WIDE_QUERY);
+  const panorama = useMediaQuery(PANORAMA_QUERY);
+  // The street is drawn once and kept: shown on the « Rue » tab, and always on wide screens.
+  const streetRoot = tab === 'street' && !route;
+  const showStreet = wide || streetRoot;
+  const shellClass = [
+    'shell',
+    streetRoot && !wide ? 'street-mode' : '',
+    wide ? 'wide' : '',
+    panorama && !wide ? (streetRoot ? 'panorama' : 'rotate') : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -159,19 +230,28 @@ export function GameShell({
       exportGame: onExport,
       quit: onQuit,
       slot,
+      audio,
     }),
-    [session, snapshot, settings, onSettings, act, notify, onSave, onExport, onQuit, slot],
+    [session, snapshot, settings, onSettings, act, notify, onSave, onExport, onQuit, slot, audio],
   );
 
   return (
     <GameContext.Provider value={game}>
       <NavigationContext.Provider value={nav}>
-        <div className="shell">
+        <div className={shellClass}>
           <StatusBar />
+          <div className="street-stage" hidden={!showStreet}>
+            <StreetWorld active={showStreet} />
+          </div>
           <main className="content" key={`${tab}-${stack.length}`}>
             <TutorialBubble shownStep={shownStep} />
-            {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} />}
+            {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} wide={wide} />}
           </main>
+          {panorama && !wide && !streetRoot && (
+            <div className="rotate-notice" role="status">
+              <p>{t.common.rotate}</p>
+            </div>
+          )}
           <nav className="tab-bar" aria-label={t.tabs.street}>
             {TABS.map(({ id, icon }) => (
               <button
@@ -194,10 +274,10 @@ export function GameShell({
   );
 }
 
-function TabRoot({ tab }: { tab: TabId }) {
+function TabRoot({ tab, wide }: { tab: TabId; wide: boolean }) {
   switch (tab) {
     case 'street':
-      return <StreetTab />;
+      return <StreetTab inline={wide} />;
     case 'map':
       return <MapTab />;
     case 'decisions':
@@ -223,5 +303,9 @@ function RouteScreen({ route }: { route: Route }) {
       return <RentScreen id={route.id} />;
     case 'settings':
       return <SettingsScreen />;
+    case 'section':
+      return (
+        <SectionScreen neighbourhoodId={route.neighbourhoodId} buildingId={route.buildingId} />
+      );
   }
 }

@@ -28,7 +28,8 @@
     "yes": "Oui",
     "no": "Non",
     "open": "Ouvrir",
-    "seeAll": "Tout voir ({count})"
+    "seeAll": "Tout voir ({count})",
+    "rotate": "Tournez le téléphone : seule la Rue s'affiche en paysage."
   },
   "creation": {
     "heading": "Nouvelle partie",
@@ -90,7 +91,75 @@
     "nothingToHandle": "Rien d'urgent. Profitez-en pour repérer une affaire.",
     "news": "Dernières nouvelles",
     "noNews": "La ville est calme pour l'instant.",
-    "streetSoon": "La rue vivante de Dole arrive bientôt : en attendant, voici votre tableau de bord."
+    "dashboard": "Tableau de bord",
+    "openDashboard": "Ouvrir le tableau de bord",
+    "closeDashboard": "Refermer le tableau de bord",
+    "neighbourhood": "Quartier",
+    "previousStreet": "Rue précédente",
+    "nextStreet": "Rue suivante",
+    "scene": "{street}, {moment}, {weather}",
+    "openSection": "{name}, {street} : voir la coupe",
+    "buildingNames": {
+      "apartment": "Immeuble",
+      "house": "Maison",
+      "building": "Immeuble de rapport",
+      "owned": "Mon bien",
+      "home": "Chez moi",
+      "listing": "Bien en vente",
+      "purchase": "Bien sous compromis",
+      "rival": "Chantier d'un concurrent"
+    },
+    "myProperty": "Mon bien",
+    "myHome": "Chez moi",
+    "forSaleSign": "À vendre",
+    "shops": [
+      "Boulangerie",
+      "Pharmacie",
+      "Café du Doubs",
+      "Fleuriste",
+      "Librairie",
+      "Primeur",
+      "Tabac presse",
+      "Fromagerie",
+      "Boucherie",
+      "Coiffure",
+      "Opticien",
+      "Comtoise d'assurances"
+    ],
+    "bubbles": {
+      "forSale": "À vendre",
+      "toLet": "À louer",
+      "incident": "Panne",
+      "arrears": "Impayé",
+      "hazard": "Imprévu",
+      "saleOffer": "{count} offre(s)",
+      "applications": "{count} candidat(s)",
+      "copro": "Assemblée",
+      "works": "Travaux {percent} %",
+      "sold": "Vendu",
+      "compromis": "Compromis"
+    },
+    "moments": {
+      "morning": "matin",
+      "day": "journée",
+      "evening": "soir",
+      "night": "nuit"
+    },
+    "weathers": {
+      "sun": "soleil",
+      "clouds": "nuageux",
+      "rain": "pluie",
+      "snow": "neige",
+      "fog": "brouillard"
+    },
+    "seasons": {
+      "spring": "printemps",
+      "summer": "été",
+      "autumn": "automne",
+      "winter": "hiver"
+    },
+    "fallback": "L'animation de la rue n'est pas disponible sur cet appareil : voici une vue simplifiée.",
+    "fps": "{fps} img/s · {p95} ms · {renderer} · qualité {quality}"
   },
   "listings": {
     "heading": "Annonces à {city}",
@@ -487,10 +556,61 @@
     "tutorialOn": "Afficher le didacticiel",
     "tutorialRestart": "Recommencer le didacticiel",
     "theme": "Thème",
-    "themeLight": "Clair (le thème sombre arrivera plus tard)",
+    "themes": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "auto": "Automatique",
+      "system": "Selon le téléphone"
+    },
+    "themeHint": "Automatique : sombre pendant la nuit du jeu.",
+    "street": "Rue",
+    "quality": "Qualité graphique",
+    "qualities": {
+      "auto": "Automatique",
+      "high": "Haute",
+      "economy": "Économie"
+    },
+    "qualityHint": "Automatique baisse les détails (passants, pluie, résolution) si le téléphone peine à suivre.",
+    "showFps": "Afficher les images par seconde",
+    "showFpsHint": "Pour vérifier la fluidité de la rue.",
+    "sound": "Son",
+    "volumes": {
+      "music": "Musique",
+      "ambience": "Ambiances",
+      "effects": "Effets"
+    },
+    "volume": "{label} : {percent} %",
+    "soundHint": "Le son démarre au premier toucher de l'écran.",
+    "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
     "version": "Format de sauvegarde v{version}"
   },
   "avatar": {
     "label": "Avatar de {name}"
+  },
+  "section": {
+    "subtitle": "{street} · construit {epoch}",
+    "worksProgress": "Travaux {percent} %",
+    "floor": "{floor}e étage",
+    "firstFloor": "1er étage",
+    "groundFloor": "Rez-de-chaussée",
+    "units": {
+      "player": "Mon logement",
+      "listing": "En vente",
+      "purchase": "Sous compromis",
+      "neighbour": "Voisins"
+    },
+    "openUnit": "{name}, {floor} : ouvrir la fiche",
+    "neighbourUnit": "{floor} : logement d'un voisin",
+    "neighbourEmpty": "{floor} : logement vide",
+    "shop": "Commerce",
+    "legend": "Touchez un logement en couleur pour ouvrir sa fiche.",
+    "rooms": "Pièces",
+    "roomState": "État {state} sur 5",
+    "renovating": "{trade} au travail",
+    "dwellingWorks": "Dans tout le logement : {trades}",
+    "openSheet": "Ouvrir la fiche",
+    "seeWorks": "Voir le chantier",
+    "ordinary": "Vous ne possédez rien dans ce bâtiment : ses habitants vivent leur vie.",
+    "gone": "Ce bâtiment n'est plus dans la rue."
   }
 }

@@ -1,5 +1,6 @@
 import type { GameAction, GameEvent, GameState } from '@cle/engine';
 import { createContext, useContext } from 'react';
+import type { AudioMixer } from '../audio/mixer.ts';
 import type { GameSession, SessionSnapshot } from '../session/game-session.ts';
 import type { Settings } from '../settings.ts';
 
@@ -14,6 +15,7 @@ export type Route =
   | { name: 'purchase'; id: string }
   | { name: 'property'; id: string; tab?: PropertyTab }
   | { name: 'rent'; id: string }
+  | { name: 'section'; neighbourhoodId: string; buildingId: string }
   | { name: 'settings' };
 
 /** A screen the tutorial waits for (content/textes/didacticiel.json). */
@@ -42,6 +44,7 @@ export interface GameContextValue {
   exportGame: () => void;
   quit: () => void;
   slot: number;
+  audio: AudioMixer;
 }
 
 export const GameContext = createContext<GameContextValue | null>(null);

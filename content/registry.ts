@@ -12,6 +12,8 @@ import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
+import { musicSchema } from './schemas/music.ts';
+import { worldRulesSchema } from './schemas/world.ts';
 
 /** Every content file, by path relative to `content/`, with the schema it must satisfy. */
 export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
@@ -23,6 +25,8 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'marche.json': marketRulesSchema,
   'location.json': rentingRulesSchema,
   'metiers.json': jobsFileSchema,
+  'monde.json': worldRulesSchema,
+  'musique.json': musicSchema,
   'partie.json': startSchema,
   'rivaux.json': rivalsFileSchema,
   'taux.json': marketRateSchema,

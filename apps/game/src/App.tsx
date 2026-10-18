@@ -1,6 +1,7 @@
 import { timeSettings } from '@cle/content';
 import type { GameEvent, GameState } from '@cle/engine';
 import { useCallback, useEffect, useState } from 'react';
+import { AudioMixer } from './audio/mixer.ts';
 import { engine } from './engine.ts';
 import { GameShell } from './game/GameShell.tsx';
 import { PwaStatus } from './PwaStatus.tsx';
@@ -12,6 +13,7 @@ import { loadSettings, type Settings } from './settings.ts';
 import { exportGame } from './storage/files.ts';
 import { loadFromSlot, saveToSlot, type SlotId } from './storage/saves.ts';
 import { t, texts } from './texts.ts';
+import { useTheme } from './theme.ts';
 
 type Screen =
   | { name: 'title' }
@@ -47,6 +49,21 @@ export function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'title' });
   const [notice, setNotice] = useState<string | null>(null);
   const [settings, setSettings] = useState<Settings>(loadSettings);
+  // Night in the running game, for the « Automatique » theme.
+  const [gameNight, setGameNight] = useState(false);
+  useTheme(settings.theme, screen.name === 'game' && gameNight);
+  // One mixer for the whole app; browsers start the sound on the first touch.
+  const [audio] = useState(() => new AudioMixer(settings.volumes));
+  useEffect(() => audio.setVolumes(settings.volumes), [audio, settings.volumes]);
+  useEffect(() => {
+    const unlock = () => audio.unlock();
+    window.addEventListener('pointerdown', unlock);
+    window.addEventListener('keydown', unlock);
+    return () => {
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+  }, [audio]);
 
   const notify = useCallback((message: string) => setNotice(message), []);
 
@@ -148,6 +165,8 @@ export function App() {
           notify={notify}
           settings={settings}
           onSettings={setSettings}
+          onNight={setGameNight}
+          audio={audio}
         />
       )}
       <div className="notice" role="status" aria-live="polite">

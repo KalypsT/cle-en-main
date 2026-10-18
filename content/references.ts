@@ -8,6 +8,7 @@ import type { TaxRules } from './schemas/taxes.ts';
 import type { Rival, RivalsFile } from './schemas/rivals.ts';
 import type { LivingCosts, Start } from './schemas/start.ts';
 import type { Artisan, ArtisansFile, WorksRules, WorksTexts } from './schemas/works.ts';
+import type { WorldRules } from './schemas/world.ts';
 
 export interface GameContent {
   start: Start;
@@ -29,6 +30,8 @@ export interface GameContent {
   artisans: Artisan[];
   worksTexts: WorksTexts;
   decisions: DecisionRules;
+  /** Moments, seasons, weather and streets (milestone 5): read by queries only. */
+  world: WorldRules;
   /** Generated city data, by city id. */
   cities: Record<string, CityData>;
 }
@@ -109,6 +112,40 @@ export function checkReferences(content: GameContent): string[] {
   }
   problems.push(...checkRentingReferences(content));
   problems.push(...checkWorksReferences(content));
+  problems.push(...checkWorldReferences(content));
+  return problems;
+}
+
+function checkWorldReferences(content: GameContent): string[] {
+  const problems: string[] = [];
+  const { world } = content;
+  for (const [cityId, city] of Object.entries(content.cities)) {
+    const streets = world.cities[cityId];
+    if (!streets) {
+      problems.push(`monde.json : aucune rue pour la ville « ${cityId} »`);
+      continue;
+    }
+    for (const neighbourhood of city.neighbourhoods) {
+      if (!streets[neighbourhood.id]) {
+        problems.push(`monde.json : aucune rue pour le quartier « ${neighbourhood.id} »`);
+      }
+    }
+    const known = new Set(city.neighbourhoods.map((n) => n.id));
+    for (const neighbourhoodId of Object.keys(streets)) {
+      if (!known.has(neighbourhoodId)) {
+        problems.push(`monde.json : quartier inconnu « ${neighbourhoodId} » (${cityId})`);
+      }
+    }
+    const ids = Object.values(streets).flatMap((n) => n.streets.map((street) => street.id));
+    if (new Set(ids).size !== ids.length) problems.push(`monde.json : rue en double (${cityId})`);
+  }
+  for (const cityId of Object.keys(world.cities)) {
+    if (!content.cities[cityId]) problems.push(`monde.json : ville inconnue « ${cityId} »`);
+  }
+  const hours = Object.values(world.momentStartHours);
+  if (new Set(hours).size !== hours.length) {
+    problems.push('monde.json : deux moments de la journée commencent à la même heure');
+  }
   return problems;
 }
 
