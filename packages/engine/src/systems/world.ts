@@ -725,3 +725,33 @@ export function section(
     worksPercent: owned ? worksPercent(content, state, owned) : null,
   };
 }
+
+/** Where a building stands: its city, neighbourhood and street. */
+export interface BuildingPlace {
+  cityId: string;
+  neighbourhoodId: string;
+  streetId: string;
+  building: StreetBuilding;
+}
+
+/**
+ * The building of a listing, a purchase or an owned property, as drawn in its
+ * street (the listing sheet shows the same façade). Null when it is unknown.
+ */
+export function findBuilding(
+  content: GameContent,
+  state: GameState,
+  propertyId: string,
+): BuildingPlace | null {
+  const property =
+    state.properties.find((owned) => owned.property.id === propertyId)?.property ??
+    state.purchases.find((purchase) => purchase.property.id === propertyId)?.property ??
+    state.listings.find((listing) => listing.property.id === propertyId)?.property;
+  if (!property) return null;
+  const { cityId, neighbourhoodId } = property;
+  for (const street of streets(content, state, cityId, neighbourhoodId)) {
+    const building = street.buildings.find((candidate) => candidate.propertyId === propertyId);
+    if (building) return { cityId, neighbourhoodId, streetId: street.id, building };
+  }
+  return null;
+}

@@ -35,6 +35,7 @@ export {
   type Bubble,
   type BubbleKind,
   type BubbleTarget,
+  type BuildingPlace,
   type BuildingRole,
   type SectionRoom,
   type SectionUnit,

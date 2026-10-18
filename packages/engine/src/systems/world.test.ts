@@ -248,6 +248,20 @@ describe('cross-section', () => {
     expect(section?.garden).toBe(true);
   });
 
+  it('finds the building of a listing in its street', () => {
+    const state = newGame();
+    const listing = state.listings[0];
+    if (!listing) throw new Error('no listing');
+    const place = engine.building(state, listing.property.id);
+    expect(place?.neighbourhoodId).toBe(listing.property.neighbourhoodId);
+    expect(place?.building.propertyId).toBe(listing.property.id);
+    const street = engine
+      .streets(state, CITY, listing.property.neighbourhoodId)
+      .find((candidate) => candidate.id === place?.streetId);
+    expect(street?.buildings).toContainEqual(place?.building);
+    expect(engine.building(state, 'nowhere')).toBeNull();
+  });
+
   it('opens an ordinary building with neighbours only', () => {
     const state = newGame();
     const street = engine.streets(state, CITY, 'paters')[0];

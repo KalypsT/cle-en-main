@@ -26,7 +26,10 @@ import { PropertyScreen } from '../screens/PropertyScreen.tsx';
 import { PurchaseScreen } from '../screens/PurchaseScreen.tsx';
 import { RentScreen } from '../screens/RentScreen.tsx';
 import { SettingsScreen } from '../screens/SettingsScreen.tsx';
+import { SectionScreen } from '../screens/SectionScreen.tsx';
 import { StreetTab } from '../screens/StreetTab.tsx';
+import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
+import { StreetWorld } from '../world/StreetWorld.tsx';
 
 const TABS: { id: TabId; icon: IconName }[] = [
   { id: 'street', icon: 'street' },
@@ -111,6 +114,19 @@ export function GameShell({
 
   const stack = stacks[tab];
   const route = stack.at(-1);
+  const wide = useMediaQuery(WIDE_QUERY);
+  const panorama = useMediaQuery(PANORAMA_QUERY);
+  // The street is drawn once and kept: shown on the « Rue » tab, and always on wide screens.
+  const streetRoot = tab === 'street' && !route;
+  const showStreet = wide || streetRoot;
+  const shellClass = [
+    'shell',
+    streetRoot && !wide ? 'street-mode' : '',
+    wide ? 'wide' : '',
+    panorama && !wide ? (streetRoot ? 'panorama' : 'rotate') : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -166,12 +182,20 @@ export function GameShell({
   return (
     <GameContext.Provider value={game}>
       <NavigationContext.Provider value={nav}>
-        <div className="shell">
+        <div className={shellClass}>
           <StatusBar />
+          <div className="street-stage" hidden={!showStreet}>
+            <StreetWorld active={showStreet} />
+          </div>
           <main className="content" key={`${tab}-${stack.length}`}>
             <TutorialBubble shownStep={shownStep} />
-            {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} />}
+            {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} wide={wide} />}
           </main>
+          {panorama && !wide && !streetRoot && (
+            <div className="rotate-notice" role="status">
+              <p>{t.common.rotate}</p>
+            </div>
+          )}
           <nav className="tab-bar" aria-label={t.tabs.street}>
             {TABS.map(({ id, icon }) => (
               <button
@@ -194,10 +218,10 @@ export function GameShell({
   );
 }
 
-function TabRoot({ tab }: { tab: TabId }) {
+function TabRoot({ tab, wide }: { tab: TabId; wide: boolean }) {
   switch (tab) {
     case 'street':
-      return <StreetTab />;
+      return <StreetTab inline={wide} />;
     case 'map':
       return <MapTab />;
     case 'decisions':
@@ -223,5 +247,9 @@ function RouteScreen({ route }: { route: Route }) {
       return <RentScreen id={route.id} />;
     case 'settings':
       return <SettingsScreen />;
+    case 'section':
+      return (
+        <SectionScreen neighbourhoodId={route.neighbourhoodId} buildingId={route.buildingId} />
+      );
   }
 }

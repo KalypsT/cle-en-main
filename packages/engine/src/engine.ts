@@ -75,7 +75,7 @@ import {
 } from './systems/taxes.ts';
 import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
 import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.ts';
-import { ambience, section, streets } from './systems/world.ts';
+import { ambience, findBuilding, section, streets } from './systems/world.ts';
 import {
   answerHazard,
   artisanDiscount,
@@ -576,6 +576,8 @@ export function createEngine(content: GameContent) {
     /** Cross-section of a building of the street: flats or floors, rooms, artisans at work. */
     section: (state: GameState, cityId: string, neighbourhoodId: string, buildingId: string) =>
       section(content, state, cityId, neighbourhoodId, buildingId),
+    /** Building of a listing, purchase or owned property, with its street (its façade). */
+    building: (state: GameState, propertyId: string) => findBuilding(content, state, propertyId),
     /** Artisans of a city the player can call, with his history with each. */
     artisans: (state: GameState, cityId: string) =>
       knownArtisans(content, state, cityId).map((artisan) => ({
