@@ -2,7 +2,7 @@
 
 ## Les quartiers
 
-Chaque ville est découpée en **quartiers réels** (environ 4 pour Dole, 6 à 8 pour les grandes villes), chacun avec :
+Chaque ville est découpée en **quartiers réels** (5 pour Dole : Centre historique, Les Mesnils Pasteur, Les Paters, Plumont – Val Fleuri, Azans ; 6 à 8 pour les grandes villes), chacun avec :
 
 - un **prix au m²** par type de bien (appartement, maison) ;
 - un **loyer au m²** ;
@@ -25,15 +25,25 @@ Chaque bien a :
 - des charges de copropriété et une taxe foncière ;
 - une **valeur réelle** calculée par le moteur (quartier, surface, état, DPE, étage, époque).
 
+> **Jalon 1b (en attendant les pièces et postes du jalon 3)** : l'état est **global**, sur 5 niveaux (à rénover entièrement, travaux à prévoir, à rafraîchir, bon état, rénové), plus des **défauts cachés** (humidité, toiture, électricité, plomberie, chauffage, fissures, mérule, voisins bruyants) qui retirent chacun une part de la valeur. La valeur réelle les compte tous ; l'**estimation** affichée au joueur ne compte que ceux qu'il connaît, et les autres selon leur probabilité. Le diagnostic par un artisan arrive au jalon 3. La taxe foncière et les charges de copropriété sont calculées et stockées sur le bien, mais prélevées à partir du jalon 2.
+
 ## La vie d'une annonce
 
-1. **Apparition** : le flux d'annonces de chaque ville est calé sur son **volume réel de ventes** (données DVF). Une petite ville comme Dole en génère peu.
+1. **Apparition** : le flux d'annonces de chaque ville est calé sur son **volume réel de ventes** (données DVF). Une petite ville comme Dole en génère peu (environ une par jour, une soixantaine en ligne).
 2. **Prix affiché** = valeur réelle × motivation du vendeur × erreur de prix. Les bonnes affaires viennent des vendeurs pressés et des erreurs d'estimation.
-3. **Durée de vie** : une bonne affaire part vite (souvent achetée par un rival), une annonce trop chère traîne puis baisse de prix.
+3. **Durée de vie** : une bonne affaire part vite (souvent achetée par un rival), une annonce trop chère traîne puis baisse de prix. Au jalon 1b, l'acheteur concurrent est anonyme (« vendu à un autre acheteur ») ; les rivaux nommés arrivent au jalon 1c. La chance quotidienne qu'un autre acheteur emporte l'annonce croît de façon exponentielle avec l'écart entre la valeur et le prix.
 4. **Visite** (1 h + trajet) : révèle une partie des défauts cachés. Option **diagnostic par un artisan** (payant, sans temps libre) qui révèle l'état d'un corps de métier.
 5. **Offre** : le joueur propose un prix. Le vendeur **accepte, refuse ou fait une contre-offre** (une seule étape de négociation). Sa décision dépend de sa motivation, du temps passé en ligne et de la concurrence. Les motivations sont décrites avec humour (« mutation », « succession », « veut partir élever des alpagas »).
+   - Le vendeur répond le lendemain. Il accepte au-dessus de son **prix plancher** : prix affiché moins une remise qui dépend de sa motivation, augmente avec les mois en ligne et diminue si l'annonce est une bonne affaire (d'autres acheteurs sont intéressés).
+   - Une offre un peu sous le plancher reçoit une **contre-offre**, valable 3 jours, que le joueur accepte ou refuse. Deux offres au plus par annonce.
+   - Le commercial obtient une remise supplémentaire ; l'agent immobilier voit une partie des annonces un jour avant les autres acheteurs.
 6. **Compromis** : délai d'environ **2 semaines de jeu** pour obtenir le prêt (condition suspensive). Sans prêt, la vente est annulée sans pénalité.
+   - Un **dépôt de garantie** de 5 % est versé à la signature ; il est rendu si le prêt n'est pas obtenu, déduit du prix à l'acte.
+   - Le joueur demande un prêt à une ou plusieurs banques (montant, durée). Chaque banque répond après son délai ; le joueur choisit une offre. Il peut aussi renoncer à la condition de prêt et payer comptant.
+   - Se retirer est gratuit pendant la condition de prêt, tant qu'aucun prêt n'est choisi.
 7. **Acte** : signature chez le notaire environ **30 jours** après le compromis. Les frais de notaire sont payés, le bien appartient au joueur.
+   - Le joueur paie le prix, les frais de notaire et (avec un prêt) les frais de dossier et de garantie, moins le dépôt et le prêt. S'il n'a pas assez sur son compte, la vente est annulée et **le dépôt est perdu**.
+   - Les défauts encore cachés se découvrent en prenant possession du bien.
 
 ## Les opportunités particulières
 
@@ -43,8 +53,9 @@ Chaque bien a :
 
 ## L'évolution du marché
 
-- **Tendance de fond par quartier**, avec du bruit.
-- **Cycles nationaux** liés au taux de marché (les prix réagissent avec retard aux taux).
+- **Tendance de fond par quartier**, avec du bruit. Elle part de la tendance observée dans DVF et revient lentement vers une tendance de long terme (moitié la tendance observée, moitié 1,5 % par an).
+- **Cycles nationaux** liés au taux de marché (les prix réagissent avec retard aux taux) : environ −5 % de prix par point de hausse du taux, lissé sur une dizaine de mois.
+- Les prix du fichier de ville sont ceux de sa date de données ; à la création de la partie, ils sont projetés jusqu'à la date du jour avec la tendance observée.
 - **Événements locaux** : arrivée d'un tramway, fermeture d'usine, rénovation urbaine, nouvelle école (voir [07-evenements.md](07-evenements.md)).
 - **Chocs rares** : crise nationale (une fois tous les 5 à 10 ans de jeu).
 
@@ -56,7 +67,10 @@ Chaque bien a :
   - **par une agence** : frais (environ 5 % du prix), aucun temps libre ;
   - **soi-même** : pas de frais, mais des visites qui coûtent du temps libre.
 - Les offres reçues arrivent dans les décisions (accepter, refuser, contre-proposer). Les rivaux peuvent faire une offre.
+  - Les visites sont plus rares quand le prix dépasse la valeur ; une agence en apporte davantage. Une offre reste valable 3 jours ; une contre-proposition est acceptée si elle reste dans la marge cachée de l'acheteur.
+  - L'acte est signé environ 60 jours après l'accord ; l'acheteur peut se désister (refus de son prêt), et le bien revient en vente.
 - À la vente : remboursement du crédit et calcul de la plus-value (voir [06-fiscalite.md](06-fiscalite.md)).
+  - Le crédit lié au bien est remboursé sur le prix, avec les mêmes frais qu'un remboursement anticipé (chapitre 3.2). La plus-value est imposée à partir du jalon 2.
 
 ## Les investisseurs rivaux
 
