@@ -9,14 +9,14 @@
 | Build et serveur de dev | Vite |
 | Écrans de gestion | React |
 | Rue vivante et coupe d'immeuble | PixiJS (WebGL) : éclairage, particules (pluie, neige, poussière), animations fluides |
-| Liaison moteur ↔ interface | petit store (par exemple Zustand) abonné à l'état du moteur |
+| Liaison moteur ↔ interface | petite session abonnée à l'état du moteur, lue par `useSyncExternalStore` (Zustand si le besoin apparaît) |
 | Validation du contenu | zod |
-| Hors ligne et installation | PWA (par exemple vite-plugin-pwa) |
-| Sauvegardes | IndexedDB (par exemple via idb) |
+| Hors ligne et installation | PWA via vite-plugin-pwa |
+| Sauvegardes | IndexedDB via idb |
 | Tests | Vitest (moteur), Playwright (fumée de l'interface) |
 | CI et déploiement | GitHub Actions, GitHub Pages |
 
-Les versions exactes sont fixées au jalon 0.
+Les versions exactes ont été fixées au jalon 0 : voir le journal des décisions de [10-points-ouverts.md](10-points-ouverts.md) et les `package.json`.
 
 ## 7.2 Organisation du repo
 

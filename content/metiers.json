@@ -1,0 +1,77 @@
+{
+  "jobs": [
+    {
+      "id": "civilServant",
+      "name": "Fonctionnaire",
+      "netMonthlySalary": 2000,
+      "freeTime": {
+        "kind": "regular",
+        "weekdayMinutes": 150,
+        "weekendMinutes": 360,
+        "regularDaysOff": true
+      },
+      "bankTrust": "veryHigh",
+      "perk": "Le profil le plus rassurant pour les banques."
+    },
+    {
+      "id": "teacher",
+      "name": "Enseignant",
+      "netMonthlySalary": 2200,
+      "freeTime": {
+        "kind": "regular",
+        "weekdayMinutes": 120,
+        "weekendMinutes": 360,
+        "schoolHolidayMinutes": 480
+      },
+      "bankTrust": "high",
+      "perk": "Les vacances scolaires sont des fenêtres d'action."
+    },
+    {
+      "id": "nurse",
+      "name": "Infirmier",
+      "netMonthlySalary": 2300,
+      "freeTime": { "kind": "shifts", "workDayMinutes": 0, "restDayMinutes": 420 },
+      "bankTrust": "high",
+      "perk": "Disponible en semaine quand les autres travaillent."
+    },
+    {
+      "id": "developer",
+      "name": "Développeur",
+      "netMonthlySalary": 3100,
+      "freeTime": { "kind": "regular", "weekdayMinutes": 180, "weekendMinutes": 360 },
+      "bankTrust": "high",
+      "perk": "Bon salaire et du temps."
+    },
+    {
+      "id": "electrician",
+      "name": "Électricien",
+      "netMonthlySalary": 2100,
+      "freeTime": { "kind": "regular", "weekdayMinutes": 120, "weekendMinutes": 360 },
+      "bankTrust": "medium",
+      "perk": "Peut faire lui-même les postes d'électricité."
+    },
+    {
+      "id": "salesperson",
+      "name": "Commercial",
+      "netMonthlySalary": 2000,
+      "averageMonthlyTotal": 2700,
+      "freeTime": { "kind": "regular", "weekdayMinutes": 90, "weekendMinutes": 360 },
+      "bankTrust": "mediumLow",
+      "perk": "Négocie mieux les prix d'achat."
+    },
+    {
+      "id": "realEstateAgent",
+      "name": "Agent immobilier",
+      "netMonthlySalary": 1800,
+      "averageMonthlyTotal": 2500,
+      "freeTime": {
+        "kind": "regular",
+        "weekdayMinutes": 90,
+        "weekendMinutes": 240,
+        "worksSaturday": true
+      },
+      "bankTrust": "mediumLow",
+      "perk": "Voit certaines annonces 24 à 48 h avant tout le monde."
+    }
+  ]
+}

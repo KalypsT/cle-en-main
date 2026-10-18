@@ -8,7 +8,7 @@ Jeu de gestion immobilière en temps réel, pour téléphone (PWA). On part d'un
 
 ## Statut
 
-Conception terminée (version 0.1). Prochaine étape : jalon 0, les fondations.
+Conception terminée (version 0.1). Jalon 0 (fondations) réalisé : monorepo, moteur déterministe, PWA hors ligne, sauvegardes, CI et déploiement sur GitHub Pages. Commandes : voir [`CLAUDE.md`](CLAUDE.md#commandes).
 
 ## Usage
 
