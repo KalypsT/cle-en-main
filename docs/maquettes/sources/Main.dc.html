@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ville et opportunités</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#F2F4F7;font-family:Manrope,system-ui,sans-serif;color:#101828;display:flex;flex-direction:column;overflow:hidden">
+
+<header style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:6px 16px 0;box-sizing:border-box">
+<div>
+<div style="font-size:17px;font-weight:800;letter-spacing:-0.2px">Lun. 14 avril 2025</div>
+<div style="font-size:12px;font-weight:600;color:#667085">Reims · Mois 4</div>
+</div>
+<div style="display:flex;gap:2px;background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:2px">
+<button aria-label="Pause" style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#344054;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+</button>
+<button style="width:44px;height:44px;border:0;border-radius:10px;background:{{accent}};color:#fff;font-size:13px;font-weight:800;padding:0;font-family:inherit">×1</button>
+<button style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#344054;font-size:13px;font-weight:800;padding:0;font-family:inherit">×2</button>
+<button style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#344054;font-size:13px;font-weight:800;padding:0;font-family:inherit">×4</button>
+</div>
+</header>
+
+<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:6px 16px 10px">
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<div style="background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px">
+<div style="font-size:11px;font-weight:600;color:#667085">Trésorerie</div>
+<div style="font-size:17px;font-weight:800;white-space:nowrap">21 400 €</div>
+<div style="font-size:11px;font-weight:700;color:#0F766E;white-space:nowrap">+180 € / mois</div>
+</div>
+<div style="background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px">
+<div style="font-size:11px;font-weight:600;color:#667085">Patrimoine net</div>
+<div style="font-size:17px;font-weight:800;white-space:nowrap">68 300 €</div>
+<div style="font-size:11px;font-weight:600;color:#667085;white-space:nowrap">1 bien · 118 k€</div>
+</div>
+<div style="background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px">
+<div style="font-size:11px;font-weight:600;color:#667085">Temps libre</div>
+<div style="font-size:17px;font-weight:800;white-space:nowrap">3 h 30</div>
+<div style="height:5px;border-radius:3px;background:#E4E7EC;margin-top:5px;overflow:hidden"><div style="width:70%;height:5px;background:{{accent}}"></div></div>
+</div>
+</div>
+
+<div style="position:relative;height:220px;border-radius:16px;overflow:hidden;border:1px solid #E4E7EC;background:#EDF0EA">
+<svg viewBox="0 0 358 220" width="358" height="220" role="img" aria-label="Carte stylisée de Reims avec mon bien et les annonces à proximité" style="display:block">
+<rect width="358" height="220" fill="#EDF0EA"/>
+<rect x="18" y="152" width="74" height="52" rx="12" fill="#D3E7D3"/>
+<rect x="244" y="22" width="62" height="40" rx="10" fill="#D3E7D3"/>
+<path d="M-10 176 C 70 150, 150 196, 240 168 S 340 146, 370 156" fill="none" stroke="#BDD8EA" stroke-width="13" stroke-linecap="round"/>
+<g fill="none" stroke="#FFFFFF" stroke-linecap="round">
+<path d="M0 64 L358 92" stroke-width="7"/>
+<path d="M0 126 C 100 112, 210 136, 358 118" stroke-width="7"/>
+<path d="M72 0 L112 220" stroke-width="7"/>
+<path d="M192 0 L172 220" stroke-width="7"/>
+<path d="M284 0 L302 220" stroke-width="7"/>
+<path d="M0 22 L358 36" stroke-width="3"/>
+<path d="M140 0 L152 220" stroke-width="3"/>
+<path d="M240 0 L250 220" stroke-width="3"/>
+<path d="M0 98 L358 66" stroke-width="3"/>
+</g>
+<g font-size="9" font-weight="700" fill="#98A2B3" letter-spacing="1">
+<text x="14" y="48">SAINT-REMI</text>
+<text x="118" y="86">CENTRE-VILLE</text>
+<text x="214" y="148">CLAIRMARAIS</text>
+<text x="344" y="20" text-anchor="end">MURIGNY</text>
+<text x="122" y="212">COURLANCY</text>
+</g>
+<g>
+<circle cx="54" cy="70" r="12" fill="#101828" stroke="#FFFFFF" stroke-width="2"/>
+<path d="M48 71 L54 65.5 L60 71 V76 H48 Z" fill="#FFFFFF"/>
+</g>
+<g>
+<rect x="274" y="40" width="46" height="22" rx="11" fill="#FFFFFF" stroke="#D0D5DD"/>
+<path d="M293 62 L297 67 L301 62 Z" fill="#FFFFFF"/>
+<text x="297" y="55" text-anchor="middle" font-size="11" font-weight="800" fill="#101828">189 k</text>
+</g>
+<g>
+<rect x="118" y="134" width="46" height="22" rx="11" fill="#FFFFFF" stroke="#D0D5DD"/>
+<path d="M137 156 L141 161 L145 156 Z" fill="#FFFFFF"/>
+<text x="141" y="149" text-anchor="middle" font-size="11" font-weight="800" fill="#101828">131 k</text>
+</g>
+<g>
+<rect x="212" y="96" width="46" height="22" rx="11" fill="{{accent}}"/>
+<path d="M231 118 L235 123 L239 118 Z" fill="{{accent}}"/>
+<text x="235" y="111" text-anchor="middle" font-size="11" font-weight="800" fill="#FFFFFF">72 k</text>
+</g>
+</svg>
+<div style="position:absolute;left:10px;top:10px;background:#fff;border:1px solid #E4E7EC;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700">Reims · 7 annonces</div>
+<div style="position:absolute;left:10px;bottom:10px;display:flex;gap:10px;background:#fff;border:1px solid #E4E7EC;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:600;color:#475467">
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#101828;display:inline-block"></span>Mes biens</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:{{accent}};display:inline-block"></span>Annonces</span>
+</div>
+</div>
+
+<section style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<h2 style="margin:0;font-size:15px;font-weight:800">Opportunités</h2>
+<a href="#annonces" style="font-size:12px;font-weight:700;color:{{accent}};text-decoration:none">Toutes (7)</a>
+</div>
+
+<a href="Bien.dc.html" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:10px 12px;text-decoration:none;color:inherit">
+<svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true" style="flex:none"><rect width="52" height="52" rx="10" fill="#E3ECF3"/><rect x="12" y="10" width="28" height="34" fill="#C28F73"/><g fill="#F7E7B4"><rect x="16" y="15" width="6" height="6"/><rect x="30" y="15" width="6" height="6"/><rect x="16" y="25" width="6" height="6"/><rect x="30" y="25" width="6" height="6"/></g><rect x="22" y="34" width="8" height="10" fill="#2B3A4A"/></svg>
+<div style="flex:1;min-width:0">
+<div style="font-size:14px;font-weight:800">Studio · Clairmarais</div>
+<div style="font-size:12px;font-weight:500;color:#667085;margin-top:1px">28 m² · 2 570 €/m² · DPE E</div>
+<span style="display:inline-block;margin-top:5px;background:#FEF0C7;color:#93370D;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700">Expire dans 3 j</span>
+</div>
+<div style="text-align:right;flex:none">
+<div style="font-size:15px;font-weight:800;white-space:nowrap">72 000 €</div>
+<div style="font-size:11px;font-weight:700;color:#0F766E;margin-top:2px">7,2 % brut</div>
+</div>
+</a>
+
+<div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:10px 12px">
+<svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true" style="flex:none"><rect width="52" height="52" rx="10" fill="#E8EFE3"/><path d="M8 27 L26 11 L44 27 Z" fill="#8C5A4A"/><rect x="12" y="27" width="28" height="17" fill="#E4C9A8"/><rect x="16" y="31" width="7" height="7" fill="#F7E7B4"/><rect x="29" y="33" width="7" height="11" fill="#2B3A4A"/></svg>
+<div style="flex:1;min-width:0">
+<div style="font-size:14px;font-weight:800">Maison · Murigny</div>
+<div style="font-size:12px;font-weight:500;color:#667085;margin-top:1px">96 m² · 1 970 €/m² · DPE D</div>
+<span style="display:inline-block;margin-top:5px;background:#E6F4F1;color:#0B5D55;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700">Enchère demain 18 h</span>
+</div>
+<div style="text-align:right;flex:none">
+<div style="font-size:15px;font-weight:800;white-space:nowrap">189 000 €</div>
+<div style="font-size:11px;font-weight:700;color:#0F766E;margin-top:2px">5,9 % brut</div>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:8px">
+<h2 style="margin:0;font-size:15px;font-weight:800">À traiter</h2>
+<div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:0 12px;height:52px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B54708" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17v.5"/></svg>
+<div style="flex:1;min-width:0">
+<div style="font-size:13px;font-weight:700">Taux de crédit en baisse : 3,6 % → 3,4 %</div>
+<div style="font-size:11px;font-weight:500;color:#667085">Valable 5 jours · simulation prête</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:0 12px;height:52px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+<div style="flex:1;min-width:0">
+<div style="font-size:13px;font-weight:700">Plombier Duval disponible dès lundi</div>
+<div style="font-size:11px;font-weight:500;color:#667085">Artisan fiable · note 4,6 sur 5</div>
+</div>
+</div>
+</section>
+
+</main>
+
+<nav aria-label="Navigation principale" style="display:flex;background:#fff;border-top:1px solid #E4E7EC;height:68px;box-sizing:border-box;padding:6px 8px 10px">
+<a href="Rue.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V4l9 5v12"/></svg>Rue</a>
+<a href="Main.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:{{accent}};font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Carte</a>
+<a href="Patrimoine.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Patrimoine</a>
+<a href="Villes.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>Villes</a>
+</nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F766E","options":["#0F766E","#1D4ED8","#7C3AED","#B54708"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#0F766E' };
+  }
+}
+</script>
+</body>
+</html>

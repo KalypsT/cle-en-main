@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Chantier pièce par pièce</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#F2F4F7;font-family:Manrope,system-ui,sans-serif;color:#101828;display:flex;flex-direction:column;overflow:hidden">
+
+<header style="display:flex;align-items:center;gap:4px;height:56px;padding:6px 16px 0 8px;box-sizing:border-box">
+<a href="Patrimoine.dc.html" aria-label="Retour au patrimoine" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#101828;text-decoration:none;flex:none">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+</a>
+<div style="flex:1;min-width:0">
+<div style="font-size:16px;font-weight:800">Chantier</div>
+<div style="font-size:12px;font-weight:600;color:#667085">Studio · Clairmarais · 28 m²</div>
+</div>
+<span style="background:#FEF0C7;color:#93370D;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;white-space:nowrap">Devis en préparation</span>
+</header>
+
+<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:4px 16px 10px">
+
+<div style="background:#fff;border:1px solid #E4E7EC;border-radius:16px;overflow:hidden;flex:none">
+<svg viewBox="0 0 356 190" width="356" height="190" role="img" aria-label="Plan du studio : entrée terminée, salle de bain sélectionnée, séjour et cuisine à faire" style="display:block">
+<rect width="356" height="190" fill="#FFFFFF"/>
+<rect x="14" y="12" width="78" height="70" fill="#E3F3EF" stroke="#344054" stroke-width="3"/>
+<rect x="14" y="82" width="78" height="96" fill="#FEF0C7" stroke="#344054" stroke-width="3"/>
+<rect x="92" y="12" width="250" height="104" fill="#F2F4F7" stroke="#344054" stroke-width="3"/>
+<rect x="92" y="116" width="250" height="62" fill="#F2F4F7" stroke="#344054" stroke-width="3"/>
+<rect x="18" y="86" width="70" height="88" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-dasharray="5 4"/>
+<g fill="#FFFFFF">
+<rect x="12" y="32" width="4" height="18"/>
+<rect x="90" y="32" width="4" height="18"/>
+<rect x="90" y="98" width="4" height="16"/>
+<rect x="182" y="114" width="60" height="4"/>
+</g>
+<g fill="#8EC5E8">
+<rect x="150" y="10" width="60" height="4"/>
+<rect x="340" y="50" width="4" height="36"/>
+<rect x="210" y="176" width="60" height="4"/>
+</g>
+<circle cx="76" cy="26" r="8" fill="{{accent}}"/>
+<path d="M72 26 L75 29 L80 23" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g text-anchor="middle" font-size="11" font-weight="800" fill="#101828">
+<text x="53" y="48">Entrée</text>
+<text x="53" y="122" font-size="10.5">Salle de bain</text>
+<text x="217" y="60">Séjour</text>
+<text x="217" y="140">Cuisine</text>
+</g>
+<g text-anchor="middle" font-size="10" font-weight="600" fill="#667085">
+<text x="53" y="61">3 m²</text>
+<text x="53" y="136">4,2 m²</text>
+<text x="217" y="74">17 m²</text>
+<text x="217" y="154">4 m²</text>
+</g>
+<g text-anchor="middle" font-size="10" font-weight="800">
+<text x="53" y="153" fill="#93370D">En cours</text>
+<text x="53" y="75" fill="#0B5D55">Terminé</text>
+<text x="217" y="88" fill="#667085">À faire</text>
+<text x="217" y="168" fill="#667085">À faire</text>
+</g>
+</svg>
+<div style="display:flex;gap:14px;padding:6px 12px 10px;font-size:11px;font-weight:600;color:#475467">
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:{{accent}};display:inline-block"></span>Terminé</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:#F2A81B;display:inline-block"></span>Sélectionnée</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:#D0D5DD;display:inline-block"></span>À faire</span>
+</div>
+</div>
+
+<section style="background:#fff;border:1px solid #E4E7EC;border-radius:16px;padding:12px 12px 4px;flex:none">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<h2 style="margin:0;font-size:15px;font-weight:800">Salle de bain</h2>
+<div style="font-size:12px;font-weight:600;color:#667085">4,2 m² · état dégradé</div>
+</div>
+<div style="display:flex;gap:4px;background:#F2F4F7;border-radius:12px;padding:3px;margin-top:10px">
+<button style="flex:1;height:38px;border:0;border-radius:10px;background:transparent;color:#475467;font-family:inherit;font-size:13px;font-weight:700">Éco</button>
+<button style="flex:1;height:38px;border:0;border-radius:10px;background:#fff;color:#101828;font-family:inherit;font-size:13px;font-weight:800;box-shadow:0 1px 2px rgba(16,24,40,0.12)">Standard</button>
+<button style="flex:1;height:38px;border:0;border-radius:10px;background:transparent;color:#475467;font-family:inherit;font-size:13px;font-weight:700">Premium</button>
+</div>
+<div style="margin-top:6px">
+<label style="display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid #EEF0F3">
+<input type="checkbox" checked style="width:22px;height:22px;margin:0;flex:none;accent-color:{{accent}}">
+<span style="flex:1;min-width:0"><span style="display:block;font-size:13px;font-weight:700">Traiter l'humidité</span><span style="display:block;font-size:11px;font-weight:500;color:#667085">Plomberie Duval · note 4,6</span></span>
+<span style="text-align:right"><span style="display:block;font-size:13px;font-weight:800;white-space:nowrap">480 €</span><span style="display:block;font-size:11px;font-weight:500;color:#667085">2 jours</span></span>
+</label>
+<label style="display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid #EEF0F3">
+<input type="checkbox" checked style="width:22px;height:22px;margin:0;flex:none;accent-color:{{accent}}">
+<span style="flex:1;min-width:0"><span style="display:block;font-size:13px;font-weight:700">Sol et faïence</span><span style="display:block;font-size:11px;font-weight:500;color:#667085">Carrelage Lenoir · note 4,1</span></span>
+<span style="text-align:right"><span style="display:block;font-size:13px;font-weight:800;white-space:nowrap">1 150 €</span><span style="display:block;font-size:11px;font-weight:500;color:#667085">4 jours</span></span>
+</label>
+<label style="display:flex;align-items:center;gap:12px;min-height:56px">
+<input type="checkbox" style="width:22px;height:22px;margin:0;flex:none;accent-color:{{accent}}">
+<span style="flex:1;min-width:0"><span style="display:block;font-size:13px;font-weight:700">Douche à l'italienne</span><span style="display:block;font-size:11px;font-weight:500;color:#667085">Plomberie Duval · +900 € de valeur</span></span>
+<span style="text-align:right"><span style="display:block;font-size:13px;font-weight:800;white-space:nowrap">1 600 €</span><span style="display:block;font-size:11px;font-weight:500;color:#667085">3 jours</span></span>
+</label>
+</div>
+</section>
+
+<div style="display:flex;align-items:center;gap:10px;background:#FEF0C7;border-radius:14px;padding:0 12px;height:48px;flex:none">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93370D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17v.5"/></svg>
+<div style="font-size:12px;font-weight:600;color:#93370D;line-height:1.35">Risque d'imprévu : 18 % · immeuble de 1974, humidité suspectée</div>
+</div>
+
+</main>
+
+<footer style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-top:1px solid #E4E7EC;padding:12px 16px 18px;box-sizing:border-box">
+<div style="min-width:0">
+<div style="font-size:20px;font-weight:800;letter-spacing:-0.3px;white-space:nowrap">1 630 €</div>
+<div style="font-size:11px;font-weight:600;color:#667085">6 jours · +2 900 € de valeur estimée</div>
+<div style="font-size:11px;font-weight:700;color:#475467">Trésorerie après : 7 170 €</div>
+</div>
+<button style="flex:none;height:48px;padding:0 18px;border-radius:12px;border:0;background:{{accent}};color:#fff;font-family:inherit;font-size:14px;font-weight:800">Lancer les travaux</button>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F766E","options":["#0F766E","#1D4ED8","#7C3AED","#B54708"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#0F766E' };
+  }
+}
+</script>
+</body>
+</html>
