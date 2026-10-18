@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>La rue vivante</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFFBF5;font-family:Manrope,system-ui,sans-serif;color:#101828;display:flex;flex-direction:column;overflow:hidden">
+
+<div style="position:relative;height:660px;flex:none;overflow:hidden">
+<svg viewBox="0 0 390 660" width="390" height="660" role="img" aria-label="Une rue de Reims illustrée : une boulangerie, mon immeuble, une maison à vendre et la résidence du studio en travaux, avec la cathédrale au fond" style="display:block">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="{{skyTop}}"/>
+<stop offset="1" stop-color="{{skyBottom}}"/>
+</linearGradient>
+</defs>
+<rect width="390" height="480" fill="url(#sky)"/>
+
+<g fill="#FFFFFF" opacity="{{starO}}">
+<circle cx="40" cy="60" r="1.5"/><circle cx="96" cy="110" r="1.2"/><circle cx="150" cy="48" r="1.6"/><circle cx="210" cy="132" r="1.2"/><circle cx="262" cy="70" r="1.4"/><circle cx="350" cy="150" r="1.3"/><circle cx="120" cy="170" r="1.1"/><circle cx="24" cy="150" r="1.2"/>
+</g>
+
+<circle cx="{{sunX}}" cy="{{sunY}}" r="46" fill="{{sunC}}" opacity="{{sunGlow}}"/>
+<circle cx="{{sunX}}" cy="{{sunY}}" r="26" fill="{{sunC}}" opacity="{{sunO}}"/>
+<g opacity="{{moonO}}">
+<circle cx="300" cy="86" r="20" fill="#F4F1DE"/>
+<circle cx="294" cy="80" r="4" fill="#E4E0C8"/>
+<circle cx="307" cy="92" r="3" fill="#E4E0C8"/>
+</g>
+
+<g fill="#FFFFFF" opacity="{{cloudO}}">
+<ellipse cx="70" cy="96" rx="34" ry="11"/><ellipse cx="94" cy="88" rx="22" ry="11"/>
+<ellipse cx="250" cy="150" rx="30" ry="10"/><ellipse cx="270" cy="143" rx="18" ry="9"/>
+</g>
+
+<g fill="{{far}}">
+<rect x="186" y="300" width="76" height="180"/>
+<rect x="190" y="240" width="22" height="240"/>
+<rect x="236" y="240" width="22" height="240"/>
+<path d="M190 240 L201 222 L212 240 Z"/>
+<path d="M236 240 L247 222 L258 240 Z"/>
+<path d="M218 300 L224 252 L230 300 Z"/>
+<rect x="0" y="336" width="62" height="144"/>
+<rect x="300" y="310" width="90" height="170"/>
+</g>
+
+<g>
+<rect x="-10" y="280" width="86" height="190" fill="#C97B5D"/>
+<rect x="-12" y="272" width="90" height="10" fill="#8A4F3C"/>
+<g fill="{{glass}}" stroke="#7A4A38" stroke-width="2">
+<rect x="10" y="300" width="22" height="30"/><rect x="46" y="300" width="22" height="30"/>
+<rect x="10" y="352" width="22" height="30"/><rect x="46" y="352" width="22" height="30"/>
+</g>
+<rect x="0" y="404" width="66" height="16" rx="3" fill="#F4F1EA"/>
+<text x="33" y="415.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="#7A4A38">BOULANGERIE</text>
+<g fill="#E07A5F"><rect x="-10" y="424" width="11" height="14"/><rect x="12" y="424" width="11" height="14"/><rect x="34" y="424" width="11" height="14"/><rect x="56" y="424" width="11" height="14"/></g>
+<rect x="1" y="424" width="11" height="14" fill="#F4F1EA"/><rect x="23" y="424" width="11" height="14" fill="#F4F1EA"/><rect x="45" y="424" width="11" height="14" fill="#F4F1EA"/><rect x="67" y="424" width="9" height="14" fill="#F4F1EA"/>
+<rect x="4" y="442" width="44" height="28" fill="{{glass}}" stroke="#7A4A38" stroke-width="2"/>
+<rect x="54" y="442" width="16" height="28" fill="#7B4B3A"/>
+</g>
+
+<g>
+<rect x="80" y="240" width="96" height="230" fill="#E6D5B8"/>
+<path d="M76 244 L84 222 L172 222 L180 244 Z" fill="#6C7A8A"/>
+<rect x="78" y="244" width="100" height="6" fill="#C9B590"/>
+<rect x="80" y="250" width="6" height="220" fill="#D2BF9B"/><rect x="170" y="250" width="6" height="220" fill="#D2BF9B"/>
+<g fill="{{glass}}" stroke="#4E5A68" stroke-width="2"><rect x="96" y="226" width="16" height="14"/><rect x="144" y="226" width="16" height="14"/></g>
+<g fill="{{glass}}" stroke="#8A7650" stroke-width="2">
+<rect x="90" y="262" width="20" height="32"/><rect x="120" y="262" width="20" height="32"/><rect x="150" y="262" width="20" height="32"/>
+<rect x="90" y="308" width="20" height="32"/><rect x="120" y="308" width="20" height="32"/><rect x="150" y="308" width="20" height="32"/>
+<rect x="90" y="354" width="20" height="32"/><rect x="120" y="354" width="20" height="32"/><rect x="150" y="354" width="20" height="32"/>
+<rect x="90" y="430" width="18" height="26"/><rect x="148" y="430" width="18" height="26"/>
+</g>
+<path d="M116 470 V426 a12 12 0 0 1 24 0 V470 Z" fill="#7B4B3A"/>
+<rect x="104" y="392" width="48" height="16" rx="4" fill="{{accent}}"/>
+<text x="128" y="403.5" text-anchor="middle" font-size="9" font-weight="800" fill="#FFFFFF">Mon bien</text>
+</g>
+
+<g>
+<path d="M176 332 L221 286 L266 332 Z" fill="#9A5B49"/>
+<rect x="180" y="330" width="82" height="140" fill="#E8C9A0"/>
+<g fill="{{glass}}" stroke="#8A7650" stroke-width="2">
+<rect x="190" y="346" width="20" height="28"/><rect x="232" y="346" width="20" height="28"/>
+<rect x="234" y="436" width="18" height="24"/>
+</g>
+<path d="M206 470 V440 a10 10 0 0 1 20 0 V470 Z" fill="#5F7F5A"/>
+<path d="M208 376 L208 396 M234 376 L234 396" stroke="#7A5A44" stroke-width="1.5"/>
+<rect x="199" y="396" width="44" height="26" rx="3" fill="#FFFFFF" stroke="#D6523A" stroke-width="2"/>
+<text x="221" y="412" text-anchor="middle" font-size="8.5" font-weight="800" fill="#D6523A">À VENDRE</text>
+</g>
+
+<g>
+<rect x="262" y="234" width="102" height="10" fill="#8C5D47"/>
+<rect x="266" y="244" width="94" height="226" fill="#C28F73"/>
+<g fill="#8C5D47"><rect x="266" y="292" width="94" height="3"/><rect x="266" y="326" width="94" height="3"/><rect x="266" y="360" width="94" height="3"/><rect x="266" y="394" width="94" height="3"/></g>
+<g fill="{{glass}}" stroke="#8C5D47" stroke-width="2">
+<rect x="276" y="268" width="20" height="22"/><rect x="304" y="268" width="20" height="22"/><rect x="332" y="268" width="20" height="22"/>
+<rect x="276" y="302" width="20" height="22"/><rect x="332" y="302" width="20" height="22"/>
+<rect x="276" y="336" width="20" height="22"/><rect x="304" y="336" width="20" height="22"/><rect x="332" y="336" width="20" height="22"/>
+<rect x="276" y="370" width="20" height="22"/><rect x="304" y="370" width="20" height="22"/><rect x="332" y="370" width="20" height="22"/>
+<rect x="276" y="430" width="18" height="22"/>
+</g>
+<rect x="304" y="302" width="20" height="22" fill="{{glass}}" stroke="{{accent}}" stroke-width="2.5"/>
+<rect x="300" y="424" width="26" height="46" fill="#3A4552"/>
+<rect x="303" y="427" width="20" height="40" fill="{{glass}}" opacity="0.5"/>
+<g stroke="#6F7B87" stroke-width="2.5" fill="none">
+<path d="M268 290 V470 M296 290 V470 M324 290 V470"/>
+<path d="M268 330 L296 290 M296 330 L324 290 M268 410 L296 370 M296 410 L324 370"/>
+</g>
+<g fill="#A9B3BE"><rect x="266" y="326" width="62" height="4"/><rect x="266" y="366" width="62" height="4"/><rect x="266" y="406" width="62" height="4"/></g>
+<g>
+<circle cx="283" cy="309" r="4.5" fill="#F1C6A0"/>
+<path d="M278 308 a5 5 0 0 1 10 0 Z" fill="#F2A81B"/>
+<rect x="279" y="313" width="8" height="12" rx="2" fill="#F2A81B"/>
+</g>
+</g>
+
+<g>
+<rect x="364" y="290" width="40" height="180" fill="#D8B98A"/>
+<rect x="362" y="282" width="44" height="9" fill="#A98B5E"/>
+<g fill="{{glass}}" stroke="#8A7650" stroke-width="2"><rect x="372" y="310" width="20" height="28"/><rect x="372" y="360" width="20" height="28"/></g>
+</g>
+
+<rect x="0" y="470" width="390" height="24" fill="#D9CDBB"/>
+<rect x="0" y="494" width="390" height="4" fill="#BFB29B"/>
+<rect x="0" y="498" width="390" height="88" fill="#7A7D86"/>
+<path d="M0 542 H390" stroke="#E8E2D0" stroke-width="3" stroke-dasharray="22 16"/>
+<rect x="0" y="586" width="390" height="74" fill="#CDBFA8"/>
+<rect x="0" y="586" width="390" height="4" fill="#BFB29B"/>
+<path d="M0 614 H390 M0 640 H390" stroke="#C2B49C" stroke-width="2"/>
+
+<g>
+<path d="M38 538 V522 Q38 516 44 514 L58 506 H86 Q92 506 96 512 L104 520 Q112 522 112 528 V538 Z" fill="#E9B44C"/>
+<path d="M60 510 H84 L92 520 H54 Z" fill="{{glass}}"/>
+<circle cx="56" cy="538" r="7" fill="#2B3038"/><circle cx="96" cy="538" r="7" fill="#2B3038"/>
+<circle cx="56" cy="538" r="3" fill="#9AA0AB"/><circle cx="96" cy="538" r="3" fill="#9AA0AB"/>
+</g>
+<g>
+<rect x="272" y="502" width="64" height="34" rx="5" fill="#F4F1EA"/>
+<path d="M336 514 H346 L356 526 V536 H336 Z" fill="#F4F1EA"/>
+<path d="M338 517 H345 L351 526 H338 Z" fill="{{glass}}"/>
+<rect x="272" y="524" width="64" height="5" fill="{{accent}}"/>
+<text x="304" y="517" text-anchor="middle" font-size="9" font-weight="800" fill="#7A4A38">DUVAL</text>
+<circle cx="290" cy="536" r="7" fill="#2B3038"/><circle cx="344" cy="536" r="7" fill="#2B3038"/>
+<circle cx="290" cy="536" r="3" fill="#9AA0AB"/><circle cx="344" cy="536" r="3" fill="#9AA0AB"/>
+</g>
+
+<g>
+<rect x="76" y="440" width="5" height="36" fill="#7A5A44"/>
+<circle cx="78" cy="418" r="20" fill="#7FB069"/><circle cx="62" cy="430" r="14" fill="#7FB069"/><circle cx="96" cy="430" r="14" fill="#7FB069"/>
+<circle cx="84" cy="411" r="10" fill="#8CC074"/>
+</g>
+<g fill="#3B4250">
+<rect x="176" y="424" width="3" height="46"/><circle cx="177.5" cy="421" r="5" fill="#EDE3C6"/>
+<rect x="361" y="424" width="3" height="46"/><circle cx="362.5" cy="421" r="5" fill="#EDE3C6"/>
+</g>
+
+<g>
+<ellipse cx="124" cy="486" rx="9" ry="2.5" fill="#000000" opacity="0.12"/>
+<rect x="118" y="456" width="12" height="22" rx="5" fill="#E07A5F"/>
+<circle cx="124" cy="449" r="5.5" fill="#F1C6A0"/>
+<path d="M118 447 a6 6 0 0 1 12 0 Z" fill="#5B3F36"/>
+<rect x="119" y="476" width="4" height="10" fill="#4A4F5C"/><rect x="125" y="476" width="4" height="10" fill="#4A4F5C"/>
+</g>
+<g>
+<ellipse cx="208" cy="486" rx="9" ry="2.5" fill="#000000" opacity="0.12"/>
+<rect x="202" y="456" width="12" height="22" rx="5" fill="#4F7CAC"/>
+<circle cx="208" cy="449" r="5.5" fill="#F1C6A0"/>
+<path d="M202 449 a6 6 0 0 1 12 0 Z" fill="#2F2A2A"/>
+<rect x="203" y="476" width="4" height="10" fill="#4A4F5C"/><rect x="209" y="476" width="4" height="10" fill="#4A4F5C"/>
+<ellipse cx="226" cy="486" rx="6" ry="2" fill="#000000" opacity="0.12"/>
+<rect x="221" y="466" width="9" height="13" rx="4" fill="#D6523A"/>
+<circle cx="225.5" cy="461" r="4.2" fill="#F1C6A0"/>
+<rect x="222" y="478" width="3" height="8" fill="#4A4F5C"/><rect x="226" y="478" width="3" height="8" fill="#4A4F5C"/>
+<path d="M214 470 L221 472" stroke="#F1C6A0" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+
+<g>
+<rect x="26" y="626" width="22" height="22" rx="3" fill="#C9785D"/>
+<circle cx="37" cy="618" r="10" fill="#6E9A5E"/><circle cx="29" cy="624" r="7" fill="#7FB069"/><circle cx="45" cy="623" r="7" fill="#7FB069"/>
+<rect x="340" y="626" width="22" height="22" rx="3" fill="#C9785D"/>
+<circle cx="351" cy="618" r="10" fill="#6E9A5E"/><circle cx="343" cy="624" r="7" fill="#7FB069"/><circle cx="359" cy="623" r="7" fill="#7FB069"/>
+</g>
+
+<rect x="0" y="200" width="390" height="460" fill="{{ambC}}" opacity="{{amb}}"/>
+
+<g opacity="{{lit}}">
+<g fill="#FFD58A" opacity="0.22">
+<rect x="6" y="296" width="30" height="38" rx="6"/><rect x="42" y="348" width="30" height="38" rx="6"/><rect x="0" y="436" width="52" height="38" rx="6"/>
+<rect x="86" y="258" width="28" height="40" rx="6"/><rect x="146" y="258" width="28" height="40" rx="6"/><rect x="116" y="304" width="28" height="40" rx="6"/><rect x="86" y="350" width="28" height="40" rx="6"/><rect x="146" y="350" width="28" height="40" rx="6"/>
+<rect x="186" y="342" width="28" height="36" rx="6"/><rect x="230" y="432" width="26" height="32" rx="6"/>
+<rect x="272" y="264" width="28" height="30" rx="6"/><rect x="328" y="264" width="28" height="30" rx="6"/><rect x="300" y="298" width="28" height="30" rx="6"/><rect x="328" y="332" width="28" height="30" rx="6"/><rect x="300" y="366" width="28" height="30" rx="6"/>
+<rect x="368" y="306" width="28" height="36" rx="6"/>
+</g>
+<g fill="#FFD58A">
+<rect x="10" y="300" width="22" height="30"/><rect x="46" y="352" width="22" height="30"/><rect x="4" y="442" width="44" height="28"/>
+<rect x="90" y="262" width="20" height="32"/><rect x="150" y="262" width="20" height="32"/><rect x="120" y="308" width="20" height="32"/><rect x="90" y="354" width="20" height="32"/><rect x="150" y="354" width="20" height="32"/>
+<rect x="96" y="226" width="16" height="14"/>
+<rect x="190" y="346" width="20" height="28"/><rect x="234" y="436" width="18" height="24"/>
+<rect x="276" y="268" width="20" height="22"/><rect x="332" y="268" width="20" height="22"/><rect x="332" y="336" width="20" height="22"/><rect x="304" y="370" width="20" height="22"/>
+<rect x="372" y="310" width="20" height="28"/>
+</g>
+<rect x="304" y="302" width="20" height="22" fill="#FFC857" stroke="{{accent}}" stroke-width="2.5"/>
+<circle cx="130" cy="322" r="5" fill="#5B3F36"/>
+<path d="M121 340 Q130 326 139 340 Z" fill="#5B3F36"/>
+</g>
+
+<g fill="#FFD58A" opacity="{{lampG}}">
+<circle cx="177.5" cy="424" r="38"/>
+<circle cx="362.5" cy="424" r="38"/>
+</g>
+</svg>
+
+<div style="position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none">
+<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;pointer-events:auto">
+<a href="Villes.dc.html" style="display:flex;align-items:center;gap:6px;height:44px;padding:0 14px;background:rgba(255,255,255,0.92);border-radius:999px;font-size:14px;font-weight:800;color:#101828;text-decoration:none;box-shadow:0 2px 8px rgba(16,24,40,0.15)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>
+Reims
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+</a>
+<div style="height:30px;display:flex;align-items:center;padding:0 12px;background:rgba(255,255,255,0.92);border-radius:999px;font-size:12px;font-weight:700;color:#344054">Lun. 5 mai · {{timeLabel}}</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+<div style="height:44px;display:flex;align-items:center;padding:0 14px;background:rgba(255,255,255,0.92);border-radius:999px;font-size:15px;font-weight:800;color:#101828;white-space:nowrap;box-shadow:0 2px 8px rgba(16,24,40,0.15)">7 170 €</div>
+<div style="height:30px;display:flex;align-items:center;padding:0 12px;background:rgba(255,255,255,0.92);border-radius:999px;font-size:12px;font-weight:700;color:#344054;white-space:nowrap">Temps libre 2 h 10</div>
+</div>
+</div>
+
+<a href="Coupe.dc.html" style="position:absolute;left:78px;top:168px;height:40px;padding:0 12px;display:flex;align-items:center;gap:6px;background:#FEF0C7;color:#93370D;border:1.5px solid #F2A81B;border-radius:999px;font-size:12px;font-weight:800;text-decoration:none;box-shadow:0 2px 6px rgba(16,24,40,0.2)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4"/><path d="M12 17v.5"/></svg>
+Chauffe-eau
+<span style="position:absolute;left:50%;bottom:-6px;width:10px;height:10px;background:#FEF0C7;border-right:1.5px solid #F2A81B;border-bottom:1.5px solid #F2A81B;transform:translateX(-50%) rotate(45deg)"></span>
+</a>
+
+<a href="Bien.dc.html" style="position:absolute;left:178px;top:232px;height:40px;padding:0 12px;display:flex;align-items:center;gap:6px;background:{{accent}};color:#FFFFFF;border-radius:999px;font-size:12px;font-weight:800;text-decoration:none;box-shadow:0 2px 6px rgba(16,24,40,0.25)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/></svg>
+131 k€
+<span style="position:absolute;left:50%;bottom:-5px;width:10px;height:10px;background:{{accent}};transform:translateX(-50%) rotate(45deg)"></span>
+</a>
+
+<a href="Coupe.dc.html" style="position:absolute;left:258px;top:186px;height:40px;padding:0 12px;display:flex;align-items:center;gap:6px;background:#FFFFFF;color:#101828;border:1.5px solid #D0D5DD;border-radius:999px;font-size:12px;font-weight:800;text-decoration:none;box-shadow:0 2px 6px rgba(16,24,40,0.2);white-space:nowrap">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8 6.2 21l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>
+Travaux · 25 %
+<span style="position:absolute;left:50%;bottom:-6px;width:10px;height:10px;background:#FFFFFF;border-right:1.5px solid #D0D5DD;border-bottom:1.5px solid #D0D5DD;transform:translateX(-50%) rotate(45deg)"></span>
+</a>
+</div>
+
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:10px 16px 0;box-sizing:border-box;background:#FFFBF5;border-top:1px solid #EADFCB">
+<div style="display:flex;align-items:center;justify-content:space-between;height:48px">
+<div style="display:flex;gap:2px;background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:2px">
+<button aria-label="Pause" style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#344054;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+</button>
+<button style="width:44px;height:44px;border:0;border-radius:10px;background:{{accent}};color:#fff;font-size:13px;font-weight:800;padding:0;font-family:inherit">×1</button>
+<button style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#344054;font-size:13px;font-weight:800;padding:0;font-family:inherit">×2</button>
+<button style="width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#344054;font-size:13px;font-weight:800;padding:0;font-family:inherit">×4</button>
+</div>
+<div style="text-align:right">
+<div style="font-size:11px;font-weight:600;color:#667085">Cash-flow immobilier</div>
+<div style="font-size:16px;font-weight:800;color:#B42318;white-space:nowrap">−300 € / mois</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:6px;height:40px">
+<div style="width:48px;font-size:11px;font-weight:700;color:#667085">Aperçu</div>
+<button onClick="{{pickMatin}}" style="flex:1;height:38px;border:1px solid #E4E7EC;border-radius:10px;background:{{matinBg}};color:{{matinFg}};font-family:inherit;font-size:13px;font-weight:800;padding:0">Matin</button>
+<button onClick="{{pickJour}}" style="flex:1;height:38px;border:1px solid #E4E7EC;border-radius:10px;background:{{jourBg}};color:{{jourFg}};font-family:inherit;font-size:13px;font-weight:800;padding:0">Jour</button>
+<button onClick="{{pickSoir}}" style="flex:1;height:38px;border:1px solid #E4E7EC;border-radius:10px;background:{{soirBg}};color:{{soirFg}};font-family:inherit;font-size:13px;font-weight:800;padding:0">Soir</button>
+<button onClick="{{pickNuit}}" style="flex:1;height:38px;border:1px solid #E4E7EC;border-radius:10px;background:{{nuitBg}};color:{{nuitFg}};font-family:inherit;font-size:13px;font-weight:800;padding:0">Nuit</button>
+</div>
+</div>
+
+<nav aria-label="Navigation principale" style="display:flex;background:#fff;border-top:1px solid #E4E7EC;height:68px;box-sizing:border-box;padding:6px 8px 10px;flex:none">
+<a href="Rue.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:{{accent}};font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V4l9 5v12"/></svg>Rue</a>
+<a href="Main.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Carte</a>
+<a href="Patrimoine.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Patrimoine</a>
+<a href="Villes.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>Villes</a>
+</nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F766E","options":["#0F766E","#1D4ED8","#7C3AED","#B54708"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tod: 'soir' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#0F766E';
+    const P = {
+      matin: { skyTop: '#9CC3E6', skyBottom: '#FBE3BE', sunX: 70, sunY: 215, sunC: '#FFD27A', sunO: 1, sunGlow: 0.3, moonO: 0, starO: 0, cloudO: 0.85, amb: 0.06, ambC: '#F6B27A', lit: 0.3, lampG: 0, far: '#C9D3E0', glass: '#C6D8E6', timeLabel: '7 h 40' },
+      jour: { skyTop: '#6EB2E8', skyBottom: '#D6EBF8', sunX: 300, sunY: 92, sunC: '#FFE08A', sunO: 1, sunGlow: 0.3, moonO: 0, starO: 0, cloudO: 1, amb: 0, ambC: '#FFFFFF', lit: 0, lampG: 0, far: '#BFD0E0', glass: '#B4CDE0', timeLabel: '13 h 10' },
+      soir: { skyTop: '#4A5384', skyBottom: '#F4A56C', sunX: 330, sunY: 255, sunC: '#FF8F4F', sunO: 1, sunGlow: 0.35, moonO: 0, starO: 0.25, cloudO: 0.5, amb: 0.18, ambC: '#5B3A6B', lit: 0.7, lampG: 0.3, far: '#8C84A8', glass: '#A9B8CC', timeLabel: '17 h 40' },
+      nuit: { skyTop: '#0E1A3C', skyBottom: '#2D4175', sunX: 330, sunY: 330, sunC: '#FF8F4F', sunO: 0, sunGlow: 0, moonO: 1, starO: 1, cloudO: 0.12, amb: 0.42, ambC: '#0A1130', lit: 1, lampG: 0.45, far: '#1F2D55', glass: '#7F93AD', timeLabel: '22 h 15' }
+    };
+    const t = this.state.tod;
+    const p = P[t];
+    const mk = (k) => ({ bg: t === k ? accent : '#FFFFFF', fg: t === k ? '#FFFFFF' : '#344054' });
+    const m = mk('matin'), j = mk('jour'), s = mk('soir'), n = mk('nuit');
+    return {
+      accent,
+      skyTop: p.skyTop, skyBottom: p.skyBottom, sunX: p.sunX, sunY: p.sunY, sunC: p.sunC, sunO: p.sunO, sunGlow: p.sunGlow,
+      moonO: p.moonO, starO: p.starO, cloudO: p.cloudO, amb: p.amb, ambC: p.ambC, lit: p.lit, lampG: p.lampG,
+      far: p.far, glass: p.glass, timeLabel: p.timeLabel,
+      matinBg: m.bg, matinFg: m.fg, jourBg: j.bg, jourFg: j.fg, soirBg: s.bg, soirFg: s.fg, nuitBg: n.bg, nuitFg: n.fg,
+      pickMatin: () => this.setState({ tod: 'matin' }),
+      pickJour: () => this.setState({ tod: 'jour' }),
+      pickSoir: () => this.setState({ tod: 'soir' }),
+      pickNuit: () => this.setState({ tod: 'nuit' })
+    };
+  }
+}
+</script>
+</body>
+</html>

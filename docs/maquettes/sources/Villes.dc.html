@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Les autres villes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFFBF5;font-family:Manrope,system-ui,sans-serif;color:#101828;display:flex;flex-direction:column;overflow:hidden">
+
+<header style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:6px 16px 0;box-sizing:border-box;flex:none">
+<div>
+<div style="font-size:17px;font-weight:800;letter-spacing:-0.2px">Villes</div>
+<div style="font-size:12px;font-weight:600;color:#667085">France · 8 marchés suivis</div>
+</div>
+<span style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #E4E7EC;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;white-space:nowrap">
+<span style="width:9px;height:9px;border-radius:50%;background:#101828;display:inline-block"></span>Mon ancrage : Reims</span>
+</header>
+
+<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:6px 16px 10px">
+
+<div style="position:relative;width:358px;height:262px;flex:none;border-radius:16px;overflow:hidden;border:1px solid #BFD8DE;background:#D6E8EC">
+<svg viewBox="0 0 300 285" width="276" height="262" role="img" aria-label="Carte stylisée de la France avec huit villes suivies, Reims comme ancrage et la ville sélectionnée reliée par un trajet" style="display:block;margin-left:41px">
+<path d="M166 3 L178 13 L189 25 L202 37 L216 34 L238 53 L251 54 L268 65 L290 69 L277 99 L276 112 L264 118 L244 146 L246 155 L260 164 L264 177 L262 211 L275 229 L251 251 L229 245 L211 242 L196 242 L178 257 L176 271 L147 270 L125 260 L103 260 L71 243 L84 202 L86 177 L85 157 L70 146 L62 124 L51 121 L35 109 L11 87 L7 84 L33 74 L66 78 L77 79 L75 47 L84 50 L114 56 L134 40 L145 31 L145 9 Z" fill="#F1E3C3" stroke="#C9B07E" stroke-width="2" stroke-linejoin="round"/>
+<g fill="none" stroke="#BDD8EA" stroke-width="2" stroke-linecap="round">
+<path d="M222 100 C 190 80, 170 80, 150 70 S 125 58, 118 56"/>
+<path d="M214 150 C 190 120, 150 118, 120 112 S 80 120, 62 124"/>
+<path d="M216 169 C 225 190, 222 215, 229 245"/>
+<path d="M97 197 C 120 212, 135 225, 142 236"/>
+</g>
+<g fill="#DCCBA2">
+<path d="M262 196 l6 -10 l6 10 Z"/><path d="M270 208 l6 -10 l6 10 Z"/><path d="M254 208 l6 -10 l6 10 Z"/>
+<path d="M118 266 l6 -9 l6 9 Z"/><path d="M132 268 l6 -9 l6 9 Z"/><path d="M148 268 l6 -9 l6 9 Z"/>
+</g>
+<path d="{{routeD}}" fill="none" stroke="{{accent}}" stroke-width="2" stroke-dasharray="5 4" stroke-linecap="round"/>
+<g fill="#FFFFFF" stroke="#98A2B3" stroke-width="2">
+<circle cx="177" cy="18" r="4.5"/><circle cx="246" cy="78" r="4.5"/><circle cx="280" cy="82" r="4.5"/><circle cx="216" cy="169" r="4.5"/><circle cx="97" cy="197" r="4.5"/><circle cx="229" cy="245" r="4.5"/><circle cx="76" cy="123" r="4.5"/><circle cx="142" cy="236" r="4.5"/>
+</g>
+<circle cx="162" cy="73" r="4.5" fill="#D0D5DD" stroke="#98A2B3" stroke-width="2"/>
+<circle cx="{{sx}}" cy="{{sy}}" r="9" fill="none" stroke="{{accent}}" stroke-width="2.5"/>
+<circle cx="{{sx}}" cy="{{sy}}" r="4.5" fill="{{accent}}"/>
+<circle cx="199" cy="60" r="7" fill="#101828" stroke="#FFFFFF" stroke-width="2"/>
+<path d="M195.5 61 L199 57.5 L202.5 61 V64 H195.5 Z" fill="#FFFFFF"/>
+<g font-size="9" font-weight="700" fill="#475467">
+<text x="185" y="16">Lille</text>
+<text x="238" y="72" text-anchor="end">Nancy</text>
+<text x="280" y="96" text-anchor="middle">Strasbourg</text>
+<text x="224" y="172">Lyon</text>
+<text x="105" y="200">Bordeaux</text>
+<text x="237" y="248">Marseille</text>
+<text x="84" y="126">Nantes</text>
+<text x="150" y="239">Toulouse</text>
+<text x="155" y="82" text-anchor="end" fill="#98A2B3">Paris</text>
+</g>
+<text x="207" y="52" font-size="10" font-weight="800" fill="#101828">Reims</text>
+<text x="{{mx}}" y="{{my}}" text-anchor="middle" font-size="9" font-weight="800" fill="{{accent}}" stroke="#F1E3C3" stroke-width="3" paint-order="stroke">{{time}}</text>
+</svg>
+
+<sc-for list="{{cities}}" as="c" hint-placeholder-count="8">
+<button aria-label="{{c.n}}" onClick="{{c.pick}}" style="position:absolute;left:{{c.left}}px;top:{{c.top}}px;width:44px;height:44px;border:0;background:transparent;padding:0;cursor:pointer"></button>
+</sc-for>
+
+<div style="position:absolute;left:10px;bottom:10px;display:flex;gap:10px;background:#fff;border:1px solid #E4E7EC;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:600;color:#475467">
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#101828;display:inline-block"></span>Ancrage</span>
+<span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid #98A2B3;box-sizing:border-box;display:inline-block"></span>Suivie</span>
+</div>
+</div>
+
+<div style="margin:0 -16px;padding:0 16px;overflow-x:auto;flex:none">
+<div style="display:flex;gap:8px;width:max-content">
+<sc-for list="{{cities}}" as="c" hint-placeholder-count="8">
+<button onClick="{{c.pick}}" style="height:40px;padding:0 16px;border-radius:999px;border:1px solid {{c.chipBd}};background:{{c.chipBg}};color:{{c.chipFg}};font-family:inherit;font-size:13px;font-weight:800;white-space:nowrap">{{c.n}}</button>
+</sc-for>
+</div>
+</div>
+
+<section style="background:#fff;border:1px solid #E4E7EC;border-radius:16px;padding:14px;flex:none">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;min-width:0">
+<h2 style="margin:0;font-size:20px;font-weight:800;letter-spacing:-0.3px">{{name}}</h2>
+<span style="background:{{tensionBg}};color:{{tensionFg}};border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;white-space:nowrap">Tension {{tension}}</span>
+</div>
+<div style="font-size:14px;font-weight:800;color:{{trendColor}};white-space:nowrap">{{trend}} / an</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px">
+<div>
+<div style="font-size:11px;font-weight:600;color:#667085">Prix moyen</div>
+<div style="font-size:14px;font-weight:800;white-space:nowrap">{{price}}</div>
+</div>
+<div>
+<div style="font-size:11px;font-weight:600;color:#667085">Loyer moyen</div>
+<div style="font-size:14px;font-weight:800;white-space:nowrap">{{rent}}</div>
+</div>
+<div>
+<div style="font-size:11px;font-weight:600;color:#667085">Rendement brut</div>
+<div style="font-size:14px;font-weight:800;color:#0F766E;white-space:nowrap">{{yld}}</div>
+</div>
+</div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid #E4E7EC;display:flex;flex-direction:column;gap:4px">
+<div style="font-size:12px;font-weight:600;color:#475467">Depuis Reims : {{travel}}</div>
+<div style="font-size:12px;font-weight:600;color:#475467">Gestion à distance : {{fees}}</div>
+</div>
+<a href="Main.dc.html" style="margin-top:12px;height:48px;border-radius:12px;background:{{accent}};color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;text-decoration:none">Explorer {{name}}</a>
+</section>
+
+<div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7EC;border-radius:14px;padding:0 14px;height:52px;flex:none">
+<span style="width:10px;height:10px;border-radius:50%;background:#101828;display:inline-block;flex:none"></span>
+<div style="flex:1;min-width:0">
+<div style="font-size:13px;font-weight:800">Reims · mon ancrage</div>
+<div style="font-size:11px;font-weight:500;color:#667085">2 biens · 2 500 €/m² · +1,2 % / an</div>
+</div>
+<a href="Rue.dc.html" style="font-size:12px;font-weight:800;color:{{accent}};text-decoration:none">Retour</a>
+</div>
+
+</main>
+
+<nav aria-label="Navigation principale" style="display:flex;background:#fff;border-top:1px solid #E4E7EC;height:68px;box-sizing:border-box;padding:6px 8px 10px;flex:none">
+<a href="Rue.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l5-3v16M10 21V4l9 5v12"/></svg>Rue</a>
+<a href="Main.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Carte</a>
+<a href="Patrimoine.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:#667085;font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Patrimoine</a>
+<a href="Villes.dc.html" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:{{accent}};font-size:11px;font-weight:700">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>Villes</a>
+</nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0F766E","options":["#0F766E","#1D4ED8","#7C3AED","#B54708"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 'lyon' };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#0F766E';
+    const C = [
+      { k: 'lille', n: 'Lille', x: 177, y: 18, price: '3 100 €/m²', rent: '13,8 €/m²', yld: '5,3 %', trend: '+2,1 %', up: true, tension: 'haute', time: '2 h 10', travel: '2 h 10 · 32 €', fees: '+8 % de frais' },
+      { k: 'nancy', n: 'Nancy', x: 246, y: 78, price: '2 050 €/m²', rent: '11,5 €/m²', yld: '6,7 %', trend: '+0,6 %', up: true, tension: 'moyenne', time: '1 h 50', travel: '1 h 50 · 24 €', fees: '+6 % de frais' },
+      { k: 'strasbourg', n: 'Strasbourg', x: 280, y: 82, price: '3 500 €/m²', rent: '13,9 €/m²', yld: '4,8 %', trend: '+1,4 %', up: true, tension: 'haute', time: '2 h 20', travel: '2 h 20 · 38 €', fees: '+9 % de frais' },
+      { k: 'lyon', n: 'Lyon', x: 216, y: 169, price: '4 700 €/m²', rent: '14,5 €/m²', yld: '3,7 %', trend: '+1,8 %', up: true, tension: 'haute', time: '3 h 30', travel: '3 h 30 · 55 €', fees: '+10 % de frais' },
+      { k: 'bordeaux', n: 'Bordeaux', x: 97, y: 197, price: '4 400 €/m²', rent: '14,2 €/m²', yld: '3,9 %', trend: '−0,5 %', up: false, tension: 'moyenne', time: '4 h 45', travel: '4 h 45 · 70 €', fees: '+12 % de frais' },
+      { k: 'marseille', n: 'Marseille', x: 229, y: 245, price: '3 600 €/m²', rent: '15,3 €/m²', yld: '5,1 %', trend: '+2,4 %', up: true, tension: 'haute', time: '5 h 30', travel: '5 h 30 · 78 €', fees: '+12 % de frais' },
+      { k: 'nantes', n: 'Nantes', x: 76, y: 123, price: '4 000 €/m²', rent: '13,6 €/m²', yld: '4,1 %', trend: '+0,2 %', up: true, tension: 'moyenne', time: '4 h 15', travel: '4 h 15 · 66 €', fees: '+11 % de frais' },
+      { k: 'toulouse', n: 'Toulouse', x: 142, y: 236, price: '3 300 €/m²', rent: '12,9 €/m²', yld: '4,7 %', trend: '+0,8 %', up: true, tension: 'haute', time: '5 h 00', travel: '5 h 00 · 74 €', fees: '+12 % de frais' }
+    ];
+    const selKey = this.state.sel;
+    const s = C.find((c) => c.k === selKey) || C[3];
+    const cities = C.map((c) => ({
+      n: c.n,
+      left: Math.round(41 + c.x * 0.92 - 22),
+      top: Math.round(c.y * 0.92 - 22),
+      chipBg: c.k === selKey ? accent : '#FFFFFF',
+      chipFg: c.k === selKey ? '#FFFFFF' : '#344054',
+      chipBd: c.k === selKey ? accent : '#E4E7EC',
+      pick: () => this.setState({ sel: c.k })
+    }));
+    const high = s.tension === 'haute';
+    return {
+      accent,
+      cities,
+      name: s.n,
+      price: s.price, rent: s.rent, yld: s.yld, trend: s.trend,
+      trendColor: s.up ? '#0F766E' : '#B42318',
+      tension: s.tension,
+      tensionBg: high ? '#E6F4F1' : '#FEF0C7',
+      tensionFg: high ? '#0B5D55' : '#93370D',
+      travel: s.travel, fees: s.fees, time: s.time,
+      sx: s.x, sy: s.y,
+      mx: Math.round((199 + s.x) / 2),
+      my: Math.round((60 + s.y) / 2) - 5,
+      routeD: 'M199 60 L' + s.x + ' ' + s.y
+    };
+  }
+}
+</script>
+</body>
+</html>
