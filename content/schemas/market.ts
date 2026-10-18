@@ -20,7 +20,8 @@ const range = z
 const motivationSchema = z
   .object({
     id,
-    weight: positive,
+    /** Draw weight of ordinary sellers; 0 for sellers that only rivals create. */
+    weight: z.number().min(0),
     /** Asking price = real value × this factor (drawn in the range) × estimation error. */
     priceFactor: range,
     /** Largest discount the seller grants at once, before time on the market. */

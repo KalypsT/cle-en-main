@@ -67,6 +67,7 @@ export const uiTextsSchema = z
         resigned: text,
         listingPublished: text,
         listingSold: text,
+        listingSoldToRival: text,
         visitDone: text,
         visitPlanned: text,
         offerAccepted: text,
@@ -77,9 +78,14 @@ export const uiTextsSchema = z
         purchaseCancelled: text,
         deedSigned: text,
         saleOfferReceived: text,
+        saleOfferFromRival: text,
         saleAgreed: text,
         saleFellThrough: text,
         propertySold: text,
+        propertyLet: text,
+        tenantLeft: text,
+        forcedSale: text,
+        bankrupt: text,
       })
       .strict(),
     /** One text per engine refusal code (packages/engine/src/actions.ts). */

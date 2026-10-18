@@ -1,0 +1,14 @@
+{
+  "vacancyDays": { "min": 15, "max": 75 },
+  "monthlyDepartureProbability": 0.03,
+  "smallApartmentMaxRooms": 2,
+  "priceIndexElasticity": 0.5,
+  "conditionFactors": {
+    "ruin": 0,
+    "toRenovate": 0.85,
+    "toRefresh": 0.95,
+    "good": 1,
+    "renovated": 1.05
+  },
+  "ownerCostsShare": 0.3
+}

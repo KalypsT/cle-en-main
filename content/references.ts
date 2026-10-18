@@ -2,6 +2,8 @@ import type { CityData } from './schemas/city.ts';
 import type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
 import type { Job } from './schemas/jobs.ts';
 import type { ListingTexts, MarketRules } from './schemas/market.ts';
+import type { RentingRules } from './schemas/renting.ts';
+import type { Rival, RivalsFile } from './schemas/rivals.ts';
 import type { LivingCosts, Start } from './schemas/start.ts';
 
 export interface GameContent {
@@ -14,6 +16,9 @@ export interface GameContent {
   marketRate: MarketRate;
   market: MarketRules;
   listingTexts: ListingTexts;
+  renting: RentingRules;
+  rivalRules: RivalsFile['aggressiveness'];
+  rivals: Rival[];
   /** Generated city data, by city id. */
   cities: Record<string, CityData>;
 }
@@ -64,6 +69,28 @@ export function checkReferences(content: GameContent): string[] {
   }
   if (!('0' in market.apartment.floorFactors)) {
     problems.push('marche.json : le facteur du rez-de-chaussée (étage 0) manque');
+  }
+  if (market.motivations.every((motivation) => motivation.weight === 0)) {
+    problems.push('marche.json : aucune motivation de vendeur ordinaire (poids positif)');
+  }
+  const motivationIds = new Set(market.motivations.map((motivation) => motivation.id));
+  for (const rival of content.rivals) {
+    for (const cityId of rival.cities) {
+      const city = content.cities[cityId];
+      if (!city) {
+        problems.push(`rivaux.json : ville inconnue « ${cityId} » (${rival.id})`);
+        continue;
+      }
+      const known = new Set(city.neighbourhoods.map((n) => n.id));
+      for (const neighbourhoodId of Object.keys(rival.preferences.neighbourhoods)) {
+        if (!known.has(neighbourhoodId)) {
+          problems.push(`rivaux.json : quartier inconnu « ${neighbourhoodId} » (${rival.id})`);
+        }
+      }
+    }
+    if (rival.flip && !motivationIds.has(rival.flip.motivationId)) {
+      problems.push(`rivaux.json : motivation inconnue « ${rival.flip.motivationId} »`);
+    }
   }
   for (const [epoch, weights] of Object.entries(market.conditionWeights)) {
     if (Object.values(weights).every((weight) => weight === 0)) {

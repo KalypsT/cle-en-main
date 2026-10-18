@@ -43,6 +43,10 @@ jobs:
         run: |
           for seed in 1 2 3; do pnpm --silent bots --seed "$seed" --days 3650; echo; done
 
+      # A small sample: it must run without error; the full 1 000-game report is made locally.
+      - name: Bot series (sample)
+        run: pnpm --silent bots:series --games 10 --years 10
+
       - name: Build
         run: pnpm build
 

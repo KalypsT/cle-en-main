@@ -30,13 +30,24 @@ export function defectProbability(
   return Math.min(0.95, rule.probability * epochMultiplier * conditionMultiplier);
 }
 
+const floorFactorCache = new WeakMap<GameContent, Map<number, number>>();
+
 function floorFactor(content: GameContent, floor: number | null): number {
   if (floor === null) return 1;
+  let cache = floorFactorCache.get(content);
+  if (!cache) {
+    cache = new Map();
+    floorFactorCache.set(content, cache);
+  }
+  const cached = cache.get(floor);
+  if (cached !== undefined) return cached;
   const factors = content.market.apartment.floorFactors;
   const known = Object.keys(factors)
     .map(Number)
     .filter((key) => key <= floor);
-  return factors[String(Math.max(0, ...known))] ?? 1;
+  const factor = factors[String(Math.max(0, ...known))] ?? 1;
+  cache.set(floor, factor);
+  return factor;
 }
 
 /**
@@ -44,19 +55,45 @@ function floorFactor(content: GameContent, floor: number | null): number {
  * from: dividing by it keeps the average generated value on the observed
  * median price per m² (epoch, DPE, condition, floor and hidden defects).
  */
-const normalizationCache = new WeakMap<GameContent, Map<string, number>>();
+/** Two-level cache keyed by content, then by strings (valuation runs for every listing daily). */
+function cacheFor<V>(
+  caches: WeakMap<GameContent, Map<string, Map<string, V>>>,
+  content: GameContent,
+  first: string,
+): Map<string, V> {
+  let byContent = caches.get(content);
+  if (!byContent) {
+    byContent = new Map();
+    caches.set(content, byContent);
+  }
+  let byFirst = byContent.get(first);
+  if (!byFirst) {
+    byFirst = new Map();
+    byContent.set(first, byFirst);
+  }
+  return byFirst;
+}
+
+const normalizationCache = new WeakMap<GameContent, Map<string, Map<string, number>>>();
+const neighbourhoodCache = new WeakMap<GameContent, Map<string, Map<string, NeighbourhoodData>>>();
+
+function neighbourhoodOf(content: GameContent, cityId: string, id: string): NeighbourhoodData {
+  const cache = cacheFor(neighbourhoodCache, content, cityId);
+  let found = cache.get(id);
+  if (!found) {
+    found = findNeighbourhood(content, cityId, id);
+    cache.set(id, found);
+  }
+  return found;
+}
 export function valueNormalization(
   content: GameContent,
   cityId: string,
   neighbourhood: NeighbourhoodData,
   kind: PropertyKind,
 ): number {
-  let cache = normalizationCache.get(content);
-  if (!cache) {
-    cache = new Map();
-    normalizationCache.set(content, cache);
-  }
-  const key = `${cityId}/${neighbourhood.id}/${kind}`;
+  const cache = cacheFor(normalizationCache, content, cityId);
+  const key = kind === 'apartment' ? neighbourhood.id : `${neighbourhood.id}/${kind}`;
   const cached = cache.get(key);
   if (cached !== undefined) return cached;
 
@@ -122,7 +159,7 @@ function surfaceValue(
   surface: number,
 ): number {
   const city = findCity(content, property.cityId);
-  const neighbourhood = findNeighbourhood(content, property.cityId, property.neighbourhoodId);
+  const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
   const stats = neighbourhood.sales[dwelling];
   const elasticity = city.commune.surfaceElasticity[dwelling];
   return surface * (surface / stats.medianSurface) ** elasticity;
@@ -140,7 +177,7 @@ function valueWith(
 ): ValueBreakdown {
   const rules = content.market;
   const dwelling = dwellingKindOf(property.kind);
-  const neighbourhood = findNeighbourhood(content, property.cityId, property.neighbourhoodId);
+  const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
   const median = neighbourhood.sales[dwelling].pricePerM2.median;
   const priceIndex =
     state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;

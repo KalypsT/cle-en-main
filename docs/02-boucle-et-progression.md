@@ -62,6 +62,8 @@ La faillite doit se voir venir et pouvoir s'éviter :
 4. **Vente forcée** : après une durée de découvert, la banque impose la vente d'un bien (choisi par le joueur si possible), avec une décote.
 5. **Faillite** : seulement si le patrimoine net reste négatif après les ventes forcées.
 
+> **Jalon 1c** : la descente est codée jusqu'à la faillite (`content/credit.json`, `distress`). Après **90 jours** de découvert, la banque vend les biens au prix réel moins **20 %**, en commençant par celui qui rapporte le plus de trésorerie, jusqu'à ramener le compte au-dessus de zéro ; chaque vente forcée coûte 15 points de confiance à la banque du compte. Sans bien restant et avec un patrimoine net négatif, le moteur déclare la faillite (`bankrupt`). L'alerte de trésorerie arrive avec l'interface (jalon 4), le nouveau départ au jalon 6.
+
 ### Le nouveau départ (mode Classique)
 
 Le joueur reste dans le **même monde** et redevient salarié dans son métier, à Dole, avec un petit apport (valeur à calibrer, par exemple 5 000 €).

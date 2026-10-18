@@ -11,6 +11,7 @@ import type { BankRelation, GameState, Loan } from '../state.ts';
 import type { SystemContext } from './context.ts';
 import { expectedSalary } from './household.ts';
 import { roundRate } from './market-rate.ts';
+import { currentRents } from './renting.ts';
 
 export type JobTrustLevel = 'mediumLow' | 'medium' | 'high' | 'veryHigh';
 const JOB_TRUST_ORDER: readonly JobTrustLevel[] = ['mediumLow', 'medium', 'high', 'veryHigh'];
@@ -19,7 +20,7 @@ const MONTHS_PER_YEAR = 12;
 const DAYS_PER_YEAR = 365;
 
 /** Trust stays within 0 … 100, kept to a tenth to avoid floating-point drift. */
-function clampTrust(value: number): number {
+export function clampTrust(value: number): number {
   return Math.round(Math.min(100, Math.max(0, value)) * 10) / 10;
 }
 
@@ -45,11 +46,22 @@ function relationOf(state: GameState, bankId: string): BankRelation {
   return relation;
 }
 
+const spreadPointsCache = new WeakMap<GameContent, (readonly [number, number])[]>();
+
+function spreadPoints(content: GameContent) {
+  let points = spreadPointsCache.get(content);
+  if (!points) {
+    points = Object.entries(content.credit.durationSpreadPercent)
+      .map(([key, value]) => [Number(key), value] as const)
+      .sort((a, b) => a[0] - b[0]);
+    spreadPointsCache.set(content, points);
+  }
+  return points;
+}
+
 /** Spread over the 20-year market rate for a duration, interpolated between content points. */
 export function durationSpread(content: GameContent, years: number): number {
-  const points = Object.entries(content.credit.durationSpreadPercent)
-    .map(([key, value]) => [Number(key), value] as const)
-    .sort((a, b) => a[0] - b[0]);
+  const points = spreadPoints(content);
   const first = points[0];
   const last = points.at(-1);
   if (!first || !last) return 0;
@@ -112,8 +124,9 @@ export function marketOffer(content: GameContent, state: GameState, durationYear
 
 /** Monthly income the banks take into account. */
 export function retainedIncome(content: GameContent, state: GameState): Cents {
-  const monthlyRents = 0; // Rental income arrives with milestone 2.
-  return expectedSalary(content, state.player) + content.credit.retainedRentShare * monthlyRents;
+  return Math.round(
+    expectedSalary(content, state.player) + content.credit.retainedRentShare * currentRents(state),
+  );
 }
 
 export function monthlyLoanPayments(state: GameState): Cents {

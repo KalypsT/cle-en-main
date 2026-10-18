@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/cli.ts",
+    "series": "tsx src/series-cli.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"
   },

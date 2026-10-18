@@ -23,10 +23,12 @@ import {
   runRenegotiationCheck,
 } from './systems/banking.ts';
 import { requestVisit, runDailyAgenda } from './systems/agenda.ts';
+import { runDailyDistress } from './systems/distress.ts';
 import type { SystemContext } from './systems/context.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { runDailyListings, seedListings } from './systems/listings.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
+import { netWorth } from './systems/net-worth.ts';
 import { answerCounter, makeOffer } from './systems/offers.ts';
 import { initialCityMarkets, runMonthlyPrices } from './systems/prices.ts';
 import {
@@ -38,6 +40,8 @@ import {
   waiveLoanCondition,
   withdrawPurchase,
 } from './systems/purchases.ts';
+import { marketRent, netRent, runDailyRenting, runMonthlyRenting } from './systems/renting.ts';
+import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
 import {
   answerSaleOffer,
   listForSale,
@@ -100,6 +104,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       freeTimeMinutes: 0,
       reputation: content.start.reputation,
       rentalHistoryMonths: 0,
+      bankruptDay: null,
     },
     banks: initialBankRelations(content, job.bankTrust),
     market: {
@@ -113,6 +118,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     purchases: [],
     properties: [],
     agenda: [],
+    rivals: initialRivals(content),
   };
   // The market already has listings on the first day.
   seedListings(context(content, state, []), content.start.cityId);
@@ -134,7 +140,9 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean): void {
     runMonthlyMarketRate(ctx);
     runMonthlyPrices(ctx);
     const lines: StatementLine[] = [];
+    runMonthlyRivals(ctx);
     runMonthlyHousehold(ctx, lines);
+    runMonthlyRenting(ctx, lines);
     const paidBankIds = new Set(ctx.state.loans.map((loan) => loan.bankId));
     runMonthlyLoanPayments(ctx, lines);
     runMonthlyTrust(ctx, paidBankIds);
@@ -149,9 +157,12 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean): void {
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
   runDailyPurchases(ctx);
+  runDailyRivals(ctx);
   runDailyListings(ctx, (listing, price) => signCompromis(ctx, listing, price));
+  runDailyRenting(ctx);
   runDailyResale(ctx);
   runDailyOverdraft(ctx);
+  runDailyDistress(ctx);
 }
 
 /** The engine bound to its content. Every function is pure: inputs are never mutated. */
@@ -300,22 +311,27 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? saleProceeds(context(content, state, []), owned, price) : null;
     },
+    /**
+     * Rent a tenant would pay today for a listing, a purchase under compromis
+     * or an owned property, before and after the owner's costs (0 if it
+     * cannot be let).
+     */
+    marketRent: (state: GameState, id: string): { gross: Cents; net: Cents } | null => {
+      const property =
+        state.listings.find((candidate) => candidate.id === id)?.property ??
+        state.purchases.find((candidate) => candidate.id === id)?.property ??
+        state.properties.find((candidate) => candidate.property.id === id)?.property;
+      if (!property) return null;
+      const gross = marketRent(content, state, property);
+      return { gross, net: netRent(content, gross) };
+    },
     netWorth: (state: GameState) => netWorth(content, state),
   };
 }
 
 export type Engine = ReturnType<typeof createEngine>;
 
-/** Cash, deposits and properties at their real value, minus debts. */
-export function netWorth(content: GameContent, state: GameState): Cents {
-  const properties = state.properties.reduce(
-    (sum, owned) => sum + realValue(content, state, owned.property).value,
-    0,
-  );
-  const deposits = state.purchases.reduce((sum, purchase) => sum + purchase.deposit, 0);
-  const debts = state.loans.reduce((sum, loan) => sum + loan.remaining, 0);
-  return state.player.balance + deposits + properties - debts;
-}
+export { netWorth };
 
 /** Short human-oriented identifier of the current game time, for logs and tools. */
 export function describeTime(state: GameState): string {

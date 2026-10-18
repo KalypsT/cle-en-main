@@ -180,7 +180,18 @@
       "priceFactor": { "min": 1.06, "max": 1.15 },
       "flexibility": 0.02
     },
-    { "id": "debts", "weight": 1, "priceFactor": { "min": 0.85, "max": 0.95 }, "flexibility": 0.12 }
+    {
+      "id": "debts",
+      "weight": 1,
+      "priceFactor": { "min": 0.85, "max": 0.95 },
+      "flexibility": 0.12
+    },
+    {
+      "id": "martinotResale",
+      "weight": 0,
+      "priceFactor": { "min": 1.02, "max": 1.1 },
+      "flexibility": 0.04
+    }
   ],
   "lifetime": {
     "maxDays": 180,

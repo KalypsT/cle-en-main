@@ -6,6 +6,8 @@ import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 export type StatementLine =
   | { kind: 'salary'; amount: Cents }
   | { kind: 'rent'; amount: Cents }
+  /** Rent of a let property, net of the owner's provisional costs. */
+  | { kind: 'rentalIncome'; propertyId: string; amount: Cents }
   | { kind: 'livingCosts'; amount: Cents }
   | { kind: 'loanPayment'; loanId: string; amount: Cents; interest: Cents; capital: Cents }
   | { kind: 'overdraftInterest'; amount: Cents };
@@ -40,6 +42,7 @@ export type GameEvent =
   | { type: 'listingPublished'; listingId: string }
   | { type: 'listingPriceDropped'; listingId: string; askingPrice: Cents }
   | { type: 'listingSold'; listingId: string; buyer: 'other' }
+  | { type: 'listingSold'; listingId: string; buyer: 'rival'; rivalId: string }
   | { type: 'listingWithdrawn'; listingId: string }
   | { type: 'visitPlanned'; listingId: string; day: number }
   | { type: 'visitDone'; listingId: string; revealedDefects: string[] }
@@ -99,7 +102,13 @@ export type GameEvent =
   | { type: 'saleWithdrawn'; propertyId: string }
   | { type: 'saleVisit'; propertyId: string }
   | { type: 'saleVisitMissed'; propertyId: string }
-  | { type: 'saleOfferReceived'; propertyId: string; offerId: string; amount: Cents }
+  | {
+      type: 'saleOfferReceived';
+      propertyId: string;
+      offerId: string;
+      amount: Cents;
+      buyerId: string | null;
+    }
   | { type: 'saleOfferExpired'; propertyId: string; offerId: string }
   | { type: 'saleCounterAccepted'; propertyId: string; offerId: string }
   | { type: 'saleCounterRefused'; propertyId: string; offerId: string }
@@ -113,6 +122,19 @@ export type GameEvent =
       loanRepaid: Cents;
       loanFees: Cents;
       net: Cents;
-    };
+    }
+  // Provisional renting (milestone 1c).
+  | { type: 'propertyLet'; propertyId: string; monthlyRent: Cents }
+  | { type: 'tenantLeft'; propertyId: string; vacantUntilDay: number }
+  // Descent towards bankruptcy (docs/02, section 2.6).
+  | {
+      type: 'forcedSale';
+      propertyId: string;
+      price: Cents;
+      loanRepaid: Cents;
+      loanFees: Cents;
+      net: Cents;
+    }
+  | { type: 'bankrupt'; netWorth: Cents };
 
 export type GameEventType = GameEvent['type'];

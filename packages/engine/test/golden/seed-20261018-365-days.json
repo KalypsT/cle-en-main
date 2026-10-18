@@ -1,12 +1,12 @@
 {
   "state": {
-    "formatVersion": 3,
+    "formatVersion": 4,
     "seed": 20261018,
     "rng": [
-      3626560228,
-      2415718855,
-      3279250634,
-      2954740683
+      3046152981,
+      2227061366,
+      2124613541,
+      1477175332
     ],
     "startDate": {
       "year": 2026,
@@ -22,17 +22,18 @@
       "hour": 8,
       "elapsedHours": 8760
     },
-    "nextId": 850,
+    "nextId": 865,
     "player": {
       "jobId": "civilServant",
       "employed": true,
-      "balance": 1097810,
+      "balance": 889290,
       "overdraftDays": 0,
       "overdraftInterestThisMonth": 0,
       "monthlyRent": 52000,
       "freeTimeMinutes": 150,
       "reputation": 10,
-      "rentalHistoryMonths": 0
+      "rentalHistoryMonths": 0,
+      "bankruptDay": null
     },
     "banks": {
       "tirelire": {
@@ -57,43 +58,43 @@
       }
     },
     "market": {
-      "ratePercent": 3.94,
+      "ratePercent": 3.92,
       "cyclePhase": 0.35761811328120546,
-      "laggedRatePercent": 3.8000904083266294,
+      "laggedRatePercent": 3.79311612394073,
       "cities": {
         "dole": {
           "centreHistorique": {
-            "priceIndex": 1.045331577229675,
-            "trendPercent": 1.3373256283063577
+            "priceIndex": 1.035583480034714,
+            "trendPercent": 1.9268041607373074
           },
           "mesnilsPasteur": {
-            "priceIndex": 1.0719161255311311,
-            "trendPercent": 2.8374416329422103
+            "priceIndex": 1.0304708776602114,
+            "trendPercent": 2.8557563696608343
           },
           "paters": {
-            "priceIndex": 1.0235384393316869,
-            "trendPercent": 2.980126386739605
+            "priceIndex": 1.0133162050109532,
+            "trendPercent": 2.7700085999475106
           },
           "plumontValFleuri": {
-            "priceIndex": 1.0456675199176482,
-            "trendPercent": 2.2006708505631396
+            "priceIndex": 1.0124357937828021,
+            "trendPercent": 1.4128537496792766
           },
           "azans": {
-            "priceIndex": 1.0081844951788945,
-            "trendPercent": 3.099651818296881
+            "priceIndex": 1.0354983204417865,
+            "trendPercent": 3.095414518191066
           }
         }
       }
     },
     "loans": [
       {
-        "id": "loan-233",
+        "id": "loan-213",
         "bankId": "tirelire",
-        "principal": 3700000,
-        "ratePercent": 4.05,
+        "principal": 5100000,
+        "ratePercent": 3.95,
         "durationMonths": 240,
-        "monthlyPayment": 22519,
-        "remaining": 3598149,
+        "monthlyPayment": 30771,
+        "remaining": 4958075,
         "paymentsMade": 10,
         "startDate": {
           "year": 2026,
@@ -101,120 +102,343 @@
           "day": 3
         },
         "renegotiationSuggested": false,
-        "propertyId": "property-159"
+        "propertyId": "property-79"
       }
     ],
     "purchases": [],
     "properties": [
       {
         "property": {
-          "id": "property-159",
+          "id": "property-79",
           "cityId": "dole",
           "neighbourhoodId": "centreHistorique",
           "kind": "apartment",
-          "surface": 20,
-          "rooms": 1,
-          "floor": 0,
+          "surface": 47,
+          "rooms": 2,
+          "floor": 3,
           "lots": [],
           "epoch": "before1948",
-          "dpe": "E",
-          "condition": "good",
-          "defects": [],
-          "annualPropertyTax": 26000,
-          "monthlyCharges": 4400
+          "dpe": "C",
+          "condition": "ruin",
+          "defects": [
+            {
+              "id": "humidity",
+              "revealed": true
+            },
+            {
+              "id": "wiring",
+              "revealed": true
+            },
+            {
+              "id": "plumbing",
+              "revealed": true
+            },
+            {
+              "id": "noisyNeighbours",
+              "revealed": true
+            }
+          ],
+          "annualPropertyTax": 61100,
+          "monthlyCharges": 10300
         },
-        "purchasePrice": 3700000,
-        "acquisitionCost": 4033000,
+        "purchasePrice": 5100000,
+        "acquisitionCost": 5559000,
         "purchaseDate": {
           "year": 2026,
           "month": 12,
           "day": 3
         },
-        "sale": null
+        "sale": null,
+        "lease": null,
+        "vacantUntilDay": 20811
       }
     ],
-    "agenda": []
+    "agenda": [],
+    "rivals": {
+      "delaporte": {
+        "budget": 2040000,
+        "purchases": 5,
+        "projects": []
+      },
+      "martinot": {
+        "budget": 4547500,
+        "purchases": 12,
+        "projects": [
+          {
+            "property": {
+              "id": "property-451",
+              "cityId": "dole",
+              "neighbourhoodId": "azans",
+              "kind": "house",
+              "surface": 90,
+              "rooms": 4,
+              "floor": null,
+              "lots": [],
+              "epoch": "from1948to1974",
+              "dpe": "F",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "heating",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 99000,
+              "monthlyCharges": 0
+            },
+            "resaleDay": 21142
+          },
+          {
+            "property": {
+              "id": "property-527",
+              "cityId": "dole",
+              "neighbourhoodId": "plumontValFleuri",
+              "kind": "apartment",
+              "surface": 46,
+              "rooms": 2,
+              "floor": 1,
+              "lots": [],
+              "epoch": "from1975to1988",
+              "dpe": "D",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "heating",
+                  "revealed": false
+                },
+                {
+                  "id": "noisyNeighbours",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 59800,
+              "monthlyCharges": 10100
+            },
+            "resaleDay": 21180
+          },
+          {
+            "property": {
+              "id": "property-649",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "surface": 35,
+              "rooms": 2,
+              "floor": 0,
+              "lots": [],
+              "epoch": "before1948",
+              "dpe": "C",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "wiring",
+                  "revealed": false
+                },
+                {
+                  "id": "plumbing",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 45500,
+              "monthlyCharges": 7700
+            },
+            "resaleDay": 21132
+          },
+          {
+            "property": {
+              "id": "property-719",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "surface": 41,
+              "rooms": 2,
+              "floor": 1,
+              "lots": [],
+              "epoch": "from1975to1988",
+              "dpe": "C",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "humidity",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 53300,
+              "monthlyCharges": 9000
+            },
+            "resaleDay": 21230
+          },
+          {
+            "property": {
+              "id": "property-557",
+              "cityId": "dole",
+              "neighbourhoodId": "paters",
+              "kind": "apartment",
+              "surface": 58,
+              "rooms": 3,
+              "floor": 0,
+              "lots": [],
+              "epoch": "from1948to1974",
+              "dpe": "B",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "plumbing",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 75400,
+              "monthlyCharges": 12800
+            },
+            "resaleDay": 21240
+          },
+          {
+            "property": {
+              "id": "property-798",
+              "cityId": "dole",
+              "neighbourhoodId": "azans",
+              "kind": "house",
+              "surface": 110,
+              "rooms": 5,
+              "floor": null,
+              "lots": [],
+              "epoch": "from1948to1974",
+              "dpe": "D",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "plumbing",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 121000,
+              "monthlyCharges": 0
+            },
+            "resaleDay": 21282
+          },
+          {
+            "property": {
+              "id": "property-819",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "surface": 30,
+              "rooms": 1,
+              "floor": 2,
+              "lots": [],
+              "epoch": "before1948",
+              "dpe": "C",
+              "condition": "toRenovate",
+              "defects": [
+                {
+                  "id": "humidity",
+                  "revealed": false
+                },
+                {
+                  "id": "wiring",
+                  "revealed": false
+                },
+                {
+                  "id": "heating",
+                  "revealed": false
+                }
+              ],
+              "annualPropertyTax": 39000,
+              "monthlyCharges": 6600
+            },
+            "resaleDay": 21304
+          }
+        ]
+      },
+      "horizon": {
+        "budget": 200000000,
+        "purchases": 0,
+        "projects": []
+      }
+    }
   },
   "listings": {
-    "count": 68,
-    "totalAskingPrice": 1177800000,
+    "count": 70,
+    "totalAskingPrice": 1311800000,
     "ids": [
-      "listing-537",
-      "listing-545",
-      "listing-547",
-      "listing-599",
-      "listing-615",
-      "listing-623",
-      "listing-635",
-      "listing-661",
-      "listing-669",
-      "listing-671",
-      "listing-675",
-      "listing-677",
-      "listing-685",
-      "listing-689",
-      "listing-693",
-      "listing-697",
-      "listing-699",
-      "listing-701",
-      "listing-703",
-      "listing-707",
-      "listing-709",
-      "listing-711",
-      "listing-715",
-      "listing-721",
-      "listing-725",
-      "listing-727",
-      "listing-733",
-      "listing-735",
-      "listing-741",
-      "listing-751",
+      "listing-538",
+      "listing-570",
+      "listing-580",
+      "listing-604",
+      "listing-608",
+      "listing-610",
+      "listing-614",
+      "listing-620",
+      "listing-622",
+      "listing-632",
+      "listing-642",
+      "listing-646",
+      "listing-648",
+      "listing-665",
+      "listing-667",
+      "listing-678",
+      "listing-684",
+      "listing-692",
+      "listing-696",
+      "listing-700",
+      "listing-710",
+      "listing-712",
+      "listing-724",
+      "listing-726",
+      "listing-732",
+      "listing-734",
+      "listing-739",
+      "listing-745",
       "listing-753",
       "listing-755",
+      "listing-757",
       "listing-759",
       "listing-761",
       "listing-763",
       "listing-765",
+      "listing-769",
+      "listing-771",
+      "listing-773",
       "listing-775",
-      "listing-777",
       "listing-779",
-      "listing-781",
       "listing-783",
-      "listing-789",
-      "listing-791",
       "listing-793",
       "listing-795",
       "listing-797",
       "listing-801",
       "listing-805",
-      "listing-807",
-      "listing-809",
-      "listing-811",
-      "listing-813",
-      "listing-815",
-      "listing-817",
-      "listing-821",
-      "listing-823",
-      "listing-825",
-      "listing-827",
-      "listing-829",
-      "listing-831",
-      "listing-835",
-      "listing-837",
-      "listing-839",
-      "listing-841",
-      "listing-843",
-      "listing-845",
-      "listing-847",
-      "listing-849"
+      "listing-806",
+      "listing-808",
+      "listing-810",
+      "listing-812",
+      "listing-814",
+      "listing-816",
+      "listing-818",
+      "listing-822",
+      "listing-824",
+      "listing-826",
+      "listing-828",
+      "listing-834",
+      "listing-836",
+      "listing-838",
+      "listing-842",
+      "listing-844",
+      "listing-846",
+      "listing-848",
+      "listing-852",
+      "listing-854",
+      "listing-858",
+      "listing-860",
+      "listing-862",
+      "listing-864"
     ]
   },
-  "netWorth": 2176061,
+  "netWorth": 1483715,
   "eventCounts": {
     "dayStarted": 365,
-    "listingSold": 328,
-    "listingPriceDropped": 316,
-    "listingPublished": 365,
+    "listingSold": 332,
+    "listingPriceDropped": 347,
+    "listingPublished": 375,
     "weekendStarted": 52,
     "monthStarted": 12,
     "marketRateChanged": 12,
@@ -230,6 +454,6 @@
     "loanChosen": 1,
     "deedSigned": 1,
     "yearStarted": 1,
-    "listingWithdrawn": 26
+    "listingWithdrawn": 30
   }
 }

@@ -27,6 +27,17 @@ export const creditRulesSchema = z
     overdraftAnnualPercent: percent,
     /** After resigning, banks lend only with this much rental history. */
     minRentalHistoryMonthsWithoutSalary: z.number().int().min(0),
+    /** Descent towards bankruptcy (docs/02, section 2.6). */
+    distress: z
+      .object({
+        /** Days of overdraft after which the bank forces the sale of a property. */
+        forcedSaleAfterOverdraftDays: z.number().int().positive(),
+        /** Discount on the real value of a forced sale. */
+        forcedSaleDiscount: share,
+        /** Trust lost with the account bank at each forced sale. */
+        forcedSaleTrust: z.number(),
+      })
+      .strict(),
     renegotiation: z
       .object({
         /** Market offer must beat the loan rate by this much to be suggested. */
