@@ -30,11 +30,14 @@
     "saved": "Partie sauvegardée.",
     "export": "Exporter",
     "menu": "Menu",
-    "demoHeading": "Démonstration du moteur",
-    "rollDie": "Lancer un dé",
-    "lastRoll": "Dernier lancer : {value}",
-    "noRollYet": "Aucun lancer pour l'instant.",
-    "latestEvent": "Dernier événement : {event}"
+    "latestEvent": "Dernier événement : {event}",
+    "situationHeading": "Ma situation",
+    "job": "Métier : {job}",
+    "balance": "Compte courant : {amount}",
+    "freeTime": "Temps libre aujourd'hui : {duration}",
+    "marketRate": "Taux du marché (20 ans) : {rate}",
+    "trust": "Confiance de {banker} : {trust} / 100",
+    "meetBanker": "Rendez-vous avec {banker}"
   },
   "calendar": {
     "weekdays": ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"],
@@ -53,16 +56,33 @@
       "décembre"
     ],
     "date": "{weekday} {day} {month} {year}",
-    "time": "{hour} h"
+    "time": "{hour} h",
+    "duration": "{hours} h {minutes}"
   },
   "events": {
     "dayStarted": "Nouveau jour : {date}",
     "weekendStarted": "C'est le week-end !",
     "monthStarted": "Nouveau mois : {month} {year}",
-    "yearStarted": "Bonne année {year} !"
+    "yearStarted": "Bonne année {year} !",
+    "monthlyStatement": "Bilan du mois : {balance} sur le compte courant.",
+    "overdraftStarted": "Votre compte est à découvert.",
+    "overdraftEnded": "Votre compte n'est plus à découvert.",
+    "loanRepaid": "Un crédit est entièrement remboursé.",
+    "renegotiationAvailable": "Votre crédit peut être renégocié.",
+    "loanRefinanced": "Crédit renégocié : {fees} de frais.",
+    "bankMeetingHeld": "Rendez-vous terminé. Confiance : {trust} / 100.",
+    "resigned": "Vous avez démissionné."
   },
   "refusals": {
-    "demo.invalidSides": "Un dé doit avoir au moins deux faces."
+    "bank.unknown": "Cette banque n'existe pas.",
+    "bank.noMeetings": "Léo est un chatbot : pas de rendez-vous, mais il vous souhaite une excellente journée !",
+    "bank.meetingTooSoon": "Votre banquier vous a déjà reçu récemment.",
+    "time.notEnoughFreeTime": "Pas assez de temps libre aujourd'hui.",
+    "loan.unknown": "Ce crédit n'existe pas.",
+    "loan.notWorthRefinancing": "Ce rachat ne ferait pas baisser votre taux.",
+    "loan.refinancingRefused": "La banque refuse de racheter ce crédit.",
+    "account.insufficientFunds": "Votre compte ne suffit pas pour payer les frais.",
+    "job.alreadyResigned": "Vous avez déjà quitté votre emploi."
   },
   "errors": {
     "importFailed": "Ce fichier ne contient pas une partie valide.",
@@ -74,5 +94,8 @@
     "offlineReady": "Le jeu est prêt à fonctionner hors ligne.",
     "updateAvailable": "Une nouvelle version est disponible.",
     "reload": "Mettre à jour"
+  },
+  "numbers": {
+    "percent": "{value} %"
   }
 }

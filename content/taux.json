@@ -1,0 +1,10 @@
+{
+  "startPercent": 3.65,
+  "longTermMeanPercent": 3.4,
+  "cycleAmplitudePercent": 0.8,
+  "cycleMonths": 96,
+  "monthlyReversion": 0.08,
+  "monthlyVolatilityPercent": 0.06,
+  "minPercent": 0.8,
+  "maxPercent": 7.5
+}
