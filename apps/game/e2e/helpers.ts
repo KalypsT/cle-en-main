@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { gameContent, timeSettings } from '@cle/content';
-import { createEngine, serializeGame } from '@cle/engine';
+import { createEngine, type GameState, serializeGame } from '@cle/engine';
 import { fileURLToPath } from 'node:url';
 import screens from '../../../content/textes/ecrans.json' with { type: 'json' };
 import tutorialTexts from '../../../content/textes/didacticiel.json' with { type: 'json' };
@@ -38,6 +38,7 @@ export async function newGame(
 }
 
 export async function pause(page: Page) {
+  await dismissOverlays(page);
   const button = page.getByRole('button', { name: t.status.pause });
   await button.click();
   await expect(button).toHaveAttribute('aria-pressed', 'true');
@@ -55,7 +56,16 @@ export async function speed(page: Page, value: number) {
 }
 
 export async function tab(page: Page, name: keyof typeof t.tabs) {
+  await dismissOverlays(page);
   await page.getByRole('navigation').getByRole('button', { name: t.tabs[name] }).click();
+}
+
+/** Closes the monthly review, the yearly review or a title's celebration if one is open. */
+export async function dismissOverlays(page: Page) {
+  const overlay = page.locator('.overlay');
+  for (let i = 0; i < 5 && (await overlay.count()) > 0; i++) {
+    await overlay.first().locator('button.primary').last().click();
+  }
 }
 
 /**
@@ -66,6 +76,7 @@ export async function waitForDecision(page: Page, kind: string, timeout = 90_000
   await tab(page, 'decisions');
   const row = page.getByTestId(`decision-${kind}`).first();
   await expect(async () => {
+    await dismissOverlays(page);
     if (!(await row.isVisible())) await speed(page, 4);
     await expect(row).toBeVisible({ timeout: 2_000 });
   }).toPass({ timeout });
@@ -92,16 +103,27 @@ export async function capture(page: Page, name: string, milestone = 'jalon-4') {
  * at a precise hour.
  */
 export async function importGameAt(page: Page, hour: number, slot = 1) {
-  const engine = createEngine(gameContent);
-  let state = engine.createGame({
+  let state = referenceGame();
+  const hours = (hour - state.clock.hour + 24) % 24;
+  state = testEngine.advanceHours(state, hours).state;
+  await importState(page, state, slot);
+}
+
+export const testEngine = createEngine(gameContent);
+
+/** The game the end-to-end tests start from, built by the engine. */
+export function referenceGame(): GameState {
+  return testEngine.createGame({
     seed: 20261018,
     startDate: { year: 2026, month: 10, day: 18 },
     startHour: timeSettings.startHour,
     name: 'Thibaud',
     tutorial: false,
   });
-  const hours = (hour - state.clock.hour + 24) % 24;
-  state = engine.advanceHours(state, hours).state;
+}
+
+/** Imports a game built by the engine into a slot, like a player's file, and pauses it. */
+export async function importState(page: Page, state: GameState, slot = 1) {
   await page.getByRole('button', { name: ui.title.continue }).click();
   const chooser = page.waitForEvent('filechooser');
   await page.getByTestId(`slot-${slot}`).getByRole('button', { name: ui.slots.import }).click();
@@ -121,4 +143,79 @@ export async function streetReady(page: Page) {
   await expect(page.getByTestId('street').locator('.street-canvas canvas')).toBeVisible();
   // Give the passers-by and the light a moment to settle.
   await page.waitForTimeout(800);
+}
+
+/**
+ * A game played by the engine until `hours` have passed: the player buys the
+ * cheapest affordable flat on credit, lets it bare at the market rent to the
+ * first candidate, and takes up the challenges.
+ */
+export function ownerGame(hours: number, until?: (state: GameState) => boolean): GameState {
+  const engine = testEngine;
+  let state = referenceGame();
+  const act = (action: Parameters<typeof engine.dispatch>[1]) => {
+    const result = engine.dispatch(state, action);
+    if (result.ok) state = result.state;
+  };
+  for (let hour = 0; hour < hours; hour++) {
+    const { state: next, events } = engine.tick(state);
+    state = next;
+    for (const event of events) {
+      const purchase = state.purchases[0];
+      if (event.type === 'compromisSigned' && purchase) {
+        act({
+          type: 'purchase/requestLoan',
+          purchaseId: purchase.id,
+          bankId: 'tirelire',
+          amount: purchase.price,
+          durationYears: 20,
+        });
+      }
+      if (event.type === 'loanAnswered' && event.decision !== 'refused' && purchase) {
+        act({
+          type: 'purchase/acceptLoan',
+          purchaseId: purchase.id,
+          applicationId: event.applicationId,
+        });
+      }
+    }
+    if (state.clock.hour === 18) {
+      if (state.properties.length === 0 && state.purchases.length === 0) {
+        const listing = [...state.listings]
+          .filter((l) => l.property.kind === 'apartment' && !l.offer && l.askingPrice < 70_000_00)
+          .filter((l) => !engine.rentQuote(state, l.id, 'bare')?.block)
+          .sort((a, b) => a.askingPrice - b.askingPrice)[0];
+        if (listing)
+          act({ type: 'market/offer', listingId: listing.id, amount: listing.askingPrice });
+      }
+      for (const owned of state.properties) {
+        if (!owned.lease && !owned.rental) {
+          const quote = engine.rentQuote(state, owned.property.id, 'bare');
+          if (quote && !quote.block) {
+            act({
+              type: 'rent/list',
+              propertyId: owned.property.id,
+              leaseType: 'bare',
+              monthlyRent: quote.market,
+              agencyId: null,
+              insured: false,
+            });
+          }
+        }
+        const application = owned.rental?.applications[0];
+        if (application) {
+          act({
+            type: 'rent/accept',
+            propertyId: owned.property.id,
+            applicationId: application.id,
+          });
+        }
+      }
+      if (state.progress.challenge && !state.progress.challenge.accepted) {
+        act({ type: 'challenge/answer', accept: true });
+      }
+    }
+    if (until?.(state)) break;
+  }
+  return state;
 }

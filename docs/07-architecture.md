@@ -71,7 +71,9 @@ cle-en-main/
 - **Format versionné** avec des **migrations** : une mise à jour du jeu ne casse pas une partie en cours.
 - **Version 6 (jalon 3)** : pièces et postes des biens, chantiers, devis, enveloppe travaux, copropriété, carnet d'artisans. La migration depuis la v5 tire les postes autour de l'ancien état global par des tirages stables (hachage de la graine et de l'identifiant du bien), sans toucher à l'état aléatoire du monde.
 - **Performance** : les pièces et les postes d'un bien sont remplacés, jamais modifiés ; ils sont **gelés** (`Object.freeze`) et partagés entre les copies de l'état (`clone.ts`), ce qui garde le coût d'une journée et d'une action raisonnable, et leurs valeurs dérivées (état pondéré, vue du joueur) restent en cache.
-- **Journal de partie** : les événements et les décisions sont enregistrés localement, exportables pour l'analyse de l'équilibrage (voir [08-equilibrage.md](08-equilibrage.md)).
+- **Version 8 (jalon 6)** : mode de partie, compteur de retours, fin de partie, progression (titres, succès, compteurs, records, défi), chronique, événements en attente et anecdotes récentes, dernier bilan annuel, agenda à plusieurs types d'actions, loyers et réputation dans la courbe mensuelle. La migration depuis la v7 met la partie en mode Classique, lui donne le titre de départ et des compteurs tirés de ce qu'elle possède (le passé n'est pas rejoué) ; les titres et succès déjà mérités arrivent le lendemain.
+- **Points de retour en arrière** : rangés dans l'emplacement de sauvegarde, pas dans l'état du moteur (date, patrimoine net, partie sérialisée) ; le moteur fournit `rewind(partie, point)`.
+- **Journal de partie** : les événements du moteur (sauf les plus fréquents : jours, prix, taux) et les actions du joueur sont enregistrés dans IndexedDB par emplacement, par lots, en gardant les 20 000 dernières lignes ; exportables depuis les Réglages (une ligne JSON par entrée) pour l'analyse de l'équilibrage (voir [08-equilibrage.md](08-equilibrage.md)).
 
 ## 7.6 Les tests
 

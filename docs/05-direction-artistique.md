@@ -71,7 +71,7 @@ L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-e
   - le jeu fonctionne sans musique tant qu'elle n'est pas fournie.
 - **Trois volumes séparés** : musique, ambiances, effets.
 - **Réalisation (jalon 5)** : ambiances et effets **synthétisés par le code** (Web Audio) : rumeur de la ville selon le moment, pluie, clapotis des quais, oiseaux le matin, grillons les nuits d'été, marteau et perceuse près d'un chantier, cloches à midi (trois coups), « ka-ching » quand des loyers arrivent au bilan du mois, tampon à la signature d'un compromis, d'un acte ou d'une vente, perceuse au lancement d'un chantier. Le son démarre au premier toucher (règle des navigateurs).
-- **Ajouter la musique** : déposer les fichiers MP3 ou OGG dans `apps/game/public/musique/<emplacement>/` (`day` pour le matin et la journée, `evening`, `night`, `celebration`) et inscrire leurs noms dans `content/musique.json`. Ils sont mis en cache pour le hors-ligne (12 Mo au plus par fichier). L'emplacement des célébrations joue 90 secondes au passage du Nouvel An, en attendant les bilans et les titres du jalon 6.
+- **Ajouter la musique** : déposer les fichiers MP3 ou OGG dans `apps/game/public/musique/<emplacement>/` (`day` pour le matin et la journée, `evening`, `night`, `celebration`) et inscrire leurs noms dans `content/musique.json`. Ils sont mis en cache pour le hors-ligne (12 Mo au plus par fichier). L'emplacement des célébrations joue pendant que le bilan mensuel, le bilan annuel ou la célébration d'un nouveau titre est ouvert (jalon 6).
 
 ## 5.9 Les maquettes
 

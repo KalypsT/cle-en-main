@@ -32,30 +32,45 @@ Les événements font vivre la simulation et maintiennent un **flux régulier de
 
 ## Événements décrits en données
 
-Chaque événement est un objet JSON dans `content/events/`, validé par un schéma :
+Chaque événement est un objet JSON dans `content/evenements/` (un fichier par famille : `marche`, `locataires`, `artisans`, `banque`, `copropriete`, `ville`, `france`), validé par un schéma zod (`content/schemas/events.ts`). Format arrêté au jalon 6 (point ouvert n° 8) :
 
 ```json
 {
-  "id": "locataire.chauffe_eau_panne",
-  "famille": "locataires",
-  "conditions": { "bien.loue": true, "bien.poste.plomberie.etat_max": 3 },
-  "probabilite_par_mois": 0.04,
-  "pause": true,
-  "echeance_jours": 3,
-  "texte": "Le chauffe-eau de {bien.nom} a rendu l'âme. {locataire.prenom} prend des douches froides depuis hier.",
-  "choix": [
-    { "id": "reparer", "label": "Réparer ({cout} €)", "effets": { "argent": -180, "locataire.satisfaction": 5, "bien.poste.plomberie.etat": "+1" } },
-    { "id": "remplacer", "label": "Remplacer ({cout} €)", "effets": { "argent": -620, "locataire.satisfaction": 10, "bien.poste.plomberie.etat": 5 } },
-    { "id": "attendre", "label": "Attendre", "effets": { "locataire.satisfaction_par_jour": -4 } }
-  ]
+  "id": "bathroomMould",
+  "family": "tenants",
+  "target": "lease",
+  "kind": "mishap",
+  "conditions": { "item": { "kind": "ventilation", "maxState": 2 } },
+  "chancePerMonth": 0.06,
+  "cooldownDays": 365,
+  "pause": false,
+  "texts": ["{locataire} envoie des photos : des moisissures noires gagnent le plafond de la salle de bains de {bien}."],
+  "choices": [
+    { "id": "vmc", "label": "Installer une VMC ({montant})", "effects": [{ "type": "money", "euros": { "min": -900, "max": -500 } }, { "type": "item", "item": "ventilation", "set": 4 }, { "type": "satisfaction", "delta": 8 }], "outcome": "L'air circule enfin." },
+    { "id": "bleach", "label": "Passer à l'eau de Javel soi-même (1 h)", "effects": [{ "type": "freeTime", "minutes": 60 }, { "type": "satisfaction", "delta": -2 }] },
+    { "id": "ignore", "label": "Ignorer", "effects": [{ "type": "satisfaction", "delta": -10 }, { "type": "reputation", "delta": -1 }] }
+  ],
+  "deadlineDays": 4,
+  "defaultChoice": "ignore"
 }
 ```
 
-(Format indicatif, à définir précisément au jalon 6.)
+- **Cible** (`target`) : rien (`none`), un bien loué (`lease`), un bien possédé hors résidence principale (`owned`), un bien vide (`vacant`), un appartement en copropriété (`copro`), un bien en chantier (`works`).
+- **Vocabulaire fermé de conditions** : mois, métiers, salarié ou non, locataire de sa résidence, crédit en cours, conditions sur les statistiques (les mêmes que les titres et les succès) ; sur la cible : état maximal d'un poste, type de bail, classes DPE, type de bien, fourchette de satisfaction du locataire.
+- **Vocabulaire fermé d'effets** (montants signés : négatif = dépense) : argent (fourchette en euros tirée quand l'événement arrive, ou part du loyer), réputation, satisfaction, confiance d'un banquier, état d'un poste (le plus usé du type), temps libre consommé (le choix le demande), préavis du locataire, variation du loyer, niveau ou tendance des prix d'un quartier, d'une ville ou de toute la France, taux du marché, bien hors marché proposé, retard ou avance d'un chantier.
+- Un événement a **soit des effets immédiats** (simple nouvelle), **soit au moins deux choix**, une échéance et un **choix par défaut** appliqué si le joueur ne répond pas.
+- **Chance par mois**, pour chaque cible possible (une seule fois pour `none`) ; les événements `mishap` sont multipliés par le coefficient d'incidents du mode. **Délai** avant qu'un même événement revienne. Au plus 3 événements en attente et 1 nouveau par jour (`content/rythme.json`).
+- **Textes** avec variantes et variables : `{bien}`, `{locataire}`, `{quartier}`, `{ville}`, `{artisan}` (tiré du métier `artisanTrade`), `{banquier}`, `{rival}`, `{montant}` (le montant du choix).
+- Les grands événements nationaux (`france`, `major`) vont dans la chronique.
+- **Catalogue du jalon 6** : 107 événements à enjeu (16 marché, 26 locataires, 15 artisans, 13 banque, 13 copropriété, 16 ville, 8 France), en plus des incidents et événements de vie des locataires et des imprévus de chantier déjà codés aux jalons 2 et 3. Les fréquences ont été calées par les bots sur la densité de décisions (voir [08-equilibrage.md](../08-equilibrage.md)).
+- **Simplification** : l'argent d'un événement passe directement sur le compte courant ; il n'apparaît pas dans les lignes du bilan mensuel ni dans les charges déductibles.
 
-- On peut **ajouter des événements sans toucher au code**.
-- Les bots vérifient qu'un nouvel événement ne casse pas l'équilibre.
-- Les textes utilisent des **variables** et des **variantes** pour éviter la répétition.
+> **Anecdotes** (`content/anecdotes.json`, 54) : locataires, voisins, artisans, banquiers, rivaux, ville ; une chance de 30 % par jour, sans effet. Elles arrivent dans le fil d'actualité et, pendant 3 jours, en bulle « … » sur le bâtiment concerné de la rue.
+>
+> **Défis** : voir [02-boucle-et-progression.md](../02-boucle-et-progression.md#210-succès-défis-chronique-et-statistiques) ; ils apparaissent dans la boîte de décisions et mettent le jeu en pause.
+
+- On peut **ajouter des événements sans toucher au code** ; `pnpm validate-content` vérifie le schéma et les références (banques, rivaux, métiers, effets compatibles avec la cible).
+- Les bots vérifient qu'un nouvel événement ne casse pas l'équilibre : ils répondent aux événements par leur choix par défaut, tout de suite.
 
 ## Le rythme sans idle
 

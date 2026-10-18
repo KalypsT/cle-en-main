@@ -34,6 +34,13 @@ C'est la ressource qui empêche le jeu de devenir idle, et l'unique « gestion d
 - **Journée sur place** : regrouper plusieurs actions dans une même ville avec un seul trajet (voir [08-villes-et-deplacements.md](08-villes-et-deplacements.md)).
 - Pas de calendrier détaillé à gérer : l'agenda reste un outil d'aide.
 
+> **Jalon 6, agenda complet** (`content/calendrier.json`) :
+> - **Jours fériés** : les 8 dates fixes, plus le lundi de Pâques, l'Ascension et le lundi de Pentecôte (calculés depuis Pâques). Un jour férié en semaine donne le temps libre du week-end.
+> - **Vacances scolaires de la zone A** : des règles (« le premier samedi à partir du 16 octobre, pour 16 jours », grandes vacances jusqu'au 31 août) qui redonnent les dates officielles de 2025-2026 et 2026-2027. Simplification : les vacances d'hiver et de printemps de la zone A ne tournent pas d'une année à l'autre. L'enseignant y a 8 h par jour (6 h le week-end hors vacances).
+> - **RTT du fonctionnaire** : le premier vendredi de chaque mois (sauf jour férié), 8 h de temps libre, soit 12 jours par an, posés automatiquement (`content/metiers.json`).
+> - Les **rendez-vous bancaires** et les **réparations faites soi-même** demandés sans assez de temps libre se planifient aussi au premier créneau, comme les visites. Chaque action de l'agenda peut être **reportée** à un autre jour qui a encore assez de temps libre, ou **annulée**.
+> - L'écran Agenda montre les 14 prochains jours : type de jour (travaillé, week-end, férié, RTT, vacances scolaires), temps libre, actions prévues.
+
 ## Les métiers
 
 Chaque métier change trois choses : le **salaire**, le **temps libre** et la **confiance bancaire de départ**. Valeurs à calibrer.

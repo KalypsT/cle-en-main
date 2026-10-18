@@ -16,7 +16,7 @@ import { useGame, useNav } from './context.tsx';
 export function StatusBar() {
   const { snapshot, session, state } = useGame();
   const nav = useNav();
-  const { speed, decisions, autoPaused } = snapshot;
+  const { speed, decisions, autoPaused, accelerated } = snapshot;
   const { player } = state;
   const fullDay = engine.dailyFreeTime(state);
   const share = fullDay > 0 ? Math.min(1, player.freeTimeMinutes / fullDay) : 0;
@@ -32,6 +32,11 @@ export function StatusBar() {
           <span className="status-time" data-testid="game-time">
             {formatGameTime(state.clock.hour)}
             {autoPaused && ` · ${t.status.paused}`}
+            {accelerated && (
+              <span title={t.status.autoSpeedHint} data-testid="accelerated">
+                {` · ${t.status.autoSpeed}`}
+              </span>
+            )}
           </span>
         </div>
         <div className="speed" role="group" aria-label={t.status.speedControls}>

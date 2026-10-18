@@ -72,3 +72,15 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Panorama** : téléphone tourné, la Rue passe en plein écran avec une barre d'état réduite (date, heure, vitesse) ; les autres écrans demandent de revenir en portrait.
 - **Thème** : Clair, Sombre, Automatique (sombre pendant la nuit du jeu), Selon le téléphone (par défaut).
 - **Réglages de la rue** : qualité graphique (Automatique, Haute, Économie) et compteur d'images par seconde, pour vérifier la fluidité sur le téléphone.
+
+## 4.10 Rythme et progression (jalon 6)
+
+- **Barre d'état** : quand l'accélération automatique joue, l'horloge passe à ×4 sans changer le bouton choisi (×1), et l'heure porte la mention « accéléré ».
+- **Décisions** : les événements du catalogue (« Événement : à vous de décider », avec le bien ou la famille) et les défis proposés y apparaissent. L'écran d'un événement montre son texte, ses choix avec leur montant et le temps libre qu'ils demandent, et le choix appliqué sans réponse.
+- **Rue** : une bulle « Événement » sur le bien concerné ; une bulle « … » pour une anecdote récente, qui s'affiche au toucher.
+- **Bilans** : le bilan du mois s'ouvre par-dessus le jeu le 1er de chaque mois (réglage), le bilan annuel avec Yvon Tableur le 1er janvier ; tous deux arrêtent l'horloge et se retrouvent dans le Menu.
+- **Nouveau titre** : une fenêtre de célébration avec des confettis (sans animation si « réduire les animations ») et la musique de célébration.
+- **Menu** : Agenda, Bilan du mois, Bilan annuel, Progression (onglets Titres et réputation, Succès, Défis, Chronique), Statistiques (courbes, records, compteurs), Réglages.
+- **Réglages** : accélération automatique, bilan mensuel, Revenir en arrière (les points du 1er des derniers mois, avec le patrimoine net, et les retours restants), export du journal de partie.
+- **Création de partie** : choix du mode (Serein, Classique, Exigeant) avec sa description.
+- **Faillite** : une fenêtre « Nouveau départ » (Classique, Serein) ou « Fin de partie » (Exigeant), qui mène à la chronique.
