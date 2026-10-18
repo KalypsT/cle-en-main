@@ -4,7 +4,9 @@ import { nextFloat, nextRange } from '../random.ts';
 import type { OwnedProperty, SaleMode } from '../state.ts';
 import { refinancingFees } from './banking.ts';
 import type { SystemContext } from './context.ts';
+import { moveOutOfHome } from './renting.ts';
 import { rivalAcquired } from './rivals.ts';
+import { capitalGainsTax as capitalGainsTaxOf } from './taxes.ts';
 import { realValue } from './valuation.ts';
 
 export type SaleRefusal =
@@ -114,21 +116,38 @@ export function saleProceeds(ctx: SystemContext, owned: OwnedProperty, price: Ce
   return { agencyFees, ...settlement(ctx, owned, price - agencyFees) };
 }
 
-/** Repayment of the property's loans, with their early-repayment fees, out of `received`. */
+/**
+ * What comes out of `received` (the price, agency fees deducted): the
+ * property's loans with their early-repayment fees, the capital gains tax
+ * collected by the notary, and the tenant's deposit handed to the buyer.
+ */
 function settlement(ctx: SystemContext, owned: OwnedProperty, received: Cents) {
   const loans = ctx.state.loans.filter((loan) => loan.propertyId === owned.property.id);
   const loanRepaid = loans.reduce((sum, loan) => sum + loan.remaining, 0);
   const loanFees = loans.reduce((sum, loan) => sum + refinancingFees(ctx.content, loan), 0);
-  return { loanRepaid, loanFees, net: received - loanRepaid - loanFees };
+  const capitalGainsTax = capitalGainsTaxOf(ctx, owned, received).tax;
+  const depositTransferred = owned.lease?.deposit ?? 0;
+  return {
+    loanRepaid,
+    loanFees,
+    capitalGainsTax,
+    depositTransferred,
+    net: received - loanRepaid - loanFees - capitalGainsTax - depositTransferred,
+  };
 }
 
 /** Hands the property over: its loans are repaid and the net amount reaches the account. */
 export function transferProperty(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
   const { state } = ctx;
   const proceeds = settlement(ctx, owned, price);
+  const propertyId = owned.property.id;
   state.player.balance += proceeds.net;
-  state.loans = state.loans.filter((loan) => loan.propertyId !== owned.property.id);
-  state.properties = state.properties.filter((p) => p.property.id !== owned.property.id);
+  state.loans = state.loans.filter((loan) => loan.propertyId !== propertyId);
+  // This year's rents and costs are still taxed at the yearly review.
+  const ledger = state.tax.ledgers[propertyId];
+  if (ledger) ledger.sold = true;
+  state.properties = state.properties.filter((p) => p.property.id !== propertyId);
+  if (state.player.homePropertyId === propertyId) moveOutOfHome(ctx);
   return proceeds;
 }
 

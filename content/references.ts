@@ -2,7 +2,8 @@ import type { CityData } from './schemas/city.ts';
 import type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
 import type { Job } from './schemas/jobs.ts';
 import type { ListingTexts, MarketRules } from './schemas/market.ts';
-import type { RentingRules } from './schemas/renting.ts';
+import type { RentingRules, TenantTexts } from './schemas/renting.ts';
+import type { TaxRules } from './schemas/taxes.ts';
 import type { Rival, RivalsFile } from './schemas/rivals.ts';
 import type { LivingCosts, Start } from './schemas/start.ts';
 
@@ -17,6 +18,8 @@ export interface GameContent {
   market: MarketRules;
   listingTexts: ListingTexts;
   renting: RentingRules;
+  tenantTexts: TenantTexts;
+  taxes: TaxRules;
   rivalRules: RivalsFile['aggressiveness'];
   rivals: Rival[];
   /** Generated city data, by city id. */
@@ -96,6 +99,65 @@ export function checkReferences(content: GameContent): string[] {
     if (Object.values(weights).every((weight) => weight === 0)) {
       problems.push(`marche.json : aucun état possible pour l'époque « ${epoch} »`);
     }
+  }
+  problems.push(...checkRentingReferences(content));
+  return problems;
+}
+
+function checkRentingReferences(content: GameContent): string[] {
+  const problems: string[] = [];
+  const { renting, tenantTexts } = content;
+  const unique = (ids: string[], what: string) => {
+    if (new Set(ids).size !== ids.length) problems.push(`location.json : ${what} en double`);
+  };
+  unique(
+    renting.profiles.map((p) => p.id),
+    'profil',
+  );
+  unique(
+    renting.traits.map((t) => t.id),
+    'trait',
+  );
+  unique(
+    renting.agencies.map((a) => a.id),
+    'agence',
+  );
+  unique(
+    renting.incidents.map((i) => i.id),
+    'incident',
+  );
+  unique(
+    renting.lifeEvents.events.map((e) => e.id),
+    'événement de vie',
+  );
+  const profileIds = new Set(renting.profiles.map((p) => p.id));
+  const texts: [string, { id: string }[], Record<string, string>][] = [
+    ['profil', renting.profiles, tenantTexts.profiles],
+    ['trait', renting.traits, tenantTexts.traits],
+    ['incident', renting.incidents, tenantTexts.incidents],
+    ['événement de vie', renting.lifeEvents.events, tenantTexts.lifeEvents],
+  ];
+  for (const [what, rules, byId] of texts) {
+    for (const rule of rules) {
+      if (!byId[rule.id]) {
+        problems.push(`textes/locataires.json : aucun texte pour le ${what} « ${rule.id} »`);
+      }
+    }
+  }
+  for (const event of renting.lifeEvents.events) {
+    for (const profileId of event.profiles ?? []) {
+      if (!profileIds.has(profileId)) {
+        problems.push(`location.json : profil inconnu « ${profileId} » (${event.id})`);
+      }
+    }
+  }
+  for (const type of ['bare', 'furnished'] as const) {
+    if (renting.profiles.every((p) => p.weights[type] === 0)) {
+      problems.push(`location.json : aucun candidat possible pour le bail « ${type} »`);
+    }
+  }
+  if (renting.rentRange.min > 1 || renting.rentRange.max < 1) {
+    problems.push('location.json : la fourchette de loyer doit contenir le loyer de marché');
   }
   return problems;
 }

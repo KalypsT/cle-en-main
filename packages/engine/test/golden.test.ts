@@ -8,8 +8,10 @@ const DAYS = 365;
 /**
  * Plays one year as a fonctionnaire who meets the Tirelire banker at the start
  * of every month and buys one modest property: on the 2nd at 18:00, visits
- * the listing whose estimate beats its asking price the most, then offers its
- * asking price, borrows the price over 20 years and signs.
+ * the listing that can be let whose estimate beats its asking price the most, then offers its
+ * asking price, borrows the price over 20 years and signs. Once the property is
+ * owned, it is let bare at the market rent, managed by the player, who accepts
+ * the first candidate at 18:00 (milestone 2).
  */
 function playReferenceGame() {
   let state = engine.createGame({
@@ -51,6 +53,31 @@ function playReferenceGame() {
         });
       }
     }
+    if (state.clock.hour === 18) {
+      for (const owned of state.properties) {
+        if (!owned.lease && !owned.rental) {
+          const quote = engine.rentQuote(state, owned.property.id, 'bare');
+          if (quote && !quote.block) {
+            tryAction({
+              type: 'rent/list',
+              propertyId: owned.property.id,
+              leaseType: 'bare',
+              monthlyRent: quote.market,
+              agencyId: null,
+              insured: false,
+            });
+          }
+        }
+        const application = owned.rental?.applications[0];
+        if (application) {
+          tryAction({
+            type: 'rent/accept',
+            propertyId: owned.property.id,
+            applicationId: application.id,
+          });
+        }
+      }
+    }
     if (state.clock.date.day === 2 && state.clock.hour === 18) {
       tryAction({ type: 'bank/meet', bankId: 'tirelire' });
       const idle = state.properties.length === 0 && state.purchases.length === 0;
@@ -68,6 +95,7 @@ function bestDeal(state: GameState) {
   let best: { id: string; askingPrice: number; ratio: number } | undefined;
   for (const listing of state.listings) {
     if (listing.offer || listing.askingPrice > 8_000_000) continue;
+    if (engine.rentQuote(state, listing.id, 'bare')?.block) continue;
     const ratio = (engine.estimate(state, listing.id)?.estimate ?? 0) / listing.askingPrice;
     if (!best || ratio > best.ratio)
       best = { id: listing.id, askingPrice: listing.askingPrice, ratio };
@@ -106,5 +134,7 @@ describe('golden seed', () => {
     const result = playReferenceGame();
     expect(result.eventCounts.deedSigned).toBe(1);
     expect(result.state.properties).toHaveLength(1);
+    expect(result.eventCounts.tenantMovedIn).toBeGreaterThanOrEqual(1);
+    expect(result.eventCounts.taxAssessed).toBe(1);
   });
 });

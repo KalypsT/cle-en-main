@@ -61,6 +61,21 @@ export function toDayNumber(date: CalendarDate): number {
   return era * 146097 + doe - 719468;
 }
 
+/** Inverse of toDayNumber (Howard Hinnant's civil_from_days). */
+export function fromDayNumber(dayNumber: number): CalendarDate {
+  const z = dayNumber + 719468;
+  const era = Math.floor(z / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor(
+    (doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365,
+  );
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const day = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const month = mp < 10 ? mp + 3 : mp - 9;
+  return { year: yoe + era * 400 + (month <= 2 ? 1 : 0), month, day };
+}
+
 export function weekdayOf(date: CalendarDate): Weekday {
   // 1970-01-01 was a Thursday (ISO 4).
   return (((((toDayNumber(date) + 3) % 7) + 7) % 7) + 1) as Weekday;

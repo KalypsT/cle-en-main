@@ -2,7 +2,7 @@ import type { DispatchResult, GameAction, RefusalCode } from './actions.ts';
 import { type CalendarDate, isValidDate, toDayNumber, toIsoDate } from './calendar.ts';
 import { advanceClock, createClock, HOURS_PER_DAY } from './clock.ts';
 import { deepClone } from './clone.ts';
-import { findJob, type GameContent } from './content.ts';
+import { findJob, type GameContent, type LeaseType } from './content.ts';
 import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
@@ -40,7 +40,38 @@ import {
   waiveLoanCondition,
   withdrawPurchase,
 } from './systems/purchases.ts';
-import { marketRent, netRent, runDailyRenting, runMonthlyRenting } from './systems/renting.ts';
+import {
+  repairIncident,
+  runDailyLeases,
+  runMonthlyLeases,
+  runYearlyDpeWarnings,
+} from './systems/leases.ts';
+import {
+  acceptApplication,
+  changeManagement,
+  furnitureCost,
+  letBanDay,
+  lettingBlock,
+  listForRent,
+  moveIntoHome,
+  moveOutOfHome,
+  ownerInsurance,
+  recoverableCharges,
+  rejectApplication,
+  rentRange,
+  runDailyRentalListings,
+  withdrawRental,
+} from './systems/renting.ts';
+import {
+  capitalGainsTax,
+  closeTaxYear,
+  estimateRegimes,
+  initialTaxState,
+  recordStatement,
+  runDailyPropertyTax,
+  runMonthlyTaxInstalment,
+  setTaxRegime,
+} from './systems/taxes.ts';
 import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
 import {
   answerSaleOffer,
@@ -105,6 +136,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       reputation: content.start.reputation,
       rentalHistoryMonths: 0,
       bankruptDay: null,
+      homePropertyId: null,
     },
     banks: initialBankRelations(content, job.bankTrust),
     market: {
@@ -119,6 +151,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     properties: [],
     agenda: [],
     rivals: initialRivals(content),
+    tax: initialTaxState(startDate.year),
   };
   // The market already has listings on the first day.
   seedListings(context(content, state, []), content.start.cityId);
@@ -135,16 +168,24 @@ function context(content: GameContent, state: GameState, events: GameEvent[]): S
 }
 
 /** Systems run in this fixed order at the start of each game day. */
-function runNewDay(ctx: SystemContext, monthStarted: boolean): void {
+function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boolean): void {
+  if (yearStarted) {
+    // Yearly review: last year's tax, before this year's first flows.
+    closeTaxYear(ctx);
+    runYearlyDpeWarnings(ctx);
+  }
   if (monthStarted) {
     runMonthlyMarketRate(ctx);
     runMonthlyPrices(ctx);
     const lines: StatementLine[] = [];
     runMonthlyRivals(ctx);
     runMonthlyHousehold(ctx, lines);
-    runMonthlyRenting(ctx, lines);
+    runMonthlyLeases(ctx, lines);
     const paidBankIds = new Set(ctx.state.loans.map((loan) => loan.bankId));
+    const loanProperty = new Map(ctx.state.loans.map((loan) => [loan.id, loan.propertyId]));
     runMonthlyLoanPayments(ctx, lines);
+    recordStatement(ctx, lines, loanProperty);
+    runMonthlyTaxInstalment(ctx, lines);
     runMonthlyTrust(ctx, paidBankIds);
     runRenegotiationCheck(ctx);
     const { player } = ctx.state;
@@ -159,7 +200,9 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean): void {
   runDailyPurchases(ctx);
   runDailyRivals(ctx);
   runDailyListings(ctx, (listing, price) => signCompromis(ctx, listing, price));
-  runDailyRenting(ctx);
+  runDailyLeases(ctx);
+  runDailyRentalListings(ctx);
+  runDailyPropertyTax(ctx);
   runDailyResale(ctx);
   runDailyOverdraft(ctx);
   runDailyDistress(ctx);
@@ -174,6 +217,7 @@ export function createEngine(content: GameContent) {
     runNewDay(
       context(content, draft, events),
       events.some((event) => event.type === 'monthStarted'),
+      events.some((event) => event.type === 'yearStarted'),
     );
     return { state: draft, events };
   }
@@ -249,6 +293,38 @@ export function createEngine(content: GameContent) {
           amount: action.amount,
         });
         break;
+      case 'rent/list':
+        refusal = listForRent(ctx, action.propertyId, {
+          leaseType: action.leaseType,
+          monthlyRent: action.monthlyRent,
+          agencyId: action.agencyId,
+          insured: action.insured,
+        });
+        break;
+      case 'rent/withdraw':
+        refusal = withdrawRental(ctx, action.propertyId);
+        break;
+      case 'rent/accept':
+        refusal = acceptApplication(ctx, action.propertyId, action.applicationId);
+        break;
+      case 'rent/reject':
+        refusal = rejectApplication(ctx, action.propertyId, action.applicationId);
+        break;
+      case 'rent/manage':
+        refusal = changeManagement(ctx, action.propertyId, action.agencyId);
+        break;
+      case 'rent/repair':
+        refusal = repairIncident(ctx, action.propertyId, action.method);
+        break;
+      case 'home/moveIn':
+        refusal = moveIntoHome(ctx, action.propertyId);
+        break;
+      case 'home/moveOut':
+        refusal = moveOutOfHome(ctx);
+        break;
+      case 'tax/setRegime':
+        refusal = setTaxRegime(ctx, action.propertyId, action.regime);
+        break;
       case 'job/resign':
         if (!draft.player.employed) {
           refusal = 'job.alreadyResigned';
@@ -312,21 +388,46 @@ export function createEngine(content: GameContent) {
       return owned ? saleProceeds(context(content, state, []), owned, price) : null;
     },
     /**
-     * Rent a tenant would pay today for a listing, a purchase under compromis
-     * or an owned property, before and after the owner's costs (0 if it
-     * cannot be let).
+     * Rents the player may ask today for a listing, a purchase under compromis
+     * or an owned property, whether a new lease is allowed (indecent home,
+     * DPE ban and its date), and the owner's monthly costs before any tax.
      */
-    marketRent: (state: GameState, id: string): { gross: Cents; net: Cents } | null => {
-      const property =
-        state.listings.find((candidate) => candidate.id === id)?.property ??
-        state.purchases.find((candidate) => candidate.id === id)?.property ??
-        state.properties.find((candidate) => candidate.property.id === id)?.property;
+    rentQuote: (state: GameState, id: string, leaseType: LeaseType) => {
+      const property = findAnyProperty(state, id);
       if (!property) return null;
-      const gross = marketRent(content, state, property);
-      return { gross, net: netRent(content, gross) };
+      const today = toDayNumber(state.clock.date);
+      const range = rentRange(content, state, property, leaseType);
+      return {
+        ...range,
+        block: lettingBlock(content, property, today),
+        banDay: letBanDay(content, property.dpe),
+        /** Charges left to the owner, property tax and landlord insurance, per month. */
+        monthlyOwnerCosts:
+          property.monthlyCharges -
+          recoverableCharges(content, property) +
+          Math.round(property.annualPropertyTax / 12) +
+          ownerInsurance(content, property),
+        furnitureCost: furnitureCost(content, property),
+      };
+    },
+    /** This year's tax so far, and the cost of each regime for each let property. */
+    estimateTaxes: (state: GameState) =>
+      estimateRegimes(content, state, toDayNumber(state.clock.date)),
+    /** Capital gains tax if an owned property sold today, `received` net of agency fees. */
+    capitalGainsTax: (state: GameState, propertyId: string, received: Cents) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? capitalGainsTax({ content, state }, owned, received) : null;
     },
     netWorth: (state: GameState) => netWorth(content, state),
   };
+}
+
+function findAnyProperty(state: GameState, id: string) {
+  return (
+    state.listings.find((candidate) => candidate.id === id)?.property ??
+    state.purchases.find((candidate) => candidate.id === id)?.property ??
+    state.properties.find((candidate) => candidate.property.id === id)?.property
+  );
 }
 
 export type Engine = ReturnType<typeof createEngine>;

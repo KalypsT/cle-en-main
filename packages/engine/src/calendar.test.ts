@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   compareDates,
   daysInMonth,
+  fromDayNumber,
   isLeapYear,
   isValidDate,
   isWeekend,
@@ -68,5 +69,19 @@ describe('calendar', () => {
     expect(parseIsoDate('2026-03-07')).toEqual({ year: 2026, month: 3, day: 7 });
     expect(parseIsoDate('2026-02-30')).toBeNull();
     expect(parseIsoDate('07/03/2026')).toBeNull();
+  });
+
+  it('converts day numbers back to dates', () => {
+    for (const date of [
+      { year: 1970, month: 1, day: 1 },
+      { year: 2024, month: 2, day: 29 },
+      { year: 2026, month: 10, day: 18 },
+      { year: 2100, month: 12, day: 31 },
+    ]) {
+      expect(fromDayNumber(toDayNumber(date))).toEqual(date);
+    }
+    for (let day = 18_000; day < 22_000; day += 37) {
+      expect(toDayNumber(fromDayNumber(day))).toBe(day);
+    }
   });
 });

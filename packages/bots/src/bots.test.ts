@@ -24,6 +24,9 @@ describe('bots', () => {
     expect(result.visits).toBeGreaterThan(0);
     expect(result.purchases).toBeGreaterThan(0);
     expect(result.firstPurchaseDay).toBeLessThan(200);
+    // It lets what it buys, and its first year is assessed on 1 January.
+    expect(result.letMonths).toBeGreaterThan(0);
+    expect(result.assessedPropertyYears).toBeGreaterThan(0);
     expect(playGame(createStrategy('chasseur'), options)).toEqual(result);
   });
 
@@ -56,5 +59,6 @@ describe('bots', () => {
     expect(report.summaries.map((s) => s.botId)).toEqual(['prudent', 'levier']);
     expect(report.checks.some((check) => check.label.startsWith('Faillites du Levier'))).toBe(true);
     expect(formatReport(report, 'Test')).toContain('| Levier maximal |');
+    expect(formatReport(report, 'Test')).toContain('## Location et fiscalité');
   }, 60_000);
 });

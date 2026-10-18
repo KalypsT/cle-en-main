@@ -1,4 +1,10 @@
-import type { GameEvent, Listing } from '@cle/engine';
+import {
+  type GameEvent,
+  type LeaseType,
+  type Listing,
+  type OwnedProperty,
+  visibleReliability,
+} from '@cle/engine';
 import type { BotApi, Strategy } from './driver.ts';
 
 /**
@@ -32,8 +38,21 @@ export interface InvestorProfile {
   maxDebtRatio: number;
   /** Lowest monthly cash flow accepted (net rent − loan payment, euros); null ignores it. */
   minCashFlow: number | null;
-  /** Skips properties in ruins, which cannot be let before milestone 3. */
+  /** Skips properties that cannot be let (ruins, DPE bans) before milestone 3. */
   avoidRuins: boolean;
+  /** Skips properties a DPE ban stops from being let within this many years (0: ignores it). */
+  minLettableYears: number;
+  leaseType: LeaseType;
+  /** Rent asked, as a share of the market rent (within the allowed range). */
+  rentShare: number;
+  /** Managing agency; null: manages the lets himself. */
+  agencyId: string | null;
+  /** Takes the unpaid-rent insurance. */
+  insured: boolean;
+  /** Picks the candidate with the best file, or takes the first one. */
+  tenantChoice: 'best' | 'first';
+  /** Regime choice: follows the recommendation, or stays with the micro regime. */
+  taxRegime: 'recommended' | 'micro';
   /** Banks asked for a loan, in order. */
   banks: string[];
   /** Banks met every month, to build trust. */
@@ -44,6 +63,12 @@ export interface InvestorProfile {
 
 const OFFER_STEP = 500_00;
 const DAYS_PER_MONTH = 30;
+const DAYS_PER_YEAR = 365;
+/** Share of the year a let is expected to be vacant, in the bots' cash-flow estimate. */
+const VACANCY_ALLOWANCE = 0.05;
+/** A careful owner waits this long for several candidates, then takes the best one. */
+const CANDIDATE_WAIT_DAYS = 5;
+const DECEMBER = 12;
 
 interface Plan {
   bankIds: string[];
@@ -89,8 +114,13 @@ export function investor(profile: InvestorProfile): Strategy {
     const fees = Math.round(price * feesShare(api));
     const contribution = fees + Math.round(price * profile.extraContributionShare);
     const amount = price + fees - contribution;
-    const cash = state.player.balance + deposit;
-    const rent = engine.marketRent(state, rentId)?.net ?? 0;
+    // A furnished let needs its furniture on top.
+    const furniture =
+      profile.leaseType === 'furnished'
+        ? (engine.rentQuote(state, rentId, 'furnished')?.furnitureCost ?? 0)
+        : 0;
+    const cash = state.player.balance + deposit - furniture;
+    const rent = netRent(api, rentId);
     const bankIds: string[] = [];
     for (const bankId of profile.banks) {
       const decision = engine.evaluateLoan(state, {
@@ -112,6 +142,99 @@ export function investor(profile: InvestorProfile): Strategy {
       bankIds.push(bankId);
     }
     return bankIds.length > 0 ? { bankIds, amount, maxPrice: price } : null;
+  }
+
+  /** Monthly rent left after the owner's costs and the agency, before the loan and tax. */
+  function netRent(api: BotApi, id: string): number {
+    const { engine, state } = api;
+    const quote = engine.rentQuote(state, id, profile.leaseType);
+    if (!quote || quote.block) return 0;
+    const rent = quote.market * profile.rentShare;
+    const agency = engine.content.renting.agencies.find((a) => a.id === profile.agencyId);
+    const insurance = profile.insured ? engine.content.renting.unpaidRentInsurance.premiumShare : 0;
+    return (
+      rent * (1 - VACANCY_ALLOWANCE) * (1 - (agency?.feeShare ?? 0) - insurance) -
+      quote.monthlyOwnerCosts
+    );
+  }
+
+  /** The property can be let now, and long enough for this bot. */
+  function lettable(api: BotApi, id: string): boolean {
+    const quote = api.engine.rentQuote(api.state, id, profile.leaseType);
+    if (!quote || quote.block) return false;
+    if (profile.minLettableYears === 0 || quote.banDay === null) return true;
+    return quote.banDay - api.today > profile.minLettableYears * DAYS_PER_YEAR;
+  }
+
+  /** Offers the property on the bot's terms; bare if it cannot pay for the furniture. */
+  function offerForRent(api: BotApi, owned: OwnedProperty): void {
+    const id = owned.property.id;
+    const affordable =
+      owned.furniture !== null ||
+      (api.engine.rentQuote(api.state, id, 'furnished')?.furnitureCost ?? 0) <=
+        api.state.player.balance;
+    const leaseType = profile.leaseType === 'furnished' && !affordable ? 'bare' : profile.leaseType;
+    const quote = api.engine.rentQuote(api.state, id, leaseType);
+    if (!quote || quote.block) return;
+    const monthlyRent = Math.min(
+      quote.max,
+      Math.max(quote.min, Math.round((quote.market * profile.rentShare) / 100) * 100),
+    );
+    api.act({
+      type: 'rent/list',
+      propertyId: id,
+      leaseType,
+      monthlyRent,
+      agencyId: profile.agencyId,
+      insured: profile.insured,
+    });
+  }
+
+  /** Offers vacant properties, picks tenants, fixes incidents; sets the tax regimes in December. */
+  function manageLets(api: BotApi): void {
+    const { engine } = api;
+    for (const owned of [...api.state.properties]) {
+      const id = owned.property.id;
+      if (!owned.lease && !owned.rental && !owned.sale) offerForRent(api, owned);
+      const rental = api.state.properties.find((o) => o.property.id === id)?.rental;
+      if (rental && rental.agencyId === null && rental.applications.length > 0) {
+        const waited = api.today - rental.listedDay >= CANDIDATE_WAIT_DAYS;
+        const ranked = [...rental.applications].sort(
+          (a, b) =>
+            visibleReliability(engine.content, b.tenant, rental.monthlyRent) -
+            visibleReliability(engine.content, a.tenant, rental.monthlyRent),
+        );
+        const choice =
+          profile.tenantChoice === 'first'
+            ? rental.applications[0]
+            : waited || rental.applications.length >= 3
+              ? ranked[0]
+              : undefined;
+        if (choice) api.act({ type: 'rent/accept', propertyId: id, applicationId: choice.id });
+      }
+      const incident = owned.lease?.incident;
+      if (incident && !incident.repair) {
+        if (!api.act({ type: 'rent/repair', propertyId: id, method: 'self' })) {
+          api.act({ type: 'rent/repair', propertyId: id, method: 'artisan' });
+        }
+      }
+    }
+    if (api.state.clock.date.month !== DECEMBER || api.state.clock.date.day !== 1) return;
+    if (profile.taxRegime === 'micro') {
+      for (const owned of api.state.properties) {
+        if (owned.taxRegime !== 'micro') {
+          api.act({ type: 'tax/setRegime', propertyId: owned.property.id, regime: 'micro' });
+        }
+      }
+      return;
+    }
+    for (const estimate of engine.estimateTaxes(api.state).properties) {
+      api.act({
+        type: 'tax/setRegime',
+        propertyId: estimate.propertyId,
+        regime: estimate.recommended,
+      });
+    }
   }
 
   function meetBanks(api: BotApi): void {
@@ -144,7 +267,7 @@ export function investor(profile: InvestorProfile): Strategy {
     const result: { listing: Listing; estimate: number; ratio: number }[] = [];
     for (const listing of state.listings) {
       if (listing.offer || listing.offersMade >= limit || api.today < listing.publicDay) continue;
-      if (profile.avoidRuins && listing.property.condition === 'ruin') continue;
+      if (profile.avoidRuins && !lettable(api, listing.id)) continue;
       const estimate = engine.estimate(state, listing.id)?.estimate ?? 0;
       const ratio = estimate / listing.askingPrice;
       if (ratio < profile.screenRatio) continue;
@@ -155,6 +278,7 @@ export function investor(profile: InvestorProfile): Strategy {
 
   function daily(api: BotApi): void {
     memory.startDay ??= api.today;
+    manageLets(api);
     if ((api.today - memory.startDay) % profile.decisionEveryDays !== 0) return;
     meetBanks(api);
     const { state } = api;
@@ -294,6 +418,13 @@ export const PROFILES = {
     banks: BANKS_BY_RATE,
     meetBanks: ['tirelire'],
     acceptsLongerLoans: false,
+    minLettableYears: 8,
+    leaseType: 'bare',
+    rentShare: 1,
+    agencyId: null,
+    insured: true,
+    tenantChoice: 'best',
+    taxRegime: 'recommended',
   },
   levier: {
     id: 'levier',
@@ -314,6 +445,13 @@ export const PROFILES = {
     banks: ['fougueux', 'tirelire', 'zeroPapier', 'rigueur'],
     meetBanks: ['fougueux', 'tirelire'],
     acceptsLongerLoans: true,
+    minLettableYears: 2,
+    leaseType: 'furnished',
+    rentShare: 1.05,
+    agencyId: 'bonnePioche',
+    insured: false,
+    tenantChoice: 'best',
+    taxRegime: 'recommended',
   },
   naif: {
     id: 'naif',
@@ -334,6 +472,13 @@ export const PROFILES = {
     banks: ['tirelire', 'fougueux', 'zeroPapier'],
     meetBanks: [],
     acceptsLongerLoans: true,
+    minLettableYears: 0,
+    leaseType: 'bare',
+    rentShare: 1.15,
+    agencyId: null,
+    insured: false,
+    tenantChoice: 'first',
+    taxRegime: 'micro',
   },
   chasseur: {
     id: 'chasseur',
@@ -354,6 +499,13 @@ export const PROFILES = {
     banks: BANKS_BY_RATE,
     meetBanks: ['tirelire'],
     acceptsLongerLoans: false,
+    minLettableYears: 5,
+    leaseType: 'bare',
+    rentShare: 1,
+    agencyId: null,
+    insured: false,
+    tenantChoice: 'best',
+    taxRegime: 'recommended',
   },
 } as const satisfies Record<string, InvestorProfile>;
 

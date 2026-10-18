@@ -1,0 +1,37 @@
+{
+  "incomeTax": {
+    "brackets": [
+      { "from": 0, "rate": 0 },
+      { "from": 11600, "rate": 0.11 },
+      { "from": 29579, "rate": 0.3 },
+      { "from": 84577, "rate": 0.41 },
+      { "from": 181917, "rate": 0.45 }
+    ],
+    "salaryAllowanceShare": 0.1
+  },
+  "socialContributions": { "bare": 0.172, "furnished": 0.186, "capitalGains": 0.172 },
+  "microFoncier": { "allowanceShare": 0.3, "receiptsCeiling": 15000 },
+  "microBic": { "allowanceShare": 0.5, "minimumAllowance": 305, "receiptsCeiling": 77700 },
+  "landlordDeficit": { "globalCeiling": 10700, "carryYears": 10 },
+  "lmnp": { "buildingShare": 0.85, "buildingYears": 30, "furnitureYears": 7 },
+  "accountantFees": {
+    "bare": { "first": 300, "perExtraProperty": 60 },
+    "furnished": { "first": 550, "perExtraProperty": 120 }
+  },
+  "propertyTaxDate": { "month": 10, "day": 15 },
+  "capitalGains": {
+    "incomeTaxRate": 0.19,
+    "acquisitionFeesFlatShare": 0.075,
+    "worksFlatShare": 0.15,
+    "worksFlatMinYears": 5,
+    "incomeTaxAllowances": [
+      { "fromYear": 6, "toYear": 21, "perYear": 0.06 },
+      { "fromYear": 22, "toYear": 22, "perYear": 0.04 }
+    ],
+    "socialAllowances": [
+      { "fromYear": 6, "toYear": 21, "perYear": 0.0165 },
+      { "fromYear": 22, "toYear": 22, "perYear": 0.016 },
+      { "fromYear": 23, "toYear": 30, "perYear": 0.09 }
+    ]
+  }
+}

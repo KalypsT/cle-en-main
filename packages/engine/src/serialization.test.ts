@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import v1Save from '../test/fixtures/save-v1-milestone-0.json' with { type: 'json' };
 import v2Save from '../test/fixtures/save-v2-milestone-1a.json' with { type: 'json' };
 import v3Save from '../test/fixtures/save-v3-milestone-1b.json' with { type: 'json' };
+import v4Save from '../test/fixtures/save-v4-milestone-1c.json' with { type: 'json' };
 import { content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -116,7 +117,10 @@ describe('migrations', () => {
     const owned = migrated.properties[0];
     expect(owned?.property.id).toBe(original.properties[0]?.property.id);
     expect(owned?.lease).toBeNull();
-    expect(owned?.vacantUntilDay).toBe(toDayNumber(original.clock.date) + 1);
+    // Version 5: the vacant property is offered for rent (unless the law forbids it).
+    if (owned?.property.dpe !== 'G' && owned?.property.condition !== 'ruin') {
+      expect(owned?.rental?.listedDay).toBe(toDayNumber(original.clock.date));
+    }
 
     // Offers and agreements of a version 3 save came from households.
     const withOffer = JSON.parse(v3) as typeof original;
@@ -130,8 +134,50 @@ describe('migrations', () => {
     expect(upgraded?.offers[0]?.buyerId).toBeNull();
     expect(upgraded?.agreement?.buyerId).toBeNull();
 
-    // The migrated game keeps running: the tenant moves in.
-    const later = engine.advanceHours(migrated, 24 * 3).state;
-    expect(later.properties[0]?.lease?.monthlyRent).toBeGreaterThan(0);
+    // The migrated game keeps running.
+    expect(engine.advanceHours(migrated, 24 * 40).state.clock.elapsedHours).toBe(
+      migrated.clock.elapsedHours + 24 * 40,
+    );
+  });
+
+  it('upgrades a milestone 1c save (version 4): real leases, rentals and taxes', () => {
+    const v4 = JSON.stringify(v4Save);
+    const original = JSON.parse(v4) as {
+      clock: { date: { year: number; month: number; day: number } };
+      player: { balance: number };
+      properties: {
+        property: { id: string; monthlyCharges: number };
+        lease: { monthlyRent: number; startDay: number } | null;
+      }[];
+    };
+    const migrated = engine.loadGame(v4);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.player.homePropertyId).toBeNull();
+    expect(migrated.tax.year).toBe(original.clock.date.year);
+    const [let_, vacant] = migrated.properties;
+    const oldLease = original.properties[0]?.lease;
+    if (!let_?.lease || !oldLease) throw new Error('The fixture has a let property');
+    // Same tenant start; the rent loses the recoverable charges it included.
+    expect(let_.lease.startDay).toBe(oldLease.startDay);
+    expect(let_.lease.leaseType).toBe('bare');
+    expect(let_.lease.monthlyRent).toBe(
+      oldLease.monthlyRent -
+        Math.round(
+          (original.properties[0]?.property.monthlyCharges ?? 0) *
+            content.renting.recoverableChargesShare,
+        ),
+    );
+    expect(let_.lease.tenant.firstName.length).toBeGreaterThan(0);
+    expect(let_.lease.termDay).toBeGreaterThan(toDayNumber(original.clock.date));
+    // The deposit reaches the account: the net worth is unchanged by it.
+    expect(migrated.player.balance).toBe(original.player.balance + let_.lease.deposit);
+    expect(vacant?.lease).toBeNull();
+    expect(vacant?.rental?.leaseType).toBe('bare');
+    // Deterministic, and the game keeps running with rents and taxes.
+    expect(engine.loadGame(v4)).toEqual(migrated);
+    const later = engine.advanceHours(migrated, 24 * 400);
+    expect(later.events.some((e) => e.type === 'taxAssessed')).toBe(true);
+    // Managed by the owner: candidates wait for his answer.
+    expect(later.events.some((e) => e.type === 'applicationReceived')).toBe(true);
   });
 });

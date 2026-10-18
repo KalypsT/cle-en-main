@@ -1,5 +1,11 @@
 import { gameContent, uiTexts } from '@cle/content';
-import { type CalendarDate, type Cents, type GameEvent, weekdayOf } from '@cle/engine';
+import {
+  type CalendarDate,
+  type Cents,
+  fromDayNumber,
+  type GameEvent,
+  weekdayOf,
+} from '@cle/engine';
 
 /** Every displayed text comes from content/textes/interface.json. */
 export const texts = uiTexts;
@@ -121,10 +127,52 @@ export function describeEvent(event: GameEvent): string | null {
       return events.saleFellThrough;
     case 'propertySold':
       return format(events.propertySold, { net: formatMoney(event.net) });
-    case 'propertyLet':
-      return format(events.propertyLet, { rent: formatMoney(event.monthlyRent) });
+    case 'rentalListed':
+      return format(events.rentalListed, { rent: formatMoney(event.monthlyRent) });
+    case 'rentalBlocked':
+      return events.rentalBlocked;
+    case 'furnitureBought':
+      return format(events.furnitureBought, { cost: formatMoney(event.cost) });
+    case 'applicationReceived':
+      return events.applicationReceived;
+    case 'rentalVisitMissed':
+      return events.rentalVisitMissed;
+    case 'tenantMovedIn':
+      return format(events.tenantMovedIn, {
+        tenant: event.tenantName,
+        rent: formatMoney(event.monthlyRent),
+      });
+    case 'tenantGaveNotice':
+      return events.tenantGaveNotice;
     case 'tenantLeft':
-      return events.tenantLeft;
+      return event.reason === 'evicted' ? events.tenantEvicted : events.tenantLeft;
+    case 'rentRevised':
+      return format(events.rentRevised, { rent: formatMoney(event.monthlyRent) });
+    case 'tenantLifeEvent':
+      return gameContent.tenantTexts.lifeEvents[event.eventId] ?? null;
+    case 'incidentReported':
+      return gameContent.tenantTexts.incidents[event.kindId] ?? events.incidentReported;
+    case 'incidentRepaired':
+      return format(events.incidentRepaired, { cost: formatMoney(event.cost) });
+    case 'rentMissed':
+      return event.insured ? events.rentMissedInsured : events.rentMissed;
+    case 'reminderSent':
+      return event.settled ? events.reminderSettled : events.reminderFailed;
+    case 'procedureStarted':
+      return events.procedureStarted;
+    case 'dpeWarning':
+      return format(events.dpeWarning, { date: formatGameDate(fromDayNumber(event.banDay)) });
+    case 'movedIntoHome':
+      return events.movedIntoHome;
+    case 'movedOutOfHome':
+      return events.movedOutOfHome;
+    case 'propertyTaxCharged':
+      return format(events.propertyTaxCharged, { amount: formatMoney(event.amount) });
+    case 'taxAssessed':
+      if (event.total === 0) return null;
+      return event.total > 0
+        ? format(events.taxAssessed, { year: event.year, amount: formatMoney(event.total) })
+        : format(events.taxRefund, { year: event.year, amount: formatMoney(-event.total) });
     case 'forcedSale':
       return format(events.forcedSale, { price: formatMoney(event.price) });
     case 'bankrupt':
@@ -147,6 +195,9 @@ export function describeEvent(event: GameEvent): string | null {
     case 'saleOfferExpired':
     case 'saleCounterAccepted':
     case 'saleCounterRefused':
+    case 'rentalWithdrawn':
+    case 'applicationExpired':
+    case 'leaseRenewed':
       return null;
   }
 }
