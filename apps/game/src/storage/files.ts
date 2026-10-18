@@ -1,4 +1,5 @@
-import { deserializeGame, type GameState, serializeGame, toIsoDate } from '@cle/engine';
+import { type GameState, serializeGame, toIsoDate } from '@cle/engine';
+import { engine } from '../engine.ts';
 
 /** Downloads the game as a JSON file. */
 export function exportGame(state: GameState): void {
@@ -13,5 +14,5 @@ export function exportGame(state: GameState): void {
 
 /** Reads, migrates and validates a game file; throws SaveFormatError when invalid. */
 export async function importGame(file: File): Promise<GameState> {
-  return deserializeGame(await file.text());
+  return engine.loadGame(await file.text());
 }

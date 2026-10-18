@@ -4,9 +4,9 @@
 
 | # | Sujet | À trancher avant | Notes |
 |---|---|---|---|
-| 1 | **Quartiers de Dole** : liste définitive (4 ou 5) et profil de chacun | Jalon 1 (données), au plus tard jalon 4 | Première liste à valider : Centre historique, Les Mesnils Pasteur, Les Paters, Plumont – Val Fleuri, Azans. Thibaud connaît un peu Dole. |
+| 1 | **Quartiers de Dole** : profil de chacun | Jalon 1 (données), au plus tard jalon 4 | **Liste validée le 2026-10-18** : Centre historique, Les Mesnils Pasteur, Les Paters, Plumont – Val Fleuri, Azans. Profils à tirer des données (jalon 1b). |
 | 2 | **Coûts de travaux réels** par poste et par gamme | Jalon 3 | À rechercher sur des prix réels 2026 |
-| 3 | **Taux de marché de départ** et marges des banques | Jalon 1 | Caler sur les taux réels du moment |
+| 3 | **Marges des banques** | Jalon 1c (bots) | **Taux de départ tranché le 2026-10-18** : 3,65 % sur 20 ans hors assurance (baromètres d'octobre 2026), plus 0,30 point d'assurance. Marges indicatives dans `content/banques.json`, à calibrer par les bots. |
 | 4 | **Règles fiscales** exactes (barème, régimes, plus-value, IFI) | Jalon 2 | Revérifier la loi en vigueur |
 | 5 | **Seuils exacts** des titres, de la réputation, des succès | Jalon 6 | Calibrés par les bots |
 | 6 | **Villes après la Bourgogne-Franche-Comté** | Jalon 9 | Éviter l'Alsace-Moselle (pas de données DVF) ou prévoir une autre source |
@@ -30,3 +30,11 @@ Chaque changement de décision en cours de réalisation est noté ici (date, dé
 | 2026-10-18 | Calendrier du moteur codé en arithmétique entière (sans objet `Date`) ; la date de départ est fournie par l'application (date du téléphone) et la partie commence à 8 h (`content/temps.json`) | Déterminisme et indépendance au fuseau horaire | 07, 03/01 |
 | 2026-10-18 | Le moteur reçoit le contenu en paramètre ; l'application importe le contenu JSON au moment du build | Fonctionne hors ligne, moteur testable seul | 07 |
 | 2026-10-18 | Sauvegarde automatique dans l'emplacement courant le 1er de chaque mois ; les 6 points mensuels de retour en arrière sont prévus dans le format (`checkpoints`) mais remplis à partir du jalon 4 | Socle posé sans anticiper le gameplay | 07, 02 |
+| 2026-10-18 | Quartiers de Dole : la liste proposée de 5 quartiers est retenue | Choix de Thibaud | 10 |
+| 2026-10-18 | Taux de marché de départ : 3,65 % sur 20 ans (hors assurance), écart selon la durée (−0,15 point à 15 ans, +0,10 point à 25 ans), assurance de 0,30 point incluse dans le taux affiché ; évolution mensuelle par un cycle lent (8 ans), un rappel vers la moyenne et un bruit | Baromètres d'octobre 2026 ; règle « assurance incluse » du chapitre 3.2 | 03/02 |
+| 2026-10-18 | **Train de vie** : des dépenses de vie mensuelles (hors loyer) suivent le salaire, de sorte que l'épargne de salaire reste faible (environ 100 à 250 € par mois selon le métier) ; minimum de 900 € sans emploi | La doc ne définissait pas les dépenses du personnage ; sans elles, le bot Inactif s'enrichirait | 03/01 |
+| 2026-10-18 | Les flux mensuels (salaire, loyer, dépenses de vie, mensualités) passent le 1er du mois ; les agios du découvert sont calculés chaque jour | Simplicité et lisibilité du bilan mensuel | 03/01, 03/02 |
+| 2026-10-18 | Salaire variable (commercial, agent immobilier) : salaire fixe plus une prime mensuelle tirée au hasard, dont la moyenne donne le revenu moyen du chapitre 3.1 ; les banques retiennent le revenu moyen | Règle simple, la variabilité pèse via la confiance bancaire plus faible | 03/01 |
+| 2026-10-18 | Temps libre au jalon 1 : semaine et week-end selon le métier ; cycle de garde de l'infirmier (travail, travail, repos, repos) ; **vacances scolaires et RTT reportées au jalon 6** (agenda complet) | Le calendrier scolaire demande des données ; le jalon 6 traite l'agenda | 03/01 |
+| 2026-10-18 | Banques : règles chiffrées indicatives dans `content/banques.json` et `content/credit.json` (marges, délais de réponse, dérogations jusqu'à 37–40 % selon la confiance, accord partiel si au moins 50 % du montant, Rigueur exige un profil « élevé » et une confiance de 50, ZéroPapier sans dérogation ni rendez-vous) | Valeurs de départ à calibrer par les bots | 03/02 |
+| 2026-10-18 | Moteur : l'argent est stocké en centimes entiers ; l'API devient `createEngine(contenu)` qui fournit `createGame`, `tick`, `dispatch`, `loadGame` et des requêtes (taux, simulation de prêt) ; format de sauvegarde v2 avec migration depuis la v1 du jalon 0 ; l'action de démonstration est retirée | Pas d'erreurs d'arrondi ; contenu fourni en paramètre | 07 |

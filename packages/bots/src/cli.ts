@@ -1,13 +1,14 @@
 import { parseArgs } from 'node:util';
 import { timeSettings } from '@cle/content';
-import { describeTime, parseIsoDate, toIsoDate } from '@cle/engine';
+import { describeTime, netWorth, parseIsoDate, toIsoDate } from '@cle/engine';
 import { simulate } from './simulate.ts';
 
 const USAGE = `Usage : pnpm bots [--seed <entier>] [--days <entier>] [--start <AAAA-MM-JJ>]
 
   --seed   graine du hasard (entier 32 bits, défaut 1)
   --days   nombre de jours simulés (défaut 3650, soit environ 10 ans)
-  --start  date de début de la partie (défaut 2027-01-01)`;
+  --start  date de début de la partie (défaut 2027-01-01)
+  --job    métier du personnage (défaut : celui de content/partie.json)`;
 
 function fail(message: string): never {
   console.error(`${message}\n\n${USAGE}`);
@@ -26,6 +27,7 @@ const { values } = parseArgs({
     seed: { type: 'string', default: '1' },
     days: { type: 'string', default: '3650' },
     start: { type: 'string', default: '2027-01-01' },
+    job: { type: 'string' },
     help: { type: 'boolean', short: 'h', default: false },
   },
 });
@@ -40,16 +42,27 @@ const days = parseInteger('days', values.days);
 const startDate = parseIsoDate(values.start) ?? fail('--start doit être une date AAAA-MM-JJ.');
 
 const startedAt = performance.now();
-const result = simulate({ seed, startDate, startHour: timeSettings.startHour, days });
+const result = simulate({
+  seed,
+  startDate,
+  startHour: timeSettings.startHour,
+  days,
+  ...(values.job ? { jobId: values.job } : {}),
+});
 const elapsedMs = performance.now() - startedAt;
 
 const years = days / 365.25;
+const euros = (cents: number) =>
+  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(cents / 100);
 console.log(
   [
     `Graine            : ${seed}`,
     `Début             : ${toIsoDate(startDate)}`,
     `Date atteinte     : ${describeTime(result.state)}`,
     `Jours simulés     : ${days} (≈ ${years.toFixed(1)} ans, ${result.ticks} pas d'une heure)`,
+    `Métier            : ${result.state.player.jobId}`,
+    `Patrimoine net    : ${euros(netWorth(result.state))} (compte ${euros(result.state.player.balance)})`,
+    `Taux de marché    : ${result.state.market.ratePercent.toFixed(2)} %`,
     `Événements        : ${Object.entries(result.eventCounts)
       .map(([type, count]) => `${type} ${count}`)
       .join(', ')}`,

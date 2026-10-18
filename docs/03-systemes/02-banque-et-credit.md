@@ -37,7 +37,7 @@ Une jauge de 0 à 100 par banque.
 - **Revenus retenus** : salaire, plus **70 % des loyers** (comme le font les banques).
 - **Apport minimal** : les frais de notaire (environ 7,5 % dans l'ancien) plus environ 1,5 % de frais de dossier et de garantie.
 - **Le taux proposé** = taux de marché du moment + marge de la banque, ajustée selon la durée, le profil (métier, ancienneté, réputation) et la confiance.
-- **Le taux de marché** évolue lentement par simulation, avec des cycles et de rares chocs (voir [07-evenements.md](07-evenements.md)). Valeur de départ à caler sur les taux réels au moment du jalon 1.
+- **Le taux de marché** évolue lentement par simulation, avec des cycles et de rares chocs (voir [07-evenements.md](07-evenements.md)). Valeur de départ : **3,65 % sur 20 ans hors assurance** (taux réels d'octobre 2026), plus **0,30 point d'assurance** dans le taux affiché.
 - Un crédit peut financer **l'achat et les travaux** ensemble.
 
 ## La demande de prêt

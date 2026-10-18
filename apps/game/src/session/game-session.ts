@@ -1,13 +1,13 @@
 import { timeSettings } from '@cle/content';
 import {
-  dispatch,
   type DispatchResult,
   type GameAction,
   type GameEvent,
   type GameState,
   HOURS_PER_DAY,
-  tick,
 } from '@cle/engine';
+import { engine } from '../engine.ts';
+import { describeEvent } from '../texts.ts';
 
 /** Real milliseconds per game hour at speed ×1. */
 const MS_PER_HOUR = (timeSettings.realSecondsPerGameDay * 1000) / HOURS_PER_DAY;
@@ -65,7 +65,7 @@ export class GameSession {
   }
 
   dispatch(action: GameAction): DispatchResult {
-    const result = dispatch(this.snapshot.state, action);
+    const result = engine.dispatch(this.snapshot.state, action);
     if (result.ok) this.applyEvents(result.state, result.events);
     return result;
   }
@@ -79,7 +79,7 @@ export class GameSession {
       const events: GameEvent[] = [];
       while (this.pendingMs >= MS_PER_HOUR) {
         this.pendingMs -= MS_PER_HOUR;
-        const result = tick(state);
+        const result = engine.tick(state);
         state = result.state;
         events.push(...result.events);
       }
@@ -89,7 +89,7 @@ export class GameSession {
   };
 
   private applyEvents(state: GameState, events: GameEvent[]): void {
-    const shown = events.filter((event) => event.type !== 'demo/dieRolled');
+    const shown = events.filter((event) => describeEvent(event) !== null);
     this.update({ state, lastEvent: shown.at(-1) ?? this.snapshot.lastEvent });
     if (events.length > 0) this.onEvents(events, state);
   }
