@@ -16,6 +16,11 @@ export function MenuTab() {
   const { save, exportGame, quit } = useGame();
   const nav = useNav();
   const entries: Entry[] = [
+    { label: t.menu.bank, icon: 'bank', route: { name: 'bank' } },
+    { label: t.menu.statement, icon: 'euro', route: { name: 'statement' } },
+    { label: t.menu.taxes, icon: 'book', route: { name: 'taxes' } },
+    { label: t.menu.agenda, icon: 'calendar', route: { name: 'agenda' } },
+    { label: t.menu.contacts, icon: 'person', route: { name: 'contacts' } },
     { label: t.menu.cities, icon: 'globe', later: true },
     { label: t.menu.progression, icon: 'trophy', later: true },
     { label: t.menu.statistics, icon: 'chart', later: true },

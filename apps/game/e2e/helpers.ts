@@ -77,6 +77,8 @@ const CAPTURES_DIR = fileURLToPath(new URL('../../../docs/captures/jalon-4/', im
 /** A screenshot of the screen as the player sees it, only when CAPTURES is set. */
 export async function capture(page: Page, name: string) {
   if (!process.env.CAPTURES) return;
+  // Passing notices would hide the screen.
+  await page.addStyleTag({ content: '.notice, .pwa-banner { display: none !important; }' });
   await page.screenshot({
     path: `${CAPTURES_DIR}${name}.png`,
     scale: 'css',

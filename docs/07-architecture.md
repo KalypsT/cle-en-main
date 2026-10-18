@@ -47,12 +47,14 @@ cle-en-main/
   - aucun `Math.random()`, aucun `Date.now()` dans le moteur ;
   - à graine et actions identiques, résultat identique.
 - **Explicabilité** : les calculs financiers renvoient leur détail (pour l'affichage « pourquoi ce montant ? »).
+- **Requêtes pour l'interface** (jalon 4, `systems/ui-queries.ts`) : `pendingDecisions` (décisions en attente avec leur échéance et la pause automatique), `cashFlow` et `portfolio` (flux d'un bien, synthèse du patrimoine), `simulateFinancing` (financement d'une annonce : apport, mensualité, effort net, trésorerie après achat, réponse probable de la banque), `simulateLoan`, `refinanceQuote`, `saleEstimate`, `cashForecast` (trésorerie prévue sur 30 jours), `listingView`, `neighbourhoodMarkets` et `mapPosition` (épingle d'un bien dans son quartier, tirée d'un hachage de son identifiant, sans toucher au hasard du monde). Elles s'ajoutent aux décompositions existantes (`quoteRate`, `estimate`, `estimateTaxes`).
 - **Performance** : le moteur doit pouvoir simuler 10 ans de jeu en quelques secondes dans Node, pour les bots. Il tourne dans le fil principal au départ, avec une API compatible avec un Web Worker si besoin.
 
 ## 7.4 L'application (`apps/game`)
 
 - React pour tous les écrans de gestion, PixiJS dans un composant dédié pour la rue et la coupe.
-- L'interface **ne calcule rien** : elle lit l'état du moteur et envoie des actions.
+- L'interface **ne calcule rien** : elle lit l'état du moteur et ses requêtes, et envoie des actions.
+- **Jalon 4** : une session (`session/game-session.ts`) fait avancer le moteur en temps réel et l'expose à React par `useSyncExternalStore` ; une pile d'écrans par onglet (Rue, Carte, Décisions, Patrimoine, Menu), sans bibliothèque de routage. Les textes des écrans viennent de `content/textes/ecrans.json` (schéma qui vérifie qu'aucun texte n'est vide, type tiré du fichier lui-même), le didacticiel de `content/textes/didacticiel.json`. Les préférences de l'appareil (pause automatique) restent dans `localStorage`, hors de la partie.
 - Mise en page adaptative : portrait sur téléphone, deux colonnes sur grand écran, panorama pour la rue en paysage.
 - PWA installable, fonctionnant hors ligne.
 
@@ -62,6 +64,7 @@ cle-en-main/
 - **Export et import** en fichier JSON.
 - **Format versionné** avec des **migrations** : une mise à jour du jeu ne casse pas une partie en cours.
 - **Version 6 (jalon 3)** : pièces et postes des biens, chantiers, devis, enveloppe travaux, copropriété, carnet d'artisans. La migration depuis la v5 tire les postes autour de l'ancien état global par des tirages stables (hachage de la graine et de l'identifiant du bien), sans toucher à l'état aléatoire du monde.
+- **Version 7 (jalon 4)** : nom et avatar du joueur, annonces favorites, étape du didacticiel, historique mensuel (patrimoine net, trésorerie, dette, solde du bilan) pour la courbe du patrimoine, dernier bilan mensuel. La migration depuis la v6 donne le nom par défaut (`content/partie.json`), un avatar par défaut, et coupe le didacticiel d'une partie déjà commencée ; la courbe démarre au mois suivant. Les 3 emplacements, l'export et l'import passent par la même sérialisation et couvrent donc la v7.
 - **Performance** : les pièces et les postes d'un bien sont remplacés, jamais modifiés ; ils sont **gelés** (`Object.freeze`) et partagés entre les copies de l'état (`clone.ts`), ce qui garde le coût d'une journée et d'une action raisonnable, et leurs valeurs dérivées (état pondéré, vue du joueur) restent en cache.
 - **Journal de partie** : les événements et les décisions sont enregistrés localement, exportables pour l'analyse de l'équilibrage (voir [08-equilibrage.md](08-equilibrage.md)).
 
@@ -70,7 +73,7 @@ cle-en-main/
 - **Moteur** : tests unitaires Vitest par système, plus des **parties de référence** (« graines dorées ») dont le résultat après N années est figé et vérifié.
 - **Contenu** : validation par schémas à chaque compilation.
 - **Bots** : lancés en CI sur un échantillon de graines, avec alerte si une cible d'équilibrage est dépassée.
-- **Interface** : un test Playwright vérifie que le jeu démarre, qu'une partie se crée et qu'une sauvegarde se recharge.
+- **Interface** : des tests Playwright (écran de 390 × 844) jouent une partie par l'interface, du didacticiel jusqu'au premier bien loué, gèrent un bien importé (chantier, revente, banque, impôts, bilan, agenda, carnet), et vérifient la sauvegarde, le rechargement, l'export, l'import et le hors-ligne. L'adresse `?e2e` fixe la graine et la date de départ, accélère l'horloge et démarre en pause ; elle ne change rien d'autre. `CAPTURES=1 pnpm test:e2e` range les captures d'écran dans `docs/captures/jalon-4/`.
 
 ## 7.7 Le déploiement
 

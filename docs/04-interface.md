@@ -61,3 +61,14 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **3 emplacements** de partie.
 - **Export et import** d'une partie en fichier (changement de téléphone).
 - Points de retour en arrière (voir [02-boucle-et-progression.md](02-boucle-et-progression.md#27-le-retour-en-arrière)).
+
+## 4.9 Réalisation du jalon 4
+
+- **Onglet Rue provisoire** : en attendant la rue vivante du jalon 5, un tableau de bord dans l'esprit de la maquette 07 (patrimoine net, solde prévu du prochain bilan, opportunités selon l'estimation du joueur, décisions à traiter, dernières nouvelles).
+- **Carte** : contours IGN des 5 quartiers de Dole, colorés selon le prix ou le loyer au m², rivière, canal, voies ferrées et routes principales ; une épingle par annonce (ambre pour les favoris) et par bien du joueur. L'emplacement d'une épingle est tiré dans son quartier à partir de l'identifiant du bien (pas encore d'adresse réelle).
+- **Décisions** : contre-offre, demande de prêt à faire, réponse de la banque, fonds manquants pour l'acte, candidatures, offre d'achat reçue, imprévu de chantier, vote d'AG, incident, devis qui expire, avertissement DPE, logement vide, renégociation possible, alerte de trésorerie ; triées par échéance. Règles dans `content/decisions.json`.
+- **Pause automatique** : le jeu se met en pause à l'apparition d'une contre-offre, d'une offre d'achat reçue, d'un imprévu de chantier ou d'un vote d'AG (désactivable dans les réglages). L'accélération automatique reste au jalon 6.
+- **« Pourquoi ce montant ? »** : un « ? » à côté des taux (marché, durée, assurance, marge, profil, confiance), des valeurs (prix médian et facteurs), de l'effort mensuel et de l'apport.
+- **Didacticiel** : Gérard accompagne huit étapes (bienvenue, repérer, visiter, simuler, offrir, compromis, prêt, acte), chacune avancée par un écran ouvert ou un événement du moteur ; Yvon présente le premier bilan mensuel qui suit. Une bulle en tête d'écran, jamais bloquante : « Passer » ou « Arrêter le didacticiel ».
+- **Création de partie** : nom, avatar composé, métier ; seul le mode Classique est proposé (les modes arrivent au jalon 6).
+- **Pas encore** : bilan annuel plein écran, coupe d'immeuble, enchères, villes, progression, statistiques, retour en arrière, thème sombre, sons.

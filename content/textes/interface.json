@@ -57,7 +57,8 @@
     ],
     "date": "{weekday} {day} {month} {year}",
     "time": "{hour} h",
-    "duration": "{hours} h {minutes}"
+    "duration": "{hours} h {minutes}",
+    "minutes": "{minutes} min"
   },
   "events": {
     "dayStarted": "Nouveau jour : {date}",

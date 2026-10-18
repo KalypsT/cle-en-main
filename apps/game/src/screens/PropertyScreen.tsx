@@ -146,6 +146,31 @@ function Overview({ owned }: { owned: OwnedProperty }) {
               </button>
             )
           )}
+          <button
+            type="button"
+            className="button block"
+            onClick={() => nav.push({ name: 'works', id: property.id })}
+          >
+            {owned.works ? t.works.inProgress : t.property.works}
+          </button>
+          {!isHome && (
+            <button
+              type="button"
+              className="button block"
+              onClick={() => nav.push({ name: 'sale', id: property.id })}
+            >
+              {owned.sale ? t.assets.status.forSale : t.property.sell}
+            </button>
+          )}
+          {property.copro && (
+            <button
+              type="button"
+              className="button block"
+              onClick={() => nav.push({ name: 'copro', id: property.id })}
+            >
+              {t.copro.heading}
+            </button>
+          )}
         </div>
       </Card>
     </>

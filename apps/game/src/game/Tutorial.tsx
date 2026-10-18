@@ -1,7 +1,7 @@
 import { tutorial, type TutorialTrigger } from '@cle/content';
 import type { GameState } from '@cle/engine';
 import { Avatar, CHARACTER_AVATARS } from '../ui/Avatar.tsx';
-import { useGame } from './context.tsx';
+import { useGame, useNav } from './context.tsx';
 
 /** The tutorial step the game is at, if the tutorial is on and not finished. */
 export function currentStep(state: GameState) {
@@ -39,6 +39,7 @@ export function tutorialReaction(
  */
 export function TutorialBubble({ shownStep }: { shownStep: string | null }) {
   const { state, act } = useGame();
+  const nav = useNav();
   const step = currentStep(state);
   if (!step || !tutorialVisible(state, shownStep)) return null;
   const speaker = tutorial.speakers[step.speaker];
@@ -66,6 +67,15 @@ export function TutorialBubble({ shownStep }: { shownStep: string | null }) {
           >
             {tutorial.disable}
           </button>
+          {step.open && (
+            <button
+              type="button"
+              className="link-button small"
+              onClick={() => step.open && nav.push({ name: step.open.screen })}
+            >
+              {step.open.label}
+            </button>
+          )}
           <button type="button" className="link-button small" onClick={next}>
             {step.next === 'ok' ? tutorial.ok : tutorial.skip}
           </button>

@@ -14,6 +14,14 @@ export type Route =
   | { name: 'purchase'; id: string }
   | { name: 'property'; id: string; tab?: PropertyTab }
   | { name: 'rent'; id: string }
+  | { name: 'works'; id: string }
+  | { name: 'copro'; id: string }
+  | { name: 'sale'; id: string }
+  | { name: 'bank' }
+  | { name: 'statement' }
+  | { name: 'taxes' }
+  | { name: 'agenda' }
+  | { name: 'contacts' }
   | { name: 'settings' };
 
 /** A screen the tutorial waits for (content/textes/didacticiel.json). */

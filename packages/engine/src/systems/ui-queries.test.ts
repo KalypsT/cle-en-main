@@ -371,3 +371,42 @@ describe('listing view and portfolio', () => {
     expect(summary.monthlyBudget).toBe(next.player.balance - state.player.balance);
   });
 });
+
+describe('bank and resale previews', () => {
+  it('simulates a loan like the bank would offer it', () => {
+    const state = newGame();
+    const sim = engine.simulateLoan(state, 'tirelire', 100_000_00, 20);
+    if (!sim) throw new Error('No simulation');
+    expect(sim.rate).toEqual(engine.quoteRate(state, 'tirelire', 20));
+    expect(sim.monthlyPayment).toBe(annuityPayment(100_000_00, sim.rate.ratePercent, 240));
+    expect(sim.totalCost).toBe(sim.monthlyPayment * 240 - 100_000_00);
+    expect(sim.debtRatioAfter).toBeCloseTo(sim.monthlyPayment / 2_000_00, 10);
+    expect(engine.simulateLoan(state, 'nope', 1, 20)).toBeNull();
+  });
+
+  it('previews a buy-back of a loan and a sale', () => {
+    const start = newGame();
+    const { state, event } = buyWithLoan(start, affordableListing(start).id);
+    if (event.type !== 'deedSigned' || !event.loanId) throw new Error('Not bought with a loan');
+    const quote = engine.refinanceQuote(state, event.loanId, 'fougueux');
+    expect(quote?.months).toBe(240);
+    expect(quote?.fees).toBeGreaterThan(0);
+    // Same bank, same day: no better rate.
+    expect(engine.refinanceQuote(state, event.loanId, 'tirelire')?.refusal).toBe(
+      'loan.notWorthRefinancing',
+    );
+    const price = 100_000_00;
+    const bySelf = engine.saleEstimate(state, event.propertyId, price, 'self');
+    const byAgency = engine.saleEstimate(state, event.propertyId, price, 'agency');
+    expect(bySelf?.agencyFees).toBe(0);
+    expect(byAgency?.agencyFees).toBe(Math.round(price * content.market.resale.agencyFeeShare));
+    expect(bySelf?.loanRepaid).toBe(state.loans[0]?.remaining);
+    expect(bySelf?.net).toBe(
+      price -
+        (bySelf?.loanRepaid ?? 0) -
+        (bySelf?.loanFees ?? 0) -
+        (bySelf?.capitalGainsTax ?? 0) -
+        (bySelf?.depositTransferred ?? 0),
+    );
+  });
+});

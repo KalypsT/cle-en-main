@@ -60,6 +60,8 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 - **Nouveau fichier de contenu** : écrire son schéma dans `content/schemas/`, le déclarer dans `content/registry.ts` (sinon `validate-content` échoue), l'exporter depuis `content/index.ts`.
 - **Format de sauvegarde** : incrémenter `FORMAT_VERSION` (`packages/engine/src/state.ts`), ajouter la migration dans `MIGRATIONS` (`serialization.ts`) et son test.
 - **Playwright avec un Chromium déjà installé** : `PW_CHROMIUM_PATH=/chemin/vers/chrome pnpm test:e2e`.
+- **Captures d'écran (390 × 844)** : `CAPTURES=1 pnpm test:e2e` les range dans `docs/captures/jalon-4/`.
+- **Textes des écrans** : `content/textes/ecrans.json` (tout texte affiché), didacticiel dans `content/textes/didacticiel.json`.
 - **Icônes provisoires** : modifier `apps/game/public/icons/icon.svg`, puis `pnpm --filter @cle/game exec tsx scripts/generate-icons.ts`.
 
 ## Façon de travailler

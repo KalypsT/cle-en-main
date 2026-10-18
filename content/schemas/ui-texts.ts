@@ -48,6 +48,7 @@ export const uiTextsSchema = z
         date: text,
         time: text,
         duration: text,
+        minutes: text,
       })
       .strict(),
     numbers: z.object({ percent: text }).strict(),
