@@ -1,0 +1,452 @@
+{
+  "games": 1000,
+  "years": 10,
+  "summaries": [
+    {
+      "botId": "prudent",
+      "games": 1000,
+      "bankruptShare": 0,
+      "forcedSaleShare": 0,
+      "boughtShare": 0.983,
+      "firstPurchaseMonths": 11.671232876712327,
+      "firstPurchaseInWindowShare": 0.269,
+      "bailleurYears": null,
+      "bailleurShare": 0.126,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          16560,
+          18220,
+          20603.6,
+          25965.2,
+          32643.7,
+          40935.200000000004,
+          47874,
+          55407.8,
+          63704.9,
+          71175.6
+        ],
+        "p50": [
+          17880,
+          24922.5,
+          32133.5,
+          40062.5,
+          48603.5,
+          57209.5,
+          67014,
+          77249.5,
+          87304,
+          98009
+        ],
+        "p90": [
+          26965.8,
+          35383.4,
+          44790.200000000004,
+          55373.1,
+          65830.40000000001,
+          75996.5,
+          88396.6,
+          102248.80000000002,
+          116863.6,
+          130622.7
+        ]
+      },
+      "maxFinalNetWorth": 206410,
+      "medianProperties": 2,
+      "medianMonthlyRent": 1071,
+      "medianDebtRatio": 0.21725919493543833,
+      "medianVisits": 3,
+      "medianOffers": 2,
+      "meanLostToRivals": 0.306,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.2198999999999973,
+        "martinot": 17.33869999999999
+      },
+      "byJob": {
+        "civilServant": 92377,
+        "teacher": 95358,
+        "nurse": 96982,
+        "developer": 127269,
+        "electrician": 84952,
+        "salesperson": 110050,
+        "realEstateAgent": 92123.5
+      }
+    },
+    {
+      "botId": "levier",
+      "games": 1000,
+      "bankruptShare": 0.468,
+      "forcedSaleShare": 0.7,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.0520547945205478,
+      "firstPurchaseInWindowShare": 1,
+      "bailleurYears": 3.006849315068493,
+      "bailleurShare": 0.698,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          -17692.7,
+          -20572.7,
+          -20857.8,
+          -21370.8,
+          -21544.4,
+          -21776.8,
+          -21960.9,
+          -21999.5,
+          -22112.2,
+          -22116.5
+        ],
+        "p50": [
+          24591.5,
+          27843.5,
+          27831,
+          24253,
+          22179.5,
+          25647.5,
+          28397.5,
+          30998.5,
+          30274,
+          33914.5
+        ],
+        "p90": [
+          37798.3,
+          45776.9,
+          54757.4,
+          64262.1,
+          74319.3,
+          84529.6,
+          95810.5,
+          108826.00000000001,
+          122653,
+          133290.7
+        ]
+      },
+      "maxFinalNetWorth": 217273,
+      "medianProperties": 2,
+      "medianMonthlyRent": 605,
+      "medianDebtRatio": 0.20776430962925685,
+      "medianVisits": 5,
+      "medianOffers": 4,
+      "meanLostToRivals": 0.402,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.4772585083889536,
+        "martinot": 14.084382183290664
+      },
+      "byJob": {
+        "civilServant": 57051,
+        "teacher": 54924,
+        "nurse": 61620,
+        "developer": 108769,
+        "electrician": 40228,
+        "salesperson": -11033,
+        "realEstateAgent": -12500.5
+      }
+    },
+    {
+      "botId": "naif",
+      "games": 1000,
+      "bankruptShare": 0.775,
+      "forcedSaleShare": 0.845,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.0191780821917809,
+      "firstPurchaseInWindowShare": 1,
+      "bailleurYears": null,
+      "bailleurShare": 0.249,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          -34219.5,
+          -37431.1,
+          -37531.4,
+          -37531.4,
+          -37531.4,
+          -37531.4,
+          -37535.8,
+          -37543.4,
+          -37543.4,
+          -37772.7
+        ],
+        "p50": [
+          4997,
+          -6743,
+          -20855,
+          -22184,
+          -22264,
+          -22517,
+          -22581.5,
+          -22617,
+          -22738,
+          -22855
+        ],
+        "p90": [
+          19349.800000000003,
+          24268.100000000002,
+          30620.600000000002,
+          36934.3,
+          43681.6,
+          50284.2,
+          58559,
+          66772.2,
+          74267.40000000001,
+          81613.7
+        ]
+      },
+      "maxFinalNetWorth": 164199,
+      "medianProperties": 0,
+      "medianMonthlyRent": 0,
+      "medianDebtRatio": 0,
+      "medianVisits": 0,
+      "medianOffers": 2,
+      "meanLostToRivals": 0,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.805131169222448,
+        "martinot": 12.826202890836125
+      },
+      "byJob": {
+        "civilServant": -21993,
+        "teacher": -22523,
+        "nurse": -22511,
+        "developer": 20389,
+        "electrician": -21792,
+        "salesperson": -26616,
+        "realEstateAgent": -28488.5
+      }
+    },
+    {
+      "botId": "chasseur",
+      "games": 1000,
+      "bankruptShare": 0,
+      "forcedSaleShare": 0,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.084931506849315,
+      "firstPurchaseInWindowShare": 0.981,
+      "bailleurYears": 2.7013698630136984,
+      "bailleurShare": 0.973,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          19783,
+          27292.100000000002,
+          35250.2,
+          43893.1,
+          53587.6,
+          63555.7,
+          73863.2,
+          83738.8,
+          94800.9,
+          106245.2
+        ],
+        "p50": [
+          28015.5,
+          36766,
+          46788.5,
+          57624.5,
+          69243,
+          81110.5,
+          93296,
+          106775.5,
+          120635.5,
+          134693.5
+        ],
+        "p90": [
+          37210.5,
+          47735.7,
+          60043.2,
+          72658.6,
+          86839.7,
+          102256.50000000001,
+          118564.40000000001,
+          135665.7,
+          153494.2,
+          170515
+        ]
+      },
+      "maxFinalNetWorth": 249059,
+      "medianProperties": 4,
+      "medianMonthlyRent": 1552.5,
+      "medianDebtRatio": 0.315557695857694,
+      "medianVisits": 18,
+      "medianOffers": 7,
+      "meanLostToRivals": 4.242,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.2040999999999946,
+        "martinot": 17.449800000000018
+      },
+      "byJob": {
+        "civilServant": 123316,
+        "teacher": 132627,
+        "nurse": 134068,
+        "developer": 162071,
+        "electrician": 122544,
+        "salesperson": 147737,
+        "realEstateAgent": 130446
+      }
+    },
+    {
+      "botId": "inactif",
+      "games": 1000,
+      "bankruptShare": 0,
+      "forcedSaleShare": 0,
+      "boughtShare": 0,
+      "firstPurchaseMonths": null,
+      "firstPurchaseInWindowShare": 0,
+      "bailleurYears": null,
+      "bailleurShare": 0,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          16560,
+          17990,
+          19550,
+          21110,
+          22670,
+          24230,
+          25790,
+          27350,
+          28910,
+          30470
+        ],
+        "p50": [
+          16800,
+          18450,
+          20250,
+          22261.5,
+          24119,
+          26157.5,
+          28216,
+          30200,
+          32120,
+          34040
+        ],
+        "p90": [
+          17880,
+          20520,
+          23400,
+          26280,
+          29160,
+          32040,
+          34920,
+          37800,
+          40680,
+          43560
+        ]
+      },
+      "maxFinalNetWorth": 49233,
+      "medianProperties": 0,
+      "medianMonthlyRent": 0,
+      "medianDebtRatio": 0,
+      "medianVisits": 0,
+      "medianOffers": 0,
+      "meanLostToRivals": 0,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.215499999999996,
+        "martinot": 17.402900000000006
+      },
+      "byJob": {
+        "civilServant": 30470,
+        "teacher": 32850,
+        "nurse": 34040,
+        "developer": 43560,
+        "electrician": 31660,
+        "salesperson": 38203,
+        "realEstateAgent": 36113.5
+      }
+    }
+  ],
+  "checks": [
+    {
+      "label": "Premier achat (Chasseur de bonnes affaires)",
+      "target": "entre le 2e et le 6e mois (médiane)",
+      "measured": "1,1 mois (98,1 % des parties dans la fenêtre, 100 % achètent)",
+      "ok": true
+    },
+    {
+      "label": "Titre Bailleur, 3 biens loués (Chasseur de bonnes affaires)",
+      "target": "2 à 4 ans",
+      "measured": "2,7 ans (atteint dans 97,3 % des parties)",
+      "ok": true
+    },
+    {
+      "label": "Investisseur aguerri, 250 k€ nets (Chasseur de bonnes affaires)",
+      "target": "6 à 10 ans (sans la condition des 2 villes)",
+      "measured": "> 10 ans (atteint dans 0 % des parties)",
+      "ok": false
+    },
+    {
+      "label": "Premier achat (Prudent)",
+      "target": "entre le 2e et le 6e mois (médiane)",
+      "measured": "11,7 mois (26,9 % des parties dans la fenêtre, 98,3 % achètent)",
+      "ok": null
+    },
+    {
+      "label": "Titre Bailleur, 3 biens loués (Prudent)",
+      "target": "2 à 4 ans",
+      "measured": "> 10 ans (atteint dans 12,6 % des parties)",
+      "ok": null
+    },
+    {
+      "label": "Investisseur aguerri, 250 k€ nets (Prudent)",
+      "target": "6 à 10 ans (sans la condition des 2 villes)",
+      "measured": "> 10 ans (atteint dans 0 % des parties)",
+      "ok": null
+    },
+    {
+      "label": "Faillites du Prudent",
+      "target": "moins de 5 %",
+      "measured": "0 %",
+      "ok": true
+    },
+    {
+      "label": "Faillites du Levier maximal",
+      "target": "plus de 40 %",
+      "measured": "46,8 %",
+      "ok": true
+    },
+    {
+      "label": "Le Levier maximal peut progresser vite",
+      "target": "son 9e décile dépasse la médiane du Prudent",
+      "measured": "133 291 € contre 98 009 €",
+      "ok": true
+    },
+    {
+      "label": "Le Naïf stagne ou perd",
+      "target": "médiane à 10 ans ≤ celle de l’Inactif",
+      "measured": "-22 855 € contre 34 040 €",
+      "ok": true
+    },
+    {
+      "label": "L’Inactif ne s’enrichit jamais",
+      "target": "médiane de chaque métier ≤ apport + 250 €/mois d’épargne (45 000 €)",
+      "measured": "métier le plus favorable 43 560 € (maximum d’une partie 49 233 €)",
+      "ok": true
+    },
+    {
+      "label": "Le Chasseur a un bon rendement",
+      "target": "médiane à 10 ans au-dessus de celle du Prudent",
+      "measured": "134 694 € contre 98 009 €",
+      "ok": true
+    },
+    {
+      "label": "Le Chasseur est limité par le temps libre",
+      "target": "information : visites médianes, patrimoine selon le métier",
+      "measured": "18 visites ; civilServant 123 316 €, teacher 132 627 €, nurse 134 068 €, developer 162 071 €, electrician 122 544 €, salesperson 147 737 €, realEstateAgent 130 446 €",
+      "ok": null
+    },
+    {
+      "label": "Aucune stratégie ne domine",
+      "target": "information (une seule ville et un seul mode au jalon 1)",
+      "measured": "meilleure médiane : Chasseur de bonnes affaires (134 694 €)",
+      "ok": null
+    }
+  ]
+}
