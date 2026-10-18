@@ -14,7 +14,7 @@
     "continueHeading": "Reprendre une partie",
     "slotLabel": "Emplacement {number}",
     "empty": "Vide",
-    "gameDate": "Partie au {date}",
+    "gameDate": "Partie au {date}, {time}",
     "savedAt": "Sauvegardée le {date} à {time}",
     "start": "Commencer ici",
     "load": "Charger",
