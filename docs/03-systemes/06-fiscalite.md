@@ -14,7 +14,7 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
 > | Prélèvements sociaux | 17,2 % sur les revenus fonciers (location nue) et les plus-values immobilières ; **18,6 %** sur les revenus de location meublée (LMNP), touchés par la hausse de la CSG de 2026 |
 > | Micro-foncier | abattement de 30 %, recettes nues jusqu'à 15 000 € |
 > | Micro-BIC (meublé de longue durée) | abattement de 50 % (305 € au moins), recettes jusqu'à 77 700 € (certaines sources donnent un plafond revalorisé à 83 600 € : sans effet à l'échelle du jeu) |
-> | Déficit foncier | imputable sur le revenu global jusqu'à 10 700 € par an, hors intérêts d'emprunt ; le reste se reporte 10 ans sur les revenus fonciers. Le plafond doublé (21 400 €) pour une rénovation énergétique est prolongé jusqu'à fin 2027 : il sera utile avec les travaux du jalon 3 |
+> | Déficit foncier | imputable sur le revenu global jusqu'à 10 700 € par an, hors intérêts d'emprunt ; le reste se reporte 10 ans sur les revenus fonciers. Le plafond doublé (21 400 €) pour une rénovation énergétique (logement classé E, F ou G porté en A à D, loué nu au réel) est prolongé jusqu'à fin 2027 par la loi de finances pour 2026 : modélisé au jalon 3 |
 > | LMNP au réel | amortissement du bâti (85 % du coût d'acquisition sur 30 ans) et du mobilier (7 ans) ; l'amortissement ne peut pas créer de déficit, il se reporte ; depuis la loi de finances pour 2025, l'amortissement du bâti déduit est **réintégré dans la plus-value** |
 > | Plus-value | 19 % + 17,2 % ; frais d'acquisition réels ou forfait de 7,5 % ; forfait travaux de 15 % après 5 ans ; abattements de 6 % par an de la 6e à la 21e année et 4 % la 22e (impôt), de 1,65 % par an de la 6e à la 21e, 1,60 % la 22e et 9 % par an de la 23e à la 30e (prélèvements sociaux) ; résidence principale exonérée |
 >
@@ -25,6 +25,10 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
 > - L'impôt est payé en **12 mensualités** l'année suivante (ou remboursé de même). Les honoraires de **Yvon Tableur** (réel nu : 300 € pour le premier bien, 60 € par bien en plus ; LMNP : 550 € puis 120 €) sont payés au bilan et déduits du résultat.
 > - **Taxe foncière** : prélevée le 15 octobre pour chaque bien possédé ce jour-là (résidence principale comprise), déductible sauf pour la résidence principale.
 > - **Plus-value** : calculée à la vente (et aux ventes forcées), retenue par le notaire sur le prix ; le dépôt de garantie du locataire en place est remis à l'acheteur.
+>
+> **Travaux (jalon 3)** :
+> - Les travaux payés (acomptes, factures, imprévus, matériaux, appels de fonds de la copropriété) vont dans le livre de l'année du bien. Au bilan : en **location nue au réel**, ils sont déduits et peuvent créer un **déficit foncier** ; l'année où une rénovation fait passer un bien de E, F ou G à A, B, C ou D (jusqu'en 2027), le plafond imputable sur le salaire passe à **21 400 €** ; en **LMNP au réel**, ils sont **amortis sur 15 ans** comme le bâti (et réintégrés de même dans la plus-value) ; sous un régime simple, pour un bien vide ou pour la résidence principale, ils ne sont pas déduits.
+> - **Plus-value** : les travaux réels non déduits des loyers remplacent le forfait de 15 % quand ils sont plus élevés (et comptent même avant 5 ans de détention), comme le prévoit la règle réelle (des travaux déjà déduits ne peuvent pas compter deux fois).
 > - Requête `estimateTaxes` : impôt de l'année en cours et coût de chaque régime pour chaque bien (le futur écran « d'où vient ce montant ? »).
 >
 > **Simplifications** (à connaître) :
@@ -35,7 +39,8 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
 > - la taxe foncière n'est pas proratisée à l'achat ni à la vente, et n'augmente pas avec les années (le jeu n'a pas encore d'inflation générale) ;
 > - les frais de dossier bancaires ne sont pas déduits au réel ; le mobilier n'est pas renouvelé ;
 > - pas de prélèvement à la source en cours d'année ni de régularisation : l'impôt d'une année est payé l'année suivante ;
-> - le **statut du bailleur privé** (« dispositif Jeanbrun », loi de finances pour 2026 : amortissement en location nue pour le neuf et l'ancien avec au moins 30 % de travaux, sous plafonds de loyer et engagement de 9 ans) n'est pas modélisé : il concerne surtout le neuf et les gros travaux, à revoir au jalon 3 ;
+> - le **statut du bailleur privé** (« dispositif Jeanbrun », loi de finances pour 2026 : amortissement en location nue pour le neuf et l'ancien avec au moins 30 % de travaux, sous plafonds de loyer et engagement de 9 ans) n'est pas modélisé (décision du jalon 3 : trop de contraintes pour un gain de jeu limité) ;
+> - travaux : pas de distinction entre entretien, amélioration et agrandissement (tout est déductible au réel nu) ; le plafond doublé s'applique à tout le déficit de l'année du chantier et non à la seule part des travaux énergétiques ; l'engagement de louer 3 ans n'est pas vérifié ; pour un bien vendu en cours d'année, les travaux de l'année comptent dans la plus-value sauf en location nue ; les matériaux des travaux faits soi-même comptent comme des factures ;
 > - pas de taxe sur les logements vacants (Dole n'est pas en zone tendue), pas d'encadrement des loyers ; l'IFI reste pour plus tard (jalon 6 ou 8).
 
 ## L'impôt sur les revenus locatifs

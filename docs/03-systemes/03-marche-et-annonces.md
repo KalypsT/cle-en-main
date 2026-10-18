@@ -26,6 +26,8 @@ Chaque bien a :
 - une **valeur réelle** calculée par le moteur (quartier, surface, état, DPE, étage, époque).
 
 > **Jalon 1b (en attendant les pièces et postes du jalon 3)** : l'état est **global**, sur 5 niveaux (à rénover entièrement, travaux à prévoir, à rafraîchir, bon état, rénové), plus des **défauts cachés** (humidité, toiture, électricité, plomberie, chauffage, fissures, mérule, voisins bruyants) qui retirent chacun une part de la valeur. La valeur réelle les compte tous ; l'**estimation** affichée au joueur ne compte que ceux qu'il connaît, et les autres selon leur probabilité. Le diagnostic par un artisan arrive au jalon 3. La taxe foncière et les charges de copropriété sont calculées et stockées sur le bien, mais prélevées à partir du jalon 2.
+>
+> **Jalon 3** : l'état global et les défauts cachés sont remplacés par les **pièces et postes** du chapitre [05-travaux-et-copropriete.md](05-travaux-et-copropriete.md) (état de 1 à 5 par poste, en partie caché). L'annonce garde un des 5 états globaux, calculé depuis les postes ; la visite montre les pièces et seulement parfois les éléments techniques ; le **diagnostic par un artisan** (180 €, sans temps libre) révèle les postes de son métier. Seul défaut caché restant : les voisins bruyants. Les frères Martinot remettent en vente des biens dont ils ont refait tous les postes visibles en gamme Éco, et les postes cachés une fois sur deux (« du travail de pro, ou presque »).
 
 ## La vie d'une annonce
 
