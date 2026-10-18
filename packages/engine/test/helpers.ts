@@ -1,10 +1,10 @@
-import { gameContent } from '@cle/content';
+import { type GameContent, gameContent } from '@cle/content';
 import type { GameAction } from '../src/actions.ts';
 import { toDayNumber } from '../src/calendar.ts';
 import { deepClone } from '../src/clone.ts';
 import type { GameEvent } from '../src/events.ts';
 import { createEngine, type CreateGameOptions } from '../src/index.ts';
-import type { GameState } from '../src/state.ts';
+import type { GameState, OwnedProperty } from '../src/state.ts';
 import type { SystemContext } from '../src/systems/context.ts';
 
 export const content = gameContent;
@@ -113,4 +113,80 @@ export function buyWithLoan(state: GameState, listingId: string) {
     (e) => e.type === 'deedSigned' || e.type === 'purchaseCancelled',
   );
   return { state: deed.state, event: deed.event, purchase };
+}
+
+/** A flat owned since mid-December 2026, optionally let bare to a quiet tenant from `day`. */
+export function sampleOwned(
+  day: number,
+  overrides: { property?: Partial<OwnedProperty['property']>; let?: boolean } = {},
+): OwnedProperty {
+  const rent = 520_00;
+  return {
+    property: {
+      id: 'property-sample',
+      cityId: 'dole',
+      neighbourhoodId: 'centreHistorique',
+      kind: 'apartment',
+      surface: 45,
+      rooms: 2,
+      floor: 1,
+      lots: [],
+      epoch: 'from1948to1974',
+      dpe: 'D',
+      condition: 'good',
+      defects: [],
+      annualPropertyTax: 585_00,
+      monthlyCharges: 99_00,
+      ...overrides.property,
+    },
+    purchasePrice: 80_000_00,
+    acquisitionCost: 86_800_00,
+    purchaseDate: { year: 2026, month: 12, day: 15 },
+    sale: null,
+    rental: null,
+    lease:
+      overrides.let === false
+        ? null
+        : {
+            leaseType: 'bare',
+            tenant: {
+              firstName: 'Camille',
+              lastName: 'Martin',
+              profileId: 'employee',
+              traitId: 'plantLover',
+              monthlyIncome: 2_000_00,
+              guarantor: false,
+              desiredYears: 4,
+              reliability: 0.9,
+              mobility: 1,
+            },
+            monthlyRent: rent,
+            startDay: day,
+            termDay: day + 3 * 365,
+            anniversaryDay: day + 365,
+            revisionFactor: 1,
+            deposit: rent,
+            agencyId: null,
+            insured: false,
+            satisfaction: 75,
+            noticeEndDay: null,
+            incident: null,
+            arrears: null,
+          },
+    furniture: null,
+    taxRegime: 'auto',
+    furnishedTax: { deferredDepreciation: 0, deficitCarry: 0, buildingDepreciationDeducted: 0 },
+  };
+}
+
+/** The content with the hazards of renting switched off (incidents, unpaid rents, departures). */
+export function quietContent(): GameContent {
+  const quiet = deepClone(gameContent);
+  for (const incident of quiet.renting.incidents) incident.monthlyProbability = 0;
+  quiet.renting.unpaid.monthlyProbability = 0;
+  quiet.renting.leaseTypes.bare.monthlyDepartureProbability = 0;
+  quiet.renting.leaseTypes.furnished.monthlyDepartureProbability = 0;
+  quiet.renting.lifeEvents.yearlyProbability = 0;
+  quiet.renting.damages.probability = 0;
+  return quiet;
 }

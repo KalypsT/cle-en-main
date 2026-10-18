@@ -10,7 +10,6 @@ import {
 } from './banking.ts';
 import type { SystemContext } from './context.ts';
 import { removeListing } from './listings.ts';
-import { drawVacancyEnd } from './renting.ts';
 
 export type PurchaseRefusal =
   | 'purchase.unknown'
@@ -247,8 +246,11 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
     acquisitionCost: purchase.price + fees.notary + fees.bank,
     purchaseDate: { ...state.clock.date },
     sale: null,
+    rental: null,
     lease: null,
-    vacantUntilDay: drawVacancyEnd(ctx),
+    furniture: null,
+    taxRegime: 'auto',
+    furnishedTax: { deferredDepreciation: 0, deficitCarry: 0, buildingDepreciationDeducted: 0 },
   });
   ctx.events.push({
     type: 'deedSigned',

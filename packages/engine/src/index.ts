@@ -23,3 +23,6 @@ export { expectedSalary, livingCosts } from './systems/household.ts';
 export { visitMinutes } from './systems/agenda.ts';
 export { dailyListingRate } from './systems/listings.ts';
 export { type Estimate, type ValueBreakdown } from './systems/valuation.ts';
+export { visibleReliability } from './systems/tenants.ts';
+export { type CapitalGain, type RegimeEstimate } from './systems/taxes.ts';
+export { type RentalTerms, type RentRefusal } from './systems/renting.ts';

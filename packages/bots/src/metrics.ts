@@ -46,6 +46,22 @@ export interface GameMetrics {
   seasonedDay: number | null;
   overdraftDays: number;
   minBalance: number;
+  /** Renting: property-months let, over property-months owned (main residence excluded). */
+  letMonths: number;
+  ownedMonths: number;
+  rentMissed: number;
+  evictions: number;
+  incidents: number;
+  tenantDepartures: number;
+  /** Taxes (euros): tax on rents assessed, property tax, accountant, capital gains. */
+  rentTax: number;
+  propertyTax: number;
+  accountantFees: number;
+  capitalGainsTax: number;
+  /** Property-years assessed, and those under a real regime. */
+  assessedPropertyYears: number;
+  realRegimeYears: number;
+  furnishedYears: number;
 }
 
 const euros = (cents: number) => Math.round(cents / 100);
@@ -90,6 +106,19 @@ export class MetricsRecorder {
       seasonedDay: null,
       overdraftDays: 0,
       minBalance: euros(state.player.balance),
+      letMonths: 0,
+      ownedMonths: 0,
+      rentMissed: 0,
+      evictions: 0,
+      incidents: 0,
+      tenantDepartures: 0,
+      rentTax: 0,
+      propertyTax: 0,
+      accountantFees: 0,
+      capitalGainsTax: 0,
+      assessedPropertyYears: 0,
+      realRegimeYears: 0,
+      furnishedYears: 0,
     };
   }
 
@@ -112,11 +141,39 @@ export class MetricsRecorder {
           }
           break;
         }
-        case 'monthStarted':
+        case 'monthStarted': {
           if (m.seasonedDay === null && this.engine.netWorth(state) >= SEASONED_NET_WORTH) {
             m.seasonedDay = this.day(state);
           }
+          const rented = state.properties.filter(
+            (owned) => owned.property.id !== state.player.homePropertyId,
+          );
+          m.ownedMonths += rented.length;
+          m.letMonths += rented.filter((owned) => owned.lease).length;
           break;
+        }
+        case 'rentMissed':
+          m.rentMissed += 1;
+          break;
+        case 'incidentReported':
+          m.incidents += 1;
+          break;
+        case 'tenantLeft':
+          if (event.reason === 'evicted') m.evictions += 1;
+          else m.tenantDepartures += 1;
+          break;
+        case 'propertyTaxCharged':
+          m.propertyTax += euros(event.amount);
+          break;
+        case 'taxAssessed': {
+          m.rentTax += euros(event.total);
+          m.accountantFees += euros(event.accountantFees);
+          const properties = state.tax.lastAssessment?.properties ?? [];
+          m.assessedPropertyYears += properties.length;
+          m.realRegimeYears += properties.filter((p) => p.regime === 'real').length;
+          m.furnishedYears += properties.filter((p) => p.category === 'furnished').length;
+          break;
+        }
         case 'visitDone':
           m.visits += 1;
           this.visited.add(event.listingId);
@@ -137,12 +194,14 @@ export class MetricsRecorder {
           break;
         case 'propertySold':
           m.sales += 1;
+          m.capitalGainsTax += euros(event.capitalGainsTax);
           break;
         case 'saleOfferReceived':
           if (event.buyerId) m.rivalOffers += 1;
           break;
         case 'forcedSale':
           m.forcedSales += 1;
+          m.capitalGainsTax += euros(event.capitalGainsTax);
           break;
         case 'bankrupt':
           m.bankruptDay = this.day(state);

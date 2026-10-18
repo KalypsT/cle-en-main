@@ -41,6 +41,17 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 > | Inactif | ne fait rien |
 >
 > Le Marchand de biens et le Rénovateur premium attendent les travaux (jalon 3), l'Aléatoire viendra avec l'interface complète.
+>
+> **Jalon 2** : les bots louent ce qu'ils achètent et choisissent leur régime fiscal. Ils écartent les biens qu'ils ne pourraient pas louer assez longtemps (DPE) et comptent dans leur plan le mobilier d'un meublé, les charges non récupérées, la taxe foncière, l'assurance, l'agence et 5 % de vacance.
+>
+> | Bot | Location |
+> |---|---|
+> | Prudent | nu, au loyer de marché, gère lui-même, garantie loyers impayés ; écarte les biens interdits à la location avant 8 ans (donc les DPE E, F, G) ; régime recommandé |
+> | Levier maximal | meublé, loyer de marché + 5 %, Agence Bonne Pioche, sans garantie ; loue nu s'il ne peut pas payer le mobilier ; régime recommandé |
+> | Naïf | nu, loyer de marché + 15 %, gère lui-même, prend le premier candidat, reste au régime simple ; achète même ce qui ne se loue pas |
+> | Chasseur | nu, au loyer de marché, gère lui-même, choisit le meilleur dossier ; écarte les biens interdits avant 5 ans ; régime recommandé |
+>
+> Le Chasseur loue nu : pour un salaire de la tranche à 11 %, le meublé (mobilier, comptable plus cher) rapporte moins que la location nue, et le mobilier ralentit les achats suivants ; essai sur 100 parties : 77 k€ de patrimoine médian en meublé contre 102 k€ en nu.
 
 ## 8.3 Les leviers de difficulté
 
@@ -77,4 +88,10 @@ Risque classique : une fois riche, tout devient facile (effet boule de neige). C
 > - « l'Inactif ne s'enrichit jamais » : pour chaque métier, sa médiane reste sous l'apport plus 250 € d'épargne par mois (le haut de la fourchette du chapitre 3.1) ;
 > - « le Naïf stagne ou perd » : sa médiane ne dépasse pas celle de l'Inactif ;
 > - la densité de décisions attend l'interface et l'agenda (jalons 4 et 6).
+>
+> **Rapport du jalon 2** (`packages/bots/rapports/jalon-2.md`, 1 000 parties de 10 ans par bot) : 7 cibles sur 9 atteintes.
+> - Le Chasseur atteint « Bailleur » en 2,9 ans et finit à 97 k€ nets (134 k€ au jalon 1c) : la vraie fiscalité, les charges et les aléas pèsent plus que l'ancien forfait de 30 %. 45 % de ses parties connaissent au moins une vente forcée (5,4 % de faillites) : sa réserve de 3 mensualités est mince face aux chocs de trésorerie (procédure, chauffe-eau, taxe foncière, comptable).
+> - « Investisseur aguerri » reste manqué (écart connu, jalons 3 et 7).
+> - « Le Levier peut progresser vite » est manqué de peu : son 9e décile (73,8 k€) frôle la médiane du Prudent (74,5 k€), avec 42,7 % de faillites. Le Levier meublé souffre du coût du mobilier et des locataires fragiles de Bonne Pioche. Ce n'est pas recalibré dans le contenu : l'écart est faible et dépend surtout des réglages du bot ; à revoir avec les travaux (jalon 3), qui donnent au levier de quoi créer de la valeur.
+> - Le Naïf (99,5 % de faillites) achète au prix affiché des biens parfois impossibles à louer (ruines, DPE G) : il « perd », comme prévu, plus nettement qu'au jalon 1c.
 

@@ -1,4 +1,4 @@
-import type { Condition, DpeLabel, Epoch } from './content.ts';
+import type { Condition, DpeLabel, Epoch, LeaseType } from './content.ts';
 import type { CalendarDate } from './calendar.ts';
 import type { Clock } from './clock.ts';
 import type { Cents } from './money.ts';
@@ -6,7 +6,7 @@ import type { RngState } from './random.ts';
 import type { LoanDecision } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 4;
+export const FORMAT_VERSION = 5;
 
 export interface PlayerState {
   jobId: string;
@@ -27,6 +27,8 @@ export interface PlayerState {
   rentalHistoryMonths: number;
   /** Day number of the bankruptcy (net worth still negative after forced sales). */
   bankruptDay: number | null;
+  /** Owned property the player lives in (résidence principale); null while renting. */
+  homePropertyId: string | null;
 }
 
 export interface BankRelation {
@@ -98,7 +100,7 @@ export interface Property {
   condition: Condition;
   /** Hidden until revealed: they lower the real value. */
   defects: Defect[];
-  /** Yearly property tax and monthly co-ownership charges (charged from milestone 2). */
+  /** Yearly property tax and monthly co-ownership charges. */
   annualPropertyTax: Cents;
   monthlyCharges: Cents;
 }
@@ -179,11 +181,97 @@ export interface SaleState {
   agreement: { price: Cents; deedDay: number; buyerId: string | null } | null;
 }
 
-/** Provisional lease of milestone 1c (docs/03-systemes/04): one tenant, one rent. */
+/** A candidate tenant (docs/03-systemes/04, « Trouver un locataire »). */
+export interface Tenant {
+  firstName: string;
+  lastName: string;
+  profileId: string;
+  traitId: string;
+  /** Net monthly income, shown on the application. */
+  monthlyIncome: Cents;
+  guarantor: boolean;
+  desiredYears: number;
+  /** Hidden: drives late payments and damages, 0 … 1. */
+  reliability: number;
+  /** Multiplier on the departure probability (profile, then life events). */
+  mobility: number;
+}
+
+export interface RentalApplication {
+  id: string;
+  tenant: Tenant;
+  /** Day number the candidate gives up and looks elsewhere. */
+  expiresDay: number;
+}
+
+/** A property offered for rent: candidates arrive until one is accepted. */
+export interface RentalListing {
+  leaseType: LeaseType;
+  /** Rent asked, excluding charges. */
+  monthlyRent: Cents;
+  /** Managing agency; null when the owner manages it himself. */
+  agencyId: string | null;
+  /** Garantie loyers impayés. */
+  insured: boolean;
+  listedDay: number;
+  applications: RentalApplication[];
+}
+
+export interface Incident {
+  id: string;
+  /** Kind of incident (content/location.json). */
+  kindId: string;
+  day: number;
+  /** An artisan is booked: repaired on this day for this cost. */
+  repair: { day: number; cost: Cents } | null;
+}
+
+/** Unpaid rents of a lease (docs/03-systemes/04, « Les impayés »). */
+export interface Arrears {
+  /** Owed by the tenant (rent and charges). */
+  amount: Cents;
+  months: number;
+  sinceDay: number;
+  /** The reminder failed: the tenant stopped paying. */
+  reminderFailed: boolean;
+  /** Court procedure: eviction possible from this day (outside the winter truce). */
+  procedureEndDay: number | null;
+}
+
 export interface Lease {
-  /** Rent paid by the tenant, before the owner's costs. */
+  leaseType: LeaseType;
+  tenant: Tenant;
+  /** Rent excluding charges. */
   monthlyRent: Cents;
   startDay: number;
+  /** End of the current term: renewed, unless the tenant leaves or the DPE forbids it. */
+  termDay: number;
+  /** Next yearly rent revision and life event. */
+  anniversaryDay: number;
+  /** Market rent factor of the neighbourhood at the last revision (simulated IRL). */
+  revisionFactor: number;
+  /** Security deposit held by the owner. */
+  deposit: Cents;
+  agencyId: string | null;
+  insured: boolean;
+  /** Tenant satisfaction, 0 … 100. */
+  satisfaction: number;
+  /** The tenant gave notice: he leaves on this day. */
+  noticeEndDay: number | null;
+  incident: Incident | null;
+  arrears: Arrears | null;
+}
+
+export type TaxRegimeChoice = 'auto' | 'micro' | 'real';
+
+/** LMNP real-regime carry-overs of a property. */
+export interface FurnishedTaxState {
+  /** Depreciation not used yet (it cannot create a deficit). */
+  deferredDepreciation: Cents;
+  /** Deficit carried forward on this property's furnished income. */
+  deficitCarry: Cents;
+  /** Building depreciation deducted so far: added back to the capital gain (2025 rule). */
+  buildingDepreciationDeducted: Cents;
 }
 
 export interface OwnedProperty {
@@ -193,9 +281,13 @@ export interface OwnedProperty {
   acquisitionCost: Cents;
   purchaseDate: CalendarDate;
   sale: SaleState | null;
+  rental: RentalListing | null;
   lease: Lease | null;
-  /** Without a lease, the next tenant arrives on this day (if the property can be let). */
-  vacantUntilDay: number;
+  /** Furniture bought for a furnished let. */
+  furniture: { cost: Cents; boughtDay: number } | null;
+  /** Tax regime chosen by the player; 'auto' applies the cheapest. */
+  taxRegime: TaxRegimeChoice;
+  furnishedTax: FurnishedTaxState;
 }
 
 /** A property a marchand de biens renovates before selling it again. */
@@ -240,4 +332,48 @@ export interface GameState {
   agenda: AgendaItem[];
   /** Named rivals, by id (content/rivaux.json). */
   rivals: Record<string, RivalState>;
+  tax: TaxState;
+}
+
+/** What one property earned and cost during the tax year, for the yearly assessment. */
+export interface PropertyLedger {
+  /** Kind of let this year (the last lease's type); null if never let. */
+  category: LeaseType | null;
+  regime: TaxRegimeChoice;
+  /** Rents received, charges excluded (unpaid rents are not income). */
+  rents: Cents;
+  /** Deductible costs, interest excluded. */
+  costs: Cents;
+  interest: Cents;
+  /** Still owned at the end of the year (depreciation only applies then). */
+  sold: boolean;
+}
+
+export interface TaxAssessment {
+  year: number;
+  incomeTax: Cents;
+  socialContributions: Cents;
+  accountantFees: Cents;
+  /** Landlord deficit deducted from the salary. */
+  deficitOnSalary: Cents;
+  properties: {
+    propertyId: string;
+    category: LeaseType;
+    regime: 'micro' | 'real';
+    /** Taxable result (negative for a deficit). */
+    taxable: Cents;
+  }[];
+}
+
+export interface TaxState {
+  /** Year being accumulated. */
+  year: number;
+  /** Salary received this year. */
+  salary: Cents;
+  ledgers: Record<string, PropertyLedger>;
+  /** Landlord deficits carried forward on bare-let income, by year of origin. */
+  landlordDeficits: { year: number; amount: Cents }[];
+  /** Last year's tax, paid monthly this year. */
+  installments: { monthly: Cents; remaining: number };
+  lastAssessment: TaxAssessment | null;
 }

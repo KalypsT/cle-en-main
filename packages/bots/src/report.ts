@@ -37,6 +37,24 @@ export interface BotSummary {
   rivalPurchasesPerYear: Record<string, number>;
   /** Median final net worth by job. */
   byJob: Record<string, number>;
+  renting: {
+    /** Share of property-months let. */
+    occupancy: number;
+    /** Per property and year. */
+    rentMissed: number;
+    incidents: number;
+    departures: number;
+    /** Share of games with at least one eviction. */
+    evictionShare: number;
+    /** Means per game and year, in euros. */
+    rentTaxPerYear: number;
+    propertyTaxPerYear: number;
+    accountantPerYear: number;
+    capitalGainsTax: number;
+    /** Shares of assessed property-years. */
+    realRegimeShare: number;
+    furnishedShare: number;
+  };
 }
 
 export interface TargetCheck {
@@ -132,6 +150,39 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
       Object.entries(rivalTotals).map(([id, total]) => [id, total / Math.max(1, games.length)]),
     ),
     byJob,
+    renting: rentingSummary(games),
+  };
+}
+
+function rentingSummary(games: GameMetrics[]): BotSummary['renting'] {
+  const total = (pick: (game: GameMetrics) => number) =>
+    games.reduce((sum, game) => sum + pick(game), 0);
+  const propertyYears = Math.max(1, total((g) => g.ownedMonths) / 12);
+  const gameYears = Math.max(
+    1,
+    total((g) => g.days / DAYS_PER_YEAR),
+  );
+  const assessed = Math.max(
+    1,
+    total((g) => g.assessedPropertyYears),
+  );
+  return {
+    occupancy:
+      total((g) => g.letMonths) /
+      Math.max(
+        1,
+        total((g) => g.ownedMonths),
+      ),
+    rentMissed: total((g) => g.rentMissed) / propertyYears,
+    incidents: total((g) => g.incidents) / propertyYears,
+    departures: total((g) => g.tenantDepartures) / propertyYears,
+    evictionShare: share(games.map((g) => g.evictions > 0)),
+    rentTaxPerYear: total((g) => g.rentTax) / gameYears,
+    propertyTaxPerYear: total((g) => g.propertyTax) / gameYears,
+    accountantPerYear: total((g) => g.accountantFees) / gameYears,
+    capitalGainsTax: mean(games.map((g) => g.capitalGainsTax)),
+    realRegimeShare: total((g) => g.realRegimeYears) / assessed,
+    furnishedShare: total((g) => g.furnishedYears) / assessed,
   };
 }
 
@@ -356,6 +407,41 @@ export function formatReport(report: Report, title: string): string {
         num(s.medianOffers),
         num(s.meanLostToRivals),
         num(s.meanRivalOffers),
+      ]),
+    ),
+    '',
+    '## Location et fiscalité',
+    '',
+    'Moyennes sur toutes les parties : taux d’occupation des biens loués, événements par bien et par an, impôts par partie et par an.',
+    '',
+    table(
+      [
+        'Bot',
+        'Occupation',
+        'Loyers impayés',
+        'Incidents',
+        'Départs',
+        'Parties avec expulsion',
+        'Impôt sur les loyers/an',
+        'Taxe foncière/an',
+        'Comptable/an',
+        'Impôt sur les plus-values (partie)',
+        'Biens au réel',
+        'Biens meublés',
+      ],
+      summaries.map((s) => [
+        name(s),
+        pct(s.renting.occupancy),
+        num(s.renting.rentMissed),
+        num(s.renting.incidents),
+        num(s.renting.departures),
+        pct(s.renting.evictionShare),
+        money(s.renting.rentTaxPerYear),
+        money(s.renting.propertyTaxPerYear),
+        money(s.renting.accountantPerYear),
+        money(s.renting.capitalGainsTax),
+        pct(s.renting.realRegimeShare),
+        pct(s.renting.furnishedShare),
       ]),
     ),
     '',

@@ -3,9 +3,10 @@ import { cityDataSchema } from './schemas/city.ts';
 import { banksFileSchema, creditRulesSchema, marketRateSchema } from './schemas/credit.ts';
 import { jobsFileSchema } from './schemas/jobs.ts';
 import { listingTextsSchema, marketRulesSchema } from './schemas/market.ts';
-import { rentingRulesSchema } from './schemas/renting.ts';
+import { rentingRulesSchema, tenantTextsSchema } from './schemas/renting.ts';
 import { rivalsFileSchema } from './schemas/rivals.ts';
 import { livingCostsSchema, startSchema } from './schemas/start.ts';
+import { taxRulesSchema } from './schemas/taxes.ts';
 import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
 
@@ -13,6 +14,7 @@ import { uiTextsSchema } from './schemas/ui-texts.ts';
 export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'banques.json': banksFileSchema,
   'credit.json': creditRulesSchema,
+  'fiscalite.json': taxRulesSchema,
   'marche.json': marketRulesSchema,
   'location.json': rentingRulesSchema,
   'metiers.json': jobsFileSchema,
@@ -23,6 +25,7 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'train-de-vie.json': livingCostsSchema,
   'textes/annonces.json': listingTextsSchema,
   'textes/interface.json': uiTextsSchema,
+  'textes/locataires.json': tenantTextsSchema,
 };
 
 /** Generated city files, by path relative to `data/`. */

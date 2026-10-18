@@ -1,13 +1,23 @@
 import { z } from 'zod';
 import { isValidDate, toDayNumber } from './calendar.ts';
-import { CONDITIONS, DPE_LABELS, EPOCHS } from './content-constants.ts';
+import { CONDITIONS, DPE_LABELS, EPOCHS, LEASE_TYPES } from './content-constants.ts';
 import type { GameContent } from './content.ts';
 import { toCents } from './money.ts';
-import { FORMAT_VERSION, type GameState } from './state.ts';
+import { FORMAT_VERSION, type GameState, type Lease, type OwnedProperty } from './state.ts';
 import { initialBankRelations } from './systems/banking.ts';
 import { seedListings } from './systems/listings.ts';
 import { initialCityMarkets } from './systems/prices.ts';
+import {
+  lettingBlock,
+  marketRent,
+  monthsToDays,
+  recoverableCharges,
+  rentLevel,
+  DAYS_PER_YEAR,
+} from './systems/renting.ts';
 import { initialRivals } from './systems/rivals.ts';
+import { initialTaxState, ledgerOf } from './systems/taxes.ts';
+import { drawTenant } from './systems/tenants.ts';
 
 /** What a migration may read besides the old save. */
 export interface MigrationContext {
@@ -121,6 +131,81 @@ export const MIGRATIONS: MigrationRegistry = {
       rivals: initialRivals(content),
     };
   },
+  /**
+   * Version 4 (milestone 1c) had a provisional lease: one rent, charges
+   * included, and 30 % kept for the owner's costs. A let property gets a
+   * bare lease managed by the owner, with a tenant drawn from the save's
+   * random state, at the old rent without the recoverable charges; its
+   * deposit reaches the account. A vacant property is offered for rent at
+   * the market rent when the law allows it. Taxes start with this year.
+   */
+  4: (raw, { content }) => {
+    const state = raw as unknown as GameState;
+    const today = toDayNumber(state.clock.date);
+    const ctx = { content, state, events: [], today };
+    const rules = content.renting.leaseTypes.bare;
+    const player = { ...(raw.player as Record<string, unknown>), homePropertyId: null };
+    state.player = player as unknown as GameState['player'];
+    state.tax = initialTaxState(state.clock.date.year);
+    const old = raw.properties as (Record<string, unknown> & {
+      lease: { monthlyRent: number; startDay: number } | null;
+    })[];
+    state.properties = old.map((entry) => {
+      const { vacantUntilDay: _vacant, lease: oldLease, ...rest } = entry;
+      void _vacant;
+      const owned = {
+        ...rest,
+        rental: null,
+        lease: null,
+        furniture: null,
+        taxRegime: 'auto',
+        furnishedTax: { deferredDepreciation: 0, deficitCarry: 0, buildingDepreciationDeducted: 0 },
+      } as unknown as OwnedProperty;
+      const property = owned.property;
+      if (oldLease) {
+        const monthlyRent = Math.max(
+          100,
+          oldLease.monthlyRent - recoverableCharges(content, property),
+        );
+        const market = marketRent(content, state, property, 'bare');
+        let termDay = oldLease.startDay + monthsToDays(rules.termMonths);
+        while (termDay <= today) termDay += monthsToDays(rules.termMonths);
+        let anniversaryDay = oldLease.startDay + DAYS_PER_YEAR;
+        while (anniversaryDay <= today) anniversaryDay += DAYS_PER_YEAR;
+        const deposit = monthlyRent * rules.depositMonths;
+        const lease: Lease = {
+          leaseType: 'bare',
+          tenant: drawTenant(ctx, 'bare', monthlyRent, market, undefined),
+          monthlyRent,
+          startDay: oldLease.startDay,
+          termDay,
+          anniversaryDay,
+          revisionFactor: rentLevel(content, state, property),
+          deposit,
+          agencyId: null,
+          insured: false,
+          satisfaction: content.renting.satisfaction.initial,
+          noticeEndDay: null,
+          incident: null,
+          arrears: null,
+        };
+        owned.lease = lease;
+        state.player.balance += deposit;
+      } else if (!lettingBlock(content, property, today) && !owned.sale?.agreement) {
+        owned.rental = {
+          leaseType: 'bare',
+          monthlyRent: marketRent(content, state, property, 'bare'),
+          agencyId: null,
+          insured: false,
+          listedDay: today,
+          applications: [],
+        };
+      }
+      ledgerOf(state, owned);
+      return owned;
+    });
+    return state as unknown as Record<string, unknown>;
+  },
 };
 
 export type SaveErrorCode =
@@ -164,6 +249,75 @@ const propertySchema = z
     defects: z.array(z.object({ id: z.string(), revealed: z.boolean() }).strict()),
     annualPropertyTax: cents.min(0),
     monthlyCharges: cents.min(0),
+  })
+  .strict();
+
+const leaseTypeSchema = z.enum(LEASE_TYPES);
+const taxRegimeSchema = z.enum(['auto', 'micro', 'real']);
+
+const tenantSchema = z
+  .object({
+    firstName: z.string(),
+    lastName: z.string(),
+    profileId: z.string(),
+    traitId: z.string(),
+    monthlyIncome: cents.min(0),
+    guarantor: z.boolean(),
+    desiredYears: z.number().int().min(0),
+    reliability: z.number().min(0).max(1),
+    mobility: z.number().min(0),
+  })
+  .strict();
+
+const rentalListingSchema = z
+  .object({
+    leaseType: leaseTypeSchema,
+    monthlyRent: cents.positive(),
+    agencyId: z.string().nullable(),
+    insured: z.boolean(),
+    listedDay: day,
+    applications: z.array(
+      z.object({ id: z.string(), tenant: tenantSchema, expiresDay: day }).strict(),
+    ),
+  })
+  .strict();
+
+const leaseSchema = z
+  .object({
+    leaseType: leaseTypeSchema,
+    tenant: tenantSchema,
+    monthlyRent: cents.positive(),
+    startDay: day,
+    termDay: day,
+    anniversaryDay: day,
+    revisionFactor: z.number().positive(),
+    deposit: cents.min(0),
+    agencyId: z.string().nullable(),
+    insured: z.boolean(),
+    satisfaction: z.number().min(0).max(100),
+    noticeEndDay: day.nullable(),
+    incident: z
+      .object({
+        id: z.string(),
+        kindId: z.string(),
+        day,
+        repair: z
+          .object({ day, cost: cents.min(0) })
+          .strict()
+          .nullable(),
+      })
+      .strict()
+      .nullable(),
+    arrears: z
+      .object({
+        amount: cents.min(0),
+        months: z.number().int().min(0),
+        sinceDay: day,
+        reminderFailed: z.boolean(),
+        procedureEndDay: day.nullable(),
+      })
+      .strict()
+      .nullable(),
   })
   .strict();
 
@@ -249,6 +403,7 @@ const gameStateSchema = z
         reputation: z.number().min(0).max(100),
         rentalHistoryMonths: z.number().int().min(0),
         bankruptDay: day.nullable(),
+        homePropertyId: z.string().nullable(),
       })
       .strict(),
     banks: z.record(
@@ -376,8 +531,20 @@ const gameStateSchema = z
             })
             .strict()
             .nullable(),
-          lease: z.object({ monthlyRent: cents.positive(), startDay: day }).strict().nullable(),
-          vacantUntilDay: day,
+          rental: rentalListingSchema.nullable(),
+          lease: leaseSchema.nullable(),
+          furniture: z
+            .object({ cost: cents.min(0), boughtDay: day })
+            .strict()
+            .nullable(),
+          taxRegime: taxRegimeSchema,
+          furnishedTax: z
+            .object({
+              deferredDepreciation: cents.min(0),
+              deficitCarry: cents.min(0),
+              buildingDepreciationDeducted: cents.min(0),
+            })
+            .strict(),
         })
         .strict(),
     ),
@@ -402,6 +569,51 @@ const gameStateSchema = z
         })
         .strict(),
     ),
+    tax: z
+      .object({
+        year: z.number().int(),
+        salary: cents.min(0),
+        ledgers: z.record(
+          z.string(),
+          z
+            .object({
+              category: leaseTypeSchema.nullable(),
+              regime: taxRegimeSchema,
+              rents: cents,
+              costs: cents,
+              interest: cents.min(0),
+              sold: z.boolean(),
+            })
+            .strict(),
+        ),
+        landlordDeficits: z.array(
+          z.object({ year: z.number().int(), amount: cents.min(0) }).strict(),
+        ),
+        installments: z
+          .object({ monthly: cents, remaining: z.number().int().min(0).max(12) })
+          .strict(),
+        lastAssessment: z
+          .object({
+            year: z.number().int(),
+            incomeTax: cents,
+            socialContributions: cents,
+            accountantFees: cents.min(0),
+            deficitOnSalary: cents.min(0),
+            properties: z.array(
+              z
+                .object({
+                  propertyId: z.string(),
+                  category: leaseTypeSchema,
+                  regime: z.enum(['micro', 'real']),
+                  taxable: cents,
+                })
+                .strict(),
+            ),
+          })
+          .strict()
+          .nullable(),
+      })
+      .strict(),
   })
   .strict();
 

@@ -1,10 +1,12 @@
 import type { GameEvent } from './events.ts';
 import type { Cents } from './money.ts';
-import type { GameState, SaleMode } from './state.ts';
+import type { LeaseType } from './content.ts';
+import type { GameState, SaleMode, TaxRegimeChoice } from './state.ts';
 import type { VisitRefusal } from './systems/agenda.ts';
 import type { BankActionRefusal } from './systems/banking.ts';
 import type { OfferRefusal } from './systems/offers.ts';
 import type { PurchaseRefusal } from './systems/purchases.ts';
+import type { RentRefusal } from './systems/renting.ts';
 import type { SaleRefusal } from './systems/resale.ts';
 
 /** Every player or bot decision goes through one of these actions. Amounts are in cents. */
@@ -30,7 +32,25 @@ export type GameAction =
   | { type: 'sale/withdraw'; propertyId: string }
   | { type: 'sale/acceptOffer'; propertyId: string; offerId: string }
   | { type: 'sale/rejectOffer'; propertyId: string; offerId: string }
-  | { type: 'sale/counterOffer'; propertyId: string; offerId: string; amount: Cents };
+  | { type: 'sale/counterOffer'; propertyId: string; offerId: string; amount: Cents }
+  | {
+      type: 'rent/list';
+      propertyId: string;
+      leaseType: LeaseType;
+      monthlyRent: Cents;
+      /** Managing agency; null to manage it oneself. */
+      agencyId: string | null;
+      /** Garantie loyers impayés. */
+      insured: boolean;
+    }
+  | { type: 'rent/withdraw'; propertyId: string }
+  | { type: 'rent/accept'; propertyId: string; applicationId: string }
+  | { type: 'rent/reject'; propertyId: string; applicationId: string }
+  | { type: 'rent/manage'; propertyId: string; agencyId: string | null }
+  | { type: 'rent/repair'; propertyId: string; method: 'self' | 'artisan' }
+  | { type: 'home/moveIn'; propertyId: string }
+  | { type: 'home/moveOut' }
+  | { type: 'tax/setRegime'; propertyId: string; regime: TaxRegimeChoice };
 
 export type RefusalCode =
   | BankActionRefusal
@@ -38,6 +58,7 @@ export type RefusalCode =
   | OfferRefusal
   | PurchaseRefusal
   | SaleRefusal
+  | RentRefusal
   | 'job.alreadyResigned';
 
 /** Machine-readable refusal; the interface maps `code` to a text from `content/`. */
