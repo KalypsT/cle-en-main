@@ -1,0 +1,49 @@
+{
+  "maxDebtRatio": 0.35,
+  "minDurationYears": 5,
+  "maxDurationYears": 25,
+  "maxDurationWithWorksYears": 27,
+  "worksShareForLongerDuration": 0.1,
+  "partialAgreementMinShare": 0.5,
+  "retainedRentShare": 0.7,
+  "notaryFeesShare": 0.075,
+  "bankFeesShare": 0.015,
+  "insurancePercent": 0.3,
+  "durationSpreadPercent": {
+    "5": -0.55,
+    "10": -0.35,
+    "15": -0.15,
+    "20": 0,
+    "25": 0.1,
+    "27": 0.15
+  },
+  "overdraftAnnualPercent": 16,
+  "minRentalHistoryMonthsWithoutSalary": 24,
+  "renegotiation": {
+    "thresholdPercent": 0.7,
+    "feesShareOfRemaining": 0.03,
+    "fixedFees": 1000
+  },
+  "trust": {
+    "startByJob": {
+      "veryHigh": 60,
+      "high": 55,
+      "medium": 45,
+      "mediumLow": 40
+    },
+    "marginByJobPercent": {
+      "veryHigh": -0.15,
+      "high": -0.05,
+      "medium": 0.05,
+      "mediumLow": 0.2
+    },
+    "marginSwingPercent": 0.25,
+    "onTimePayment": 0.5,
+    "relationshipMonth": 0.2,
+    "overdraftDay": -1,
+    "refusedApplication": -3,
+    "meeting": 3,
+    "meetingCooldownDays": 30,
+    "meetingMinutes": 60
+  }
+}

@@ -1,8 +1,18 @@
-import { timeSettings } from '@cle/content';
+import { gameContent, timeSettings } from '@cle/content';
 import { useEffect, useSyncExternalStore } from 'react';
 import type { GameSession } from '../session/game-session.ts';
 import { exportGame } from '../storage/files.ts';
-import { describeEvent, format, formatGameDate, formatGameTime, texts } from '../texts.ts';
+import {
+  bankerName,
+  describeEvent,
+  format,
+  formatDuration,
+  formatGameDate,
+  formatGameTime,
+  formatMoney,
+  formatPercent,
+  texts,
+} from '../texts.ts';
 
 interface Props {
   session: GameSession;
@@ -11,8 +21,7 @@ interface Props {
   notify: (message: string) => void;
 }
 
-const DEMO_DIE_SIDES = 6;
-
+/** Temporary screen until the management interface of milestone 4. */
 export function GameScreen({ session, onSave, onMenu, notify }: Props) {
   const { state, speed, lastEvent } = useSyncExternalStore(session.subscribe, session.getSnapshot);
 
@@ -21,8 +30,12 @@ export function GameScreen({ session, onSave, onMenu, notify }: Props) {
     return () => session.stop();
   }, [session]);
 
-  const rollDie = () => {
-    const result = session.dispatch({ type: 'demo/rollDie', sides: DEMO_DIE_SIDES });
+  const accountBankId = gameContent.start.accountBankId;
+  const banker = bankerName(accountBankId);
+  const job = gameContent.jobs.find((candidate) => candidate.id === state.player.jobId);
+
+  const meetBanker = () => {
+    const result = session.dispatch({ type: 'bank/meet', bankId: accountBankId });
     if (!result.ok) notify(texts.refusals[result.reason.code]);
   };
 
@@ -54,17 +67,26 @@ export function GameScreen({ session, onSave, onMenu, notify }: Props) {
       </div>
 
       <section className="card">
-        <h2 className="card-heading">{texts.game.demoHeading}</h2>
-        <p data-testid="last-roll">
-          {state.demo.lastRoll === null
-            ? texts.game.noRollYet
-            : format(texts.game.lastRoll, { value: state.demo.lastRoll })}
+        <h2 className="card-heading">{texts.game.situationHeading}</h2>
+        <p>{format(texts.game.job, { job: job?.name ?? state.player.jobId })}</p>
+        <p data-testid="balance">
+          {format(texts.game.balance, { amount: formatMoney(state.player.balance) })}
+        </p>
+        <p>
+          {format(texts.game.freeTime, { duration: formatDuration(state.player.freeTimeMinutes) })}
+        </p>
+        <p>{format(texts.game.marketRate, { rate: formatPercent(state.market.ratePercent) })}</p>
+        <p data-testid="trust">
+          {format(texts.game.trust, {
+            banker,
+            trust: Math.round(state.banks[accountBankId]?.trust ?? 0),
+          })}
         </p>
         {eventText && (
           <p className="muted">{format(texts.game.latestEvent, { event: eventText })}</p>
         )}
-        <button type="button" className="button" onClick={rollDie}>
-          {texts.game.rollDie}
+        <button type="button" className="button" onClick={meetBanker}>
+          {format(texts.game.meetBanker, { banker })}
         </button>
       </section>
 

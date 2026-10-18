@@ -1,4 +1,5 @@
 {
+  "unemployedFreeTimeMinutes": 480,
   "jobs": [
     {
       "id": "civilServant",
@@ -30,7 +31,12 @@
       "id": "nurse",
       "name": "Infirmier",
       "netMonthlySalary": 2300,
-      "freeTime": { "kind": "shifts", "workDayMinutes": 0, "restDayMinutes": 420 },
+      "freeTime": {
+        "kind": "shifts",
+        "workDayMinutes": 0,
+        "restDayMinutes": 420,
+        "cycle": ["work", "work", "rest", "rest"]
+      },
       "bankTrust": "high",
       "perk": "Disponible en semaine quand les autres travaillent."
     },
@@ -38,7 +44,11 @@
       "id": "developer",
       "name": "Développeur",
       "netMonthlySalary": 3100,
-      "freeTime": { "kind": "regular", "weekdayMinutes": 180, "weekendMinutes": 360 },
+      "freeTime": {
+        "kind": "regular",
+        "weekdayMinutes": 180,
+        "weekendMinutes": 360
+      },
       "bankTrust": "high",
       "perk": "Bon salaire et du temps."
     },
@@ -46,7 +56,11 @@
       "id": "electrician",
       "name": "Électricien",
       "netMonthlySalary": 2100,
-      "freeTime": { "kind": "regular", "weekdayMinutes": 120, "weekendMinutes": 360 },
+      "freeTime": {
+        "kind": "regular",
+        "weekdayMinutes": 120,
+        "weekendMinutes": 360
+      },
       "bankTrust": "medium",
       "perk": "Peut faire lui-même les postes d'électricité."
     },
@@ -55,7 +69,11 @@
       "name": "Commercial",
       "netMonthlySalary": 2000,
       "averageMonthlyTotal": 2700,
-      "freeTime": { "kind": "regular", "weekdayMinutes": 90, "weekendMinutes": 360 },
+      "freeTime": {
+        "kind": "regular",
+        "weekdayMinutes": 90,
+        "weekendMinutes": 360
+      },
       "bankTrust": "mediumLow",
       "perk": "Négocie mieux les prix d'achat."
     },

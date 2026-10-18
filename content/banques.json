@@ -1,0 +1,77 @@
+{
+  "banks": [
+    {
+      "id": "tirelire",
+      "name": "La Tirelire Comtoise",
+      "banker": {
+        "name": "Gérard Prudhomme",
+        "description": "58 ans, cravate en laine."
+      },
+      "policy": "Prudente, mais fidèle et compréhensive en cas de coup dur.",
+      "marginPercent": 0.25,
+      "responseDelayDays": 5,
+      "minTrust": 0,
+      "minJobTrust": "mediumLow",
+      "derogation": {
+        "minTrust": 70,
+        "maxDebtRatio": 0.38
+      },
+      "counterOffers": true,
+      "meetings": true
+    },
+    {
+      "id": "fougueux",
+      "name": "Crédit Fougueux",
+      "banker": {
+        "name": "Kévin Boost",
+        "description": "« On va scaler ton patrimoine. »"
+      },
+      "policy": "Souple avec les investisseurs, taux un peu plus élevés.",
+      "marginPercent": 0.45,
+      "responseDelayDays": 3,
+      "minTrust": 0,
+      "minJobTrust": "mediumLow",
+      "derogation": {
+        "minTrust": 50,
+        "maxDebtRatio": 0.4
+      },
+      "counterOffers": true,
+      "meetings": true
+    },
+    {
+      "id": "rigueur",
+      "name": "Banque Rigueur & Fils",
+      "banker": {
+        "name": "Hortense Rigueur",
+        "description": "Aucun sourire."
+      },
+      "policy": "Les meilleurs taux, mais un dossier irréprochable exigé.",
+      "marginPercent": 0.05,
+      "responseDelayDays": 7,
+      "minTrust": 50,
+      "minJobTrust": "high",
+      "derogation": {
+        "minTrust": 85,
+        "maxDebtRatio": 0.37
+      },
+      "counterOffers": false,
+      "meetings": true
+    },
+    {
+      "id": "zeroPapier",
+      "name": "Néobanque ZéroPapier",
+      "banker": {
+        "name": "Léo",
+        "description": "Un chatbot très enthousiaste."
+      },
+      "policy": "Réponse immédiate, aucune dérogation, aucune relation.",
+      "marginPercent": 0.3,
+      "responseDelayDays": 0,
+      "minTrust": 0,
+      "minJobTrust": "medium",
+      "derogation": null,
+      "counterOffers": false,
+      "meetings": false
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { timeSettings } from '@cle/content';
-import { createGame, type GameEvent, type GameState } from '@cle/engine';
+import type { GameEvent, GameState } from '@cle/engine';
 import { useCallback, useEffect, useState } from 'react';
+import { engine } from './engine.ts';
 import { PwaStatus } from './PwaStatus.tsx';
 import { GameScreen } from './screens/GameScreen.tsx';
 import { SlotsScreen } from './screens/SlotsScreen.tsx';
@@ -63,7 +64,7 @@ export function App() {
   );
 
   const startNewGame = async (slot: SlotId) => {
-    const state = createGame({
+    const state = engine.createGame({
       seed: randomSeed(),
       startDate: today(),
       startHour: timeSettings.startHour,

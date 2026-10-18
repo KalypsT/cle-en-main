@@ -55,6 +55,13 @@ Chaque métier change trois choses : le **salaire**, le **temps libre** et la **
 - Les banques ne retiennent alors que les revenus locatifs (à 70 %) et exigent un historique solide : démissionner trop tôt bloque le crédit.
 - Reprendre un emploi est possible, avec un délai de recherche.
 
+## Le train de vie
+
+- Chaque mois, le personnage paie ses **dépenses de vie** (hors loyer) : elles suivent son revenu, si bien que l'**épargne de salaire reste faible** (environ 100 à 250 € par mois selon le métier).
+- On s'enrichit donc en investissant, pas en attendant : l'apport de départ compte vraiment.
+- Sans emploi, les dépenses de vie tombent à un minimum (valeur indicative : 900 €/mois).
+- Valeurs dans `content/train-de-vie.json`.
+
 ## Le logement du personnage
 
 - Au départ, le joueur est **locataire** à Dole. Son loyer est une charge mensuelle et compte dans son « reste à vivre ».

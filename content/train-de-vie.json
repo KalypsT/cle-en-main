@@ -1,0 +1,6 @@
+{
+  "referenceIncome": 2000,
+  "costAtReferenceIncome": 1350,
+  "shareOfIncomeDifference": 0.9,
+  "minimum": 900
+}

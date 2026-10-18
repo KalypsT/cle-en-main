@@ -28,6 +28,8 @@ const freeTimeSchema = z.discriminatedUnion('kind', [
       kind: z.literal('shifts'),
       workDayMinutes: minutes,
       restDayMinutes: minutes,
+      /** Repeating pattern of work and rest days, starting on the first day of the game. */
+      cycle: z.array(z.enum(['work', 'rest'])).min(1),
     })
     .strict(),
 ]);
@@ -47,6 +49,8 @@ export const jobSchema = z
 
 export const jobsFileSchema = z
   .object({
+    /** Daily free time after resigning. */
+    unemployedFreeTimeMinutes: minutes,
     jobs: z
       .array(jobSchema)
       .min(1)

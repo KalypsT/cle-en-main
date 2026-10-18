@@ -31,11 +31,14 @@ export const uiTextsSchema = z
         saved: text,
         export: text,
         menu: text,
-        demoHeading: text,
-        rollDie: text,
-        lastRoll: text,
-        noRollYet: text,
         latestEvent: text,
+        situationHeading: text,
+        job: text,
+        balance: text,
+        freeTime: text,
+        marketRate: text,
+        trust: text,
+        meetBanker: text,
       })
       .strict(),
     calendar: z
@@ -44,12 +47,40 @@ export const uiTextsSchema = z
         months: z.array(text).length(12),
         date: text,
         time: text,
+        duration: text,
       })
       .strict(),
+    numbers: z.object({ percent: text }).strict(),
     events: z
-      .object({ dayStarted: text, weekendStarted: text, monthStarted: text, yearStarted: text })
+      .object({
+        dayStarted: text,
+        weekendStarted: text,
+        monthStarted: text,
+        yearStarted: text,
+        monthlyStatement: text,
+        overdraftStarted: text,
+        overdraftEnded: text,
+        loanRepaid: text,
+        renegotiationAvailable: text,
+        loanRefinanced: text,
+        bankMeetingHeld: text,
+        resigned: text,
+      })
       .strict(),
-    refusals: z.object({ 'demo.invalidSides': text }).strict(),
+    /** One text per engine refusal code (packages/engine/src/actions.ts). */
+    refusals: z
+      .object({
+        'bank.unknown': text,
+        'bank.noMeetings': text,
+        'bank.meetingTooSoon': text,
+        'time.notEnoughFreeTime': text,
+        'loan.unknown': text,
+        'loan.notWorthRefinancing': text,
+        'loan.refinancingRefused': text,
+        'account.insufficientFunds': text,
+        'job.alreadyResigned': text,
+      })
+      .strict(),
     errors: z
       .object({ importFailed: text, loadFailed: text, saveFailed: text, storageUnavailable: text })
       .strict(),

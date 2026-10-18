@@ -1,17 +1,20 @@
+import { gameContent } from '@cle/content';
 import {
   type CalendarDate,
-  createGame,
+  createEngine,
   type GameEventType,
   type GameState,
   HOURS_PER_DAY,
-  tick,
 } from '@cle/engine';
+
+export const engine = createEngine(gameContent);
 
 export interface SimulationOptions {
   seed: number;
   startDate: CalendarDate;
   startHour: number;
   days: number;
+  jobId?: string;
 }
 
 export interface SimulationResult {
@@ -20,13 +23,14 @@ export interface SimulationResult {
   eventCounts: Partial<Record<GameEventType, number>>;
 }
 
-/** Plays a game without any interface. No strategy yet: bots arrive in milestone 1. */
+/** Plays a game without any interface. No strategy yet: bots arrive in milestone 1c. */
 export function simulate(options: SimulationOptions): SimulationResult {
-  let state = createGame(options);
+  const { days, ...gameOptions } = options;
+  let state = engine.createGame(gameOptions);
   const eventCounts: Partial<Record<GameEventType, number>> = {};
-  const ticks = options.days * HOURS_PER_DAY;
+  const ticks = days * HOURS_PER_DAY;
   for (let i = 0; i < ticks; i++) {
-    const result = tick(state);
+    const result = engine.tick(state);
     state = result.state;
     for (const event of result.events) {
       eventCounts[event.type] = (eventCounts[event.type] ?? 0) + 1;

@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
+import banks from '../../../content/banques.json' with { type: 'json' };
+import start from '../../../content/partie.json' with { type: 'json' };
 import uiTexts from '../../../content/textes/interface.json' with { type: 'json' };
 
 const t = uiTexts;
+const banker = banks.banks.find((bank) => bank.id === start.accountBankId)?.banker.name ?? '';
 
 test('starts, creates a game, saves it and loads it back', async ({ page }) => {
   await page.goto('./');
@@ -17,12 +20,15 @@ test('starts, creates a game, saves it and loads it back', async ({ page }) => {
   await page.getByRole('button', { name: t.game.speed.replace('{speed}', '4') }).click();
   await expect(time).not.toHaveText(startTime ?? '', { timeout: 5_000 });
 
-  // Pause, roll the demo die, then save.
+  // Pause, meet the banker (trust goes up), then save.
   await page.getByRole('button', { name: t.game.pause }).click();
-  await page.getByRole('button', { name: t.game.rollDie }).click();
+  const trustBefore = await page.getByTestId('trust').textContent();
+  await page.getByRole('button', { name: t.game.meetBanker.replace('{banker}', banker) }).click();
+  await expect(page.getByTestId('trust')).not.toHaveText(trustBefore ?? '');
   const savedDate = await page.getByTestId('game-date').textContent();
   const savedTime = await time.textContent();
-  const savedRoll = await page.getByTestId('last-roll').textContent();
+  const savedTrust = await page.getByTestId('trust').textContent();
+  const savedBalance = await page.getByTestId('balance').textContent();
   await page.getByRole('button', { name: t.game.save }).click();
   await expect(page.getByRole('status').filter({ hasText: t.game.saved })).toBeVisible();
 
@@ -34,7 +40,8 @@ test('starts, creates a game, saves it and loads it back', async ({ page }) => {
 
   await expect(page.getByTestId('game-date')).toHaveText(savedDate ?? '');
   await expect(time).toHaveText(savedTime ?? '');
-  await expect(page.getByTestId('last-roll')).toHaveText(savedRoll ?? '');
+  await expect(page.getByTestId('trust')).toHaveText(savedTrust ?? '');
+  await expect(page.getByTestId('balance')).toHaveText(savedBalance ?? '');
 });
 
 test('exports a game and imports it into another slot', async ({ page }) => {

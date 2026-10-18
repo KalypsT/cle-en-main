@@ -65,3 +65,10 @@ export function nextInt(state: RngState, min: number, max: number): number {
   while (value >= limit) value = nextUint32(state);
   return min + (value % range);
 }
+
+/** Returns a standard normal draw (Box–Muller). */
+export function nextNormal(state: RngState): number {
+  const u1 = 1 - nextFloat(state); // (0, 1]: avoids log(0)
+  const u2 = nextFloat(state);
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}

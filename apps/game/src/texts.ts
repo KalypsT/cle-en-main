@@ -1,5 +1,5 @@
-import { uiTexts } from '@cle/content';
-import { type CalendarDate, type GameEvent, weekdayOf } from '@cle/engine';
+import { gameContent, uiTexts } from '@cle/content';
+import { type CalendarDate, type Cents, type GameEvent, weekdayOf } from '@cle/engine';
 
 /** Every displayed text comes from content/textes/interface.json. */
 export const texts = uiTexts;
@@ -24,21 +24,63 @@ export function formatGameTime(hour: number): string {
   return format(texts.calendar.time, { hour });
 }
 
+const moneyFormat = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+const rateFormat = new Intl.NumberFormat('fr-FR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export function formatMoney(amount: Cents): string {
+  return moneyFormat.format(amount / 100);
+}
+
+export function formatPercent(value: number): string {
+  return format(texts.numbers.percent, { value: rateFormat.format(value) });
+}
+
+export function formatDuration(minutes: number): string {
+  return format(texts.calendar.duration, {
+    hours: Math.floor(minutes / 60),
+    minutes: String(minutes % 60).padStart(2, '0'),
+  });
+}
+
+export function bankerName(bankId: string): string {
+  return gameContent.banks.find((bank) => bank.id === bankId)?.banker.name ?? bankId;
+}
+
 /** Text for an engine event, or null when the event is not shown to the player. */
 export function describeEvent(event: GameEvent): string | null {
+  const { events } = texts;
   switch (event.type) {
     case 'dayStarted':
-      return format(texts.events.dayStarted, { date: formatGameDate(event.date) });
+      return format(events.dayStarted, { date: formatGameDate(event.date) });
     case 'weekendStarted':
-      return texts.events.weekendStarted;
+      return events.weekendStarted;
     case 'monthStarted':
-      return format(texts.events.monthStarted, {
+      return format(events.monthStarted, {
         month: texts.calendar.months[event.month - 1] ?? '',
         year: event.year,
       });
     case 'yearStarted':
-      return format(texts.events.yearStarted, { year: event.year });
-    case 'demo/dieRolled':
+      return format(events.yearStarted, { year: event.year });
+    case 'monthlyStatement':
+      return format(events.monthlyStatement, { balance: formatMoney(event.balance) });
+    case 'overdraftStarted':
+      return events.overdraftStarted;
+    case 'overdraftEnded':
+      return events.overdraftEnded;
+    case 'loanRepaid':
+      return events.loanRepaid;
+    case 'renegotiationAvailable':
+      return events.renegotiationAvailable;
+    case 'loanRefinanced':
+      return format(events.loanRefinanced, { fees: formatMoney(event.fees) });
+    case 'bankMeetingHeld':
+      return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
+    case 'resigned':
+      return events.resigned;
+    case 'marketRateChanged':
       return null;
   }
 }

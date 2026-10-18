@@ -1,5 +1,6 @@
-import { type CalendarDate, deserializeGame, type GameState, serializeGame } from '@cle/engine';
+import { type CalendarDate, type GameState, serializeGame } from '@cle/engine';
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
+import { engine } from '../engine.ts';
 
 /** Three save slots (docs/07-architecture.md, section 7.5). */
 export const SLOT_IDS = [1, 2, 3] as const;
@@ -58,5 +59,5 @@ export async function saveToSlot(slot: SlotId, state: GameState): Promise<SlotRe
 /** Loads a slot; throws SaveFormatError when the stored game is invalid. */
 export async function loadFromSlot(slot: SlotId): Promise<GameState | null> {
   const record = await (await db()).get('slots', slot);
-  return record ? deserializeGame(record.game) : null;
+  return record ? engine.loadGame(record.game) : null;
 }

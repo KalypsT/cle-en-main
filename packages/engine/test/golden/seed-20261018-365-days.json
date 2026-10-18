@@ -1,12 +1,12 @@
 {
   "state": {
-    "formatVersion": 1,
+    "formatVersion": 2,
     "seed": 20261018,
     "rng": [
-      91732418,
-      1506967442,
-      3793543067,
-      676357184
+      2974627273,
+      1680189825,
+      524578071,
+      2873657261
     ],
     "startDate": {
       "year": 2026,
@@ -22,16 +22,53 @@
       "hour": 8,
       "elapsedHours": 8760
     },
-    "demo": {
-      "rollCount": 12,
-      "lastRoll": 1
-    }
+    "nextId": 1,
+    "player": {
+      "jobId": "civilServant",
+      "employed": true,
+      "balance": 1656000,
+      "overdraftDays": 0,
+      "overdraftInterestThisMonth": 0,
+      "monthlyRent": 52000,
+      "freeTimeMinutes": 150,
+      "reputation": 10,
+      "rentalHistoryMonths": 0
+    },
+    "banks": {
+      "tirelire": {
+        "trust": 95.4,
+        "relationshipMonths": 12,
+        "lastMeetingDay": 21093
+      },
+      "fougueux": {
+        "trust": 60,
+        "relationshipMonths": 0,
+        "lastMeetingDay": null
+      },
+      "rigueur": {
+        "trust": 60,
+        "relationshipMonths": 0,
+        "lastMeetingDay": null
+      },
+      "zeroPapier": {
+        "trust": 60,
+        "relationshipMonths": 0,
+        "lastMeetingDay": null
+      }
+    },
+    "market": {
+      "ratePercent": 3.75,
+      "cyclePhase": 0.35761811328120546
+    },
+    "loans": []
   },
   "eventCounts": {
     "dayStarted": 365,
     "weekendStarted": 52,
     "monthStarted": 12,
-    "demo/dieRolled": 12,
+    "marketRateChanged": 12,
+    "monthlyStatement": 12,
+    "bankMeetingHeld": 11,
     "yearStarted": 1
   }
 }

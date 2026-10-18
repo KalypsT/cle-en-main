@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { jobs, timeSettings, uiTexts } from './index.ts';
+import { checkReferences, gameContent, jobs, timeSettings, uiTexts } from './index.ts';
 import { validateContentDirectory, validateContentText } from './validation.ts';
 
 const schema = z.object({ name: z.string() }).strict();
@@ -21,6 +21,15 @@ describe('content', () => {
     expect(jobs.length).toBeGreaterThan(0);
     expect(timeSettings.speeds).toContain(1);
     expect(uiTexts.calendar.months).toHaveLength(12);
+  });
+
+  it('checks references between files', () => {
+    expect(checkReferences(gameContent)).toEqual([]);
+    const broken = {
+      ...gameContent,
+      start: { ...gameContent.start, defaultJobId: 'astronaut', accountBankId: 'nowhere' },
+    };
+    expect(checkReferences(broken)).toHaveLength(2);
   });
 
   it('reports invalid JSON and schema violations', () => {
