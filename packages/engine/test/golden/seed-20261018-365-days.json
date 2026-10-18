@@ -1,12 +1,12 @@
 {
   "state": {
-    "formatVersion": 2,
+    "formatVersion": 3,
     "seed": 20261018,
     "rng": [
-      2974627273,
-      1680189825,
-      524578071,
-      2873657261
+      3626560228,
+      2415718855,
+      3279250634,
+      2954740683
     ],
     "startDate": {
       "year": 2026,
@@ -22,11 +22,11 @@
       "hour": 8,
       "elapsedHours": 8760
     },
-    "nextId": 1,
+    "nextId": 850,
     "player": {
       "jobId": "civilServant",
       "employed": true,
-      "balance": 1656000,
+      "balance": 1097810,
       "overdraftDays": 0,
       "overdraftInterestThisMonth": 0,
       "monthlyRent": 52000,
@@ -36,7 +36,7 @@
     },
     "banks": {
       "tirelire": {
-        "trust": 95.4,
+        "trust": 100,
         "relationshipMonths": 12,
         "lastMeetingDay": 21093
       },
@@ -57,18 +57,179 @@
       }
     },
     "market": {
-      "ratePercent": 3.75,
-      "cyclePhase": 0.35761811328120546
+      "ratePercent": 3.94,
+      "cyclePhase": 0.35761811328120546,
+      "laggedRatePercent": 3.8000904083266294,
+      "cities": {
+        "dole": {
+          "centreHistorique": {
+            "priceIndex": 1.045331577229675,
+            "trendPercent": 1.3373256283063577
+          },
+          "mesnilsPasteur": {
+            "priceIndex": 1.0719161255311311,
+            "trendPercent": 2.8374416329422103
+          },
+          "paters": {
+            "priceIndex": 1.0235384393316869,
+            "trendPercent": 2.980126386739605
+          },
+          "plumontValFleuri": {
+            "priceIndex": 1.0456675199176482,
+            "trendPercent": 2.2006708505631396
+          },
+          "azans": {
+            "priceIndex": 1.0081844951788945,
+            "trendPercent": 3.099651818296881
+          }
+        }
+      }
     },
-    "loans": []
+    "loans": [
+      {
+        "id": "loan-233",
+        "bankId": "tirelire",
+        "principal": 3700000,
+        "ratePercent": 4.05,
+        "durationMonths": 240,
+        "monthlyPayment": 22519,
+        "remaining": 3598149,
+        "paymentsMade": 10,
+        "startDate": {
+          "year": 2026,
+          "month": 12,
+          "day": 3
+        },
+        "renegotiationSuggested": false,
+        "propertyId": "property-159"
+      }
+    ],
+    "purchases": [],
+    "properties": [
+      {
+        "property": {
+          "id": "property-159",
+          "cityId": "dole",
+          "neighbourhoodId": "centreHistorique",
+          "kind": "apartment",
+          "surface": 20,
+          "rooms": 1,
+          "floor": 0,
+          "lots": [],
+          "epoch": "before1948",
+          "dpe": "E",
+          "condition": "good",
+          "defects": [],
+          "annualPropertyTax": 26000,
+          "monthlyCharges": 4400
+        },
+        "purchasePrice": 3700000,
+        "acquisitionCost": 4033000,
+        "purchaseDate": {
+          "year": 2026,
+          "month": 12,
+          "day": 3
+        },
+        "sale": null
+      }
+    ],
+    "agenda": []
   },
+  "listings": {
+    "count": 68,
+    "totalAskingPrice": 1177800000,
+    "ids": [
+      "listing-537",
+      "listing-545",
+      "listing-547",
+      "listing-599",
+      "listing-615",
+      "listing-623",
+      "listing-635",
+      "listing-661",
+      "listing-669",
+      "listing-671",
+      "listing-675",
+      "listing-677",
+      "listing-685",
+      "listing-689",
+      "listing-693",
+      "listing-697",
+      "listing-699",
+      "listing-701",
+      "listing-703",
+      "listing-707",
+      "listing-709",
+      "listing-711",
+      "listing-715",
+      "listing-721",
+      "listing-725",
+      "listing-727",
+      "listing-733",
+      "listing-735",
+      "listing-741",
+      "listing-751",
+      "listing-753",
+      "listing-755",
+      "listing-759",
+      "listing-761",
+      "listing-763",
+      "listing-765",
+      "listing-775",
+      "listing-777",
+      "listing-779",
+      "listing-781",
+      "listing-783",
+      "listing-789",
+      "listing-791",
+      "listing-793",
+      "listing-795",
+      "listing-797",
+      "listing-801",
+      "listing-805",
+      "listing-807",
+      "listing-809",
+      "listing-811",
+      "listing-813",
+      "listing-815",
+      "listing-817",
+      "listing-821",
+      "listing-823",
+      "listing-825",
+      "listing-827",
+      "listing-829",
+      "listing-831",
+      "listing-835",
+      "listing-837",
+      "listing-839",
+      "listing-841",
+      "listing-843",
+      "listing-845",
+      "listing-847",
+      "listing-849"
+    ]
+  },
+  "netWorth": 2176061,
   "eventCounts": {
     "dayStarted": 365,
+    "listingSold": 328,
+    "listingPriceDropped": 316,
+    "listingPublished": 365,
     "weekendStarted": 52,
     "monthStarted": 12,
     "marketRateChanged": 12,
+    "propertyPricesUpdated": 12,
     "monthlyStatement": 12,
     "bankMeetingHeld": 11,
-    "yearStarted": 1
+    "visitDone": 1,
+    "offerMade": 1,
+    "offerAnswered": 1,
+    "compromisSigned": 1,
+    "loanRequested": 1,
+    "loanAnswered": 1,
+    "loanChosen": 1,
+    "deedSigned": 1,
+    "yearStarted": 1,
+    "listingWithdrawn": 26
   }
 }

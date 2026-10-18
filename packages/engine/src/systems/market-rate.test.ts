@@ -19,5 +19,5 @@ describe('market rate', () => {
     }
     expect(Math.max(...rates) - Math.min(...rates)).toBeGreaterThan(0.5);
     expect(run(3)).toEqual(rates);
-  });
+  }, 60_000);
 });

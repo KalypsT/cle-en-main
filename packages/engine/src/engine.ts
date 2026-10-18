@@ -22,9 +22,35 @@ import {
   runMonthlyTrust,
   runRenegotiationCheck,
 } from './systems/banking.ts';
+import { requestVisit, runDailyAgenda } from './systems/agenda.ts';
 import type { SystemContext } from './systems/context.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
+import { runDailyListings, seedListings } from './systems/listings.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
+import { answerCounter, makeOffer } from './systems/offers.ts';
+import { initialCityMarkets, runMonthlyPrices } from './systems/prices.ts';
+import {
+  acceptLoan,
+  cashDueAtDeed,
+  requestLoan,
+  runDailyPurchases,
+  signCompromis,
+  waiveLoanCondition,
+  withdrawPurchase,
+} from './systems/purchases.ts';
+import {
+  answerSaleOffer,
+  listForSale,
+  runDailyResale,
+  saleProceeds,
+  updateSale,
+} from './systems/resale.ts';
+import {
+  type Estimate,
+  estimateValue,
+  realValue,
+  type ValueBreakdown,
+} from './systems/valuation.ts';
 
 export interface CreateGameOptions {
   /** uint32 seed of the random generator. */
@@ -56,6 +82,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
   }
   const job = findJob(content, options.jobId ?? content.start.defaultJobId);
   const rng = seedRng(seed);
+  const startRate = roundRate(content.marketRate.startPercent);
   const state: GameState = {
     formatVersion: FORMAT_VERSION,
     seed,
@@ -76,11 +103,19 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     },
     banks: initialBankRelations(content, job.bankTrust),
     market: {
-      ratePercent: roundRate(content.marketRate.startPercent),
+      ratePercent: startRate,
       cyclePhase: nextFloat(rng),
+      laggedRatePercent: startRate,
+      cities: initialCityMarkets(content, startDate),
     },
     loans: [],
+    listings: [],
+    purchases: [],
+    properties: [],
+    agenda: [],
   };
+  // The market already has listings on the first day.
+  seedListings(context(content, state, []), content.start.cityId);
   // Free time left on the first day, prorated to the hours remaining.
   const fullDay = dailyFreeTime(content, state, startDate);
   state.player.freeTimeMinutes = Math.floor(
@@ -97,6 +132,7 @@ function context(content: GameContent, state: GameState, events: GameEvent[]): S
 function runNewDay(ctx: SystemContext, monthStarted: boolean): void {
   if (monthStarted) {
     runMonthlyMarketRate(ctx);
+    runMonthlyPrices(ctx);
     const lines: StatementLine[] = [];
     runMonthlyHousehold(ctx, lines);
     const paidBankIds = new Set(ctx.state.loans.map((loan) => loan.bankId));
@@ -111,6 +147,10 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean): void {
     ctx.events.push({ type: 'monthlyStatement', lines, balance: player.balance });
   }
   startFreeDay(ctx, ctx.state.clock.date);
+  runDailyAgenda(ctx);
+  runDailyPurchases(ctx);
+  runDailyListings(ctx, (listing, price) => signCompromis(ctx, listing, price));
+  runDailyResale(ctx);
   runDailyOverdraft(ctx);
 }
 
@@ -150,6 +190,54 @@ export function createEngine(content: GameContent) {
       case 'bank/refinance':
         refusal = refinanceLoan(ctx, action.loanId, action.bankId);
         break;
+      case 'market/visit':
+        refusal = requestVisit(ctx, action.listingId);
+        break;
+      case 'market/offer':
+        refusal = makeOffer(ctx, action.listingId, action.amount);
+        break;
+      case 'market/answerCounter':
+        refusal = answerCounter(ctx, action.listingId, action.accept);
+        break;
+      case 'purchase/requestLoan':
+        refusal = requestLoan(
+          ctx,
+          action.purchaseId,
+          action.bankId,
+          action.amount,
+          action.durationYears,
+        );
+        break;
+      case 'purchase/acceptLoan':
+        refusal = acceptLoan(ctx, action.purchaseId, action.applicationId);
+        break;
+      case 'purchase/payCash':
+        refusal = waiveLoanCondition(ctx, action.purchaseId);
+        break;
+      case 'purchase/withdraw':
+        refusal = withdrawPurchase(ctx, action.purchaseId);
+        break;
+      case 'sale/list':
+        refusal = listForSale(ctx, action.propertyId, action.askingPrice, action.mode);
+        break;
+      case 'sale/update':
+        refusal = updateSale(ctx, action.propertyId, action.askingPrice);
+        break;
+      case 'sale/withdraw':
+        refusal = updateSale(ctx, action.propertyId, null);
+        break;
+      case 'sale/acceptOffer':
+        refusal = answerSaleOffer(ctx, action.propertyId, action.offerId, { type: 'accept' });
+        break;
+      case 'sale/rejectOffer':
+        refusal = answerSaleOffer(ctx, action.propertyId, action.offerId, { type: 'reject' });
+        break;
+      case 'sale/counterOffer':
+        refusal = answerSaleOffer(ctx, action.propertyId, action.offerId, {
+          type: 'counter',
+          amount: action.amount,
+        });
+        break;
       case 'job/resign':
         if (!draft.player.employed) {
           refusal = 'job.alreadyResigned';
@@ -181,15 +269,52 @@ export function createEngine(content: GameContent) {
     /** What a bank would answer to a loan request today. */
     evaluateLoan: (state: GameState, request: LoanRequest): LoanDecision =>
       evaluateLoan(content, state, request),
-    netWorth,
+    /**
+     * What the player can tell of a listing's or an owned property's value:
+     * hidden defects count by their probability, with a range.
+     */
+    estimate: (state: GameState, id: string): Estimate | null => {
+      const listing = state.listings.find((candidate) => candidate.id === id);
+      if (listing) return estimateValue(content, state, listing.property, listing.visited);
+      const owned = state.properties.find((candidate) => candidate.property.id === id);
+      return owned ? estimateValue(content, state, owned.property, true) : null;
+    },
+    /**
+     * Real value, hidden defects included. Never shown to the player: for
+     * tests and balancing reports only.
+     */
+    realValue: (state: GameState, id: string): ValueBreakdown | null => {
+      const property =
+        state.listings.find((candidate) => candidate.id === id)?.property ??
+        state.purchases.find((candidate) => candidate.id === id)?.property ??
+        state.properties.find((candidate) => candidate.property.id === id)?.property;
+      return property ? realValue(content, state, property) : null;
+    },
+    /** Cash the player needs on the deed day of a purchase under compromis. */
+    cashDueAtDeed: (state: GameState, purchaseId: string): Cents | null => {
+      const purchase = state.purchases.find((candidate) => candidate.id === purchaseId);
+      return purchase ? cashDueAtDeed({ content }, purchase) : null;
+    },
+    /** Net proceeds if an owned property sold today at `price`. */
+    saleProceeds: (state: GameState, propertyId: string, price: Cents) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? saleProceeds(context(content, state, []), owned, price) : null;
+    },
+    netWorth: (state: GameState) => netWorth(content, state),
   };
 }
 
 export type Engine = ReturnType<typeof createEngine>;
 
-/** Cash minus debts; properties join with milestone 1b. */
-export function netWorth(state: GameState): Cents {
-  return state.player.balance - state.loans.reduce((sum, loan) => sum + loan.remaining, 0);
+/** Cash, deposits and properties at their real value, minus debts. */
+export function netWorth(content: GameContent, state: GameState): Cents {
+  const properties = state.properties.reduce(
+    (sum, owned) => sum + realValue(content, state, owned.property).value,
+    0,
+  );
+  const deposits = state.purchases.reduce((sum, purchase) => sum + purchase.deposit, 0);
+  const debts = state.loans.reduce((sum, loan) => sum + loan.remaining, 0);
+  return state.player.balance + deposits + properties - debts;
 }
 
 /** Short human-oriented identifier of the current game time, for logs and tools. */

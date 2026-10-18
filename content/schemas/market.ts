@@ -93,6 +93,8 @@ export const marketRulesSchema = z
         errorMax: share,
         /** Asking prices are rounded to this many euros. */
         rounding: z.number().int().positive(),
+        /** Half-width of the range shown around an estimate (share of the estimate). */
+        estimateSpread: share,
       })
       .strict(),
     motivations: z.array(motivationSchema).min(1),

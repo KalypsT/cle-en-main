@@ -72,3 +72,39 @@ export function nextNormal(state: RngState): number {
   const u2 = nextFloat(state);
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
+
+/** Returns a float in [min, max). */
+export function nextRange(state: RngState, min: number, max: number): number {
+  return min + (max - min) * nextFloat(state);
+}
+
+/** Picks a key with probability proportional to its weight (weights ≥ 0, at least one > 0). */
+export function pickWeighted<K extends string>(
+  state: RngState,
+  weights: Readonly<Partial<Record<K, number>>>,
+): K {
+  const entries = Object.entries(weights) as [K, number][];
+  const total = entries.reduce((sum, [, weight]) => sum + Math.max(0, weight), 0);
+  if (!(total > 0)) throw new RangeError('No positive weight to pick from');
+  let draw = nextFloat(state) * total;
+  for (const [key, weight] of entries) {
+    draw -= Math.max(0, weight);
+    if (draw < 0) return key;
+  }
+  // Floating-point remainder: the last positive entry.
+  const last = entries.filter(([, weight]) => weight > 0).at(-1);
+  return (last ?? entries[0] ?? ['' as K])[0];
+}
+
+/** Number of events of a Poisson process with mean `lambda` (Knuth's method, small lambdas). */
+export function nextPoisson(state: RngState, lambda: number): number {
+  if (!(lambda > 0)) return 0;
+  const limit = Math.exp(-lambda);
+  let count = 0;
+  let product = nextFloat(state);
+  while (product > limit) {
+    count++;
+    product *= nextFloat(state);
+  }
+  return count;
+}

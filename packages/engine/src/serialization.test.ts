@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import v1Save from '../test/fixtures/save-v1-milestone-0.json' with { type: 'json' };
+import v2Save from '../test/fixtures/save-v2-milestone-1a.json' with { type: 'json' };
 import { content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -64,13 +65,37 @@ describe('migrations', () => {
     const original = JSON.parse(v1) as { clock: unknown; rng: unknown; seed: number };
     expect(migrated.formatVersion).toBe(FORMAT_VERSION);
     expect(migrated.clock).toEqual(original.clock);
-    expect(migrated.rng).toEqual(original.rng);
+    expect(migrated.seed).toBe(original.seed);
     expect(migrated.player.jobId).toBe(content.start.defaultJobId);
     expect(migrated.loans).toEqual([]);
     expect('demo' in migrated).toBe(false);
+    expect(migrated.listings.length).toBeGreaterThan(0);
     // The migrated game keeps running.
     expect(engine.advanceHours(migrated, 24 * 40).state.clock.elapsedHours).toBe(
       migrated.clock.elapsedHours + 24 * 40,
     );
+  });
+
+  it('upgrades a milestone 1a save (version 2): loans, price levels and a stocked market', () => {
+    const v2 = JSON.stringify(v2Save);
+    const original = JSON.parse(v2) as {
+      clock: unknown;
+      player: { balance: number };
+      banks: unknown;
+      market: { ratePercent: number };
+    };
+    const migrated = engine.loadGame(v2);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.clock).toEqual(original.clock);
+    expect(migrated.player.balance).toBe(original.player.balance);
+    expect(migrated.banks).toEqual(original.banks);
+    expect(migrated.market.laggedRatePercent).toBe(original.market.ratePercent);
+    expect(Object.keys(migrated.market.cities.dole ?? {})).toHaveLength(5);
+    expect(migrated.listings.length).toBeGreaterThan(20);
+    expect(migrated.purchases).toEqual([]);
+    expect(migrated.properties).toEqual([]);
+    // Deterministic, and the game keeps running.
+    expect(engine.loadGame(v2)).toEqual(migrated);
+    expect(engine.advanceHours(migrated, 24 * 40).state.listings.length).toBeGreaterThan(0);
   });
 });

@@ -1,7 +1,7 @@
 import { parseArgs } from 'node:util';
 import { timeSettings } from '@cle/content';
-import { describeTime, netWorth, parseIsoDate, toIsoDate } from '@cle/engine';
-import { simulate } from './simulate.ts';
+import { describeTime, parseIsoDate, toIsoDate } from '@cle/engine';
+import { engine, simulate } from './simulate.ts';
 
 const USAGE = `Usage : pnpm bots [--seed <entier>] [--days <entier>] [--start <AAAA-MM-JJ>]
 
@@ -61,8 +61,16 @@ console.log(
     `Date atteinte     : ${describeTime(result.state)}`,
     `Jours simulés     : ${days} (≈ ${years.toFixed(1)} ans, ${result.ticks} pas d'une heure)`,
     `Métier            : ${result.state.player.jobId}`,
-    `Patrimoine net    : ${euros(netWorth(result.state))} (compte ${euros(result.state.player.balance)})`,
+    `Patrimoine net    : ${euros(engine.netWorth(result.state))} (compte ${euros(result.state.player.balance)})`,
     `Taux de marché    : ${result.state.market.ratePercent.toFixed(2)} %`,
+    `Indices des prix  : ${Object.entries(result.state.market.cities)
+      .flatMap(([cityId, neighbourhoods]) =>
+        Object.entries(neighbourhoods).map(
+          ([id, market]) => `${cityId}/${id} ${market.priceIndex.toFixed(3)}`,
+        ),
+      )
+      .join(', ')}`,
+    `Annonces en ligne : ${result.state.listings.length}`,
     `Événements        : ${Object.entries(result.eventCounts)
       .map(([type, count]) => `${type} ${count}`)
       .join(', ')}`,

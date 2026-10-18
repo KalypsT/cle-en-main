@@ -135,7 +135,7 @@
       "kinds": ["apartment", "building"]
     }
   ],
-  "pricing": { "errorStdDev": 0.06, "errorMax": 0.18, "rounding": 1000 },
+  "pricing": { "errorStdDev": 0.06, "errorMax": 0.18, "rounding": 1000, "estimateSpread": 0.08 },
   "motivations": [
     {
       "id": "transfer",

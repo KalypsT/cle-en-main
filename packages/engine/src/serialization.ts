@@ -1,9 +1,12 @@
 import { z } from 'zod';
-import { isValidDate } from './calendar.ts';
+import { isValidDate, toDayNumber } from './calendar.ts';
+import { CONDITIONS, DPE_LABELS, EPOCHS } from './content-constants.ts';
 import type { GameContent } from './content.ts';
 import { toCents } from './money.ts';
 import { FORMAT_VERSION, type GameState } from './state.ts';
 import { initialBankRelations } from './systems/banking.ts';
+import { seedListings } from './systems/listings.ts';
+import { initialCityMarkets } from './systems/prices.ts';
 
 /** What a migration may read besides the old save. */
 export interface MigrationContext {
@@ -52,6 +55,37 @@ export const MIGRATIONS: MigrationRegistry = {
       loans: [],
     };
   },
+  /**
+   * Version 2 (milestone 1a) had no property market. Loans get no property,
+   * prices start from the city data brought to the save's date, and the
+   * market is stocked as at a game start, from the save's own random state.
+   */
+  2: (raw, { content }) => {
+    const market = raw.market as { ratePercent: number; cyclePhase: number };
+    const clock = raw.clock as GameState['clock'];
+    const loans = (raw.loans as Record<string, unknown>[]).map((loan) => ({
+      ...loan,
+      propertyId: null,
+    }));
+    const state = {
+      ...raw,
+      market: {
+        ...market,
+        laggedRatePercent: market.ratePercent,
+        cities: initialCityMarkets(content, clock.date),
+      },
+      loans,
+      listings: [],
+      purchases: [],
+      properties: [],
+      agenda: [],
+    } as unknown as GameState;
+    seedListings(
+      { content, state, events: [], today: toDayNumber(clock.date) },
+      content.start.cityId,
+    );
+    return state as unknown as Record<string, unknown>;
+  },
 };
 
 export type SaveErrorCode =
@@ -75,6 +109,84 @@ const calendarDateSchema = z
   .refine(isValidDate, 'Invalid calendar date');
 
 const cents = z.number().int();
+const day = z.number().int();
+
+const propertySchema = z
+  .object({
+    id: z.string(),
+    cityId: z.string(),
+    neighbourhoodId: z.string(),
+    kind: z.enum(['apartment', 'house', 'building']),
+    surface: z.number().positive(),
+    rooms: z.number().int().min(1),
+    floor: z.number().int().min(0).nullable(),
+    lots: z.array(
+      z.object({ surface: z.number().positive(), rooms: z.number().int().min(1) }).strict(),
+    ),
+    epoch: z.enum(EPOCHS),
+    dpe: z.enum(DPE_LABELS),
+    condition: z.enum(CONDITIONS),
+    defects: z.array(z.object({ id: z.string(), revealed: z.boolean() }).strict()),
+    annualPropertyTax: cents.min(0),
+    monthlyCharges: cents.min(0),
+  })
+  .strict();
+
+const rateQuoteSchema = z
+  .object({
+    marketPercent: z.number(),
+    durationSpreadPercent: z.number(),
+    insurancePercent: z.number(),
+    bankMarginPercent: z.number(),
+    profilePercent: z.number(),
+    trustPercent: z.number(),
+    ratePercent: z.number(),
+  })
+  .strict();
+
+const loanOfferSchema = z
+  .object({
+    bankId: z.string(),
+    amount: cents.min(0),
+    durationYears: z.number().int().positive(),
+    ratePercent: z.number(),
+    rate: rateQuoteSchema,
+    monthlyPayment: cents.min(0),
+    totalCost: cents,
+    debtRatioAfter: z.number(),
+  })
+  .strict();
+
+const loanDecisionSchema = z.discriminatedUnion('decision', [
+  z.object({ decision: z.literal('accepted'), offer: loanOfferSchema }).strict(),
+  z
+    .object({ decision: z.literal('partial'), offer: loanOfferSchema, requestedAmount: cents })
+    .strict(),
+  z
+    .object({
+      decision: z.literal('counterOffer'),
+      offer: loanOfferSchema,
+      requestedDurationYears: z.number().int(),
+    })
+    .strict(),
+  z
+    .object({
+      decision: z.literal('refused'),
+      reason: z.enum([
+        'unknownBank',
+        'creditFrozen',
+        'jobProfile',
+        'noIncomeHistory',
+        'lowTrust',
+        'invalidDuration',
+        'insufficientContribution',
+        'overFinancing',
+        'debtRatio',
+      ]),
+      debtRatioAfter: z.number().optional(),
+    })
+    .strict(),
+]);
 
 const gameStateSchema = z
   .object({
@@ -113,7 +225,20 @@ const gameStateSchema = z
         })
         .strict(),
     ),
-    market: z.object({ ratePercent: z.number(), cyclePhase: z.number().min(0).max(1) }).strict(),
+    market: z
+      .object({
+        ratePercent: z.number(),
+        cyclePhase: z.number().min(0).max(1),
+        laggedRatePercent: z.number(),
+        cities: z.record(
+          z.string(),
+          z.record(
+            z.string(),
+            z.object({ priceIndex: z.number().positive(), trendPercent: z.number() }).strict(),
+          ),
+        ),
+      })
+      .strict(),
     loans: z.array(
       z
         .object({
@@ -127,6 +252,101 @@ const gameStateSchema = z
           paymentsMade: z.number().int().min(0),
           startDate: calendarDateSchema,
           renegotiationSuggested: z.boolean(),
+          propertyId: z.string().nullable(),
+        })
+        .strict(),
+    ),
+    listings: z.array(
+      z
+        .object({
+          id: z.string(),
+          property: propertySchema,
+          titleId: z.string(),
+          motivationId: z.string(),
+          askingPrice: cents.positive(),
+          initialAskingPrice: cents.positive(),
+          publishedDay: day,
+          publicDay: day,
+          lastPriceDropDay: day,
+          visited: z.boolean(),
+          offersMade: z.number().int().min(0),
+          offer: z
+            .object({
+              amount: cents.positive(),
+              responseDay: day,
+              counter: z.object({ amount: cents.positive(), expiresDay: day }).strict().nullable(),
+            })
+            .strict()
+            .nullable(),
+        })
+        .strict(),
+    ),
+    purchases: z.array(
+      z
+        .object({
+          id: z.string(),
+          listingId: z.string(),
+          property: propertySchema,
+          price: cents.positive(),
+          deposit: cents.min(0),
+          signedDay: day,
+          loanDeadlineDay: day,
+          deedDay: day,
+          applications: z.array(
+            z
+              .object({
+                id: z.string(),
+                bankId: z.string(),
+                amount: cents.positive(),
+                durationYears: z.number().int(),
+                responseDay: day,
+                decision: loanDecisionSchema.nullable(),
+              })
+              .strict(),
+          ),
+          acceptedApplicationId: z.string().nullable(),
+          cash: z.boolean(),
+        })
+        .strict(),
+    ),
+    properties: z.array(
+      z
+        .object({
+          property: propertySchema,
+          purchasePrice: cents.positive(),
+          acquisitionCost: cents.positive(),
+          purchaseDate: calendarDateSchema,
+          sale: z
+            .object({
+              askingPrice: cents.positive(),
+              mode: z.enum(['agency', 'self']),
+              listedDay: day,
+              offers: z.array(
+                z
+                  .object({
+                    id: z.string(),
+                    amount: cents.positive(),
+                    buyerMax: cents.positive(),
+                    expiresDay: day,
+                    counterAmount: cents.positive().nullable(),
+                  })
+                  .strict(),
+              ),
+              agreement: z.object({ price: cents.positive(), deedDay: day }).strict().nullable(),
+            })
+            .strict()
+            .nullable(),
+        })
+        .strict(),
+    ),
+    agenda: z.array(
+      z
+        .object({
+          id: z.string(),
+          kind: z.literal('visit'),
+          listingId: z.string(),
+          day,
+          minutes: z.number().int().min(0),
         })
         .strict(),
     ),
