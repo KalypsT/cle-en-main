@@ -23,3 +23,10 @@ Chaque changement de décision en cours de réalisation est noté ici (date, dé
 | Date | Décision | Raison | Chapitres |
 |---|---|---|---|
 | 2026-10-18 | Conception initiale validée (chapitres 1 à 9) | — | Tous |
+| 2026-10-18 | Jalon 0 : versions de base — Node 22 LTS, pnpm 10.28, TypeScript 6.0 (strict ; la 7.0 n'est pas encore prise en charge par typescript-eslint), Vite 8, React 19, Vitest 5, Playwright 1.64, ESLint 10 + typescript-eslint 8, Prettier 3, zod 4, PixiJS 8 (installé, pas encore utilisé) | Versions stables du moment, compatibles entre elles | 07 |
+| 2026-10-18 | Jalon 0 : bibliothèques ajoutées — vite-plugin-pwa (manifeste et service worker Workbox), idb (petite surcouche d'IndexedDB), @fontsource-variable/manrope (police embarquée, donc disponible hors ligne), tsx (exécuter les scripts TypeScript sans build) | Besoins du jalon 0, dépendances légères | 07 |
+| 2026-10-18 | Pas de Zustand pour l'instant : la liaison moteur ↔ interface passe par `useSyncExternalStore` de React et une petite classe de session | Une seule source d'état à observer ; à réévaluer au jalon 4 | 07 |
+| 2026-10-18 | Hasard : xoshiro128** initialisé par splitmix32 ; état = 4 entiers 32 bits stockés dans l'état du monde | Rapide, bien étudié, sérialisable en JSON | 07 |
+| 2026-10-18 | Calendrier du moteur codé en arithmétique entière (sans objet `Date`) ; la date de départ est fournie par l'application (date du téléphone) et la partie commence à 8 h (`content/temps.json`) | Déterminisme et indépendance au fuseau horaire | 07, 03/01 |
+| 2026-10-18 | Le moteur reçoit le contenu en paramètre ; l'application importe le contenu JSON au moment du build | Fonctionne hors ligne, moteur testable seul | 07 |
+| 2026-10-18 | Sauvegarde automatique dans l'emplacement courant le 1er de chaque mois ; les 6 points mensuels de retour en arrière sont prévus dans le format (`checkpoints`) mais remplis à partir du jalon 4 | Socle posé sans anticiper le gameplay | 07, 02 |

@@ -37,7 +37,27 @@ Jeu de gestion immobilière en temps réel, PWA mobile (portrait), en français,
 
 ## Commandes
 
-À compléter au jalon 0 (installation, dev, tests, bots, build, génération des données).
+Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la version est fixée par `packageManager`).
+
+| Commande | Rôle |
+|---|---|
+| `pnpm install` | Installer les dépendances de tout le monorepo |
+| `pnpm dev` | Lancer le jeu en développement (http://localhost:5173/cle-en-main/) |
+| `pnpm build` | Construire la PWA dans `apps/game/dist` |
+| `pnpm preview` | Servir le build (http://localhost:4173/cle-en-main/), service worker compris |
+| `pnpm test` | Tests Vitest de tous les paquets (moteur, contenu, bots) |
+| `pnpm test:e2e` | Tests Playwright de fumée (construit puis sert le jeu) |
+| `pnpm typecheck` | Vérifier les types (`tsc`) de tous les paquets |
+| `pnpm lint` | ESLint, puis vérification Prettier |
+| `pnpm format` | Reformater avec Prettier |
+| `pnpm validate-content` | Valider tous les JSON de `content/` avec leurs schémas zod |
+| `pnpm bots --seed 1 --days 3650` | Simuler une partie sans interface et afficher un résumé |
+
+- **Graine dorée** : si un changement de règle modifie la partie de référence, relancer `pnpm --filter @cle/engine test -- -u`, vérifier le diff de `packages/engine/test/golden/` et l'expliquer dans la PR.
+- **Nouveau fichier de contenu** : écrire son schéma dans `content/schemas/`, le déclarer dans `content/registry.ts` (sinon `validate-content` échoue), l'exporter depuis `content/index.ts`.
+- **Format de sauvegarde** : incrémenter `FORMAT_VERSION` (`packages/engine/src/state.ts`), ajouter la migration dans `MIGRATIONS` (`serialization.ts`) et son test.
+- **Playwright avec un Chromium déjà installé** : `PW_CHROMIUM_PATH=/chemin/vers/chrome pnpm test:e2e`.
+- **Icônes provisoires** : modifier `apps/game/public/icons/icon.svg`, puis `pnpm --filter @cle/game exec tsx scripts/generate-icons.ts`.
 
 ## Façon de travailler
 

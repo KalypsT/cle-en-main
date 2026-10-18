@@ -15,7 +15,8 @@ export default defineConfig({
     ...(executablePath ? { launchOptions: { executablePath } } : {}),
   },
   webServer: {
-    command: 'pnpm build && pnpm preview',
+    // CI builds in an earlier step; locally, build before serving.
+    command: process.env.CI ? 'pnpm preview' : 'pnpm build && pnpm preview',
     url: 'http://localhost:4173/cle-en-main/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
