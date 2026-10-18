@@ -127,4 +127,50 @@ describe('purchase', () => {
       expect(engine.dispatch(late, { ...base, bankId: 'tirelire' }).ok).toBe(false);
     }
   });
+
+  it('lends for the works into an envelope kept on the property, over 27 years', () => {
+    const { state, purchase } = underCompromis();
+    // Works of 30 % of the price: the 27-year duration is allowed.
+    const works = Math.round(purchase.price * 0.3);
+    let current = act(state, {
+      type: 'purchase/requestLoan',
+      purchaseId: purchase.id,
+      bankId: 'tirelire',
+      amount: purchase.price + works,
+      durationYears: 27,
+      works,
+    }).state;
+    const answered = advanceUntil(current, (e) => e.type === 'loanAnswered');
+    current = answered.state;
+    const application = current.purchases[0]?.applications[0];
+    const decision = application?.decision;
+    expect(application?.works).toBe(works);
+    if (!decision || decision.decision === 'refused') throw new Error('Loan refused');
+    expect(decision.offer.durationYears).toBe(27);
+    current = act(current, {
+      type: 'purchase/acceptLoan',
+      purchaseId: purchase.id,
+      applicationId: application?.id ?? '',
+    }).state;
+    // The works part of the loan does not pay the price.
+    const due = engine.cashDueAtDeed(current, purchase.id) ?? 0;
+    const lent = decision.offer.amount - Math.min(works, decision.offer.amount);
+    expect(due).toBe(
+      purchase.price +
+        Math.round(purchase.price * content.credit.notaryFeesShare) +
+        Math.round(purchase.price * content.credit.bankFeesShare) -
+        purchase.deposit -
+        lent,
+    );
+    const deed = advanceUntil(current, (e) => e.type === 'deedSigned');
+    const owned = deed.state.properties[0];
+    expect(owned?.worksFund?.amount).toBe(Math.min(works, decision.offer.amount));
+    expect(owned?.property.items.every((item) => item.known)).toBe(true);
+    // Unused, the envelope goes back to the bank after two years.
+    const later = advanceDays(deed.state, 2 * 365 + 10);
+    expect(later.events).toContainEqual(expect.objectContaining({ type: 'worksFundReturned' }));
+    const loan = later.state.loans.find((l) => l.propertyId === owned?.property.id);
+    const before = deed.state.loans.find((l) => l.propertyId === owned?.property.id);
+    expect(loan?.monthlyPayment ?? 0).toBeLessThan(before?.monthlyPayment ?? 0);
+  });
 });

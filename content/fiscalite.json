@@ -12,8 +12,17 @@
   "socialContributions": { "bare": 0.172, "furnished": 0.186, "capitalGains": 0.172 },
   "microFoncier": { "allowanceShare": 0.3, "receiptsCeiling": 15000 },
   "microBic": { "allowanceShare": 0.5, "minimumAllowance": 305, "receiptsCeiling": 77700 },
-  "landlordDeficit": { "globalCeiling": 10700, "carryYears": 10 },
-  "lmnp": { "buildingShare": 0.85, "buildingYears": 30, "furnitureYears": 7 },
+  "landlordDeficit": {
+    "globalCeiling": 10700,
+    "carryYears": 10,
+    "energyRenovation": {
+      "ceiling": 21400,
+      "untilYear": 2027,
+      "fromLabels": ["E", "F", "G"],
+      "toLabels": ["A", "B", "C", "D"]
+    }
+  },
+  "lmnp": { "buildingShare": 0.85, "buildingYears": 30, "furnitureYears": 7, "worksYears": 15 },
   "accountantFees": {
     "bare": { "first": 300, "perExtraProperty": 60 },
     "furnished": { "first": 550, "perExtraProperty": 120 }

@@ -1,0 +1,278 @@
+{
+  "trades": {
+    "plumber": "Plombier",
+    "electrician": "Électricien",
+    "mason": "Maçon",
+    "painter": "Peintre",
+    "tiler": "Carreleur",
+    "carpenter": "Menuisier",
+    "heatingEngineer": "Chauffagiste",
+    "kitchenFitter": "Cuisiniste"
+  },
+  "artisans": [
+    {
+      "id": "robinet",
+      "name": "Plomberie Robinet & Fils",
+      "trade": "plumber",
+      "cities": ["dole"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": { "min": 3, "max": 10 },
+      "personality": "Toujours là le lundi, jamais le vendredi.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "aquaDoloise",
+      "name": "Aqua Doloise",
+      "trade": "plumber",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": { "min": 7, "max": 20 },
+      "personality": "Sandrine Mercier rend des devis plus précis qu'un horaire de la SNCF.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "plombiersDuDoubs",
+      "name": "Les Plombiers du Doubs",
+      "trade": "plumber",
+      "cities": ["dole"],
+      "priceFactor": 1.18,
+      "reliability": 0.95,
+      "queueDays": { "min": 15, "max": 35 },
+      "personality": "Hervé Cattin ne commence jamais avant d'avoir bu son café… chez vous.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "wattElse",
+      "name": "Watt Else",
+      "trade": "electrician",
+      "cities": ["dole"],
+      "priceFactor": 0.88,
+      "reliability": 0.68,
+      "queueDays": { "min": 2, "max": 8 },
+      "personality": "Câble tout, n'explique rien, et part avec votre tournevis.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "elecComtoise",
+      "name": "Élec Comtoise",
+      "trade": "electrician",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": { "min": 7, "max": 21 },
+      "personality": "Étiquette chaque disjoncteur, même celui du grille-pain.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "voltVauban",
+      "name": "Volt & Vauban",
+      "trade": "electrician",
+      "cities": ["dole"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": { "min": 14, "max": 40 },
+      "personality": "Tableau électrique rangé comme une bibliothèque de chartiste.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "pierrot",
+      "name": "Maçonnerie Pierrot",
+      "trade": "mason",
+      "cities": ["dole"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": { "min": 5, "max": 15 },
+      "personality": "Annonce trois jours, en met cinq, sourit tout du long.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "batiJura",
+      "name": "Bâti Jura",
+      "trade": "mason",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": { "min": 10, "max": 30 },
+      "personality": "« Ça, c'est du costaud » : il le dit de tout, même du placo.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "compagnonsDeLaLoue",
+      "name": "Les Compagnons de la Loue",
+      "trade": "mason",
+      "cities": ["dole"],
+      "priceFactor": 1.22,
+      "reliability": 0.96,
+      "queueDays": { "min": 20, "max": 60 },
+      "personality": "Taillent la pierre comme au temps de Pasteur, et facturent comme aujourd'hui.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "pinceauPresse",
+      "name": "Pinceau Pressé",
+      "trade": "painter",
+      "cities": ["dole"],
+      "priceFactor": 0.85,
+      "reliability": 0.65,
+      "queueDays": { "min": 1, "max": 5 },
+      "personality": "Deux couches en une : la vitesse avant tout, les prises aussi.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "couleursDuDoubs",
+      "name": "Couleurs du Doubs",
+      "trade": "painter",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": { "min": 5, "max": 14 },
+      "personality": "Bâche tout, même le chat.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierVermeer",
+      "name": "Atelier Vermeer & Co",
+      "trade": "painter",
+      "cities": ["dole"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": { "min": 10, "max": 30 },
+      "personality": "Refuse de peindre en blanc « simplement blanc ».",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "carrelagesExpress",
+      "name": "Carrelages Express",
+      "trade": "tiler",
+      "cities": ["dole"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": { "min": 2, "max": 8 },
+      "personality": "Les joints sont droits, à condition de pencher un peu la tête.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "jointParfait",
+      "name": "Joint Parfait",
+      "trade": "tiler",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": { "min": 5, "max": 18 },
+      "personality": "Vient avec son niveau à bulle comme d'autres avec leur chien.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "mosaiquesPasteur",
+      "name": "Mosaïques Pasteur",
+      "trade": "tiler",
+      "cities": ["dole"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": { "min": 12, "max": 35 },
+      "personality": "Pose chaque carreau comme s'il allait au musée.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "lebois",
+      "name": "Menuiserie Lebois",
+      "trade": "carpenter",
+      "cities": ["dole"],
+      "priceFactor": 0.9,
+      "reliability": 0.72,
+      "queueDays": { "min": 4, "max": 12 },
+      "personality": "Mesure deux fois, coupe une fois, oublie la troisième fenêtre.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "fenetresSurDole",
+      "name": "Fenêtres sur Dole",
+      "trade": "carpenter",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": { "min": 10, "max": 25 },
+      "personality": "Vous parle de double vitrage à la boulangerie.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "grandvaux",
+      "name": "Ébénisterie Grandvaux",
+      "trade": "carpenter",
+      "cities": ["dole"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": { "min": 20, "max": 50 },
+      "personality": "Du chêne du Jura, et un sourire en sapin.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "chauffeMarcel",
+      "name": "Chauffe Marcel",
+      "trade": "heatingEngineer",
+      "cities": ["dole"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": { "min": 2, "max": 8 },
+      "personality": "Répare tout avec un trombone, ou presque.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "thermoJura",
+      "name": "Thermo Jura",
+      "trade": "heatingEngineer",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": { "min": 7, "max": 20 },
+      "personality": "Calcule la puissance de la chaudière au watt près, et le café au sucre près.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "caloriesConfort",
+      "name": "Calories & Confort",
+      "trade": "heatingEngineer",
+      "cities": ["dole"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": { "min": 14, "max": 40 },
+      "personality": "Installe des pompes à chaleur si silencieuses qu'on les cherche.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "cuisinesMalignes",
+      "name": "Cuisines Malignes",
+      "trade": "kitchenFitter",
+      "cities": ["dole"],
+      "priceFactor": 0.85,
+      "reliability": 0.7,
+      "queueDays": { "min": 7, "max": 20 },
+      "personality": "Des placards en kit, et une notice en suédois.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierDesCuisines",
+      "name": "L'Atelier des Cuisines",
+      "trade": "kitchenFitter",
+      "cities": ["dole"],
+      "priceFactor": 1,
+      "reliability": 0.87,
+      "queueDays": { "min": 14, "max": 30 },
+      "personality": "Teste chaque tiroir trois fois en disant « clac ».",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "grandChef",
+      "name": "Cuisines Grand Chef",
+      "trade": "kitchenFitter",
+      "cities": ["dole"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": { "min": 21, "max": 50 },
+      "personality": "Livre un plan de travail en granit et un tablier brodé.",
+      "unlockAfterWorks": 2
+    }
+  ]
+}

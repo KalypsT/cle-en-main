@@ -57,7 +57,8 @@
       },
       "flip": {
         "months": { "min": 4, "max": 9 },
-        "conditionAfter": "renovated",
+        "tier": "eco",
+        "hiddenWorksShare": 0.5,
         "motivationId": "martinotResale"
       }
     },

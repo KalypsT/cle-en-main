@@ -17,6 +17,14 @@ import type {
   RentalApplication,
   RentalListing,
 } from '../state.ts';
+import {
+  heavyWorksInProgress,
+  interpolateByState,
+  isIndecent,
+  tierShare,
+  weightedState,
+} from './dwelling.ts';
+import { realValue } from './valuation.ts';
 import type { SystemContext } from './context.ts';
 import { addCost, addRent, ledgerOf } from './taxes.ts';
 import { drawTenant, visibleReliability } from './tenants.ts';
@@ -53,7 +61,8 @@ export type RentRefusal =
   | 'home.already'
   | 'home.none'
   | 'time.notEnoughFreeTime'
-  | 'account.insufficientFunds';
+  | 'account.insufficientFunds'
+  | 'works.inProgress';
 
 export function findOwned(state: GameState, propertyId: string): OwnedProperty | undefined {
   return state.properties.find((owned) => owned.property.id === propertyId);
@@ -82,7 +91,8 @@ export function recoverableCharges(content: GameContent, property: Property): Ce
 /**
  * Monthly rent a tenant would pay today, charges excluded; 0 if the property
  * is indecent. The city's rents per m² include charges: the recoverable
- * charges are taken out.
+ * charges are taken out. Rent quotes before buying pass the player's view
+ * of the property (dwelling.believedView).
  */
 export function marketRent(
   content: GameContent,
@@ -91,8 +101,13 @@ export function marketRent(
   leaseType: LeaseType = 'bare',
 ): Cents {
   const rules = content.renting;
-  const factor = rules.conditionFactors[property.condition];
-  if (factor === 0) return 0;
+  if (isIndecent(content, property)) return 0;
+  const tiers = tierShare(content, property, 'rent');
+  // The tiers' rent bonus stops where their value bonus does (the neighbourhood's ceiling).
+  const ceiling = tiers > 0 ? realValue(content, state, property).tierCeilingShare : 1;
+  const factor =
+    interpolateByState(rules.stateRentFactors, weightedState(content, property)) *
+    (1 + tiers * ceiling);
   const lots =
     property.kind === 'building'
       ? property.lots
@@ -140,7 +155,7 @@ export function lettingBlock(
   property: Property,
   day: number,
 ): 'rent.indecent' | 'rent.dpeBanned' | null {
-  if (content.renting.conditionFactors[property.condition] === 0) return 'rent.indecent';
+  if (isIndecent(content, property)) return 'rent.indecent';
   const ban = letBanDay(content, property.dpe);
   return ban !== null && day >= ban ? 'rent.dpeBanned' : null;
 }
@@ -189,6 +204,7 @@ export function listForRent(
   if (owned.sale?.agreement) return 'sale.agreed';
   const block = lettingBlock(content, owned.property, ctx.today);
   if (block) return block;
+  if (heavyWorksInProgress(content, owned)) return 'works.inProgress';
   if (terms.agencyId !== null && !findAgency(content, terms.agencyId)) return 'agency.unknown';
   const range = rentRange(content, state, owned.property, terms.leaseType);
   if (

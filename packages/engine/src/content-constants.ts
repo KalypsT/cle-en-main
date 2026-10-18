@@ -1,4 +1,4 @@
-import type { Condition, DpeLabel, Epoch, LeaseType } from './content.ts';
+import type { Condition, DpeLabel, Epoch, LeaseType, Tier } from './content.ts';
 
 /**
  * Enumerations the save schema checks. The engine imports only types from
@@ -30,6 +30,7 @@ export const CONDITIONS = [
   'renovated',
 ] as const satisfies readonly Condition[];
 export const LEASE_TYPES = ['bare', 'furnished'] as const satisfies readonly LeaseType[];
+export const TIERS = ['eco', 'standard', 'premium'] as const satisfies readonly Tier[];
 
 type Exhaustive<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 type Assert<T extends true> = T;
@@ -38,4 +39,5 @@ export type ConstantsMatchContent = [
   Assert<Exhaustive<(typeof DPE_LABELS)[number], DpeLabel>>,
   Assert<Exhaustive<(typeof CONDITIONS)[number], Condition>>,
   Assert<Exhaustive<(typeof LEASE_TYPES)[number], LeaseType>>,
+  Assert<Exhaustive<(typeof TIERS)[number], Tier>>,
 ];

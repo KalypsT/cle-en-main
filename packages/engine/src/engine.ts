@@ -73,6 +73,20 @@ import {
   setTaxRegime,
 } from './systems/taxes.ts';
 import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
+import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.ts';
+import {
+  answerHazard,
+  artisanDiscount,
+  diagnose,
+  type ItemChoice,
+  knownArtisans,
+  requestQuote,
+  runDailyWorks,
+  runYearlyWear,
+  startWorks,
+} from './systems/works.ts';
+import { worksCatalog, worksEstimate, worksPlan } from './systems/works-view.ts';
+import { believedView } from './systems/dwelling.ts';
 import {
   answerSaleOffer,
   listForSale,
@@ -152,6 +166,8 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     agenda: [],
     rivals: initialRivals(content),
     tax: initialTaxState(startDate.year),
+    artisans: {},
+    worksDone: {},
   };
   // The market already has listings on the first day.
   seedListings(context(content, state, []), content.start.cityId);
@@ -173,6 +189,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     // Yearly review: last year's tax, before this year's first flows.
     closeTaxYear(ctx);
     runYearlyDpeWarnings(ctx);
+    runYearlyWear(ctx);
   }
   if (monthStarted) {
     runMonthlyMarketRate(ctx);
@@ -181,6 +198,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     runMonthlyRivals(ctx);
     runMonthlyHousehold(ctx, lines);
     runMonthlyLeases(ctx, lines);
+    runMonthlyCopro(ctx, lines);
     const paidBankIds = new Set(ctx.state.loans.map((loan) => loan.bankId));
     const loanProperty = new Map(ctx.state.loans.map((loan) => [loan.id, loan.propertyId]));
     runMonthlyLoanPayments(ctx, lines);
@@ -197,6 +215,8 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   }
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
+  runDailyWorks(ctx);
+  runDailyCopro(ctx);
   runDailyPurchases(ctx);
   runDailyRivals(ctx);
   runDailyListings(ctx, (listing, price) => signCompromis(ctx, listing, price));
@@ -261,6 +281,7 @@ export function createEngine(content: GameContent) {
           action.bankId,
           action.amount,
           action.durationYears,
+          action.works ?? 0,
         );
         break;
       case 'purchase/acceptLoan':
@@ -324,6 +345,21 @@ export function createEngine(content: GameContent) {
         break;
       case 'tax/setRegime':
         refusal = setTaxRegime(ctx, action.propertyId, action.regime);
+        break;
+      case 'market/diagnose':
+        refusal = diagnose(ctx, action.listingId, action.trade);
+        break;
+      case 'works/quote':
+        refusal = requestQuote(ctx, action.propertyId, action.artisanId, action.items);
+        break;
+      case 'works/start':
+        refusal = startWorks(ctx, action.propertyId, action.quoteIds, action.diy);
+        break;
+      case 'works/hazard':
+        refusal = answerHazard(ctx, action.propertyId, action.choice);
+        break;
+      case 'copro/vote':
+        refusal = voteResolution(ctx, action.propertyId, action.resolutionId, action.vote);
         break;
       case 'job/resign':
         if (!draft.player.employed) {
@@ -396,10 +432,12 @@ export function createEngine(content: GameContent) {
       const property = findAnyProperty(state, id);
       if (!property) return null;
       const today = toDayNumber(state.clock.date);
-      const range = rentRange(content, state, property, leaseType);
+      // Before buying, the rent reflects what the player knows of the items.
+      const believed = believedView(content, property);
+      const range = rentRange(content, state, believed, leaseType);
       return {
         ...range,
-        block: lettingBlock(content, property, today),
+        block: lettingBlock(content, believed, today),
         banDay: letBanDay(content, property.dpe),
         /** Charges left to the owner, property tax and landlord insurance, per month. */
         monthlyOwnerCosts:
@@ -419,6 +457,36 @@ export function createEngine(content: GameContent) {
       return owned ? capitalGainsTax({ content, state }, owned, received) : null;
     },
     netWorth: (state: GameState) => netWorth(content, state),
+    /**
+     * Items of a listing, a purchase or an owned property, with their state
+     * as the player knows it and the reference price of each tier.
+     */
+    worksCatalog: (state: GameState, id: string) => {
+      const property = findAnyProperty(state, id);
+      return property ? worksCatalog(content, state, property) : null;
+    },
+    /** Reference cost, duration, DPE, value and rent after renovating these items. */
+    worksEstimate: (state: GameState, id: string, choices: readonly ItemChoice[]) => {
+      const property = findAnyProperty(state, id);
+      return property ? worksEstimate(content, state, property, choices) : null;
+    },
+    /** Schedule of a project (the « frise »): in progress, or with these quotes. */
+    worksPlan: (
+      state: GameState,
+      propertyId: string,
+      quoteIds?: readonly string[],
+      diy?: readonly ItemChoice[],
+    ) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? worksPlan(content, state, owned, quoteIds, diy) : null;
+    },
+    /** Artisans of a city the player can call, with his history with each. */
+    artisans: (state: GameState, cityId: string) =>
+      knownArtisans(content, state, cityId).map((artisan) => ({
+        artisan,
+        jobs: state.artisans[artisan.id]?.jobs ?? 0,
+        discount: artisanDiscount(content, state, artisan.id),
+      })),
   };
 }
 

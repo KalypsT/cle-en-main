@@ -51,13 +51,6 @@
     "martinotResale": "Rénové par les frères Martinot : « du travail de pro, ou presque ! »"
   },
   "defects": {
-    "humidity": "Traces d'humidité derrière l'armoire.",
-    "roof": "Toiture fatiguée : quelques tuiles jouent à cache-cache.",
-    "wiring": "Électricité d'époque, fusibles en porcelaine.",
-    "plumbing": "Plomberie qui chante la nuit.",
-    "heating": "Chaudière qui a connu le franc.",
-    "cracks": "Fissures en façade, « c'est juste esthétique ».",
-    "dryRot": "Mérule dans la cave. Aïe.",
     "noisyNeighbours": "Voisin du dessus batteur amateur."
   }
 }

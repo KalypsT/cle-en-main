@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { dpeLabelSchema } from './city.ts';
 import { euros, share } from './common.ts';
 
 /** Tax rules (docs/03-systemes/06-fiscalite.md), French rules of 2026, simplified. */
@@ -38,7 +39,22 @@ export const taxRulesSchema = z
       .strict(),
     /** Bare lets, real regime: deficit (interest excluded) deducted from the salary. */
     landlordDeficit: z
-      .object({ globalCeiling: euros, carryYears: z.number().int().min(1) })
+      .object({
+        globalCeiling: euros,
+        carryYears: z.number().int().min(1),
+        /**
+         * Doubled ceiling for an energy renovation: works paid up to `untilYear`
+         * that take a home from one of `fromLabels` to one of `toLabels`.
+         */
+        energyRenovation: z
+          .object({
+            ceiling: euros,
+            untilYear: z.number().int(),
+            fromLabels: z.array(dpeLabelSchema).min(1),
+            toLabels: z.array(dpeLabelSchema).min(1),
+          })
+          .strict(),
+      })
       .strict(),
     /** Furnished lets, real regime (LMNP): depreciation. */
     lmnp: z
@@ -47,6 +63,8 @@ export const taxRulesSchema = z
         buildingShare: share,
         buildingYears: z.number().int().min(1),
         furnitureYears: z.number().int().min(1),
+        /** Works on a furnished let are depreciated over this many years. */
+        worksYears: z.number().int().min(1),
       })
       .strict(),
     /** Yearly accountant fees for the properties in a real regime (Yvon Tableur). */

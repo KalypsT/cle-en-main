@@ -30,6 +30,14 @@ describe('bots', () => {
     expect(playGame(createStrategy('chasseur'), options)).toEqual(result);
   });
 
+  it('the marchand and the premium renovator play deterministically', () => {
+    for (const id of ['marchand', 'renovateur'] as const) {
+      const result = playGame(createStrategy(id), options);
+      expect(result.bankruptDay).toBeNull();
+      expect(playGame(createStrategy(id), options)).toEqual(result);
+    }
+  });
+
   it('the naive bot offers without visiting', () => {
     const result = playGame(createStrategy('naif'), options);
     expect(result.visits).toBe(0);

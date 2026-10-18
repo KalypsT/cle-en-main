@@ -1,6 +1,6 @@
 import type { CalendarDate, Weekday } from './calendar.ts';
 import type { Cents } from './money.ts';
-import type { LeaseType } from './content.ts';
+import type { DpeLabel, LeaseType, Trade } from './content.ts';
 import type { SaleMode } from './state.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
@@ -14,6 +14,8 @@ export type StatementLine =
   | { kind: 'ownerInsurance'; propertyId: string; amount: Cents }
   | { kind: 'managementFees'; propertyId: string; amount: Cents }
   | { kind: 'legalCosts'; propertyId: string; amount: Cents }
+  /** Call for funds voted by a co-ownership. */
+  | { kind: 'coproCall'; propertyId: string; amount: Cents }
   | { kind: 'taxInstalment'; amount: Cents }
   | { kind: 'taxRefund'; amount: Cents }
   | { kind: 'livingCosts'; amount: Cents }
@@ -53,7 +55,14 @@ export type GameEvent =
   | { type: 'listingSold'; listingId: string; buyer: 'rival'; rivalId: string }
   | { type: 'listingWithdrawn'; listingId: string }
   | { type: 'visitPlanned'; listingId: string; day: number }
-  | { type: 'visitDone'; listingId: string; revealedDefects: string[] }
+  | { type: 'visitDone'; listingId: string; revealedDefects: string[]; revealedItems: string[] }
+  | {
+      type: 'diagnosisDone';
+      listingId: string;
+      trade: Trade;
+      revealedItems: string[];
+      cost: Cents;
+    }
   | { type: 'visitCancelled'; listingId: string; day: number }
   | { type: 'offerMade'; listingId: string; amount: Cents; responseDay: number }
   | { type: 'offerAnswered'; listingId: string; answer: 'accepted'; price: Cents }
@@ -104,6 +113,10 @@ export type GameEvent =
       bankFees: Cents;
       loanId: string | null;
       discoveredDefects: string[];
+      /** Items whose state the new owner discovers. */
+      discoveredItems: string[];
+      /** Part of the loan kept for the works. */
+      worksEnvelope: Cents;
     }
   // Resale.
   | { type: 'saleListed'; propertyId: string; askingPrice: Cents; mode: SaleMode }
@@ -180,6 +193,65 @@ export type GameEvent =
   | { type: 'dpeWarning'; propertyId: string; banDay: number }
   | { type: 'movedIntoHome'; propertyId: string }
   | { type: 'movedOutOfHome'; propertyId: string }
+  // Works and co-ownership (docs/03-systemes/05).
+  | {
+      type: 'quoteReceived';
+      propertyId: string;
+      quoteId: string;
+      artisanId: string;
+      total: Cents;
+      availableDay: number;
+    }
+  | {
+      type: 'worksStarted';
+      propertyId: string;
+      projectId: string;
+      plannedCost: Cents;
+      plannedEndDay: number;
+    }
+  | {
+      type: 'worksTaskStarted';
+      propertyId: string;
+      taskId: string;
+      trade: Trade;
+      artisanId: string | null;
+    }
+  | { type: 'worksTaskDone'; propertyId: string; taskId: string; cost: Cents }
+  | {
+      type: 'worksHazard';
+      propertyId: string;
+      hazardId: string;
+      itemId: string;
+      cost: Cents;
+      days: number;
+      deadlineDay: number;
+    }
+  | {
+      type: 'worksHazardResolved';
+      propertyId: string;
+      hazardId: string;
+      choice: 'treat' | 'postpone' | 'eco';
+    }
+  | {
+      type: 'worksCompleted';
+      propertyId: string;
+      cost: Cents;
+      dpeBefore: DpeLabel;
+      dpeAfter: DpeLabel;
+    }
+  | { type: 'worksFundReturned'; propertyId: string; amount: Cents }
+  | {
+      type: 'coproMeetingCalled';
+      propertyId: string;
+      voteDay: number;
+      resolutions: { id: string; cost: Cents }[];
+    }
+  | {
+      type: 'coproMeetingHeld';
+      propertyId: string;
+      /** `textIndex`: the humorous verdict (content/textes/travaux.json). */
+      results: { id: string; passed: boolean; textIndex: number }[];
+    }
   // Taxes (docs/03-systemes/06).
   | { type: 'propertyTaxCharged'; amount: Cents }
   | { type: 'taxAssessed'; year: number; total: Cents; accountantFees: Cents }

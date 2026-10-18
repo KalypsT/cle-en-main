@@ -4,6 +4,7 @@
   "maxDurationYears": 25,
   "maxDurationWithWorksYears": 27,
   "worksShareForLongerDuration": 0.1,
+  "worksEnvelopeMonths": 24,
   "partialAgreementMinShare": 0.5,
   "retainedRentShare": 0.7,
   "notaryFeesShare": 0.075,

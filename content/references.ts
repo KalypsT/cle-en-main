@@ -6,6 +6,7 @@ import type { RentingRules, TenantTexts } from './schemas/renting.ts';
 import type { TaxRules } from './schemas/taxes.ts';
 import type { Rival, RivalsFile } from './schemas/rivals.ts';
 import type { LivingCosts, Start } from './schemas/start.ts';
+import type { Artisan, ArtisansFile, WorksRules, WorksTexts } from './schemas/works.ts';
 
 export interface GameContent {
   start: Start;
@@ -22,6 +23,10 @@ export interface GameContent {
   taxes: TaxRules;
   rivalRules: RivalsFile['aggressiveness'];
   rivals: Rival[];
+  works: WorksRules;
+  trades: ArtisansFile['trades'];
+  artisans: Artisan[];
+  worksTexts: WorksTexts;
   /** Generated city data, by city id. */
   cities: Record<string, CityData>;
 }
@@ -101,6 +106,62 @@ export function checkReferences(content: GameContent): string[] {
     }
   }
   problems.push(...checkRentingReferences(content));
+  problems.push(...checkWorksReferences(content));
+  return problems;
+}
+
+function checkWorksReferences(content: GameContent): string[] {
+  const problems: string[] = [];
+  const { works, worksTexts } = content;
+  const jobIds = new Set(content.jobs.map((job) => job.id));
+  for (const [kind, rule] of Object.entries(works.items)) {
+    const diy = rule.works?.diy;
+    for (const jobId of diy?.jobs ?? []) {
+      if (!jobIds.has(jobId)) problems.push(`travaux.json : métier inconnu « ${jobId} » (${kind})`);
+    }
+    if (diy && Math.abs(diy.quality[5] + diy.quality[4] + diy.quality[3] - 1) > 1e-9) {
+      problems.push(`travaux.json : la qualité de « ${kind} » fait soi-même ne somme pas à 1`);
+    }
+    if (
+      rule.scope === 'space' &&
+      !Object.values(works.spaces).some((list) => list.includes(kind as never))
+    ) {
+      problems.push(`travaux.json : le poste « ${kind} » n'est dans aucune pièce`);
+    }
+  }
+  const ids = new Set<string>();
+  for (const artisan of content.artisans) {
+    if (ids.has(artisan.id)) problems.push(`artisans.json : artisan en double « ${artisan.id} »`);
+    ids.add(artisan.id);
+    for (const cityId of artisan.cities) {
+      if (!content.cities[cityId]) problems.push(`artisans.json : ville inconnue « ${cityId} »`);
+    }
+  }
+  for (const cityId of Object.keys(content.cities)) {
+    if (!works.cityCostIndex[cityId])
+      problems.push(`travaux.json : pas d'indice de prix pour « ${cityId} »`);
+    for (const [kind, rule] of Object.entries(works.items)) {
+      const trade = rule.works?.trade;
+      if (!trade) continue;
+      const available = content.artisans.some(
+        (a) => a.trade === trade && a.cities.includes(cityId) && a.unlockAfterWorks === 0,
+      );
+      if (!available) {
+        problems.push(
+          `artisans.json : aucun artisan « ${trade} » connu dès le départ à ${cityId} (${kind})`,
+        );
+      }
+    }
+  }
+  for (const hazard of works.hazards) {
+    if (!worksTexts.hazards[hazard.id])
+      problems.push(`textes/travaux.json : aucun texte pour l'imprévu « ${hazard.id} »`);
+  }
+  for (const resolution of works.copro.resolutions) {
+    if (!worksTexts.resolutions[resolution.id]) {
+      problems.push(`textes/travaux.json : aucun texte pour la résolution « ${resolution.id} »`);
+    }
+  }
   return problems;
 }
 

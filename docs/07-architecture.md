@@ -61,6 +61,8 @@ cle-en-main/
 - Stockées dans **IndexedDB** : 3 emplacements, chacun avec la partie courante et ses **6 points mensuels** de retour en arrière.
 - **Export et import** en fichier JSON.
 - **Format versionné** avec des **migrations** : une mise à jour du jeu ne casse pas une partie en cours.
+- **Version 6 (jalon 3)** : pièces et postes des biens, chantiers, devis, enveloppe travaux, copropriété, carnet d'artisans. La migration depuis la v5 tire les postes autour de l'ancien état global par des tirages stables (hachage de la graine et de l'identifiant du bien), sans toucher à l'état aléatoire du monde.
+- **Performance** : les pièces et les postes d'un bien sont remplacés, jamais modifiés ; ils sont **gelés** (`Object.freeze`) et partagés entre les copies de l'état (`clone.ts`), ce qui garde le coût d'une journée et d'une action raisonnable, et leurs valeurs dérivées (état pondéré, vue du joueur) restent en cache.
 - **Journal de partie** : les événements et les décisions sont enregistrés localement, exportables pour l'analyse de l'équilibrage (voir [08-equilibrage.md](08-equilibrage.md)).
 
 ## 7.6 Les tests

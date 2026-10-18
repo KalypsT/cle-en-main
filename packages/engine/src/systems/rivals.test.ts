@@ -5,7 +5,9 @@ import {
   affordableListing,
   buyWithLoan,
   content,
+  dwelling,
   newGame,
+  type PropertyBasics,
   systemContext,
 } from '../../test/helpers.ts';
 import type { GameState, Listing, Property } from '../state.ts';
@@ -19,11 +21,17 @@ function rival(id: string) {
 }
 
 /** The state with one listing turned into a property and price of our choosing. */
-function withBargain(changes: Partial<Property>, priceShare: number) {
+function withBargain(changes: Partial<PropertyBasics>, priceShare: number, itemState = 4) {
   const state = newGame({ seed: 7 });
   const base = state.listings[0];
   if (!base) throw new Error('No listing');
-  const property: Property = { ...base.property, ...changes };
+  const { spaces, items, energyFactor, copro, postponedHazards, ...basics } = base.property;
+  void [spaces, items, energyFactor, copro, postponedHazards];
+  const built = dwelling({ ...basics, ...changes }, itemState);
+  const property: Property = {
+    ...built,
+    items: built.items.map((item) => ({ ...item, known: false })),
+  };
   const value = realValue(content, state, property).value;
   const listing: Listing = { ...base, property, askingPrice: Math.round(value * priceShare) };
   return { state: { ...state, listings: [listing] } as GameState, listing };
@@ -35,7 +43,6 @@ const monique: Partial<Property> = {
   rooms: 1,
   floor: 1,
   lots: [],
-  condition: 'good',
   neighbourhoodId: 'centreHistorique',
 };
 
@@ -76,10 +83,7 @@ describe('rivals', () => {
   });
 
   it('the Martinot brothers renovate what they buy and put it back on the market', () => {
-    const { state, listing } = withBargain(
-      { kind: 'house', floor: null, lots: [], condition: 'toRenovate' },
-      0.7,
-    );
+    const { state, listing } = withBargain({ kind: 'house', floor: null, lots: [] }, 0.7, 2);
     const ctx = runDays(state, 60);
     const project = ctx.state.rivals.martinot?.projects[0];
     expect(project?.property.id).toBe(listing.property.id);
@@ -88,8 +92,12 @@ describe('rivals', () => {
     const find = () => current.listings.find((l) => l.property.id === listing.property.id);
     for (let day = 0; day < 320 && !find(); day++) current = advanceDays(current, 1).state;
     const resold = find();
-    expect(resold?.property.condition).toBe('renovated');
-    expect(resold?.property.defects).toEqual([]);
+    // Every visible item is redone (Éco), the hidden ones only sometimes.
+    const visible = resold?.property.items.filter(
+      (item) => content.works.items[item.kind].revealOnVisit >= 1,
+    );
+    expect(visible?.every((item) => item.state === 5 && item.tier === 'eco')).toBe(true);
+    expect(visible?.every((item) => !item.known)).toBe(true);
     expect(resold?.motivationId).toBe('martinotResale');
   });
 
@@ -98,12 +106,17 @@ describe('rivals', () => {
     const { state } = buyWithLoan(start, affordableListing(start).id);
     const owned = state.properties[0];
     if (!owned) throw new Error('No property');
-    // Make it something both rivals could want, priced far too low.
+    // Make it something Monique could want (a small flat in good condition), priced far too low.
+    const { spaces, items, energyFactor, copro, postponedHazards, ...basics } = owned.property;
+    void [spaces, items, energyFactor, copro, postponedHazards];
+    const flat = dwelling({ ...basics, ...monique });
+    // With money to spend (her purchases on the market may have emptied her budget).
     const bargain: GameState = {
       ...state,
-      properties: [{ ...owned, property: { ...owned.property, ...monique } }],
+      properties: [{ ...owned, property: flat }],
+      rivals: { ...state.rivals, delaporte: { budget: 300_000_00, purchases: 0, projects: [] } },
     };
-    const value = realValue(content, bargain, { ...owned.property, ...monique }).value;
+    const value = realValue(content, bargain, flat).value;
     let current = act(bargain, {
       type: 'sale/list',
       propertyId: owned.property.id,

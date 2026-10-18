@@ -17,7 +17,8 @@ export type SaleRefusal =
   | 'sale.invalidPrice'
   | 'sale.unknownOffer'
   | 'sale.counterPending'
-  | 'sale.invalidCounter';
+  | 'sale.invalidCounter'
+  | 'works.inProgress';
 
 function findOwned(ctx: SystemContext, propertyId: string): OwnedProperty | undefined {
   return ctx.state.properties.find((owned) => owned.property.id === propertyId);
@@ -36,6 +37,7 @@ export function listForSale(
   const owned = findOwned(ctx, propertyId);
   if (!owned) return 'property.unknown';
   if (owned.sale) return 'sale.alreadyListed';
+  if (owned.works) return 'works.inProgress';
   if (!validPrice(askingPrice)) return 'sale.invalidPrice';
   owned.sale = { askingPrice, mode, listedDay: ctx.today, offers: [], agreement: null };
   ctx.events.push({ type: 'saleListed', propertyId, askingPrice, mode });
@@ -127,12 +129,14 @@ function settlement(ctx: SystemContext, owned: OwnedProperty, received: Cents) {
   const loanFees = loans.reduce((sum, loan) => sum + refinancingFees(ctx.content, loan), 0);
   const capitalGainsTax = capitalGainsTaxOf(ctx, owned, received).tax;
   const depositTransferred = owned.lease?.deposit ?? 0;
+  // What is left of the works envelope comes back to the account.
+  const worksFund = owned.worksFund?.amount ?? 0;
   return {
     loanRepaid,
     loanFees,
     capitalGainsTax,
     depositTransferred,
-    net: received - loanRepaid - loanFees - capitalGainsTax - depositTransferred,
+    net: received + worksFund - loanRepaid - loanFees - capitalGainsTax - depositTransferred,
   };
 }
 

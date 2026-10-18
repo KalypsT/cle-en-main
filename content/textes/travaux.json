@@ -1,0 +1,64 @@
+{
+  "items": {
+    "floors": "Sols",
+    "walls": "Murs et plafonds",
+    "joinery": "Portes et placards",
+    "kitchen": "Cuisine équipée",
+    "bathroom": "Salle de bain",
+    "wcUnit": "WC",
+    "garden": "Jardin",
+    "electricity": "Électricité",
+    "plumbing": "Plomberie",
+    "heating": "Chauffage",
+    "insulation": "Isolation",
+    "windows": "Fenêtres",
+    "ventilation": "Ventilation",
+    "roof": "Toiture",
+    "facade": "Façade",
+    "commonParts": "Parties communes"
+  },
+  "spaces": {
+    "entry": "Entrée",
+    "living": "Séjour",
+    "kitchen": "Cuisine",
+    "bedroom": "Chambre",
+    "bathroom": "Salle de bain",
+    "wc": "WC",
+    "garden": "Jardin"
+  },
+  "tiers": { "eco": "Éco", "standard": "Standard", "premium": "Premium" },
+  "states": ["À refaire entièrement", "Très usé", "Correct", "Bon état", "Neuf"],
+  "hazards": {
+    "asbestos": "Amiante sous l'ancien revêtement : il faut un désamiantage dans les règles.",
+    "lead": "Plomb dans les vieilles peintures : décapage et protection obligatoires.",
+    "rottenFloor": "Une poutre du plancher ressemble à une éponge. Le maçon fait la grimace.",
+    "wiringOutOfCode": "L'électricien de passage a vu les fils : hors normes, il faut sécuriser.",
+    "hiddenDamp": "Derrière le placo, une humidité cachée prospère depuis des années."
+  },
+  "poorStateHints": {
+    "electricity": "Électricité d'époque, fusibles en porcelaine.",
+    "plumbing": "Plomberie qui chante la nuit.",
+    "heating": "Chaudière qui a connu le franc.",
+    "roof": "Toiture fatiguée : quelques tuiles jouent à cache-cache.",
+    "facade": "Fissures en façade, « c'est juste esthétique ».",
+    "insulation": "Isolation : une feuille de papier journal de 1974.",
+    "walls": "Traces d'humidité derrière l'armoire."
+  },
+  "resolutions": {
+    "facadeRenovation": "Ravalement de la façade",
+    "roofRenovation": "Réfection de la toiture",
+    "elevator": "Installation d'un ascenseur",
+    "collectiveBoiler": "Remplacement de la chaudière collective",
+    "stairwell": "Rénovation de la cage d'escalier"
+  },
+  "meetingPassed": [
+    "Adopté. M. Grosjean, du 2e, a voté contre, comme chaque année depuis 1987.",
+    "Adopté à l'unanimité moins Mme Pichon, qui pensait qu'on votait pour le buffet.",
+    "Adopté après deux heures de débat sur la couleur, finalement « beige syndic »."
+  ],
+  "meetingRejected": [
+    "Rejeté. Le syndic note la résolution pour l'an prochain, comme l'an dernier.",
+    "Rejeté : le 3e gauche a rappelé que « de son temps, on faisait sans ».",
+    "Rejeté, faute de majorité et de croissants."
+  ]
+}
