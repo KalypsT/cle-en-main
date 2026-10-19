@@ -39,21 +39,20 @@ export async function newGame(
 
 export async function pause(page: Page) {
   const button = page.getByRole('button', { name: t.status.pause });
-  // A review can open on the 1st while the clock runs: close it, then pause.
+  const time = page.getByTestId('game-time');
+  // A review can open on the 1st while the clock runs, and closing it sets the previous speed
+  // again a moment later: pause, then check that the pause holds with no overlay over it.
   await expect(async () => {
     await dismissOverlays(page);
     // Dispatched straight to the button: waiting for it to be « stable » never ends while the
     // street starves the page of frames at ×4.
     if ((await button.getAttribute('aria-pressed')) !== 'true') await button.dispatchEvent('click');
-    await expect(button).toHaveAttribute('aria-pressed', 'true', { timeout: 1_000 });
-  }).toPass({ timeout: 15_000 });
-  // Let React render the last hour ticked before the pause: the time stops changing.
-  const time = page.getByTestId('game-time');
-  await expect(async () => {
     const before = await time.textContent();
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(300);
+    expect(await page.locator('.overlay').count()).toBe(0);
+    await expect(button).toHaveAttribute('aria-pressed', 'true', { timeout: 500 });
     expect(await time.textContent()).toBe(before);
-  }).toPass();
+  }).toPass({ timeout: 20_000 });
 }
 
 /** The date and the hour on the status bar. */
