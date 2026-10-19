@@ -17,7 +17,9 @@ export const companyRulesSchema = z
     leaseTypes: z.array(leaseTypeSchema).min(1),
     credit: z
       .object({
-        /** Contribution asked beyond the fees, as a share of the price. */
+        /** Share of the notary and bank fees the SCI must bring itself (0: they are lent too). */
+        feesContributionShare: share,
+        /** Contribution asked beyond that, as a share of the price. */
         extraContributionShare: share,
         /** The property's potential rent times this must cover the monthly payment. */
         rentCoverageShare: share,

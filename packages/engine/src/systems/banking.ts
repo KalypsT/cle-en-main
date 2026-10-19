@@ -316,10 +316,12 @@ export function evaluateLoan(
   if (company && !state.company) return { decision: 'refused', reason: 'noCompany' };
   if (company && !bank.lendsToCompanies) return { decision: 'refused', reason: 'companyNotServed' };
   const fees = requiredContribution(content, request.price);
-  const extra = company
-    ? Math.round(request.price * content.company.credit.extraContributionShare)
-    : 0;
-  if (request.contribution < fees + extra) {
+  const sci = content.company.credit;
+  // Through the SCI, the bank may lend the fees too, and asks a share of the price instead.
+  const required = company
+    ? Math.round(fees * sci.feesContributionShare + request.price * sci.extraContributionShare)
+    : fees;
+  if (request.contribution < required) {
     return { decision: 'refused', reason: 'insufficientContribution' };
   }
   if (request.amount > request.price + request.works + fees - request.contribution) {

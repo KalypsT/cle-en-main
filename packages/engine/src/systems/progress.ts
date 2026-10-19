@@ -10,7 +10,7 @@ import { currentMonthlyRent, statementNet } from './history.ts';
 import { netWorth } from './net-worth.ts';
 import { changeReputation } from './reputation.ts';
 import { interest, isRivalActive } from './rivals.ts';
-import { isIndecent } from './dwelling.ts';
+import { isDwelling, isIndecent } from './dwelling.ts';
 import { changeRenown } from './cities.ts';
 
 const DAYS_PER_YEAR = 365;
@@ -59,7 +59,9 @@ export function statValue(
     case 'properties':
       return state.properties.length;
     case 'letProperties':
-      return state.properties.filter((owned) => owned.lease).length;
+      // Homes let: a parking space or a shop does not make a landlord (milestone 8).
+      return state.properties.filter((owned) => owned.lease && isDwelling(owned.property.kind))
+        .length;
     case 'passoires':
       return state.properties.filter(
         (owned) =>

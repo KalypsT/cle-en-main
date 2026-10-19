@@ -73,7 +73,7 @@ export interface BotSummary {
     medianAchievements: number;
     medianReputation: number;
     /** Share of games earning each title, and the median years over those that do. */
-    titles: Record<string, { share: number; years: number | null }>;
+    titles: Record<string, { share: number; years: number | null; within10: number }>;
   };
   /** Cities (milestone 7): trips, remote deeds and the number of cities held. */
   cities: {
@@ -279,6 +279,7 @@ function rhythmSummary(games: GameMetrics[]): BotSummary['rhythm'] {
     titles[title.id] = {
       share: days.length / Math.max(1, games.length),
       years: days.length > 0 ? median(days) / DAYS_PER_YEAR : null,
+      within10: days.filter((day) => day <= 10 * DAYS_PER_YEAR).length / Math.max(1, games.length),
     };
   }
   return {
@@ -392,10 +393,51 @@ function cityChecks(get: (id: BotId) => BotSummary | undefined, last: number): T
   return list;
 }
 
+/**
+ * The depth (milestone 8), over games of 20 years or more: Magnat reachable in 15 to 25 years,
+ * Baron rare, the Promoteur title within reach of the Promoteur bot (docs/08, 8.1).
+ */
+function depthChecks(get: (id: BotId) => BotSummary | undefined, years: number): TargetCheck[] {
+  const list: TargetCheck[] = [];
+  const promoter = get('promoteur');
+  if (promoter) {
+    const title = promoter.rhythm.titles.developer;
+    list.push({
+      label: 'Titre Promoteur (Promoteur)',
+      target: 'plus de 50 % des parties en 10 ans',
+      measured: `${pct(title?.within10 ?? 0)} en 10 ans ; ${pct(title?.share ?? 0)} en ${years} ans (${num(title?.years ?? 0)} ans en médiane)`,
+      ok: (title?.within10 ?? 0) > 0.5,
+    });
+  }
+  if (years < 20) return list;
+  for (const id of ['chasseur', 'promoteur'] as const) {
+    const s = get(id);
+    if (!s) continue;
+    const magnate = s.rhythm.titles.magnate;
+    const share = magnate?.share ?? 0;
+    const at = magnate?.years ?? null;
+    list.push({
+      label: `Titre Magnat (${BOT_NAMES[id]})`,
+      target: `25 à 50 % des parties en ${years} ans, de 15 à 25 ans en médiane`,
+      measured: `${pct(share)} des parties${at === null ? '' : `, en ${num(at)} ans (médiane)`}`,
+      ok: share >= 0.25 && share <= 0.5 && at !== null && at >= 15 && at <= 25,
+    });
+    const baron = s.rhythm.titles.baron;
+    list.push({
+      label: `Titre Baron de la pierre (${BOT_NAMES[id]})`,
+      target: `moins de 5 % des parties en ${years} ans`,
+      measured: `${pct(baron?.share ?? 0)} des parties`,
+      ok: (baron?.share ?? 0) < 0.05,
+    });
+  }
+  return list;
+}
+
 function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[] {
   const list: TargetCheck[] = [];
   const get = (id: BotId) => summaries.get(id);
   const last = years - 1;
+  list.push(...depthChecks(get, years));
   // Section 8.1 is for « un joueur raisonnable »: the hunter, who visits, negotiates and
   // keeps a moderate debt. The Prudent bot is shown for information.
   for (const id of ['chasseur', 'prudent'] as const) {
@@ -430,7 +472,7 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
   if (dijonHunter) {
     list.push({
       label: 'Titre Investisseur aguerri (Chasseur à Dijon)',
-      target: '6 à 10 ans (patrimoine de 250 k€ et 2 villes)',
+      target: '6 à 10 ans (patrimoine de 150 k€ et 2 villes)',
       measured: `${num(dijonHunter.seasonedYears)} ans (atteint dans ${pct(dijonHunter.seasonedShare)} des parties)`,
       ok: dijonHunter.seasonedYears >= 6 && dijonHunter.seasonedYears <= 10,
     });

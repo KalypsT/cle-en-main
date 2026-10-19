@@ -588,6 +588,7 @@
     "divisionLots": { "min": 2, "max": 4 },
     "constructionSurface": { "share": 0.25, "min": 80, "max": 150 },
     "constructionDpe": "A",
+    "residualShare": 0.75,
     "overrun": { "chance": 0.35, "share": { "min": 0.05, "max": 0.2 } },
     "attic": { "houseShare": 0.35, "surfaceShare": { "min": 0.2, "max": 0.4 } }
   },

@@ -30,6 +30,7 @@ export function defectProbability(rule: DefectRule, kind: PropertyKind, epoch: E
   return Math.min(0.95, rule.probability * epochMultiplier);
 }
 
+const MAX_ITEM_STATE = 5;
 const floorFactorCache = new WeakMap<GameContent, Map<number, number>>();
 
 function floorFactor(content: GameContent, floor: number | null): number {
@@ -258,8 +259,65 @@ function valueWith(
     defectsFactor,
     normalization,
     buildingFactor,
-    value: toCents(Math.round(base * tierFactor)),
+    value: toCents(
+      Math.round(base * tierFactor + atticPotential(content, property, base * tierFactor)),
+    ),
   };
+}
+
+/** Share of the cost of a transformation's works that includes the project manager's fee. */
+function managedCost(content: GameContent, cityId: string, euros: number): number {
+  const index = content.works.cityCostIndex[cityId] ?? 1;
+  return euros * index * (1 + content.works.projectManager.feeShare);
+}
+
+/** Area of the house one can build on a plot. */
+export function constructionSurface(content: GameContent, plot: number): number {
+  const rules = content.works.transformations.constructionSurface;
+  return Math.round(Math.min(rules.max, Math.max(rules.min, plot * rules.share)));
+}
+
+/**
+ * A convertible attic is part of a house's price: the seller asks for a share of what
+ * converting it would bring, its cost deducted (in euros, like `base`).
+ */
+function atticPotential(content: GameContent, property: Property, base: number): number {
+  if (property.kind !== 'house' || property.atticSurface <= 0 || property.surface <= 0) return 0;
+  const rules = content.works.transformations;
+  const gain = (base * property.atticSurface) / property.surface;
+  const cost = managedCost(
+    content,
+    property.cityId,
+    rules.rules.attic.costPerM2 * property.atticSurface,
+  );
+  return rules.residualShare * Math.max(0, gain - cost);
+}
+
+/** Value (cents, unrounded) of a new house built in a neighbourhood, as the market would see it. */
+function newHouseValue(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  surface: number,
+): number {
+  const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
+  const stats = neighbourhood.sales.house;
+  const city = findCity(content, property.cityId);
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  const surfaceFactor = (surface / stats.medianSurface) ** city.commune.surfaceElasticity.house;
+  const rules = content.market;
+  return (
+    ((surface *
+      stats.pricePerM2.median *
+      priceIndex *
+      surfaceFactor *
+      rules.epochFactors.after2012 *
+      rules.dpeFactors[content.works.transformations.constructionDpe] *
+      interpolateByState(content.works.valueByState, MAX_ITEM_STATE)) /
+      valueNormalization(content, property.cityId, neighbourhood, 'house')) *
+    100
+  );
 }
 
 /**
@@ -277,6 +335,20 @@ function otherKindValue(
   const priceIndex =
     state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
   const ratio = content.market.otherKinds[kind].priceRatio;
+  const floorValue = toCents(property.surface * median * priceIndex * ratio);
+  // Building land is worth a share of the margin of the house it can hold (« compte à rebours »).
+  let residual = 0;
+  if (kind === 'land') {
+    const rules = content.works.transformations;
+    const surface = constructionSurface(content, property.surface);
+    const cost = managedCost(
+      content,
+      property.cityId,
+      rules.rules.construction.costPerM2 * surface,
+    );
+    residual =
+      rules.residualShare * (newHouseValue(content, state, property, surface) - cost * 100);
+  }
   return {
     medianPricePerM2: median,
     priceIndex,
@@ -290,7 +362,7 @@ function otherKindValue(
     defectsFactor: 1,
     normalization: 1,
     buildingFactor: 1,
-    value: toCents(Math.round(property.surface * median * priceIndex * ratio)),
+    value: Math.round(Math.max(floorValue, residual)),
   };
 }
 

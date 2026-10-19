@@ -1,6 +1,7 @@
 import {
   type GameEvent,
   type Holder,
+  type TransformationKind,
   type LeaseType,
   type Listing,
   type OwnedProperty,
@@ -34,16 +35,30 @@ export interface ExpansionProfile {
   visitsPerTrip: number;
 }
 
+/** A developer (milestone 8): buys to transform, sells part of what it produces. */
+export interface PromoterProfile {
+  /** Transformations considered, in order of preference at equal value. */
+  kinds: TransformationKind[];
+  /** Value after the transformation over price and cost (with its margin) to aim for. */
+  margin: number;
+  /** Share of the flats produced that is put up for sale, the largest first. */
+  sellShare: number;
+}
+
 /** An investor who buys through an SCI once his own credit runs out (milestone 8). */
 export interface CompanyProfile {
   /** Creates the SCI once he owns this many properties. */
   afterProperties: number;
+  /** Share of the fees he brings himself, whatever the bank lends (prudence). */
+  feesShare: number;
 }
 
 export interface InvestorProfile {
   id: string;
   /** Uses an SCI; undefined or null: buys in his own name only. */
   company?: CompanyProfile | null;
+  /** Buys to transform (the Promoteur); undefined or null: never transforms. */
+  promoter?: PromoterProfile | null;
   /** Plays beyond his base city; undefined or null: stays in his base. */
   expansion?: ExpansionProfile | null;
   /** Answers the events by weighing their choices (a reader), rather than by default. */
@@ -118,6 +133,8 @@ interface Appraisal {
   value: number;
   works: number;
   rentAfter: number | null;
+  /** The transformation the bot would make of it (the Promoteur). */
+  transformation?: TransformationKind;
 }
 
 interface Plan {
@@ -155,6 +172,10 @@ interface Memory {
   blockedSince: Map<string, number>;
   /** Properties sold to get out of an overdraft. */
   rescue: Set<string>;
+  /** Transformations planned: by listing (offer), purchase (compromis), then property (deed). */
+  transformations: Map<string, TransformationKind>;
+  /** Flats a transformation produced that are to be sold. */
+  toSell: Set<string>;
   /** Properties whose works are completed. */
   renovated: Set<string>;
 }
@@ -173,6 +194,8 @@ export function investor(profile: InvestorProfile): Strategy {
     lastCut: new Map(),
     blockedSince: new Map(),
     rescue: new Set(),
+    transformations: new Map(),
+    toSell: new Set(),
     renovated: new Set(),
   };
   const desk = new RenovationDesk(profile.renovation);
@@ -216,9 +239,15 @@ export function investor(profile: InvestorProfile): Strategy {
   ): Plan | null {
     const { engine, state } = api;
     const fees = Math.round(price * feesShare(api));
-    const companyShare =
-      holder === 'company' ? engine.content.company.credit.extraContributionShare : 0;
-    const contribution = fees + Math.round(price * (profile.extraContributionShare + companyShare));
+    const sci = engine.content.company.credit;
+    const feesBrought = Math.max(sci.feesContributionShare, profile.company?.feesShare ?? 1);
+    const contribution =
+      holder === 'company'
+        ? Math.round(
+            fees * feesBrought +
+              price * (profile.extraContributionShare + sci.extraContributionShare),
+          )
+        : fees + Math.round(price * profile.extraContributionShare);
     const amount = price + works + fees - contribution;
     const durationYears =
       works >= engine.content.credit.worksShareForLongerDuration * (price + works)
@@ -252,7 +281,9 @@ export function investor(profile: InvestorProfile): Strategy {
       if (decision.decision === 'counterOffer' && !profile.acceptsLongerLoans) continue;
       const offer = decision.offer;
       if (offer.debtRatioAfter > profile.maxDebtRatio) continue;
-      if (cash - contribution < reserve(api, offer.monthlyPayment)) continue;
+      // A property to transform earns nothing for months: its payments must be covered too.
+      const idle = transformationMonths(api, rentId) * offer.monthlyPayment;
+      if (cash - contribution < reserve(api, offer.monthlyPayment) + idle) continue;
       if (profile.minCashFlow !== null && !profile.resell) {
         if (rent - offer.monthlyPayment < profile.minCashFlow * 100) continue;
       }
@@ -288,6 +319,15 @@ export function investor(profile: InvestorProfile): Strategy {
     const allowed = api.engine.content.company.leaseTypes;
     if (held === 'company' && !allowed.includes(profile.leaseType)) return 'bare';
     return profile.leaseType;
+  }
+
+  /** Months a property bought for a transformation stays empty (0 otherwise). */
+  function transformationMonths(api: BotApi, id: string): number {
+    const listingId = api.state.purchases.find((p) => p.id === id)?.listingId ?? id;
+    const kind = memory.transformations.get(id) ?? memory.transformations.get(listingId);
+    const listing = api.state.listings.find((l) => l.id === id);
+    const planned = kind ?? (listing ? appraise(api, listing)?.transformation : undefined);
+    return planned ? api.engine.content.works.transformations.rules[planned].months : 0;
   }
 
   /** Monthly rent left after the owner's costs and the agency, before the loan and tax. */
@@ -354,7 +394,8 @@ export function investor(profile: InvestorProfile): Strategy {
     const { engine } = api;
     for (const owned of [...api.state.properties]) {
       const id = owned.property.id;
-      if (!owned.lease && !owned.rental && !owned.sale) offerForRent(api, owned);
+      const waits = memory.transformations.has(id);
+      if (!owned.lease && !owned.rental && !owned.sale && !waits) offerForRent(api, owned);
       const rental = api.state.properties.find((o) => o.property.id === id)?.rental;
       if (rental && rental.agencyId === null && rental.applications.length > 0) {
         const waited = api.today - rental.listedDay >= CANDIDATE_WAIT_DAYS;
@@ -433,6 +474,8 @@ export function investor(profile: InvestorProfile): Strategy {
     }
     if (api.act({ type: 'market/offer', listingId: listing.id, amount })) {
       memory.maxPrice.set(listing.id, Math.min(maxPrice, listing.askingPrice));
+      const kind = appraise(api, listing)?.transformation;
+      if (kind) memory.transformations.set(listing.id, kind);
     }
   }
 
@@ -508,6 +551,29 @@ export function investor(profile: InvestorProfile): Strategy {
     return value;
   }
 
+  /**
+   * The Promoteur's view of a listing: the value of what the best transformation produces,
+   * its cost (with the usual margin) deducted; null when no transformation fits.
+   */
+  function promoterAppraisal(api: BotApi, listing: Listing): Appraisal | null {
+    const promoter = profile.promoter;
+    if (!promoter) return null;
+    let best: Appraisal | null = null;
+    for (const kind of promoter.kinds) {
+      const estimate = api.engine.transformationEstimate(api.state, listing.id, kind);
+      if (!estimate || typeof estimate === 'string') continue;
+      // What it produces must be let at once, and long enough (no works money left after).
+      if (estimate.blocked > 0) continue;
+      const horizon = profile.minLettableYears * DAYS_PER_YEAR;
+      if (estimate.firstBanDay !== null && estimate.firstBanDay - api.today <= horizon) continue;
+      const works = Math.round(estimate.quote.total * WORKS_MARGIN);
+      const value = Math.round((estimate.valueAfter - works) / (1 + promoter.margin));
+      if (!best || value > best.value)
+        best = { value, works, rentAfter: null, transformation: kind };
+    }
+    return best;
+  }
+
   /** What the bot would pay for a listing: the value after its works, the works deducted. */
   function appraiseNow(
     api: BotApi,
@@ -515,6 +581,9 @@ export function investor(profile: InvestorProfile): Strategy {
     project: WorksProjectPlan | null,
   ): Appraisal | null {
     const { engine, state } = api;
+    const promoted = promoterAppraisal(api, listing);
+    // The Promoteur only buys what he can transform.
+    if (profile.promoter) return promoted;
     if (project && profile.appraisal === 'asIs') {
       // Premium everywhere: bought on its value as it is, the works financed on top.
       const value = engine.estimate(state, listing.id)?.estimate ?? 0;
@@ -631,7 +700,7 @@ export function investor(profile: InvestorProfile): Strategy {
       if (owned.works) continue;
       const sale = owned.sale;
       if (!sale) {
-        if (memory.rescue.has(id)) {
+        if (memory.rescue.has(id) || memory.toSell.has(id)) {
           // Sold to get out of the overdraft.
         } else if (!profile.resell) {
           // Given up: vacant and impossible to let for months.
@@ -694,10 +763,22 @@ export function investor(profile: InvestorProfile): Strategy {
     api.act({ type: 'company/create' });
   }
 
+  /** Starts the planned transformations of the properties bought for them. */
+  function transformProperties(api: BotApi): void {
+    for (const owned of [...api.state.properties]) {
+      const kind = memory.transformations.get(owned.property.id);
+      if (!kind || owned.works || owned.lease) continue;
+      if (owned.rental) api.act({ type: 'rent/withdraw', propertyId: owned.property.id });
+      api.act({ type: 'works/transform', propertyId: owned.property.id, kind });
+    }
+  }
+
   function daily(api: BotApi): void {
     memory.startDay ??= api.today;
     createCompany(api);
-    desk.daily(api, reserve(api, 0), () => false);
+    transformProperties(api);
+    // A property bought to be transformed waits for its project manager, not for artisans.
+    desk.daily(api, reserve(api, 0), (owned) => memory.transformations.has(owned.property.id));
     manageSales(api);
     if (!profile.resell) manageLets(api);
     if ((api.today - memory.startDay) % profile.decisionEveryDays !== 0) return;
@@ -820,8 +901,24 @@ export function investor(profile: InvestorProfile): Strategy {
       case 'compromisSigned': {
         const purchase = api.state.purchases.find((p) => p.id === event.purchaseId);
         if (!purchase) return;
-        const project = chooseWorks(api, purchase.id, profile.renovation);
-        const works = project ? Math.round(project.estimate.cost * WORKS_MARGIN) : 0;
+        // A transformation to come: its cost goes into the loan, no other works.
+        const kind = memory.transformations.get(purchase.listingId);
+        const transformation = kind
+          ? api.engine.transformationEstimate(api.state, purchase.id, kind)
+          : null;
+        const project =
+          transformation && typeof transformation !== 'string'
+            ? null
+            : chooseWorks(api, purchase.id, profile.renovation);
+        const works =
+          transformation && typeof transformation !== 'string'
+            ? Math.round(transformation.quote.total * WORKS_MARGIN)
+            : project
+              ? Math.round(project.estimate.cost * WORKS_MARGIN)
+              : 0;
+        if (kind && transformation && typeof transformation !== 'string') {
+          memory.transformations.set(purchase.id, kind);
+        }
         memory.worksBudget.set(purchase.id, works);
         const financing = plan(
           api,
@@ -844,6 +941,22 @@ export function investor(profile: InvestorProfile): Strategy {
       case 'worksCompleted':
         memory.renovated.add(event.propertyId);
         return;
+      case 'deedSigned': {
+        const kind = memory.transformations.get(event.purchaseId);
+        if (kind) memory.transformations.set(event.propertyId, kind);
+        return;
+      }
+      case 'transformationCompleted': {
+        memory.transformations.delete(event.propertyId);
+        const sellShare = profile.promoter?.sellShare ?? 0;
+        const flats = event.propertyIds
+          .map((id) => api.state.properties.find((o) => o.property.id === id))
+          .filter((owned): owned is OwnedProperty => owned !== undefined)
+          .sort((a, b) => b.property.surface - a.property.surface);
+        const count = flats.length > 1 ? Math.round(flats.length * sellShare) : 0;
+        for (const owned of flats.slice(0, count)) memory.toSell.add(owned.property.id);
+        return;
+      }
       case 'offerAnswered': {
         if (event.answer !== 'counterOffer') return;
         const maxPrice = memory.maxPrice.get(event.listingId) ?? 0;
@@ -1002,7 +1115,7 @@ const BASE_PROFILES = {
   },
   chasseur: {
     id: 'chasseur',
-    company: { afterProperties: 2 },
+    company: { afterProperties: 2, feesShare: 1 },
     smartAnswers: true,
     visits: true,
     visitsPerDay: 4,
@@ -1141,11 +1254,45 @@ function expandingHunter(id: string, cityId: string): InvestorProfile {
   };
 }
 
+/**
+ * The Promoteur (milestone 8): a Chasseur who also looks at what a property could become
+ * (a building sold flat by flat, a house divided, an attic, a plot), through his SCI.
+ */
+function developer(): InvestorProfile {
+  return {
+    ...BASE_PROFILES.chasseur,
+    id: 'promoteur',
+    banks: [...BASE_PROFILES.chasseur.banks],
+    meetBanks: [...BASE_PROFILES.chasseur.meetBanks],
+    renovation: { ...BASE_PROFILES.chasseur.renovation },
+    company: { afterProperties: 1, feesShare: 0 },
+    // His SCI loans pay for themselves: a thinner reserve than the Chasseur's.
+    reserveMonths: 2,
+    // Buildings to sell flat by flat are many in the big cities: he looks there too.
+    expansion: {
+      cities: ['dijon', 'besancon'],
+      afterProperties: 1,
+      remoteAgencyId: 'immoZen',
+      premium: 0.02,
+      visitsPerTrip: 3,
+    },
+    // His margin is in the appraisal (value after the works, their cost and his margin deducted).
+    screenRatio: 0.98,
+    buyRatio: 1,
+    promoter: {
+      kinds: ['splitBuilding', 'division', 'attic', 'construction'],
+      margin: 0.08,
+      sellShare: 0,
+    },
+  };
+}
+
 export const PROFILES = {
   ...BASE_PROFILES,
   chasseurDijon: expandingHunter('chasseurDijon', 'dijon'),
   chasseurBesancon: expandingHunter('chasseurBesancon', 'besancon'),
   chasseurChalon: expandingHunter('chasseurChalon', 'chalon'),
+  promoteur: developer(),
 } satisfies Record<string, InvestorProfile>;
 
 export const inactive: Strategy = { id: 'inactif' };
@@ -1161,6 +1308,7 @@ export const BOT_IDS: readonly BotId[] = [
   'chasseurDijon',
   'chasseurBesancon',
   'chasseurChalon',
+  'promoteur',
   'inactif',
 ];
 
@@ -1174,6 +1322,7 @@ export const BOT_NAMES: Record<BotId, string> = {
   chasseurDijon: 'Chasseur à Dijon',
   chasseurBesancon: 'Chasseur à Besançon',
   chasseurChalon: 'Chasseur à Chalon',
+  promoteur: 'Promoteur',
   inactif: 'Inactif',
 };
 

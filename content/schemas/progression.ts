@@ -54,6 +54,7 @@ export const STATS = [
   'balance',
   'debt',
   'properties',
+  /** Homes let (flats, houses, buildings), shops and parking spaces aside. */
   'letProperties',
   /** Owned properties classed E, F or G. */
   'passoires',

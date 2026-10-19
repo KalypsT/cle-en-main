@@ -80,4 +80,37 @@ describe('shops, parking spaces and building land (milestone 8)', () => {
     }).state;
     expect(listed.properties[0]?.rental?.leaseType).toBe('parking');
   });
+
+  it('prices land and attics by what one could build on them (« compte à rebours »)', () => {
+    const state = newGame({ seed: 5 });
+    const land = generated(4000).find((p) => p.kind === 'land');
+    if (!land) throw new Error('no land');
+    const rule = content.market.otherKinds.land;
+    const median =
+      content.cities.dole?.neighbourhoods.find((n) => n.id === land.neighbourhoodId)?.sales
+        .apartment.pricePerM2.median ?? 0;
+    const priceIndex = state.market.cities.dole?.[land.neighbourhoodId]?.priceIndex ?? 1;
+    // Never under its floor price.
+    expect(realValue(content, state, land).value).toBeGreaterThanOrEqual(
+      Math.round(land.surface * median * priceIndex * rule.priceRatio * 100) - 1,
+    );
+    // Where houses are dear, land follows: it is worth more than its floor price.
+    const dear = { ...land, cityId: 'dijon', neighbourhoodId: 'montchapetRepublique' };
+    const dijonMedian =
+      content.cities.dijon?.neighbourhoods.find((n) => n.id === 'montchapetRepublique')?.sales
+        .apartment.pricePerM2.median ?? 0;
+    const dijonIndex = state.market.cities.dijon?.montchapetRepublique?.priceIndex ?? 1;
+    expect(realValue(content, state, dear).value).toBeGreaterThan(
+      dear.surface * dijonMedian * dijonIndex * rule.priceRatio * 100,
+    );
+    // A convertible attic adds to a house's value.
+    const house = generated(400).find((p) => p.kind === 'house');
+    if (!house) throw new Error('no house');
+    const without = realValue(content, state, { ...house, atticSurface: 0 }).value;
+    const withAttic = realValue(content, state, {
+      ...house,
+      atticSurface: Math.round(house.surface * 0.3),
+    }).value;
+    expect(withAttic).toBeGreaterThan(without);
+  });
 });

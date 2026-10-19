@@ -2,7 +2,9 @@ import { findCity, type GameContent } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextRange } from '../random.ts';
 import type { GameState, OwnedProperty, Property, TransformationKind, WorkItem } from '../state.ts';
+import { toDayNumber } from '../calendar.ts';
 import type { SystemContext } from './context.ts';
+import { letBanDay, lettingBlock } from './renting.ts';
 import { crisisFactor } from './crises.ts';
 import {
   blankItems,
@@ -13,7 +15,7 @@ import {
   itemId,
   layoutSpaces,
 } from './dwelling.ts';
-import { realValue } from './valuation.ts';
+import { constructionSurface, estimateValue } from './valuation.ts';
 
 /**
  * Transformations (docs/03-systemes/05, milestone 8), always led by the project manager: a
@@ -71,19 +73,23 @@ function divisionLots(content: GameContent, property: Property) {
   }));
 }
 
-function constructionSurface(content: GameContent, plot: number): number {
-  const rules = content.works.transformations.constructionSurface;
-  return Math.round(Math.min(rules.max, Math.max(rules.min, plot * rules.share)));
-}
-
 export function transformationQuote(
   content: GameContent,
   state: GameState,
   owned: OwnedProperty,
   kind: TransformationKind,
 ): TransformationQuote | TransformationRefusal {
+  return quoteFor(content, state, owned.property, kind);
+}
+
+/** The project manager's quote for a property, owned or still on the market. */
+export function quoteFor(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  kind: TransformationKind,
+): TransformationQuote | TransformationRefusal {
   const rules = content.works.transformations.rules[kind];
-  const { property } = owned;
   if (property.kind !== rules.kind || property.surface < rules.minSurface) {
     return 'transformation.notAllowed';
   }
@@ -104,7 +110,8 @@ export function transformationQuote(
   // Per m² of what is created or redone: the attic itself, the new house, the divided house.
   const area = kind === 'attic' ? property.atticSurface : surfaceAfter;
   const index = content.works.cityCostIndex[property.cityId] ?? 1;
-  const value = realValue(content, state, property).value;
+  // What the player can tell of the value (all of it, once owned).
+  const value = estimateValue(content, state, property, true).estimate;
   const works = Math.round(
     (toCents(rules.costPerM2 * area + rules.costPerLot * (lots?.length ?? 0)) * index +
       value * rules.costShareOfValue) *
@@ -205,17 +212,18 @@ function relaid(content: GameContent, property: Property, kept: readonly WorkIte
 
 /** One flat of a divided house or of a building sold flat by flat. */
 function flatOf(
-  ctx: SystemContext,
+  content: GameContent,
   source: Property,
   lot: { surface: number; rooms: number },
   floor: number,
   count: number,
   items: (flat: Property) => WorkItem[],
+  id: string,
+  meetingMonth: number,
 ): Property {
-  const { content, state } = ctx;
   const spaces = layoutSpaces(content, 'apartment', lot.surface, lot.rooms, []);
   const base: Property = {
-    id: `property-${state.nextId++}`,
+    id,
     cityId: source.cityId,
     neighbourhoodId: source.neighbourhoodId,
     kind: 'apartment',
@@ -229,7 +237,7 @@ function flatOf(
     items: [],
     energyFactor: source.energyFactor,
     atticSurface: 0,
-    copro: { lots: count, meetingMonth: nextInt(state.rng, 1, 12) },
+    copro: { lots: count, meetingMonth },
     postponedHazards: [],
     defects: source.defects.map((defect) => ({ ...defect })),
     annualPropertyTax: toCents(
@@ -292,36 +300,37 @@ function shareOwnership(
   return { flats: result, firstId: flats[0]?.id ?? owned.property.id };
 }
 
-/** The bill is paid and the property becomes what the project made of it. */
-export function finishTransformation(ctx: SystemContext, owned: OwnedProperty): void {
-  const { content, state } = ctx;
-  const project = owned.works;
-  const transformation = project?.transformation;
-  if (!project || !transformation) return;
-  const bill = Math.round(transformation.total * (1 + transformation.overrun));
-  payTransformation(ctx, owned, Math.max(0, bill - project.paid));
-  owned.works = null;
-  const source = owned.property;
-  const quote = transformationQuote(content, state, owned, transformation.kind);
-  let produced: string[] = [source.id];
-  switch (transformation.kind) {
+/**
+ * What a property becomes: the property itself changed (attic, construction), or the flats it
+ * is cut into. `newId` and `meetingMonth` give the new flats their ids and general meetings.
+ */
+export function transformedProperties(
+  content: GameContent,
+  state: GameState,
+  source: Property,
+  kind: TransformationKind,
+  newId: () => string,
+  meetingMonth: () => number,
+): Property[] {
+  switch (kind) {
     case 'attic': {
       const surface = source.surface + source.atticSurface;
       const rooms = source.rooms + 1;
       const spaces = layoutSpaces(content, 'house', surface, rooms, []);
-      owned.property = relaid(
-        content,
-        {
-          ...source,
-          surface,
-          rooms,
-          atticSurface: 0,
-          spaces,
-          annualPropertyTax: Math.round((source.annualPropertyTax * surface) / source.surface),
-        },
-        source.items,
-      );
-      break;
+      return [
+        relaid(
+          content,
+          {
+            ...source,
+            surface,
+            rooms,
+            atticSurface: 0,
+            spaces,
+            annualPropertyTax: Math.round((source.annualPropertyTax * surface) / source.surface),
+          },
+          source.items,
+        ),
+      ];
     }
     case 'construction': {
       const surface = constructionSurface(content, source.surface);
@@ -344,35 +353,108 @@ export function finishTransformation(ctx: SystemContext, owned: OwnedProperty): 
       };
       const withItems = { ...built, items: newItems(content, built) };
       // Built to its target class: the energy model is calibrated on it.
-      owned.property = { ...withItems, energyFactor: calibrateEnergy(content, withItems) };
-      break;
+      return [{ ...withItems, energyFactor: calibrateEnergy(content, withItems) }];
     }
     case 'division':
     case 'splitBuilding': {
+      const quote = quoteFor(content, state, source, kind);
       const lots = typeof quote === 'string' ? [] : (quote.lots ?? []);
-      const flats = lots.map((lot, i) =>
+      return lots.map((lot, i) =>
         flatOf(
-          ctx,
+          content,
           source,
           lot,
           i,
           lots.length,
-          transformation.kind === 'division'
+          kind === 'division'
             ? (flat) => newItems(content, flat)
             : buildingFlatItems(content, source, i),
+          newId(),
+          meetingMonth(),
         ),
       );
-      if (flats.length === 0) break;
-      const { flats: ownedFlats, firstId } = shareOwnership(owned, flats);
+    }
+  }
+}
+
+/**
+ * What the player can expect of a transformation of a property (owned or listed): the quote and
+ * the estimated value of what it produces.
+ */
+export function transformationEstimate(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  kind: TransformationKind,
+):
+  | {
+      quote: TransformationQuote;
+      valueAfter: Cents;
+      /** What it produces that could not be let today (indecent, DPE ban); its first ban day. */
+      blocked: number;
+      firstBanDay: number | null;
+    }
+  | TransformationRefusal {
+  const quote = quoteFor(content, state, property, kind);
+  if (typeof quote === 'string') return quote;
+  let n = 0;
+  const results = transformedProperties(
+    content,
+    state,
+    property,
+    kind,
+    () => `estimate-${++n}`,
+    () => 1,
+  );
+  const valueAfter = results.reduce(
+    (sum, result) => sum + estimateValue(content, state, result, true).estimate,
+    0,
+  );
+  const today = toDayNumber(state.clock.date);
+  const blocked = results.filter((result) => lettingBlock(content, result, today) !== null).length;
+  const banDays = results
+    .map((result) => letBanDay(content, result.dpe))
+    .filter((day): day is number => day !== null);
+  return {
+    quote,
+    valueAfter,
+    blocked,
+    firstBanDay: banDays.length > 0 ? Math.min(...banDays) : null,
+  };
+}
+
+/** The bill is paid and the property becomes what the project made of it. */
+export function finishTransformation(ctx: SystemContext, owned: OwnedProperty): void {
+  const { content, state } = ctx;
+  const project = owned.works;
+  const transformation = project?.transformation;
+  if (!project || !transformation) return;
+  const bill = Math.round(transformation.total * (1 + transformation.overrun));
+  payTransformation(ctx, owned, Math.max(0, bill - project.paid));
+  owned.works = null;
+  const source = owned.property;
+  const results = transformedProperties(
+    content,
+    state,
+    source,
+    transformation.kind,
+    () => `property-${state.nextId++}`,
+    () => nextInt(state.rng, 1, 12),
+  );
+  let produced: string[] = [source.id];
+  if (transformation.kind === 'division' || transformation.kind === 'splitBuilding') {
+    if (results.length > 0) {
+      const { flats: ownedFlats, firstId } = shareOwnership(owned, results);
       for (const flat of ownedFlats) freezeDwelling(flat.property);
       state.properties = state.properties.flatMap((candidate) =>
         candidate === owned ? ownedFlats : [candidate],
       );
       // The loan follows the first flat: it is repaid when that one is sold.
       for (const loan of state.loans) if (loan.propertyId === source.id) loan.propertyId = firstId;
-      produced = flats.map((flat) => flat.id);
-      break;
+      produced = results.map((flat) => flat.id);
     }
+  } else if (results[0]) {
+    owned.property = results[0];
   }
   if (produced.length === 1 && produced[0] === source.id) freezeDwelling(owned.property);
   state.worksDone[source.cityId] = (state.worksDone[source.cityId] ?? 0) + 1;

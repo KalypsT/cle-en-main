@@ -60,6 +60,7 @@ import { expireCrises } from './systems/crises.ts';
 import {
   runDailyTransformations,
   startTransformation,
+  transformationEstimate,
   transformationQuote,
 } from './systems/transformations.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
@@ -664,6 +665,11 @@ export function createEngine(content: GameContent) {
     transformationQuote: (state: GameState, propertyId: string, kind: TransformationKind) => {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? transformationQuote(content, state, owned, kind) : null;
+    },
+    /** A transformation's quote and the estimated value of what it produces, listed or owned. */
+    transformationEstimate: (state: GameState, id: string, kind: TransformationKind) => {
+      const property = findAnyProperty(state, id);
+      return property ? transformationEstimate(content, state, property, kind) : null;
     },
     /** Reference cost, duration, DPE, value and rent after renovating these items. */
     worksEstimate: (state: GameState, id: string, choices: readonly ItemChoice[]) => {

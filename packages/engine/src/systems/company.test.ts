@@ -10,6 +10,7 @@ import {
   systemContext,
 } from '../../test/helpers.ts';
 import { toDayNumber } from '../calendar.ts';
+import { deepClone } from '../clone.ts';
 import { toCents } from '../money.ts';
 import type { GameState } from '../state.ts';
 import {
@@ -31,9 +32,11 @@ function companyRequest(state: GameState, listingId: string, bankId = 'tirelire'
   const listing = state.listings.find((l) => l.id === listingId);
   if (!listing) throw new Error('Unknown listing');
   const price = listing.askingPrice;
-  const contribution =
-    requiredContribution(content, price) +
-    Math.round(price * content.company.credit.extraContributionShare);
+  const rules = content.company.credit;
+  const contribution = Math.round(
+    requiredContribution(content, price) * rules.feesContributionShare +
+      price * rules.extraContributionShare,
+  );
   return {
     bankId,
     amount: price + requiredContribution(content, price) - contribution,
@@ -73,13 +76,22 @@ describe('SCI (docs/03-systemes/06, milestone 8)', () => {
     expect(
       evaluateLoan(content, state, companyRequest(state, listing.id, 'zeroPapier')),
     ).toMatchObject({ decision: 'refused', reason: 'companyNotServed' });
-    // The contribution asks 10 % of the price beyond the fees.
-    const short = { ...companyRequest(state, listing.id) };
-    short.contribution -= 100_00;
-    expect(evaluateLoan(content, state, short)).toMatchObject({
-      decision: 'refused',
-      reason: 'insufficientContribution',
-    });
+    // The contribution the SCI's bank asks: a share of the fees and of the price (content).
+    const strict = deepClone(content);
+    strict.company.credit.feesContributionShare = 1;
+    strict.company.credit.extraContributionShare = 0.1;
+    const asked = companyRequest(state, listing.id);
+    const required = requiredContribution(content, asked.price) + Math.round(asked.price * 0.1);
+    expect(
+      evaluateLoan(strict, state, { ...asked, contribution: required - 100_00 }),
+    ).toMatchObject({ decision: 'refused', reason: 'insufficientContribution' });
+    expect(
+      evaluateLoan(strict, state, {
+        ...asked,
+        contribution: required,
+        amount: asked.price + requiredContribution(content, asked.price) - required,
+      }).decision,
+    ).not.toBe('refused');
     const request = companyRequest(state, listing.id);
     const decision = evaluateLoan(content, state, request);
     if (decision.decision === 'refused') throw new Error(`refused: ${decision.reason}`);
@@ -98,9 +110,10 @@ describe('SCI (docs/03-systemes/06, milestone 8)', () => {
     const listing = affordableListing(state, 60_000);
     // Twice the price lent: the rent no longer covers the payment, even over 25 years.
     const request = { ...companyRequest(state, listing.id), price: listing.askingPrice * 4 };
-    request.contribution =
-      requiredContribution(content, request.price) +
-      Math.round(request.price * content.company.credit.extraContributionShare);
+    request.contribution = Math.round(
+      requiredContribution(content, request.price) * content.company.credit.feesContributionShare +
+        request.price * content.company.credit.extraContributionShare,
+    );
     request.amount =
       request.price + requiredContribution(content, request.price) - request.contribution;
     const decision = evaluateLoan(content, state, request);

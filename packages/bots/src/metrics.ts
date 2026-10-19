@@ -109,6 +109,14 @@ export interface GameMetrics {
   finalPropertiesByCity: Record<string, number>;
   /** Local renown at the end, by city. */
   finalRenown: Record<string, number>;
+  /** Depth (milestone 8): IFI paid (euros), transformations, the SCI and what it holds. */
+  wealthTax: number;
+  transformations: number;
+  companyDay: number | null;
+  finalCompanyProperties: number;
+  /** Day the SCI Horizon arrived on the market. */
+  horizonDay: number | null;
+  maxNetWorth: number;
 }
 
 const euros = (cents: number) => Math.round(cents / 100);
@@ -146,6 +154,12 @@ export class MetricsRecorder {
       rivalPurchases: {},
       rivalOffers: 0,
       netWorthByYear: [],
+      wealthTax: 0,
+      transformations: 0,
+      companyDay: null,
+      finalCompanyProperties: 0,
+      horizonDay: null,
+      maxNetWorth: 0,
       finalNetWorth: 0,
       finalBalance: 0,
       finalDebt: 0,
@@ -211,7 +225,9 @@ export class MetricsRecorder {
           if (state.player.balance < 0) m.overdraftDays += 1;
           m.minBalance = Math.min(m.minBalance, euros(state.player.balance));
           if (day > 0 && day % DAYS_PER_YEAR === 0) {
-            m.netWorthByYear.push(euros(this.engine.netWorth(state)));
+            const worth = euros(this.engine.netWorth(state));
+            m.netWorthByYear.push(worth);
+            m.maxNetWorth = Math.max(m.maxNetWorth, worth);
           }
           break;
         }
@@ -219,6 +235,15 @@ export class MetricsRecorder {
           m.titleDays[event.titleId] ??= this.day(state);
           if (event.titleId === 'landlord') m.bailleurDay ??= this.day(state);
           if (event.titleId === 'seasonedInvestor') m.seasonedDay ??= this.day(state);
+          break;
+        case 'transformationCompleted':
+          m.transformations += 1;
+          break;
+        case 'companyCreated':
+          m.companyDay ??= this.day(state);
+          break;
+        case 'rivalArrived':
+          if (event.rivalId === 'horizon') m.horizonDay ??= this.day(state);
           break;
         case 'achievementEarned':
           m.achievements += 1;
@@ -271,7 +296,8 @@ export class MetricsRecorder {
           m.propertyTax += euros(event.amount);
           break;
         case 'taxAssessed': {
-          m.rentTax += euros(event.total);
+          m.rentTax += euros(event.total - event.wealthTax);
+          m.wealthTax += euros(event.wealthTax);
           m.accountantFees += euros(event.accountantFees);
           const properties = state.tax.lastAssessment?.properties ?? [];
           m.assessedPropertyYears += properties.length;
@@ -400,6 +426,10 @@ export class MetricsRecorder {
     m.finalBalance = euros(state.player.balance);
     m.finalDebt = euros(state.loans.reduce((sum, loan) => sum + loan.remaining, 0));
     m.finalProperties = state.properties.length;
+    m.finalCompanyProperties = state.properties.filter(
+      (owned) => owned.holder === 'company',
+    ).length;
+    m.maxNetWorth = Math.max(m.maxNetWorth, m.finalNetWorth);
     m.finalPassoires = state.properties.filter((owned) =>
       PASSOIRES.includes(owned.property.dpe),
     ).length;

@@ -209,6 +209,12 @@ export const worksRulesSchema = z
         constructionSurface: z.object({ share, min: positive, max: positive }).strict(),
         /** Energy class a new house is built to. */
         constructionDpe: dpeLabelSchema,
+        /**
+         * Share of a transformation's margin the seller already asks for (the developer's
+         * « compte à rebours »): building land is worth this share of the margin of the house it
+         * can hold, and a convertible attic adds this share of its own margin to a house.
+         */
+        residualShare: share,
         /** Chance and size of a final overrun of the bill. */
         overrun: z
           .object({ chance: share, share: z.object({ min: share, max: share }).strict() })
