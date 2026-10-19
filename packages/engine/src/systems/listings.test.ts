@@ -54,7 +54,9 @@ describe('listings', () => {
       const { property } = listing;
       expect(neighbourhoods.has(property.neighbourhoodId)).toBe(true);
       expect(property.surface).toBeGreaterThan(8);
-      expect(property.rooms).toBeGreaterThanOrEqual(1);
+      // Shops, parking spaces and land have no rooms (milestone 8).
+      const dwelling = ['apartment', 'house', 'building'].includes(property.kind);
+      expect(property.rooms).toBeGreaterThanOrEqual(dwelling ? 1 : 0);
       expect(listing.askingPrice % (content.market.pricing.rounding * 100)).toBe(0);
       if (property.kind === 'apartment') expect(property.floor).not.toBeNull();
       if (property.kind === 'building') expect(property.lots.length).toBeGreaterThanOrEqual(2);

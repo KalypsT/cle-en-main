@@ -20,6 +20,7 @@ import type {
 import {
   heavyWorksInProgress,
   interpolateByState,
+  isDwelling,
   isIndecent,
   tierShare,
   weightedState,
@@ -47,6 +48,8 @@ export function monthsToDays(months: number): number {
 
 export type RentRefusal =
   | 'rent.notEnoughRooms'
+  | 'rent.leaseNotAllowed'
+  | 'rent.notLettable'
   | 'agency.leaseType'
   | 'company.leaseType'
   | 'company.noHome'
@@ -107,6 +110,20 @@ export function marketRent(
   leaseType: LeaseType = 'bare',
 ): Cents {
   const rules = content.renting;
+  const { kind } = property;
+  if (!isDwelling(kind)) {
+    // A shop or a parking space: a share of the neighbourhood's rent for large flats.
+    const ratio = content.market.otherKinds[kind].rentRatio;
+    const perM2 = findNeighbourhood(content, property.cityId, property.neighbourhoodId).rentPerM2;
+    const rent = toCents(
+      property.surface *
+        perM2.largeApartment *
+        ratio *
+        rentLevel(content, state, property) *
+        rules.leaseTypes[leaseType].rentFactor,
+    );
+    return rent > 0 ? Math.max(RENT_ROUNDING, Math.round(rent / RENT_ROUNDING) * RENT_ROUNDING) : 0;
+  }
   if (isIndecent(content, property)) return 0;
   const tiers = tierShare(content, property, 'rent');
   // The tiers' rent bonus stops where their value bonus does (the neighbourhood's ceiling).
@@ -155,12 +172,19 @@ export function letBanDay(content: GameContent, dpe: DpeLabel): number | null {
   return date ? toDayNumber(date) : null;
 }
 
+/** Why a new lease cannot be signed: indecent, DPE ban, or not a property one lets (land). */
+export type LettingBlock = 'rent.indecent' | 'rent.dpeBanned' | 'rent.notLettable';
+
 /** Why a new lease cannot be signed on `day`, or null if it can. */
 export function lettingBlock(
   content: GameContent,
   property: Property,
   day: number,
-): 'rent.indecent' | 'rent.dpeBanned' | null {
+): LettingBlock | null {
+  // Housing rules (decency, DPE) do not apply to a shop or a parking space; land is not let.
+  if (!isDwelling(property.kind)) {
+    return content.market.otherKinds[property.kind].rentRatio > 0 ? null : 'rent.notLettable';
+  }
   if (isIndecent(content, property)) return 'rent.indecent';
   const ban = letBanDay(content, property.dpe);
   return ban !== null && day >= ban ? 'rent.dpeBanned' : null;
@@ -176,7 +200,11 @@ export function furnitureCost(content: GameContent, property: Property): Cents {
 /** Landlord insurance (propriétaire non occupant), per month. */
 export function ownerInsurance(content: GameContent, property: Property): Cents {
   const rules = content.renting.ownerInsurance;
-  return Math.round(toCents(rules.base + rules.perM2 * property.surface) / MONTHS_PER_YEAR);
+  const { kind } = property;
+  const factor = isDwelling(kind) ? 1 : content.market.otherKinds[kind].insuranceFactor;
+  return Math.round(
+    (toCents(rules.base + rules.perM2 * property.surface) * factor) / MONTHS_PER_YEAR,
+  );
 }
 
 /** Rents currently paid by tenants, charges excluded: the banks retain a share of them. */
@@ -215,6 +243,7 @@ export function listForRent(
   if (block) return block;
   if (heavyWorksInProgress(content, owned)) return 'works.inProgress';
   const leaseRules = content.renting.leaseTypes[terms.leaseType];
+  if (!leaseRules.kinds.includes(owned.property.kind)) return 'rent.leaseNotAllowed';
   if (owned.property.rooms < leaseRules.minRooms) return 'rent.notEnoughRooms';
   const agency = terms.agencyId === null ? undefined : findAgency(content, terms.agencyId);
   if (terms.agencyId !== null && !agency) return 'agency.unknown';

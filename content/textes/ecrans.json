@@ -105,6 +105,9 @@
       "apartment": "Immeuble",
       "house": "Maison",
       "building": "Immeuble de rapport",
+      "commercial": "Local commercial",
+      "parking": "Parking",
+      "land": "Terrain",
       "owned": "Mon bien",
       "home": "Chez moi",
       "listing": "Bien en vente",
@@ -194,7 +197,10 @@
     "kindShort": {
       "apartment": "Appartement",
       "house": "Maison",
-      "building": "Immeuble"
+      "building": "Immeuble",
+      "commercial": "Local",
+      "parking": "Parking",
+      "land": "Terrain"
     }
   },
   "listing": {
@@ -411,7 +417,9 @@
       "bare": "Location nue",
       "furnished": "Location meublée",
       "shared": "Colocation",
-      "shortTerm": "Location courte durée"
+      "shortTerm": "Location courte durée",
+      "commercial": "Bail commercial",
+      "parking": "Location de parking"
     },
     "monthlyRent": "Loyer hors charges",
     "since": "Depuis le {date}",

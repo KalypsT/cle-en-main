@@ -73,7 +73,7 @@
       "arrival": { "fromYear": 8, "minPlayerNetWorth": 400000 },
       "cities": ["dijon", "besancon", "dole"],
       "preferences": {
-        "kinds": ["building"],
+        "kinds": ["building", "commercial"],
         "maxSurface": 2000,
         "conditions": ["toRefresh", "good", "renovated"],
         "neighbourhoods": {},

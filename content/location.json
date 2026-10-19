@@ -31,7 +31,9 @@
       "microBic": null,
       "applicationRate": 1,
       "shortTerm": null,
-      "recoverableCharges": true
+      "recoverableCharges": true,
+      "kinds": ["apartment", "house", "building"],
+      "incidents": true
     },
     "furnished": {
       "rentFactor": 1.15,
@@ -46,7 +48,9 @@
       "microBic": null,
       "applicationRate": 1,
       "shortTerm": null,
-      "recoverableCharges": true
+      "recoverableCharges": true,
+      "kinds": ["apartment", "house", "building"],
+      "incidents": true
     },
     "shared": {
       "rentFactor": 1.3,
@@ -61,7 +65,9 @@
       "microBic": null,
       "applicationRate": 0.8,
       "shortTerm": null,
-      "recoverableCharges": true
+      "recoverableCharges": true,
+      "kinds": ["apartment", "house"],
+      "incidents": true
     },
     "shortTerm": {
       "rentFactor": 1.3,
@@ -83,7 +89,43 @@
         "selfMinutesPerDay": 20,
         "guestProfileId": "guests"
       },
-      "recoverableCharges": false
+      "recoverableCharges": false,
+      "kinds": ["apartment", "house"],
+      "incidents": true
+    },
+    "commercial": {
+      "rentFactor": 1,
+      "termMonths": 108,
+      "studentTermMonths": null,
+      "depositMonths": 3,
+      "noticeMonths": 6,
+      "monthlyDepartureProbability": 0.006,
+      "kinds": ["commercial"],
+      "incidents": false,
+      "furnished": false,
+      "minRooms": 0,
+      "taxCategory": "bare",
+      "microBic": null,
+      "applicationRate": 0.3,
+      "recoverableCharges": true,
+      "shortTerm": null
+    },
+    "parking": {
+      "rentFactor": 1,
+      "termMonths": 12,
+      "studentTermMonths": null,
+      "depositMonths": 1,
+      "noticeMonths": 1,
+      "monthlyDepartureProbability": 0.02,
+      "kinds": ["parking"],
+      "incidents": false,
+      "furnished": false,
+      "minRooms": 0,
+      "taxCategory": "bare",
+      "microBic": null,
+      "applicationRate": 1.5,
+      "recoverableCharges": true,
+      "shortTerm": null
     }
   },
   "recoverableChargesShare": 0.7,
@@ -135,7 +177,9 @@
         "bare": 40,
         "furnished": 25,
         "shared": 10,
-        "shortTerm": 0
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 30
       },
       "incomeToRent": {
         "min": 2.8,
@@ -159,7 +203,9 @@
         "bare": 15,
         "furnished": 3,
         "shared": 0,
-        "shortTerm": 0
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 20
       },
       "incomeToRent": {
         "min": 2.8,
@@ -183,7 +229,9 @@
         "bare": 15,
         "furnished": 25,
         "shared": 30,
-        "shortTerm": 0
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 25
       },
       "incomeToRent": {
         "min": 2.2,
@@ -207,7 +255,9 @@
         "bare": 3,
         "furnished": 30,
         "shared": 50,
-        "shortTerm": 0
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 5
       },
       "incomeToRent": {
         "min": 1,
@@ -231,7 +281,9 @@
         "bare": 15,
         "furnished": 5,
         "shared": 0,
-        "shortTerm": 0
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 15
       },
       "incomeToRent": {
         "min": 2.5,
@@ -255,7 +307,9 @@
         "bare": 10,
         "furnished": 12,
         "shared": 10,
-        "shortTerm": 0
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 5
       },
       "incomeToRent": {
         "min": 2,
@@ -279,7 +333,9 @@
         "bare": 0,
         "furnished": 0,
         "shared": 0,
-        "shortTerm": 1
+        "shortTerm": 1,
+        "commercial": 0,
+        "parking": 0
       },
       "incomeToRent": {
         "min": 3,
@@ -294,6 +350,32 @@
       "desiredYears": {
         "min": 0,
         "max": 0
+      }
+    },
+    {
+      "id": "shopkeeper",
+      "contract": "selfEmployed",
+      "weights": {
+        "bare": 0,
+        "furnished": 0,
+        "shared": 0,
+        "shortTerm": 0,
+        "commercial": 1,
+        "parking": 0
+      },
+      "incomeToRent": {
+        "min": 3,
+        "max": 8
+      },
+      "guarantorChance": 0.4,
+      "reliability": {
+        "min": 0.6,
+        "max": 0.92
+      },
+      "mobility": 1,
+      "desiredYears": {
+        "min": 6,
+        "max": 12
       }
     }
   ],
@@ -372,7 +454,7 @@
         "min": 1,
         "max": 2
       },
-      "leaseTypes": ["bare", "furnished", "shared"]
+      "leaseTypes": ["bare", "furnished", "shared", "commercial", "parking"]
     },
     {
       "id": "bonnePioche",
@@ -386,7 +468,7 @@
         "min": 2,
         "max": 5
       },
-      "leaseTypes": ["bare", "furnished", "shared"]
+      "leaseTypes": ["bare", "furnished", "shared", "commercial", "parking"]
     },
     {
       "id": "plusOuMoins",
@@ -400,7 +482,7 @@
         "min": 1,
         "max": 10
       },
-      "leaseTypes": ["bare", "furnished", "shared"]
+      "leaseTypes": ["bare", "furnished", "shared", "commercial", "parking"]
     },
     {
       "id": "conciergerie",

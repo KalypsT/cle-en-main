@@ -8,10 +8,11 @@ import {
   type NeighbourhoodData,
 } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
-import type { GameState, Property, PropertyKind } from '../state.ts';
+import type { GameState, OtherKind, Property, PropertyKind } from '../state.ts';
 import {
   believedView,
   interpolateByState,
+  isDwelling,
   stateValueFactor,
   tierShare,
   valueCeilingPerM2,
@@ -24,7 +25,7 @@ export function dwellingKindOf(kind: PropertyKind): DwellingKind {
 
 /** Chance that a property of this epoch and kind has a nuisance. */
 export function defectProbability(rule: DefectRule, kind: PropertyKind, epoch: Epoch): number {
-  if (!rule.kinds.includes(kind)) return 0;
+  if (!(rule.kinds as readonly PropertyKind[]).includes(kind)) return 0;
   const epochMultiplier = rule.epochMultipliers?.[epoch] ?? 1;
   return Math.min(0.95, rule.probability * epochMultiplier);
 }
@@ -198,6 +199,7 @@ function valueWith(
   property: Property,
   defectsFactor: number,
 ): ValueBreakdown {
+  if (!isDwelling(property.kind)) return otherKindValue(content, state, property, property.kind);
   const rules = content.market;
   const dwelling = dwellingKindOf(property.kind);
   const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
@@ -257,6 +259,38 @@ function valueWith(
     normalization,
     buildingFactor,
     value: toCents(Math.round(base * tierFactor)),
+  };
+}
+
+/**
+ * A shop, a parking space or land (milestone 8): its surface at a hand-written share of the
+ * neighbourhood's median price per m² for apartments, at the current price level.
+ */
+function otherKindValue(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  kind: OtherKind,
+): ValueBreakdown {
+  const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
+  const median = neighbourhood.sales.apartment.pricePerM2.median;
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  const ratio = content.market.otherKinds[kind].priceRatio;
+  return {
+    medianPricePerM2: median,
+    priceIndex,
+    surfaceFactor: ratio,
+    epochFactor: 1,
+    dpeFactor: 1,
+    stateFactor: 1,
+    tierFactor: 1,
+    tierCeilingShare: 1,
+    floorFactor: 1,
+    defectsFactor: 1,
+    normalization: 1,
+    buildingFactor: 1,
+    value: toCents(Math.round(property.surface * median * priceIndex * ratio)),
   };
 }
 

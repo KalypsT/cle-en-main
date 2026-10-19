@@ -94,7 +94,14 @@ describe('streets', () => {
     const ordinary = streets[0]?.buildings.filter((b) => b.role === 'ordinary') ?? [];
     expect(ordinary).toHaveLength(rules?.streets[0]?.buildings ?? 0);
     for (const building of ordinary) {
-      const range = content.world.floors[building.kind][building.epoch];
+      const range =
+        content.world.floors[
+          building.kind === 'commercial'
+            ? 'apartment'
+            : building.kind === 'parking' || building.kind === 'land'
+              ? 'house'
+              : building.kind
+        ][building.epoch];
       expect(building.floors).toBeGreaterThanOrEqual(range.min);
       expect(building.floors).toBeLessThanOrEqual(range.max);
     }
@@ -221,7 +228,9 @@ describe('streets', () => {
 describe('cross-section', () => {
   it('shows the flats of a listed apartment block, the listed one among neighbours', () => {
     const state = newGame();
-    const listing = state.listings.find((l) => l.property.kind === 'apartment');
+    const listing = state.listings.find(
+      (l) => l.property.kind === 'apartment' && l.property.cityId === CITY,
+    );
     if (!listing) throw new Error('no apartment listed');
     const { neighbourhoodId } = listing.property;
     const section = engine.section(state, CITY, neighbourhoodId, listing.property.id);
@@ -250,7 +259,7 @@ describe('cross-section', () => {
 
   it('finds the building of a listing in its street', () => {
     const state = newGame();
-    const listing = state.listings[0];
+    const listing = state.listings.find((l) => l.property.cityId === CITY);
     if (!listing) throw new Error('no listing');
     const place = engine.building(state, listing.property.id);
     expect(place?.neighbourhoodId).toBe(listing.property.neighbourhoodId);

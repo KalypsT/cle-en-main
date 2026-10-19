@@ -102,7 +102,9 @@ export interface MarketState {
   cities: Record<string, Record<string, NeighbourhoodMarket>>;
 }
 
-export type PropertyKind = 'apartment' | 'house' | 'building';
+/** Dwellings, then the kinds of the depth (milestone 8): shops, parking spaces, building land. */
+export type PropertyKind = 'apartment' | 'house' | 'building' | 'commercial' | 'parking' | 'land';
+export type OtherKind = 'commercial' | 'parking' | 'land';
 
 /** A nuisance the works cannot fix (noisy neighbours). */
 export interface Defect {

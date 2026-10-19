@@ -3,6 +3,7 @@ import type { Cents } from './money.ts';
 import type { DpeLabel, LeaseType, Trade } from './content.ts';
 import type { AnecdoteNote, CatalogEventInstance, Holder, SaleMode } from './state.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
+import type { LettingBlock } from './systems/renting.ts';
 
 export type StatementLine =
   | { kind: 'salary'; amount: Cents }
@@ -166,7 +167,7 @@ export type GameEvent =
       insured: boolean;
     }
   | { type: 'rentalWithdrawn'; propertyId: string }
-  | { type: 'rentalBlocked'; propertyId: string; reason: 'rent.indecent' | 'rent.dpeBanned' }
+  | { type: 'rentalBlocked'; propertyId: string; reason: LettingBlock }
   | { type: 'furnitureBought'; propertyId: string; cost: Cents }
   | { type: 'applicationReceived'; propertyId: string; applicationId: string }
   | { type: 'applicationExpired'; propertyId: string; applicationId: string }

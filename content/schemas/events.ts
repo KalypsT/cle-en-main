@@ -4,6 +4,7 @@ import { id } from './common.ts';
 import { DECISION_KINDS } from './decisions.ts';
 import { statConditionSchema } from './progression.ts';
 import { leaseTypeSchema } from './renting.ts';
+import { propertyKindSchema } from './market.ts';
 import { ITEM_KINDS, TRADES } from './works.ts';
 
 /** Families of the catalogue (docs/03-systemes/07, « Les familles d'événements »). */
@@ -46,7 +47,7 @@ export const eventConditionsSchema = z
       .optional(),
     leaseType: leaseTypeSchema.optional(),
     dpe: z.array(dpeLabelSchema).optional(),
-    propertyKinds: z.array(z.enum(['apartment', 'house', 'building'])).optional(),
+    propertyKinds: z.array(propertyKindSchema).optional(),
     satisfaction: range.optional(),
   })
   .strict();

@@ -225,8 +225,11 @@ export function investor(profile: InvestorProfile): Strategy {
         ? profile.durationWithWorksYears
         : profile.durationYears;
     // A furnished let needs its furniture on top.
+    const leaseType = leaseTypeFor(api, rentId);
     const furniture =
-      profile.leaseType === 'furnished' && !profile.resell
+      leaseType !== null &&
+      engine.content.renting.leaseTypes[leaseType].furnished &&
+      !profile.resell
         ? (engine.rentQuote(state, rentId, 'furnished')?.furnitureCost ?? 0)
         : 0;
     const cash = state.player.balance + deposit - furniture;
@@ -260,12 +263,41 @@ export function investor(profile: InvestorProfile): Strategy {
       : null;
   }
 
+  /** The property of a listing, a purchase or an owned property. */
+  function propertyOf(api: BotApi, id: string) {
+    const { state } = api;
+    return (
+      state.listings.find((l) => l.id === id)?.property ??
+      state.purchases.find((p) => p.id === id)?.property ??
+      state.properties.find((o) => o.property.id === id)?.property
+    );
+  }
+
+  /**
+   * The lease the bot would sign: a shop has its commercial lease, a parking space its own;
+   * a property of the SCI is let bare; land is not let (null).
+   */
+  function leaseTypeFor(api: BotApi, id: string): LeaseType | null {
+    const property = propertyOf(api, id);
+    if (!property) return profile.leaseType;
+    if (property.kind === 'commercial' || property.kind === 'parking') return property.kind;
+    if (property.kind === 'land') return null;
+    const held =
+      api.state.properties.find((o) => o.property.id === id)?.holder ??
+      api.state.purchases.find((p) => p.id === id)?.holder;
+    const allowed = api.engine.content.company.leaseTypes;
+    if (held === 'company' && !allowed.includes(profile.leaseType)) return 'bare';
+    return profile.leaseType;
+  }
+
   /** Monthly rent left after the owner's costs and the agency, before the loan and tax. */
   function netRent(api: BotApi, id: string, rentAfter: number | null = null): number {
     const { engine, state } = api;
-    const quote = engine.rentQuote(state, id, profile.leaseType);
+    const leaseType = leaseTypeFor(api, id);
+    if (leaseType === null) return 0;
+    const quote = engine.rentQuote(state, id, leaseType);
     if (!quote) return 0;
-    const leaseFactor = engine.content.renting.leaseTypes[profile.leaseType].rentFactor;
+    const leaseFactor = engine.content.renting.leaseTypes[leaseType].rentFactor;
     const market = rentAfter !== null ? rentAfter * leaseFactor : quote.block ? 0 : quote.market;
     const rent = market * profile.rentShare;
     const agencyId = agencyFor(api, id);
@@ -282,7 +314,9 @@ export function investor(profile: InvestorProfile): Strategy {
 
   /** The property can be let now, and long enough for this bot. */
   function lettable(api: BotApi, id: string): boolean {
-    const quote = api.engine.rentQuote(api.state, id, profile.leaseType);
+    const leaseType = leaseTypeFor(api, id);
+    if (leaseType === null) return false;
+    const quote = api.engine.rentQuote(api.state, id, leaseType);
     if (!quote || quote.block) return false;
     if (profile.minLettableYears === 0 || quote.banDay === null) return true;
     return quote.banDay - api.today > profile.minLettableYears * DAYS_PER_YEAR;
@@ -291,11 +325,14 @@ export function investor(profile: InvestorProfile): Strategy {
   /** Offers the property on the bot's terms; bare if it cannot pay for the furniture. */
   function offerForRent(api: BotApi, owned: OwnedProperty): void {
     const id = owned.property.id;
+    const wanted = leaseTypeFor(api, id);
+    if (wanted === null) return;
     const affordable =
       owned.furniture !== null ||
       (api.engine.rentQuote(api.state, id, 'furnished')?.furnitureCost ?? 0) <=
         api.state.player.balance;
-    const leaseType = profile.leaseType === 'furnished' && !affordable ? 'bare' : profile.leaseType;
+    const furnished = api.engine.content.renting.leaseTypes[wanted].furnished;
+    const leaseType = furnished && !affordable ? 'bare' : wanted;
     const quote = api.engine.rentQuote(api.state, id, leaseType);
     if (!quote || quote.block) return;
     const monthlyRent = Math.min(

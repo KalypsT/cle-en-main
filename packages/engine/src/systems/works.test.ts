@@ -21,6 +21,8 @@ function steadyContent(change?: (content: GameContent) => void): GameContent {
   content.works.quotes.noise = 0;
   for (const hazard of content.works.hazards) hazard.probability = 0;
   for (const incident of content.renting.incidents) incident.monthlyProbability = 0;
+  // No catalogue event either (an artisan's delay or head start would move the dates).
+  content.events = [];
   change?.(content);
   return content;
 }

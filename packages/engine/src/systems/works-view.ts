@@ -4,7 +4,7 @@ import { TIERS } from '../content-constants.ts';
 import type { Cents } from '../money.ts';
 import type { GameState, OwnedProperty, Property, WorkItem } from '../state.ts';
 import { believedView, dpeOf, energyNeeds, freezeItems, itemId, itemRule } from './dwelling.ts';
-import { lettingBlock, marketRent } from './renting.ts';
+import { type LettingBlock, lettingBlock, marketRent } from './renting.ts';
 import { estimateValue } from './valuation.ts';
 import {
   buildTasks,
@@ -119,7 +119,7 @@ export interface WorksEstimate {
   rentBefore: Cents;
   rentAfter: Cents;
   /** Why a new lease would still be impossible after the works. */
-  blockAfter: 'rent.indecent' | 'rent.dpeBanned' | null;
+  blockAfter: LettingBlock | null;
 }
 
 /** Items after renovation at the chosen tiers (state 5), the others as the player believes them. */

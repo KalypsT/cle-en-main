@@ -39,6 +39,13 @@ export function cityListings(state: GameState, cityId = 'dole') {
   return state.listings.filter((l) => l.property.cityId === cityId);
 }
 
+/** First flat or house for sale in a city (shops, parking spaces and land aside). */
+export function homeListing(state: GameState, cityId = 'dole') {
+  return cityListings(state, cityId).find(
+    (l) => l.property.kind === 'apartment' || l.property.kind === 'house',
+  );
+}
+
 /** A system context on a copy of `state`, to call systems directly. */
 export function systemContext(state: GameState): SystemContext {
   return { content, state: deepClone(state), events: [], today: toDayNumber(state.clock.date) };
@@ -77,14 +84,14 @@ export function advanceUntil(
   throw new Error('Expected event did not happen');
 }
 
-/** Cheapest listing whose asking price is at most `maxPrice` euros. */
+/** Cheapest flat or house whose asking price is at most `maxPrice` euros. */
 export function affordableListing(state: GameState, maxPrice = 90_000, cityId = 'dole') {
   const listing = [...state.listings]
     .filter(
       (l) =>
         l.property.cityId === cityId &&
         l.askingPrice <= maxPrice * 100 &&
-        l.property.kind !== 'building',
+        (l.property.kind === 'apartment' || l.property.kind === 'house'),
     )
     .sort((a, b) => a.askingPrice - b.askingPrice)[0];
   if (!listing) throw new Error('No affordable listing');

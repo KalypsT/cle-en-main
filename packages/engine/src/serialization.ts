@@ -547,9 +547,10 @@ const propertySchema = z
     id: z.string(),
     cityId: z.string(),
     neighbourhoodId: z.string(),
-    kind: z.enum(['apartment', 'house', 'building']),
+    kind: z.enum(['apartment', 'house', 'building', 'commercial', 'parking', 'land']),
     surface: z.number().positive(),
-    rooms: z.number().int().min(1),
+    // No rooms for a shop, a parking space or land (version 10).
+    rooms: z.number().int().min(0),
     floor: z.number().int().min(0).nullable(),
     lots: z.array(
       z.object({ surface: z.number().positive(), rooms: z.number().int().min(1) }).strict(),

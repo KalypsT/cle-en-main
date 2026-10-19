@@ -342,6 +342,8 @@ function anniversary(ctx: SystemContext, owned: OwnedProperty, lease: Lease): vo
 function dailyIncident(ctx: SystemContext, owned: OwnedProperty, lease: Lease): void {
   const { content, state } = ctx;
   const rules = content.renting;
+  // A shop's tenant sees to his own repairs; a parking space has none.
+  if (!rules.leaseTypes[lease.leaseType].incidents) return;
   const propertyId = owned.property.id;
   const incident = lease.incident;
   if (incident) {

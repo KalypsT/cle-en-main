@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { dpeLabelSchema } from './city.ts';
 import { euros, id, share } from './common.ts';
 import { itemKindSchema } from './works.ts';
+import { propertyKindSchema } from './market.ts';
 
 /** Renting rules (docs/03-systemes/04-location.md). */
 
@@ -19,7 +20,14 @@ const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 /** Five values, for states 1 to 5. */
 const byState = z.array(z.number()).length(5);
 
-export const LEASE_TYPES = ['bare', 'furnished', 'shared', 'shortTerm'] as const;
+export const LEASE_TYPES = [
+  'bare',
+  'furnished',
+  'shared',
+  'shortTerm',
+  'commercial',
+  'parking',
+] as const;
 export const leaseTypeSchema = z.enum(LEASE_TYPES);
 export const CONTRACTS = ['permanent', 'fixedTerm', 'student', 'retired', 'selfEmployed'] as const;
 
@@ -37,6 +45,10 @@ const leaseTypeRulesSchema = z
     noticeMonths: months,
     /** Monthly chance that a satisfied tenant gives notice. */
     monthlyDepartureProbability: share,
+    /** Kinds of property it lets (a shop has its commercial lease). */
+    kinds: z.array(propertyKindSchema).min(1),
+    /** Incidents happen (a shop's tenant sees to his own repairs, a parking space has none). */
+    incidents: z.boolean(),
     /** Needs furniture (bought when the property is first offered). */
     furnished: z.boolean(),
     /** Fewest rooms the dwelling needs (a flat-share needs bedrooms). */

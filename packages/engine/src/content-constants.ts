@@ -45,6 +45,8 @@ export const LEASE_TYPES = [
   'furnished',
   'shared',
   'shortTerm',
+  'commercial',
+  'parking',
 ] as const satisfies readonly LeaseType[];
 export const TIERS = ['eco', 'standard', 'premium'] as const satisfies readonly Tier[];
 

@@ -1,5 +1,12 @@
 {
-  "kinds": { "apartment": "appartement", "house": "maison", "building": "immeuble de rapport" },
+  "kinds": {
+    "apartment": "appartement",
+    "house": "maison",
+    "building": "immeuble de rapport",
+    "commercial": "local commercial",
+    "parking": "place de parking",
+    "land": "terrain à bâtir"
+  },
   "conditions": {
     "ruin": "à rénover entièrement",
     "toRenovate": "travaux à prévoir",
@@ -23,8 +30,14 @@
       "text": "{kind} dans son jus, {neighbourhood}",
       "conditions": ["toRenovate", "toRefresh"]
     },
-    { "id": "rare", "text": "Rare ! {kind} {surface} m², {neighbourhood}" },
-    { "id": "bright", "text": "{kind} lumineux de {surface} m², au calme" },
+    {
+      "id": "rare",
+      "text": "Rare ! {kind} {surface} m², {neighbourhood}"
+    },
+    {
+      "id": "bright",
+      "text": "{kind} lumineux de {surface} m², au calme"
+    },
     {
       "id": "moveIn",
       "text": "{kind} {rooms} pièces, à poser ses valises",
@@ -35,8 +48,44 @@
       "text": "Coup de cœur assuré : {kind}, {neighbourhood}",
       "conditions": ["good", "renovated"]
     },
-    { "id": "investor", "text": "Spécial investisseur : {kind} {surface} m²" },
-    { "id": "noAgency", "text": "Particulier vend {kind} {rooms} pièces, {neighbourhood}" }
+    {
+      "id": "investor",
+      "text": "Spécial investisseur : {kind} {surface} m²"
+    },
+    {
+      "id": "noAgency",
+      "text": "Particulier vend {kind} {rooms} pièces, {neighbourhood}"
+    },
+    {
+      "id": "shopCorner",
+      "text": "Local commercial, {neighbourhood}, belle vitrine, passage garanti le samedi",
+      "kinds": ["commercial"]
+    },
+    {
+      "id": "shopFormerBakery",
+      "text": "Ancienne boulangerie, {neighbourhood}, l'odeur du pain en moins",
+      "kinds": ["commercial"]
+    },
+    {
+      "id": "parkingCovered",
+      "text": "Place de parking couverte, {neighbourhood}, pour voiture raisonnable",
+      "kinds": ["parking"]
+    },
+    {
+      "id": "parkingBox",
+      "text": "Box fermé, {neighbourhood}, idéal 2 CV ou cartons de déménagement",
+      "kinds": ["parking"]
+    },
+    {
+      "id": "landViabilised",
+      "text": "Terrain à bâtir viabilisé, {neighbourhood}, vue sur l'avenir",
+      "kinds": ["land"]
+    },
+    {
+      "id": "landOrchard",
+      "text": "Terrain constructible, {neighbourhood}, trois pommiers et beaucoup de potentiel",
+      "kinds": ["land"]
+    }
   ],
   "motivations": {
     "transfer": "Mutation professionnelle, doit vendre avant la rentrée.",

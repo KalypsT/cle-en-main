@@ -157,6 +157,8 @@
     "company.noHome": "On n'habite pas un bien de sa SCI dans ce jeu.",
     "purchase.applicationsMade": "Trop tard : les banques ont déjà été sollicitées pour cet achat.",
     "rent.notEnoughRooms": "Pas assez de pièces pour ce type de location.",
+    "rent.leaseNotAllowed": "Ce type de location ne convient pas à ce bien.",
+    "rent.notLettable": "Un terrain ne se loue pas : il attend sa maison.",
     "agency.leaseType": "Cette agence ne gère pas ce type de location.",
     "tutorial.invalidStep": "Cette étape du didacticiel n'existe pas.",
     "listing.unknown": "Cette annonce n'est plus en ligne.",

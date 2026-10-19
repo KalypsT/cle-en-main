@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { act, advanceDays, content, engine, newGame, systemContext } from '../../test/helpers.ts';
+import {
+  act,
+  advanceDays,
+  content,
+  engine,
+  homeListing,
+  newGame,
+  systemContext,
+} from '../../test/helpers.ts';
 import { visitMinutes } from './agenda.ts';
 import { toDayNumber } from '../calendar.ts';
 
@@ -7,7 +15,7 @@ describe('visits', () => {
   it('visits now when free time allows and reveals some defects', () => {
     // The default start is a Sunday morning: 6 h of free time.
     const state = newGame();
-    const listing = state.listings[0];
+    const listing = homeListing(state);
     if (!listing) throw new Error('No listing');
     const { state: after, events } = act(state, { type: 'market/visit', listingId: listing.id });
     expect(after.player.freeTimeMinutes).toBe(
@@ -25,7 +33,7 @@ describe('visits', () => {
     const ctx = systemContext(newGame());
     ctx.state.player.freeTimeMinutes = 0;
     const state = ctx.state;
-    const listing = state.listings[0];
+    const listing = homeListing(state);
     if (!listing) throw new Error('No listing');
     const planned = act(state, { type: 'market/visit', listingId: listing.id });
     const item = planned.state.agenda[0];
@@ -69,7 +77,7 @@ describe('agenda: move and cancel (milestone 6)', () => {
   it('moves a planned visit to another day with free time, or cancels it', () => {
     const start = newGame();
     const tired = { ...start, player: { ...start.player, freeTimeMinutes: 0 } };
-    const listing = tired.listings[0];
+    const listing = homeListing(tired);
     if (!listing) throw new Error('No listing');
     const planned = engine.dispatch(tired, { type: 'market/visit', listingId: listing.id });
     if (!planned.ok) throw new Error(planned.reason.code);

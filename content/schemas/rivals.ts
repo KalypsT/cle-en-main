@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { conditionSchema } from './market.ts';
+import { conditionSchema, propertyKindSchema } from './market.ts';
 import { euros, id, share } from './common.ts';
 import { tierSchema } from './works.ts';
 
@@ -29,7 +29,7 @@ const rivalSchema = z
     cities: z.array(id).min(1),
     preferences: z
       .object({
-        kinds: z.array(z.enum(['apartment', 'house', 'building'])).min(1),
+        kinds: z.array(propertyKindSchema).min(1),
         /** Largest living area considered, in m². */
         maxSurface: z.number().positive(),
         conditions: z.array(conditionSchema).min(1),

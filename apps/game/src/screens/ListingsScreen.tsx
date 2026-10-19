@@ -8,7 +8,7 @@ import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/comp
 import { KindThumb } from '../ui/Facade.tsx';
 
 type Sort = 'recent' | 'price' | 'pricePerM2' | 'yield';
-const KINDS: PropertyKind[] = ['apartment', 'house', 'building'];
+const KINDS: PropertyKind[] = ['apartment', 'house', 'building', 'commercial', 'parking', 'land'];
 /** Budget filters, in euros (presentation steps, not gameplay values). */
 const BUDGETS = [60_000, 90_000, 120_000, 180_000];
 

@@ -149,7 +149,11 @@ describe('incidents', () => {
     const { event } = until(engine, booked.state, (e) => e.type === 'incidentRepaired', 10);
     const leak = engine.content.renting.incidents.find((k) => k.id === 'leak');
     if (event.type !== 'incidentRepaired' || !leak) throw new Error('unreachable');
-    expect(event.cost).toBeGreaterThanOrEqual(leak.artisanCost.min * 100);
+    // The cheapest artisan of the address book applies his own price factor.
+    const factors = engine.content.artisans.map((artisan) => artisan.priceFactor);
+    expect(event.cost).toBeGreaterThanOrEqual(
+      Math.floor(leak.artisanCost.min * 100 * Math.min(1, ...factors)),
+    );
   });
 
   it('makes the tenant leave when nobody fixes it', () => {

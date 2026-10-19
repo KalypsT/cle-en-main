@@ -62,7 +62,7 @@ describe('resale', () => {
     const count = (askingPrice: number, mode: 'agency' | 'self') => {
       let current = act(state, { type: 'sale/list', propertyId, askingPrice, mode }).state;
       let visits = 0;
-      for (let day = 0; day < 300; day++) {
+      for (let day = 0; day < 600; day++) {
         const result = engine.advanceHours(current, 24);
         current = result.state;
         visits += result.events.filter((e) => e.type === 'saleVisit').length;

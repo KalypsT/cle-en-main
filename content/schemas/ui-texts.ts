@@ -158,6 +158,8 @@ export const uiTextsSchema = z
         'company.noHome': text,
         'purchase.applicationsMade': text,
         'rent.notEnoughRooms': text,
+        'rent.leaseNotAllowed': text,
+        'rent.notLettable': text,
         'agency.leaseType': text,
         'tutorial.invalidStep': text,
         'listing.unknown': text,
