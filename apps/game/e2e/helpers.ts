@@ -38,7 +38,7 @@ export async function newGame(
 }
 
 export async function pause(page: Page) {
-  const button = page.getByRole('button', { name: t.status.pause });
+  const button = page.getByRole('button', { name: t.status.pause, exact: true });
   const time = page.getByTestId('game-time');
   // A review can open on the 1st while the clock runs, and closing it sets the previous speed
   // again a moment later: pause, then check that the pause holds with no overlay over it.

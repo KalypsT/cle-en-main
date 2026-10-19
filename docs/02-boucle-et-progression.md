@@ -124,6 +124,12 @@ Chaque titre apporte un **petit avantage** (une marge bancaire réduite, un agen
 
 > **Jalon 6** (`content/titres.json`) : chaque titre demande un titre de l'étape précédente de sa branche. Rénovateur : 3 chantiers d'au moins 10 000 € chacun. Bailleur : 3 biens loués en même temps. La condition des 2 villes (Investisseur aguerri) et des 4 villes (Baron) est écrite mais inactive jusqu'au jalon 7 ; Promoteur arrive au jalon 8, et Magnat suit donc directement Investisseur aguerri ou Marchand de biens. Avantages : −0,05 point de marge par titre de Primo-investisseur à Magnat ; Bailleur et Rénovateur ajoutent un agent qui propose des biens hors marché (+15 % de chance par mois), Investisseur aguerri, Marchand de biens et Magnat +10 % chacun. Un nouveau titre ouvre une scène de célébration (confettis, musique « célébration »).
 
+> **Jalon 8** (décisions validées) :
+> - **Investisseur aguerri** : 150 000 € nets (250 000 € auparavant, jamais atteint en 10 ans) et des biens dans 2 villes.
+> - **Promoteur** est actif : une transformation terminée (division d'une maison, vente à la découpe d'un immeuble, combles, construction ; chapitre 3.5). Il suit Investisseur aguerri ou Marchand de biens.
+> - **Magnat** suit désormais **Promoteur** (chaque titre demande un titre de l'étape précédente de sa branche) : il faut avoir transformé un bien pour être Magnat.
+> - **Bailleur** ne compte que les logements loués (un parking ou un local ne fait pas un bailleur).
+
 Durées cibles, voir [08-equilibrage.md](08-equilibrage.md).
 
 ## 2.10 Succès, défis, chronique et statistiques
@@ -149,5 +155,7 @@ Les succès et les statistiques suffisent comme moteur à long terme : pas de co
 > - **13 défis** dans `content/defis.json`, lancés par Gérard, Kévin, Hortense, Yvon, Monique ou les frères Martinot : à accepter dans les 5 jours, à réussir en 4 à 5 mois le plus souvent (12 mois pour la série de bilans positifs, la fin de l'année pour « Zéro impôt »), récompense de 4 à 6 points de réputation, petite pénalité pour certains. Un seul à la fois, puis 45 jours de répit : 2 à 3 par an. Kévin Boost propose pour l'instant un bien « avant quatre mois » à Dole ; Besançon viendra avec les villes.
 > - **Chronique** : départ, premiers achat, bail, chantier et revente, résidence principale, titres, succès, défis, grands événements nationaux, vente forcée, faillite, nouveau départ, fin de partie, retour en arrière, record de plus-value.
 > - **Statistiques** : le point mensuel de la courbe garde aussi les loyers en cours et la réputation ; courbes du patrimoine, des loyers, des dettes, du bilan mensuel et de la réputation ; records (patrimoine le plus haut, plus belle plus-value, plus beau chantier, meilleur mois) et compteurs.
+
+> **Jalon 8, la réputation** (point ouvert n° 14, décision validée ; `content/progression.json`) : au-delà de **70**, chaque gain est multiplié par (100 − réputation) / 30 : à 85, un gain de 3 points n'en vaut plus que 1,5 ; les pertes ne changent pas. Au bilan annuel, une réputation au-dessus de **80** perd **2 points** (sans descendre sous 80) : rester au sommet demande de continuer à bien faire. La réputation peut avoir une décimale. Le seuil de 90 du Baron de la pierre reste inchangé.
 
 > **Jalon 7** : la **notoriété locale** existe (`player.renown`, 0 à 100, zéro dans chaque ville, y compris Dole). Chaque gain ou perte de réputation causé par un bien déplace aussi la notoriété de sa ville du même montant. Elle augmente la chance d'une offre hors marché dans la ville et raccourcit la file d'attente de ses artisans (détail au chapitre 3.8). Les conditions de villes des titres sont **actives** : Investisseur aguerri demande des biens dans 2 villes, Baron de la pierre dans 4 ; la condition compte les villes où le joueur possède un bien.

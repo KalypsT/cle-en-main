@@ -24,6 +24,17 @@
 
 Deux types de bail dès le départ (colocation et location courte durée au jalon 8) :
 
+> **Jalon 8, quatre baux de plus** (`content/location.json`, `leaseTypes`) ; chaque bail dit à quels types de biens il s'applique, combien de pièces il faut, s'il faut des meubles, sa famille fiscale et s'il y a des incidents :
+>
+> | Bail | Pour | Loyer | Durée, dépôt, préavis | Particularités |
+> |---|---|---|---|---|
+> | Colocation | appartement ou maison de 4 pièces ou plus | ×1,30 du nu | 1 an (9 mois pour un étudiant), 2 mois, 1 mois | meublée ; candidats surtout étudiants et jeunes actifs ; départs 5 % par mois |
+> | Courte durée | appartement ou maison | ×1,30 du nu en moyenne sur l'année | pas de dépôt | **version simplifiée** (décision validée) : pas de locataire à choisir, des « voyageurs » arrivent dès la mise en ligne ; le revenu du mois suit une saisonnalité (×0,6 en janvier à ×1,55 en août) ; gérée soi-même, elle prend **20 min de temps libre par jour**, chaque jour manqué est perdu ; sinon une conciergerie, Clés & Valises, prend 20 % ; pas de charges récupérables ; on l'arrête quand on veut ; pas dans une SCI |
+> | Bail commercial | local commercial | loyer du local | 9 ans, 3 mois, 6 mois | candidats 3 fois plus rares (des commerçants), départs rares, pas d'incident (le commerçant fait ses réparations) |
+> | Parking | parking | loyer du parking | 1 an, 1 mois, 1 mois | candidats nombreux, pas d'incident |
+>
+> Les agences classiques gèrent le nu, le meublé, la colocation, les locaux et les parkings ; la conciergerie, seulement la courte durée. La réglementation de la courte durée (enregistrement, quotas, 120 jours pour une résidence principale) n'est pas simulée.
+
 | | Location nue | Location meublée |
 |---|---|---|
 | Durée du bail | 3 ans | 1 an (9 mois pour un étudiant) |

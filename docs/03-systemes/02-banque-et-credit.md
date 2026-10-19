@@ -42,6 +42,13 @@ Une jauge de 0 à 100 par banque.
 
 > **Jalon 3** : la demande de prêt d'un achat indique la part de travaux (`works`). Si elle fait au moins 10 % du projet, la durée peut aller jusqu'à 27 ans. À l'acte, cette part du prêt est mise de côté sur le bien (**enveloppe travaux**) et paie d'abord ses factures de travaux ; ce qui reste au bout de 24 mois rembourse le prêt par anticipation (la mensualité baisse, la durée reste). À la revente, le reste de l'enveloppe revient au joueur. Pas de prêt travaux seul pour un bien déjà possédé.
 
+> **Jalon 8, le crédit de la SCI « au différentiel »** (`packages/engine/src/systems/banking.ts`, règles dans `content/sci.json`) : un prêt pour un achat via la SCI n'est pas jugé sur le taux d'endettement du joueur. Ses mensualités et ses loyers n'entrent pas dans ce taux, qui ne compte plus que les prêts et les loyers en nom propre. La banque vérifie :
+> - les contrôles habituels de l'emprunteur (métier, confiance, compte non débiteur) ; la banque doit prêter aux sociétés (le chatbot ZéroPapier ne le fait pas) ;
+> - l'apport : une part des frais de notaire et de dossier (`feesContributionShare`) et une part du prix (`extraContributionShare`) ; **valeurs retenues après mesure : 0 et 0**, la banque finance les frais (« prêt à 110 % ») quand le bien s'autofinance ;
+> - la couverture : le loyer de marché du bien, tel que le joueur le connaît (ou, si le prêt finance des travaux, comme refait à l'état 4), multiplié par 80 %, doit couvrir la mensualité ; sinon une durée plus longue, puis un accord partiel ;
+> - le plafond : les dettes de la SCI après le prêt ne dépassent pas 6 fois le patrimoine net du joueur.
+> - Un resserrement du crédit (crise nationale, chapitre 3.7) baisse pour un temps le taux d'endettement maximal et la part du loyer comptée.
+
 ## La demande de prêt
 
 1. Le joueur choisit le bien (sous compromis), le montant, la durée et la banque (ou plusieurs).

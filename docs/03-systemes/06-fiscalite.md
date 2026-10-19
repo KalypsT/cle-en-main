@@ -41,7 +41,7 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
 > - pas de prélèvement à la source en cours d'année ni de régularisation : l'impôt d'une année est payé l'année suivante ;
 > - le **statut du bailleur privé** (« dispositif Jeanbrun », loi de finances pour 2026 : amortissement en location nue pour le neuf et l'ancien avec au moins 30 % de travaux, sous plafonds de loyer et engagement de 9 ans) n'est pas modélisé (décision du jalon 3 : trop de contraintes pour un gain de jeu limité) ;
 > - travaux : pas de distinction entre entretien, amélioration et agrandissement (tout est déductible au réel nu) ; le plafond doublé s'applique à tout le déficit de l'année du chantier et non à la seule part des travaux énergétiques ; l'engagement de louer 3 ans n'est pas vérifié ; pour un bien vendu en cours d'année, les travaux de l'année comptent dans la plus-value sauf en location nue ; les matériaux des travaux faits soi-même comptent comme des factures ;
-> - pas de taxe sur les logements vacants (Dole n'est pas en zone tendue), pas d'encadrement des loyers ; l'IFI reste pour plus tard (jalon 6 ou 8).
+> - pas de taxe sur les logements vacants (Dole n'est pas en zone tendue), pas d'encadrement des loyers ; l'IFI arrive au jalon 8 (plus bas).
 
 ## L'impôt sur les revenus locatifs
 
@@ -72,6 +72,18 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
   - la **résidence principale est exonérée**.
 - **Impôt sur la fortune immobilière (IFI)** : au-delà de **1,3 M€ de patrimoine immobilier net**, barème simplifié. Un marqueur de fin de partie, avec humour (« Félicitations, vous êtes officiellement riche »).
 - **Une société (SCI)** pour aller plus loin, au jalon 8 (régime à préciser à ce moment-là).
+
+> **Jalon 8, la SCI** (point ouvert n° 9, tranché : impôt sur le revenu ; `content/sci.json`, `packages/engine/src/systems/company.ts`) :
+> - Création une fois pour toutes (action `company/create`, 1 500 € de statuts, de greffe et d'annonce légale). Deux associés sont obligatoires : le joueur détient 99 parts et tante Odile une part, pour la forme (simplification : le patrimoine compte 100 %).
+> - **Un seul bilan** : pas de compte séparé, les flux de la SCI passent sur le compte du joueur.
+> - Un achat se fait **en nom propre ou via la SCI**, choisi sur le compromis avant toute demande de prêt (action `purchase/setHolder`). On n'apporte pas un bien déjà possédé à la SCI.
+> - Elle **ne loue que nu** (le meublé, la colocation et la courte durée la feraient passer à l'impôt sur les sociétés) ; locaux commerciaux et parkings sont permis. On n'habite pas un bien de sa SCI.
+> - Transparente : ses loyers sont des revenus fonciers du joueur, **toujours au régime réel** ; son comptable coûte 1 200 € par an et 150 € par bien en plus, dès la création ; la plus-value suit le régime des particuliers.
+> - Ses prêts sont jugés « au différentiel » (chapitre 3.2).
+
+> **Jalon 8, l'IFI** (`content/fiscalite.json`, `wealthTax`) : au 1er janvier, sur la valeur de tous les biens (en nom propre et dans la SCI), avec un abattement de 30 % sur la résidence principale, moins le capital restant dû des prêts. Rien sous 1,3 M€ ; au-delà, barème 2026 (0,5 % de 800 k€ à 1,3 M€, 0,7 % jusqu'à 2,57 M€, 1 % jusqu'à 5 M€, 1,25 % jusqu'à 10 M€, 1,5 % au-delà) et décote entre 1,3 et 1,4 M€ (17 500 € − 1,25 % du patrimoine). Il est payé avec l'impôt sur les loyers, en 12 mensualités l'année suivante, et apparaît au bilan annuel (« Félicitations, vous êtes officiellement riche »). Simplifications : pas de plafonnement, pas de dettes non liées aux biens.
+
+> **Jalon 8, les nouveaux baux** : la colocation est imposée comme un meublé (BIC) ; la location courte durée aussi, avec le micro-BIC des meublés de tourisme non classés (30 % d'abattement, 15 000 € de recettes au plus) ; les baux commerciaux et de parking sont des revenus fonciers.
 
 ## À l'écran
 

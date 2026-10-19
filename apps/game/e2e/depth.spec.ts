@@ -26,8 +26,10 @@ test('creates the SCI and filters the listings by the new kinds', async ({ page 
     .getByRole('button', { name: t.cities.seeListings })
     .click();
   for (const kind of ['commercial', 'parking', 'land'] as const) {
-    await expect(page.getByRole('button', { name: t.listings.kindShort[kind] })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: t.listings.kindShort[kind], exact: true }),
+    ).toBeVisible();
   }
-  await page.getByRole('button', { name: t.listings.kindShort.parking }).click();
+  await page.getByRole('button', { name: t.listings.kindShort.parking, exact: true }).click();
   await capture(page, '03-annonces-parkings', MILESTONE);
 });

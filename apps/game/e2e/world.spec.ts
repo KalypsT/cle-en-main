@@ -97,7 +97,7 @@ test('measures the frame rate of the street', async ({ page, browserName }, test
   test.skip(browserName !== 'chromium', 'CPU throttling needs Chromium');
   await openGame(page);
   await newGame(page, { tutorialOn: false });
-  await page.getByRole('button', { name: t.status.pause }).click();
+  await page.getByRole('button', { name: t.status.pause, exact: true }).click();
   await streetReady(page);
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
