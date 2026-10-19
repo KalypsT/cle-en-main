@@ -4,6 +4,7 @@ import type { Defect, Listing, LoanApplication, Purchase } from '../state.ts';
 import {
   evaluateLoan,
   grantLoan,
+  notaryFees,
   type LoanOffer,
   type LoanRequest,
   recordRefusedApplication,
@@ -32,7 +33,7 @@ export function purchaseFees(
 ): { notary: Cents; bank: Cents } {
   const rules = ctx.content.credit;
   return {
-    notary: Math.round(price * rules.notaryFeesShare),
+    notary: notaryFees(ctx.content, price),
     bank: withLoan ? Math.round(price * rules.bankFeesShare) : 0,
   };
 }

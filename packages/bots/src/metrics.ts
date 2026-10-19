@@ -107,6 +107,8 @@ export interface GameMetrics {
   /** Cities holding at least one property at the end, and properties by city. */
   finalCities: number;
   finalPropertiesByCity: Record<string, number>;
+  /** Deeds signed, by kind of property (milestone 8). */
+  purchasesByKind: Record<string, number>;
   /** Local renown at the end, by city. */
   finalRenown: Record<string, number>;
   /** Depth (milestone 8): IFI paid (euros), transformations, the SCI and what it holds. */
@@ -208,6 +210,7 @@ export class MetricsRecorder {
       firstRemotePurchaseDay: null,
       finalCities: 0,
       finalPropertiesByCity: {},
+      purchasesByKind: {},
       finalRenown: {},
     };
   }
@@ -323,6 +326,10 @@ export class MetricsRecorder {
           m.purchases += 1;
           m.firstPurchaseDay ??= this.day(state);
           const bought = state.properties.find((owned) => owned.property.id === event.propertyId);
+          if (bought) {
+            const kind = bought.property.kind;
+            m.purchasesByKind[kind] = (m.purchasesByKind[kind] ?? 0) + 1;
+          }
           if (bought && bought.property.cityId !== state.player.baseCityId) {
             m.remotePurchases += 1;
             m.firstRemotePurchaseDay ??= this.day(state);
@@ -450,6 +457,7 @@ export class MetricsRecorder {
       rivalPurchases: { ...m.rivalPurchases },
       titleDays: { ...m.titleDays },
       finalPropertiesByCity: { ...m.finalPropertiesByCity },
+      purchasesByKind: { ...m.purchasesByKind },
       finalRenown: { ...m.finalRenown },
     };
   }

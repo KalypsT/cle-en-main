@@ -35,7 +35,7 @@ Une jauge de 0 à 100 par banque.
 - **Taux d'endettement maximal : 35 %** (mensualités totales / revenus), sauf dérogation.
 - **Durée maximale : 25 ans**, 27 ans si le projet comprend de gros travaux.
 - **Revenus retenus** : salaire, plus **70 % des loyers** (comme le font les banques).
-- **Apport minimal** : les frais de notaire (environ 7,5 % dans l'ancien) plus environ 1,5 % de frais de dossier et de garantie.
+- **Apport minimal** : les frais de notaire (environ 7,5 % dans l'ancien, **jamais moins de 1 500 €** depuis le jalon 8 : émoluments minimums et formalités pèsent lourd sur un parking à 10 000 €) plus environ 1,5 % de frais de dossier et de garantie.
 - **Le taux proposé** = taux de marché du moment + marge de la banque, ajustée selon la durée, le profil (métier, ancienneté, réputation) et la confiance.
 - **Le taux de marché** évolue lentement par simulation, avec des cycles et de rares chocs (voir [07-evenements.md](07-evenements.md)). Valeur de départ : **3,65 % sur 20 ans hors assurance** (taux réels d'octobre 2026), plus **0,30 point d'assurance** dans le taux affiché.
 - Un crédit peut financer **l'achat et les travaux** ensemble.

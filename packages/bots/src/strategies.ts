@@ -5,6 +5,8 @@ import {
   type LeaseType,
   type Listing,
   type OwnedProperty,
+  type PropertyKind,
+  requiredContribution,
   visibleReliability,
 } from '@cle/engine';
 import type { BotApi, Strategy } from './driver.ts';
@@ -59,6 +61,11 @@ export interface InvestorProfile {
   company?: CompanyProfile | null;
   /** Buys to transform (the Promoteur); undefined or null: never transforms. */
   promoter?: PromoterProfile | null;
+  /**
+   * Kinds of property looked at; undefined: dwellings and buildings, as before milestone 8
+   * (shops, parkings and plots are the Promoteur's and the player's).
+   */
+  kinds?: PropertyKind[];
   /** Plays beyond his base city; undefined or null: stays in his base. */
   expansion?: ExpansionProfile | null;
   /** Answers the events by weighing their choices (a reader), rather than by default. */
@@ -148,6 +155,10 @@ interface Plan {
 
 /** Margin the bots put on the engine's estimate of works (hazards, artisans). */
 const WORKS_MARGIN = 1.2;
+
+/** Kinds the bots of milestones 1 to 7 look at. */
+const CLASSIC_KINDS: PropertyKind[] = ['apartment', 'house', 'building'];
+
 /** A marchand's resale: asking price over the estimate, cut every month unsold. */
 const RESALE_MARKUP = 1.03;
 const RESALE_CUT = 0.03;
@@ -200,8 +211,8 @@ export function investor(profile: InvestorProfile): Strategy {
   };
   const desk = new RenovationDesk(profile.renovation);
 
-  const feesShare = (api: BotApi) =>
-    api.engine.content.credit.notaryFeesShare + api.engine.content.credit.bankFeesShare;
+  /** Notary and bank fees of a purchase at `price`. */
+  const feesOf = (api: BotApi, price: number) => requiredContribution(api.engine.content, price);
 
   const payments = (api: BotApi) =>
     api.state.loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
@@ -238,7 +249,7 @@ export function investor(profile: InvestorProfile): Strategy {
     rentAfter: number | null = null,
   ): Plan | null {
     const { engine, state } = api;
-    const fees = Math.round(price * feesShare(api));
+    const fees = feesOf(api, price);
     const sci = engine.content.company.credit;
     const feesBrought = Math.max(sci.feesContributionShare, profile.company?.feesShare ?? 1);
     const contribution =
@@ -652,8 +663,10 @@ export function investor(profile: InvestorProfile): Strategy {
     }[] = [];
     desk.forget(new Set(state.listings.map((l) => l.id)));
     const cities = workCities(api);
+    const kinds = profile.kinds ?? CLASSIC_KINDS;
     for (const listing of state.listings) {
       if (!cities.includes(listing.property.cityId)) continue;
+      if (!kinds.includes(listing.property.kind)) continue;
       if (listing.offer || listing.offersMade >= limit || api.today < listing.publicDay) continue;
       const appraisal = appraise(api, listing);
       if (!appraisal || appraisal.value <= 0) continue;
@@ -875,7 +888,7 @@ export function investor(profile: InvestorProfile): Strategy {
     const decision = application?.decision;
     if (decision && decision.decision !== 'refused') {
       const longer = decision.decision === 'counterOffer';
-      const fees = Math.round(purchase.price * feesShare(api));
+      const fees = feesOf(api, purchase.price);
       const envelope = Math.min(memory.worksBudget.get(purchase.id) ?? 0, decision.offer.amount);
       const due = purchase.price + fees - purchase.deposit - (decision.offer.amount - envelope);
       const keeps = api.state.player.balance - due >= reserve(api, decision.offer.monthlyPayment);
@@ -1279,6 +1292,7 @@ function developer(): InvestorProfile {
     // His margin is in the appraisal (value after the works, their cost and his margin deducted).
     screenRatio: 0.98,
     buyRatio: 1,
+    kinds: ['apartment', 'house', 'building', 'commercial', 'parking', 'land'],
     promoter: {
       kinds: ['splitBuilding', 'division', 'attic', 'construction'],
       margin: 0.08,

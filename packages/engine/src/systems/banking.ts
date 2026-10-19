@@ -227,9 +227,15 @@ export type LoanDecision =
   | { decision: 'counterOffer'; offer: LoanOffer; requestedDurationYears: number }
   | { decision: 'refused'; reason: LoanRefusalCode; debtRatioAfter?: number | undefined };
 
+/** Notary fees: a share of the price, never below a minimum (a parking's fees are no trifle). */
+export function notaryFees(content: GameContent, price: Cents): Cents {
+  const rules = content.credit;
+  return Math.max(Math.round(price * rules.notaryFeesShare), toCents(rules.notaryFeesMinimum));
+}
+
 /** Fees the contribution must cover at least: notary, bank file and guarantee. */
 export function requiredContribution(content: GameContent, price: Cents): Cents {
-  return Math.round(price * (content.credit.notaryFeesShare + content.credit.bankFeesShare));
+  return notaryFees(content, price) + Math.round(price * content.credit.bankFeesShare);
 }
 
 export function maxDurationYears(content: GameContent, price: Cents, works: Cents): number {
