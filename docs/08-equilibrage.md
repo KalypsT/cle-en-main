@@ -53,6 +53,17 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > Le Chasseur loue nu : pour un salaire de la tranche à 11 %, le meublé (mobilier, comptable plus cher) rapporte moins que la location nue, et le mobilier ralentit les achats suivants ; essai sur 100 parties : 77 k€ de patrimoine médian en meublé contre 102 k€ en nu.
 
+> **Jalon 3** : les bots rénovent (`packages/bots/src/renovation.ts`). Ils jugent une annonce sur sa valeur estimée après leurs travaux, coût (+20 % de marge) déduit, financent les travaux avec le prêt (enveloppe travaux, 27 ans si au moins 10 % du projet), demandent un diagnostic d'artisan des postes critiques encore inconnus avant leur offre, répondent aux imprévus et, sauf le Levier et le Naïf, vendent eux-mêmes un bien après 15 jours de découvert (avant la vente forcée à −20 %). Un bien vide impossible à louer depuis 120 jours est mis en vente.
+>
+> | Bot | Travaux |
+> |---|---|
+> | Prudent | décence, puis DPE ramené à D ; Standard, artisans les plus fiables |
+> | Levier maximal | décence et DPE à D ; Éco, artisans les moins chers, imprévus passés en Éco |
+> | Naïf | aucun |
+> | Chasseur | décence et DPE à D ; Standard, artisans les moins chers ; réserve portée de 3 à 5 mensualités (4 000 € au moins) |
+> | Marchand de biens | achète avec 22 % de marge sur la valeur après travaux, refait les postes à 3 ou moins qui rapportent plus qu'ils ne coûtent, la décence et le DPE à C, revend lui-même (3 % au-dessus de l'estimation, −3 % par mois) |
+> | Rénovateur premium | achète sur la valeur actuelle (à l'estimation, 5 % en dessous avant le suivi du jalon 3), refait en Premium tout poste à 4 ou moins et vise le DPE B, artisans les plus fiables |
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :
@@ -87,11 +98,28 @@ Risque classique : une fois riche, tout devient facile (effet boule de neige). C
 > - les titres n'existent pas encore (jalon 6) : « Bailleur » se mesure à 3 biens loués en même temps, « Investisseur aguerri » à 250 k€ nets sans la condition des 2 villes ; Magnat et Baron dépassent l'horizon de 10 ans ;
 > - « l'Inactif ne s'enrichit jamais » : pour chaque métier, sa médiane reste sous l'apport plus 250 € d'épargne par mois (le haut de la fourchette du chapitre 3.1) ;
 > - « le Naïf stagne ou perd » : sa médiane ne dépasse pas celle de l'Inactif ;
-> - la densité de décisions attend l'interface et l'agenda (jalons 4 et 6).
+> - la densité de décisions est mesurée depuis le jalon 6 (voir le rapport ci-dessous).
 >
 > **Rapport du jalon 2** (`packages/bots/rapports/jalon-2.md`, 1 000 parties de 10 ans par bot) : 7 cibles sur 9 atteintes.
 > - Le Chasseur atteint « Bailleur » en 2,9 ans et finit à 97 k€ nets (134 k€ au jalon 1c) : la vraie fiscalité, les charges et les aléas pèsent plus que l'ancien forfait de 30 %. 45 % de ses parties connaissent au moins une vente forcée (5,4 % de faillites) : sa réserve de 3 mensualités est mince face aux chocs de trésorerie (procédure, chauffe-eau, taxe foncière, comptable).
 > - « Investisseur aguerri » reste manqué (écart connu, jalons 3 et 7).
 > - « Le Levier peut progresser vite » est manqué de peu : son 9e décile (73,8 k€) frôle la médiane du Prudent (74,5 k€), avec 42,7 % de faillites. Le Levier meublé souffre du coût du mobilier et des locataires fragiles de Bonne Pioche. Ce n'est pas recalibré dans le contenu : l'écart est faible et dépend surtout des réglages du bot ; à revoir avec les travaux (jalon 3), qui donnent au levier de quoi créer de la valeur.
 > - Le Naïf (99,5 % de faillites) achète au prix affiché des biens parfois impossibles à louer (ruines, DPE G) : il « perd », comme prévu, plus nettement qu'au jalon 1c.
+>
+> **Rapport du jalon 3** (`packages/bots/rapports/jalon-3.md`, 1 000 parties de 10 ans par bot, série découpée par bot puis fusionnée) : 9 cibles sur 12.
+> - Le Chasseur : premier achat en 1,2 mois, 96 k€ nets à 10 ans, faillites 1,4 % (5,4 % au jalon 2), ventes forcées 24 % (45 %) grâce à la réserve de 5 mensualités et à la vente volontaire en découvert. **Le titre Bailleur recule à 8,5 ans** (2,9 ans au jalon 2, atteint dans 55 % des parties) : réserve plus épaisse, diagnostics avant offre, biens indisponibles pendant les travaux. À revoir.
+> - « Investisseur aguerri » reste manqué (écart connu, jalons 7 et 8).
+> - « Le Levier peut progresser vite » reste manqué (9e décile 55 k€ contre 79 k€ de médiane pour le Prudent ; 65,6 % de faillites).
+> - Le Marchand de biens dépasse à peine l'Inactif (34 k€, 2,1 reventes par partie, 12,9 k€ d'impôt sur les plus-values) : un particulier qui revend en moins de 5 ans paie 36,2 % de la plus-value, 7,5 % de frais de notaire et des indemnités de remboursement anticipé, ce que le statut réel de marchand de biens (non modélisé) allège.
+> - Le Rénovateur premium n'écrase personne (33,5 k€) : il achète très peu, le Premium coûte bien plus qu'il ne rapporte sous le plafond des quartiers (3e quartile).
+> - Les travaux : 0,3 à 1,9 imprévu par chantier ; plus aucune passoire gardée par les bots qui louent.
+>
+> **Suivi du jalon 3** (séries courtes de 100 parties de 10 ans, sans nouveau rapport complet) :
+> - Marge sur les travaux ramenée de 1,2 à 1,1 pour le Chasseur : Bailleur plus tôt (5,4 ans contre 6,4) mais ventes forcées de 32 % à 38 % et faillites de 2 % à 5 %. **Refusé** : la marge reste à 1,2. Le diagnostic limité aux biens d'avant 1975 n'a pas été essayé.
+> - Rénovateur premium, seuil d'achat de 1,05 à 1,0 : 71 % des parties font un achat (47 % avant), 1 bien en médiane (0 avant), 29,7 k€ à 10 ans (31,4 k€), faillites 4 % (1 %). Il reste très loin du Chasseur (84 k€). **Retenu**.
 
+> **Rapport du jalon 6** (série courte : 100 parties de 10 ans pour le Chasseur et le Prudent, pas de rapport complet de 1 000 parties) :
+> - Densité de décisions : au départ, **Chasseur 42 s** par décision à ×1 (de 40 à 47 s selon le métier) mais **Prudent 29 s** (de 24 à 32 s), un peu trop dense. Le Prudent garde sa trésorerie et voit donc beaucoup d'annonces « intéressantes » qu'il pourrait financer (54 par an, contre 17 pour le Chasseur, qui a placé la sienne). Réglage : les heures passées à ×1 après une nouvelle décision (`quietHours` de `content/rythme.json`) passent de 4 à 18. Série courte de contrôle : **Chasseur 50 s** (de 48 à 55 s selon le métier), **Prudent 37 s** (de 32 à 40 s), tous deux dans la cible de 30 à 60 s. Ni le patrimoine, ni les faillites des bots ne changent (la mesure du rythme n'agit pas sur la partie).
+> - Temps accéléré : 99 % du temps de jeu ; environ 0,6 heure réelle par an de jeu. Environ 110 anecdotes, 17 à 29 événements, 1,5 à 1,7 défi proposé par an.
+> - Le Chasseur : premier achat en 1,1 mois, 84 k€ nets à 10 ans (Prudent 62 k€), faillites 2 %, ventes forcées 32 %. Bailleur en 6,4 ans (47 % des parties) : toujours hors de la cible de 2 à 4 ans, mais mieux qu'au jalon 3 (8,5 ans). « Investisseur aguerri » reste manqué.
+> - **Limite de mesure** : les bots répondent aux événements par leur choix par défaut, et 13 événements sur 107 pénalisent la réputation par défaut (« attendre »). La réputation finale médiane est donc de 0 à 1 chez le Chasseur et le Prudent, alors qu'un joueur qui répond la ferait monter. Les avantages de réputation (marge bancaire, biens hors marché) ne sont pas mesurés par les bots.

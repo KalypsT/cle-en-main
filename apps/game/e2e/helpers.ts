@@ -38,17 +38,52 @@ export async function newGame(
 }
 
 export async function pause(page: Page) {
-  await dismissOverlays(page);
   const button = page.getByRole('button', { name: t.status.pause });
-  await button.click();
-  await expect(button).toHaveAttribute('aria-pressed', 'true');
-  // Let React render the last hour ticked before the pause: the time stops changing.
   const time = page.getByTestId('game-time');
+  // A review can open on the 1st while the clock runs, and closing it sets the previous speed
+  // again a moment later: pause, then check that the pause holds with no overlay over it.
   await expect(async () => {
+    await dismissOverlays(page);
+    // Dispatched straight to the button: waiting for it to be « stable » never ends while the
+    // street starves the page of frames at ×4.
+    if ((await button.getAttribute('aria-pressed')) !== 'true') await button.dispatchEvent('click');
     const before = await time.textContent();
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(300);
+    expect(await page.locator('.overlay').count()).toBe(0);
+    await expect(button).toHaveAttribute('aria-pressed', 'true', { timeout: 500 });
     expect(await time.textContent()).toBe(before);
-  }).toPass();
+  }).toPass({ timeout: 20_000 });
+}
+
+/** The date and the hour on the status bar. */
+export async function clockStamp(page: Page): Promise<string> {
+  const date = await page.getByTestId('game-date').textContent();
+  const time = await page.getByTestId('game-time').textContent();
+  return `${date} ${time}`;
+}
+
+/**
+ * Lets time run at ×4 until the clock moves (reviews and decisions may stop it:
+ * they are closed and the speed is set again on each try), leaving it running.
+ */
+export async function runClock(page: Page, from: string) {
+  await expect(async () => {
+    await dismissOverlays(page);
+    await speed(page, 4);
+    expect(await clockStamp(page)).not.toBe(from);
+  }).toPass({ timeout: 15_000 });
+}
+
+/** Lets time run until the date changes, then pauses (free time is renewed each day). */
+export async function waitNextDay(page: Page) {
+  const date = page.getByTestId('game-date');
+  const before = (await date.textContent()) ?? '';
+  await expect(async () => {
+    await dismissOverlays(page);
+    await speed(page, 4);
+    await expect(date).not.toHaveText(before, { timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  await pause(page);
 }
 
 export async function speed(page: Page, value: number) {

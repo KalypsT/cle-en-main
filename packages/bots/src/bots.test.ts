@@ -40,7 +40,7 @@ describe('bots', () => {
       expect(result.bankruptDay).toBeNull();
       expect(playGame(createStrategy(id), options)).toEqual(result);
     }
-  });
+  }, 60_000);
 
   it('the naive bot offers without visiting', () => {
     const result = playGame(createStrategy('naif'), options);

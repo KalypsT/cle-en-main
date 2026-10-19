@@ -849,7 +849,7 @@ export const PROFILES = {
     visits: true,
     visitsPerDay: 2,
     screenRatio: 1,
-    buyRatio: 1.05,
+    buyRatio: 1.0,
     firstOfferShare: 0.94,
     pick: 'best',
     decisionEveryDays: 1,
