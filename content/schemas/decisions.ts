@@ -16,6 +16,8 @@ export const DECISION_KINDS = [
   'vacant',
   'renegotiation',
   'cashAlert',
+  'catalogEvent',
+  'challengeOffer',
 ] as const;
 
 /** Rules of the pending decisions and of the cash alert (docs/04, docs/02 section 2.6). */
@@ -27,6 +29,8 @@ export const decisionRulesSchema = z
     cashForecastDays: z.number().int().min(1),
     /** Decisions that pause the game when they appear (short deadlines). */
     autoPause: z.array(z.enum(DECISION_KINDS)),
+    /** Tenant incidents serious enough to pause the game too (content/location.json). */
+    seriousIncidents: z.array(z.string()),
   })
   .strict();
 

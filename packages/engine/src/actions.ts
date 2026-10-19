@@ -2,7 +2,9 @@ import type { GameEvent } from './events.ts';
 import type { Cents } from './money.ts';
 import type { LeaseType, Trade } from './content.ts';
 import type { GameState, SaleMode, TaxRegimeChoice } from './state.ts';
-import type { VisitRefusal } from './systems/agenda.ts';
+import type { AgendaRefusal, VisitRefusal } from './systems/agenda.ts';
+import type { CatalogRefusal } from './systems/catalog.ts';
+import type { ChallengeRefusal } from './systems/challenges.ts';
 import type { BankActionRefusal } from './systems/banking.ts';
 import type { OfferRefusal } from './systems/offers.ts';
 import type { PurchaseRefusal } from './systems/purchases.ts';
@@ -67,7 +69,14 @@ export type GameAction =
       propertyId: string;
       resolutionId: string;
       vote: 'for' | 'against';
-    };
+    }
+  | { type: 'agenda/cancel'; itemId: string }
+  /** `day`: a later day number with enough free time left. */
+  | { type: 'agenda/move'; itemId: string; day: number }
+  /** Answers a catalogue event (docs/03-systemes/07). */
+  | { type: 'event/choose'; eventId: string; choiceId: string }
+  /** Accepts or declines the challenge on offer. */
+  | { type: 'challenge/answer'; accept: boolean };
 
 export type RefusalCode =
   | BankActionRefusal
@@ -78,6 +87,10 @@ export type RefusalCode =
   | RentRefusal
   | WorksRefusal
   | CoproRefusal
+  | AgendaRefusal
+  | CatalogRefusal
+  | ChallengeRefusal
+  | 'game.over'
   | 'job.alreadyResigned'
   | 'tutorial.invalidStep';
 

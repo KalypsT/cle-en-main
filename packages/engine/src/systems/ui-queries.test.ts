@@ -72,11 +72,15 @@ describe('pending decisions', () => {
       amount: purchase.price,
       durationYears: 20,
     }).state;
-    // Waiting for the bank: nothing to decide.
-    expect(engine.pendingDecisions(buying)).toEqual([]);
+    // Waiting for the bank: nothing to decide about the purchase (events and challenges aside).
+    const aboutPurchase = (state: typeof buying) =>
+      engine
+        .pendingDecisions(state)
+        .filter((d) => d.kind !== 'catalogEvent' && d.kind !== 'challengeOffer');
+    expect(aboutPurchase(buying)).toEqual([]);
     buying = advanceUntil(buying, (e) => e.type === 'loanAnswered').state;
     const application = buying.purchases[0]?.applications[0];
-    expect(engine.pendingDecisions(buying)[0]).toMatchObject({
+    expect(aboutPurchase(buying)[0]).toMatchObject({
       kind: 'loanAnswer',
       applicationIds: [application?.id],
     });

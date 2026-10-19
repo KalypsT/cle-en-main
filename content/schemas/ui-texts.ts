@@ -115,6 +115,19 @@ export const uiTextsSchema = z
         coproMeetingCalled: text,
         coproMeetingHeld: text,
         diagnosisDone: text,
+        freshStart: text,
+        gameOver: text,
+        titleEarned: text,
+        achievementEarned: text,
+        challengeOffered: text,
+        challengeWon: text,
+        challengeLost: text,
+        offMarketOffered: text,
+        bankMeetingPlanned: text,
+        selfRepairPlanned: text,
+        yourProperty: text,
+        yourTenant: text,
+        theArtisan: text,
       })
       .strict(),
     /** One text per engine refusal code (packages/engine/src/actions.ts). */
@@ -181,6 +194,13 @@ export const uiTextsSchema = z
         'works.noHazard': text,
         'copro.noMeeting': text,
         'copro.unknownResolution': text,
+        'agenda.unknown': text,
+        'agenda.invalidDay': text,
+        'event.unknown': text,
+        'event.unknownChoice': text,
+        'challenge.none': text,
+        'challenge.alreadyAccepted': text,
+        'game.over': text,
       })
       .strict(),
     errors: z

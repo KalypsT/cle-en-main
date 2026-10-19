@@ -1,7 +1,7 @@
 import type { CalendarDate, Weekday } from './calendar.ts';
 import type { Cents } from './money.ts';
 import type { DpeLabel, LeaseType, Trade } from './content.ts';
-import type { SaleMode } from './state.ts';
+import type { AnecdoteNote, CatalogEventInstance, SaleMode } from './state.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 export type StatementLine =
@@ -145,6 +145,8 @@ export type GameEvent =
       capitalGainsTax: Cents;
       depositTransferred: Cents;
       net: Cents;
+      /** Price net of fees, minus the cost of the property and of its works (the record). */
+      gain: Cents;
     }
   // Renting (docs/03-systemes/04).
   | {
@@ -266,6 +268,35 @@ export type GameEvent =
       depositTransferred: Cents;
       net: Cents;
     }
-  | { type: 'bankrupt'; netWorth: Cents };
+  | { type: 'bankrupt'; netWorth: Cents }
+  /** Classique and Serein modes: same world, a small savings, no property (docs/02, 2.6). */
+  | { type: 'freshStart'; savings: Cents; reputation: number }
+  | { type: 'gameOver' }
+  // Progression (docs/02, sections 2.8 to 2.10).
+  | { type: 'reputationChanged'; delta: number; reputation: number }
+  | { type: 'titleEarned'; titleId: string }
+  | { type: 'achievementEarned'; achievementId: string }
+  | { type: 'challengeOffered'; challengeId: string; deadlineDay: number }
+  | { type: 'challengeAccepted'; challengeId: string; deadlineDay: number }
+  | { type: 'challengeDeclined'; challengeId: string }
+  | { type: 'challengeWon'; challengeId: string; reputation: number }
+  | { type: 'challengeLost'; challengeId: string; reputation: number }
+  // Catalogue of events and anecdotes (docs/03-systemes/07).
+  | { type: 'catalogEventStarted'; event: CatalogEventInstance }
+  /** An event without choices: its effects are applied. */
+  | { type: 'catalogEventHappened'; event: CatalogEventInstance }
+  | {
+      type: 'catalogEventResolved';
+      event: CatalogEventInstance;
+      choiceId: string;
+      /** The deadline passed: the default choice applied. */
+      auto: boolean;
+    }
+  | { type: 'anecdote'; anecdote: AnecdoteNote }
+  | { type: 'offMarketOffered'; listingId: string }
+  | { type: 'agendaMoved'; itemId: string; day: number }
+  | { type: 'agendaCancelled'; itemId: string }
+  | { type: 'bankMeetingPlanned'; bankId: string; day: number }
+  | { type: 'selfRepairPlanned'; propertyId: string; day: number };
 
 export type GameEventType = GameEvent['type'];

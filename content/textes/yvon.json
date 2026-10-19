@@ -1,0 +1,87 @@
+{
+  "greetings": [
+    "Bonjour ! Yvon Tableur. J'ai passé l'année {annee} au peigne fin, voici ce que j'en retiens.",
+    "Yvon Tableur, votre comptable. Café ? Non ? Alors attaquons le bilan de {annee}.",
+    "Bilan de {annee} ! Mon moment préféré de l'année, juste avant la déclaration d'impôts."
+  ],
+  "closings": [
+    "Je retourne à mes colonnes. À l'année prochaine, et classez vos factures.",
+    "Les chiffres ne mentent jamais. Les gens, parfois. Bonne année !",
+    "Voilà. Je vous laisse, j'ai un tableur qui m'attend."
+  ],
+  "advice": {
+    "netWorthUp": [
+      "Votre patrimoine net a pris {montant} cette année. Je n'ai pas souri depuis 2009, mais là, presque.",
+      "Patrimoine net en hausse de {montant}. Continuez comme ça, et je vous facturerai plus cher."
+    ],
+    "netWorthDown": [
+      "Votre patrimoine net a reculé de {montant}. Ce n'est pas grave, c'est une année. Ne la répétez pas.",
+      "Moins {montant} de patrimoine net. Les années maigres apprennent plus que les grasses, paraît-il."
+    ],
+    "goodYear": [
+      "Vos comptes de l'année sont positifs : {montant} de plus sur le compte courant, tout compris.",
+      "Douze mois, {montant} de solde positif. C'est propre, c'est net, c'est beau."
+    ],
+    "badYear": [
+      "Sur l'année, votre compte courant a perdu {montant}. Surveillez la trésorerie, c'est elle qui décide à la fin.",
+      "Solde de l'année : moins {montant}. Je vous conseille un tableau des dépenses. J'ai un modèle."
+    ],
+    "taxFree": [
+      "Zéro impôt sur vos loyers cette année. Parfaitement légal, je l'ai vérifié trois fois.",
+      "Pas un euro d'impôt sur vos loyers. Le déficit foncier est votre ami, et le mien."
+    ],
+    "bigTax": [
+      "{montant} d'impôt sur vos loyers. Des travaux au régime réel feraient fondre ça comme neige au soleil.",
+      "Vos loyers vous coûtent {montant} d'impôt. On pourrait en parler devant un tableur, non ?"
+    ],
+    "betterRegime": [
+      "{bien} gagnerait à changer de régime fiscal : environ {montant} d'économie par an. Et vous, à dormir un peu.",
+      "Petit conseil : pour {bien}, l'autre régime vous ferait gagner {montant} cette année."
+    ],
+    "autoRegime": [
+      "J'ai choisi pour chaque bien le régime le moins cher, honoraires compris. Vous pouvez changer dans le bilan des impôts.",
+      "Régimes fiscaux : j'ai pris le moins cher pour chacun. C'est mon métier, et ma passion."
+    ],
+    "deficitCarry": [
+      "Il vous reste {montant} de déficit foncier à reporter. Ça viendra en déduction des loyers des années prochaines.",
+      "Votre déficit foncier reporté : {montant}. Un trésor fiscal, gardez-le bien au chaud."
+    ],
+    "dpeBan": [
+      "Attention : {bien} ne pourra plus être loué en {annee}, à cause de son DPE. Il est temps d'isoler.",
+      "Le DPE de {bien} le rendra interdit à la location en {annee}. Un chantier d'isolation s'impose."
+    ],
+    "vacancy": [
+      "{bien} n'a pas de locataire. Un bien vide coûte chaque mois, sans rien rapporter.",
+      "{bien} est vide. Chaque mois sans locataire, c'est un mois de taxe foncière pour rien."
+    ],
+    "lowReserve": [
+      "Votre réserve est mince : moins de trois mensualités sur le compte. Le prochain chauffe-eau vous attend au tournant.",
+      "Trésorerie un peu juste à mon goût. Un incident, et c'est le découvert. Gardez un matelas."
+    ],
+    "highDebt": [
+      "Votre taux d'endettement atteint {taux}. Les banques vont froncer les sourcils.",
+      "{taux} d'endettement : on frôle la limite des banques. Un peu de patience avant le prochain crédit."
+    ],
+    "renegotiate": [
+      "Un de vos crédits est bien plus cher que le marché. Une renégociation, peut-être ? Les banques ne mordent pas toutes.",
+      "Les taux ont baissé depuis votre crédit. Un rachat pourrait alléger vos mensualités."
+    ],
+    "noProperty": [
+      "Toujours aucun bien. L'épargne dort, l'inflation non. Les annonces de Dole n'attendent que vous.",
+      "Pas encore de premier achat ? Une visite par semaine, et la bonne affaire finira par passer."
+    ],
+    "firstYear": [
+      "Première année d'investisseur ! Gardez vos factures, toutes, même celles du café.",
+      "Votre première année au complet. La deuxième est toujours plus facile, promis."
+    ]
+  },
+  "maxAdvice": 4,
+  "thresholds": {
+    "bigTaxEuros": 1500,
+    "reserveMonths": 3,
+    "highDebtRatio": 0.33,
+    "dpeBanYears": 3,
+    "regimeSavingEuros": 100,
+    "renegotiatePoints": 0.7
+  }
+}

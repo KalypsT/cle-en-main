@@ -11,7 +11,6 @@ import { type Avatar, FORMAT_VERSION, type GameState } from './state.ts';
 import { monthlyPoint, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
-  holdMeeting,
   initialBankRelations,
   type LoanDecision,
   type LoanRequest,
@@ -23,7 +22,32 @@ import {
   runMonthlyTrust,
   runRenegotiationCheck,
 } from './systems/banking.ts';
-import { requestVisit, runDailyAgenda } from './systems/agenda.ts';
+import {
+  cancelAgendaItem,
+  moveAgendaItem,
+  requestMeeting,
+  requestSelfRepair,
+  requestVisit,
+  runDailyAgenda,
+} from './systems/agenda.ts';
+import { chooseEvent, runDailyCatalog } from './systems/catalog.ts';
+import { answerChallenge, runDailyChallenges } from './systems/challenges.ts';
+import { modeOf, rewindsLeft } from './systems/modes.ts';
+import {
+  addChronicle,
+  checkMilestones,
+  initialProgress,
+  recordProgress,
+  runYearlyProgress,
+} from './systems/progress.ts';
+import {
+  agendaWeek,
+  buildYearReview,
+  monthlyReview,
+  pace,
+  progressionView,
+  regimeAdvice,
+} from './systems/reviews.ts';
 import { runDailyDistress } from './systems/distress.ts';
 import type { SystemContext } from './systems/context.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
@@ -128,7 +152,12 @@ export interface CreateGameOptions {
   avatar?: Avatar;
   /** Gérard's tutorial; on by default. */
   tutorial?: boolean;
+  /** Game mode (content/modes.json); the default one when absent. */
+  modeId?: string;
 }
+
+export type RewindResult =
+  { ok: true; state: GameState } | { ok: false; reason: 'rewind.invalidPoint' | 'rewind.noneLeft' };
 
 export interface TickResult {
   state: GameState;
@@ -148,6 +177,10 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     throw new RangeError(`Invalid start hour ${startHour}`);
   }
   const job = findJob(content, options.jobId ?? content.start.defaultJobId);
+  const modeId = options.modeId ?? content.modes.defaultModeId;
+  if (!content.modes.modes.some((mode) => mode.id === modeId)) {
+    throw new RangeError(`Unknown game mode ${modeId}`);
+  }
   const rng = seedRng(seed);
   const startRate = roundRate(content.marketRate.startPercent);
   const state: GameState = {
@@ -192,6 +225,13 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     tutorial: { enabled: options.tutorial ?? true, step: 0 },
     history: [],
     lastStatement: null,
+    modeId,
+    rewinds: 0,
+    gameOver: null,
+    progress: initialProgress(content),
+    chronicle: [{ day: toDayNumber(startDate), kind: 'start', ref: null, amount: null }],
+    catalog: { pending: [], lastDay: {}, anecdotes: [] },
+    lastYearReview: null,
   };
   if (!isValidAvatar(state.player.avatar)) {
     throw new RangeError(`Invalid avatar ${JSON.stringify(options.avatar)}`);
@@ -213,11 +253,14 @@ function context(content: GameContent, state: GameState, events: GameEvent[]): S
 
 /** Systems run in this fixed order at the start of each game day. */
 function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boolean): void {
+  let regime: ReturnType<typeof regimeAdvice> = [];
   if (yearStarted) {
     // Yearly review: last year's tax, before this year's first flows.
+    regime = regimeAdvice(ctx);
     closeTaxYear(ctx);
     runYearlyDpeWarnings(ctx);
     runYearlyWear(ctx);
+    runYearlyProgress(ctx);
   }
   if (monthStarted) {
     runMonthlyMarketRate(ctx);
@@ -253,13 +296,18 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   runDailyRentalListings(ctx);
   runDailyPropertyTax(ctx);
   runDailyResale(ctx);
+  runDailyCatalog(ctx);
+  runDailyChallenges(ctx);
   runDailyOverdraft(ctx);
   runDailyDistress(ctx);
+  recordProgress(ctx, ctx.events.slice());
+  checkMilestones(ctx);
   if (monthStarted) {
     // The wealth curve, once the first day of the month has run.
     const net = statementNet(ctx.state.lastStatement?.lines ?? []);
     ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
   }
+  if (yearStarted) ctx.state.lastYearReview = buildYearReview(ctx, regime);
 }
 
 function playerName(content: GameContent, name: string | undefined): string {
@@ -274,6 +322,8 @@ function isValidAvatar(avatar: Avatar): boolean {
 /** The engine bound to its content. Every function is pure: inputs are never mutated. */
 export function createEngine(content: GameContent) {
   function tick(state: GameState): TickResult {
+    // The game is over (Exigeant mode): time stands still.
+    if (state.gameOver) return { state, events: [] };
     const { clock, events } = advanceClock(state.clock);
     if (events.length === 0) return { state: { ...state, clock }, events };
     const draft = deepClone({ ...state, clock });
@@ -297,13 +347,14 @@ export function createEngine(content: GameContent) {
   }
 
   function dispatch(state: GameState, action: GameAction): DispatchResult {
+    if (state.gameOver) return { ok: false, state, reason: { code: 'game.over' } };
     const draft = deepClone(state);
     const events: GameEvent[] = [];
     const ctx = context(content, draft, events);
     let refusal: RefusalCode | null;
     switch (action.type) {
       case 'bank/meet':
-        refusal = holdMeeting(ctx, action.bankId);
+        refusal = requestMeeting(ctx, action.bankId);
         break;
       case 'bank/refinance':
         refusal = refinanceLoan(ctx, action.loanId, action.bankId);
@@ -378,7 +429,22 @@ export function createEngine(content: GameContent) {
         refusal = changeManagement(ctx, action.propertyId, action.agencyId);
         break;
       case 'rent/repair':
-        refusal = repairIncident(ctx, action.propertyId, action.method);
+        refusal =
+          action.method === 'self'
+            ? requestSelfRepair(ctx, action.propertyId)
+            : repairIncident(ctx, action.propertyId, action.method);
+        break;
+      case 'agenda/cancel':
+        refusal = cancelAgendaItem(ctx, action.itemId);
+        break;
+      case 'agenda/move':
+        refusal = moveAgendaItem(ctx, action.itemId, action.day);
+        break;
+      case 'event/choose':
+        refusal = chooseEvent(ctx, action.eventId, action.choiceId);
+        break;
+      case 'challenge/answer':
+        refusal = answerChallenge(ctx, action.accept);
         break;
       case 'home/moveIn':
         refusal = moveIntoHome(ctx, action.propertyId);
@@ -426,7 +492,29 @@ export function createEngine(content: GameContent) {
         break;
     }
     if (refusal) return { ok: false, state, reason: { code: refusal } };
+    recordProgress(ctx, events.slice());
+    checkMilestones(ctx);
     return { ok: true, state: draft, events };
+  }
+
+  /**
+   * Goes back to a monthly rewind point (docs/02, section 2.7). The count of
+   * rewinds is the current game's, so going back never gives them back.
+   */
+  function rewind(current: GameState, checkpoint: GameState): RewindResult {
+    if (
+      checkpoint.seed !== current.seed ||
+      checkpoint.clock.elapsedHours >= current.clock.elapsedHours
+    ) {
+      return { ok: false, reason: 'rewind.invalidPoint' };
+    }
+    if (rewindsLeft(content, current) === 0) return { ok: false, reason: 'rewind.noneLeft' };
+    const state = deepClone(checkpoint);
+    state.rewinds = current.rewinds + 1;
+    state.modeId = current.modeId;
+    const events: GameEvent[] = [];
+    addChronicle(context(content, state, events), 'rewind', toIsoDate(current.clock.date));
+    return { ok: true, state };
   }
 
   return {
@@ -435,6 +523,19 @@ export function createEngine(content: GameContent) {
     tick,
     advanceHours,
     dispatch,
+    rewind,
+    /** Rewinds left in this game; null: unlimited. */
+    rewindsLeft: (state: GameState) => rewindsLeft(content, state),
+    /** The game mode and its coefficients. */
+    mode: (state: GameState) => modeOf(content, state),
+    /** Nothing waits for the player: the automatic acceleration may run. */
+    pace: (state: GameState) => pace(content, state),
+    /** The short monthly review, from the last statement (null before the first one). */
+    monthlyReview: (state: GameState) => monthlyReview(content, state),
+    /** Titles, achievements, reputation, challenge, records (« Progression »). */
+    progression: (state: GameState) => progressionView(content, state),
+    /** The coming days of the agenda. */
+    agendaWeek: (state: GameState, days?: number) => agendaWeek(content, state, days),
     /** Loads a save, migrating it to the current format. Throws SaveFormatError. */
     loadGame: (json: string, registry: MigrationRegistry = MIGRATIONS) =>
       deserializeGame(json, { content }, registry),

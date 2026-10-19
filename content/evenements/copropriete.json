@@ -1,0 +1,507 @@
+{
+  "events": [
+    {
+      "id": "commonRoofLeak",
+      "family": "copro",
+      "target": "copro",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Fuite dans la toiture de l'immeuble de {bien} : le syndic lance un appel de fonds d'urgence de {montant}."
+      ],
+      "effects": [
+        {
+          "type": "money",
+          "euros": {
+            "min": -500,
+            "max": -200
+          }
+        }
+      ]
+    },
+    {
+      "id": "liftBroken",
+      "family": "copro",
+      "target": "copro",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.06,
+      "cooldownDays": 240,
+      "pause": false,
+      "texts": [
+        "L'ascenseur de l'immeuble de {bien} est en panne. Encore. Le syndic propose une réparation express."
+      ],
+      "choices": [
+        {
+          "id": "vote",
+          "label": "Voter la réparation (votre part : {montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -600,
+                "max": -300
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 5
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre la prochaine assemblée",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "neighbourFeud",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Guerre ouverte entre deux copropriétaires de {bien} au sujet d'un paillasson. Les deux comptent sur vous."
+      ],
+      "choices": [
+        {
+          "id": "mediate",
+          "label": "Jouer les médiateurs (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            }
+          ],
+          "outcome": "Paillasson partagé, paix signée."
+        },
+        {
+          "id": "stay",
+          "label": "Rester en dehors",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "stay"
+    },
+    {
+      "id": "syndicChange",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "Des copropriétaires de {bien} veulent changer de syndic, « qui ne répond plus depuis 2019 »."
+      ],
+      "choices": [
+        {
+          "id": "support",
+          "label": "Monter le dossier avec eux (1 h 30)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 90
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            },
+            {
+              "type": "money",
+              "euros": {
+                "min": 100,
+                "max": 250
+              }
+            }
+          ],
+          "outcome": "Nouveau syndic, charges en baisse."
+        },
+        {
+          "id": "nothing",
+          "label": "Laisser faire",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 7,
+      "defaultChoice": "nothing"
+    },
+    {
+      "id": "bikeRoom",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": ["Projet de local à vélos dans l'immeuble de {bien}. Votre voix compte."],
+      "choices": [
+        {
+          "id": "for",
+          "label": "Voter pour (votre part : {montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -200,
+                "max": -100
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 4
+            }
+          ]
+        },
+        {
+          "id": "against",
+          "label": "Voter contre",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "against"
+    },
+    {
+      "id": "facadeWorks",
+      "family": "copro",
+      "target": "copro",
+      "kind": "mishap",
+      "conditions": {
+        "item": {
+          "kind": "facade",
+          "maxState": 3
+        }
+      },
+      "chancePerMonth": 0.03,
+      "cooldownDays": 1095,
+      "pause": false,
+      "texts": [
+        "Le ravalement de la façade de l'immeuble de {bien} est voté. Votre quote-part : {montant}."
+      ],
+      "choices": [
+        {
+          "id": "pay",
+          "label": "Payer d'un coup ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -3500,
+                "max": -1500
+              }
+            },
+            {
+              "type": "item",
+              "item": "facade",
+              "set": 5
+            }
+          ]
+        },
+        {
+          "id": "stagger",
+          "label": "Demander un étalement et des travaux réduits ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -1500,
+                "max": -800
+              }
+            },
+            {
+              "type": "item",
+              "item": "facade",
+              "delta": 1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "pay"
+    },
+    {
+      "id": "conciergeRetires",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.02,
+      "cooldownDays": 1095,
+      "pause": false,
+      "texts": [
+        "Mme Ferreira, la gardienne de l'immeuble de {bien}, part à la retraite après 31 ans. Une cagnotte circule."
+      ],
+      "choices": [
+        {
+          "id": "give",
+          "label": "Participer ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -50,
+                "max": -20
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "nothing",
+          "label": "Passer",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "nothing"
+    },
+    {
+      "id": "courtyardParty",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {
+        "months": [5, 6]
+      },
+      "chancePerMonth": 0.1,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "Fête des voisins dans la cour de l'immeuble de {bien}. Il y aura du crémant du Jura."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y aller (2 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            },
+            {
+              "type": "satisfaction",
+              "delta": 2
+            }
+          ]
+        },
+        {
+          "id": "no",
+          "label": "Pas cette année",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "no"
+    },
+    {
+      "id": "waterMeters",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 1095,
+      "pause": false,
+      "texts": ["Le syndic propose des compteurs d'eau individuels dans l'immeuble de {bien}."],
+      "choices": [
+        {
+          "id": "for",
+          "label": "Voter pour (votre part : {montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -250,
+                "max": -150
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ]
+        },
+        {
+          "id": "against",
+          "label": "Voter contre",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "against"
+    },
+    {
+      "id": "councilSeat",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "On vous propose d'entrer au conseil syndical de l'immeuble de {bien}. Réunions le mardi soir."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter (2 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "reputation",
+              "delta": 3
+            }
+          ],
+          "outcome": "Vous avez découvert un monde de devis et de passions."
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "parkingBreakIn",
+      "family": "copro",
+      "target": "copro",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Le parking de l'immeuble de {bien} a été visité cette nuit. Les locataires sont inquiets."
+      ],
+      "effects": [
+        {
+          "type": "satisfaction",
+          "delta": -3
+        }
+      ]
+    },
+    {
+      "id": "solarRoof",
+      "family": "copro",
+      "target": "copro",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.02,
+      "cooldownDays": 1460,
+      "pause": false,
+      "texts": [
+        "Projet de panneaux solaires sur le toit de l'immeuble de {bien}. Le copropriétaire du 4e a fait un diaporama."
+      ],
+      "choices": [
+        {
+          "id": "for",
+          "label": "Voter pour (votre part : {montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -1200,
+                "max": -600
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ]
+        },
+        {
+          "id": "against",
+          "label": "Voter contre",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "against"
+    },
+    {
+      "id": "pigeons",
+      "family": "copro",
+      "target": "copro",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Invasion de pigeons sur les balcons de l'immeuble de {bien}. Ils ont l'air chez eux."
+      ],
+      "choices": [
+        {
+          "id": "nets",
+          "label": "Poser des filets (votre part : {montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -150,
+                "max": -80
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ]
+        },
+        {
+          "id": "nothing",
+          "label": "Laisser les pigeons roucouler",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -3
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "nothing"
+    }
+  ]
+}

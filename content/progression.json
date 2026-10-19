@@ -1,0 +1,31 @@
+{
+  "bigWorksMinEuros": 10000,
+  "bargainShare": 0.1,
+  "reputation": {
+    "purchase": 3,
+    "saleWithGain": 2,
+    "worksDone": 1,
+    "dpeClassGained": 1,
+    "quietYear": 2,
+    "happyTenant": 1,
+    "happyTenantMin": 70,
+    "challengeWon": 0,
+    "forcedSale": -8,
+    "procedure": -4,
+    "eviction": -2,
+    "tenantConflict": -2,
+    "indecentLet": -5
+  },
+  "effects": {
+    "bankMargin": [
+      { "minReputation": 50, "percent": -0.05 },
+      { "minReputation": 70, "percent": -0.1 },
+      { "minReputation": 90, "percent": -0.2 }
+    ],
+    "offMarketFromReputation": 30,
+    "offMarketChancePerMonth": 0.25,
+    "offMarketExclusiveDays": 5,
+    "offMarketMotivationId": "offMarket"
+  },
+  "chronicleLength": 300
+}

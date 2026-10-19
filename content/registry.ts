@@ -14,10 +14,34 @@ import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
 import { musicSchema } from './schemas/music.ts';
 import { worldRulesSchema } from './schemas/world.ts';
+import { anecdotesFileSchema, eventsFileSchema, rhythmRulesSchema } from './schemas/events.ts';
+import { calendarRulesSchema, modesFileSchema } from './schemas/modes.ts';
+import {
+  achievementsFileSchema,
+  challengesFileSchema,
+  progressionRulesSchema,
+  titlesFileSchema,
+  yvonTextsSchema,
+} from './schemas/progression.ts';
 
 /** Every content file, by path relative to `content/`, with the schema it must satisfy. */
 export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
+  'anecdotes.json': anecdotesFileSchema,
   'artisans.json': artisansFileSchema,
+  'calendrier.json': calendarRulesSchema,
+  'defis.json': challengesFileSchema,
+  'evenements/artisans.json': eventsFileSchema,
+  'evenements/banque.json': eventsFileSchema,
+  'evenements/copropriete.json': eventsFileSchema,
+  'evenements/france.json': eventsFileSchema,
+  'evenements/locataires.json': eventsFileSchema,
+  'evenements/marche.json': eventsFileSchema,
+  'evenements/ville.json': eventsFileSchema,
+  'modes.json': modesFileSchema,
+  'progression.json': progressionRulesSchema,
+  'rythme.json': rhythmRulesSchema,
+  'succes.json': achievementsFileSchema,
+  'titres.json': titlesFileSchema,
   'banques.json': banksFileSchema,
   'credit.json': creditRulesSchema,
   'decisions.json': decisionRulesSchema,
@@ -39,6 +63,7 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'textes/interface.json': uiTextsSchema,
   'textes/locataires.json': tenantTextsSchema,
   'textes/travaux.json': worksTextsSchema,
+  'textes/yvon.json': yvonTextsSchema,
 };
 
 /** Generated city files, by path relative to `data/`. */

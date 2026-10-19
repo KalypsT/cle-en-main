@@ -1,0 +1,275 @@
+{
+  "chancePerDay": 0.04,
+  "minGapDays": 45,
+  "answerDays": 5,
+  "givers": {
+    "gerard": "Gérard Prudhomme",
+    "kevin": "Kévin Boost",
+    "hortense": "Hortense Rigueur",
+    "yvon": "Yvon Tableur",
+    "monique": "Monique Delaporte",
+    "martinot": "Les frères Martinot"
+  },
+  "challenges": [
+    {
+      "id": "kevinNewProperty",
+      "giver": "kevin",
+      "conditions": [
+        {
+          "stat": "properties",
+          "max": 2
+        }
+      ],
+      "goal": {
+        "stat": "purchases",
+        "gain": 1
+      },
+      "days": 120,
+      "rewardReputation": 4,
+      "penaltyReputation": 0,
+      "text": "« Un nouveau bien avant quatre mois, tu relèves ? On va scaler ton patrimoine, crois-moi. »",
+      "success": "« Je le savais ! Toi, t'as l'âme d'un bâtisseur. On fait un call la semaine prochaine ? »",
+      "failure": "« Pas grave, le marché ne dort jamais. Moi non plus d'ailleurs. »"
+    },
+    {
+      "id": "kevinTwoProperties",
+      "giver": "kevin",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 1
+        }
+      ],
+      "goal": {
+        "stat": "purchases",
+        "gain": 2
+      },
+      "days": 150,
+      "rewardReputation": 6,
+      "penaltyReputation": -1,
+      "text": "« Deux biens en cinq mois. Deux. Ça te fait peur ? Moi ça me donne des frissons. »",
+      "success": "« Deux biens ! J'ai fait une story pour toi. Anonymisée, promis. »",
+      "failure": "« Bon. On a manqué d'ambition, toi et moi. Surtout toi. »"
+    },
+    {
+      "id": "kevinRentGoal",
+      "giver": "kevin",
+      "conditions": [
+        {
+          "stat": "monthlyRent",
+          "min": 1,
+          "max": 700
+        }
+      ],
+      "goal": {
+        "stat": "monthlyRent",
+        "min": 1000
+      },
+      "days": 150,
+      "rewardReputation": 5,
+      "penaltyReputation": 0,
+      "text": "« Mille balles de loyers par mois d'ici cinq mois. C'est le palier, après tout s'accélère. »",
+      "success": "« Mille par mois ! Bienvenue dans le game. »",
+      "failure": "« Le palier résiste. Il finira par céder. »"
+    },
+    {
+      "id": "moniqueBetterDeal",
+      "giver": "monique",
+      "conditions": [],
+      "goal": {
+        "stat": "bargainPurchases",
+        "gain": 1
+      },
+      "days": 120,
+      "rewardReputation": 5,
+      "penaltyReputation": -1,
+      "text": "« Je vous parie que vous ne trouverez pas mieux que moi à Dole. Un bien à 10 % sous sa valeur ? Laissez-moi rire. »",
+      "success": "« Hmpf. Coup de chance. Profitez-en, ça ne durera pas. »",
+      "failure": "« Ce que je disais. Dole, c'est mon terrain de jeu. »"
+    },
+    {
+      "id": "moniqueBeatMe",
+      "giver": "monique",
+      "conditions": [],
+      "goal": {
+        "stat": "rivalBeaten",
+        "key": "delaporte",
+        "gain": 1
+      },
+      "days": 120,
+      "rewardReputation": 4,
+      "penaltyReputation": 0,
+      "text": "« Essayez donc de me souffler une affaire. Rien qu'une. »",
+      "success": "« Vous m'avez eue. Je ne l'oublierai pas, soyez-en sûr. »",
+      "failure": "« Toujours rien ? Je commençais à m'ennuyer. »"
+    },
+    {
+      "id": "moniqueSellHigher",
+      "giver": "monique",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 2
+        }
+      ],
+      "goal": {
+        "stat": "salesWithGain",
+        "gain": 1
+      },
+      "days": 150,
+      "rewardReputation": 4,
+      "penaltyReputation": 0,
+      "text": "« Acheter, tout le monde sait faire. Revendre avec une plus-value, c'est un métier. Le vôtre ? »",
+      "success": "« Pas mal. Pour un débutant. »",
+      "failure": "« Vous gardez tout ? Un collectionneur, pas un investisseur. »"
+    },
+    {
+      "id": "yvonZeroTax",
+      "giver": "yvon",
+      "conditions": [
+        {
+          "stat": "letProperties",
+          "min": 1
+        }
+      ],
+      "months": [1, 2, 3],
+      "goal": {
+        "stat": "rentTaxFreeYears",
+        "gain": 1
+      },
+      "days": 20,
+      "untilYearEnd": true,
+      "rewardReputation": 5,
+      "penaltyReputation": 0,
+      "text": "« Zéro impôt sur vos loyers cette année ? Avec le bon régime et quelques travaux, c'est jouable. Et c'est parfaitement légal, j'insiste. »",
+      "success": "« Zéro. Le plus beau chiffre qui soit. J'en ai fait encadrer un. »",
+      "failure": "« Un peu d'impôt, ce n'est pas un drame. C'est juste triste. »"
+    },
+    {
+      "id": "yvonPositiveYear",
+      "giver": "yvon",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 1
+        },
+        {
+          "stat": "positiveStreak",
+          "max": 3
+        }
+      ],
+      "goal": {
+        "stat": "positiveStreak",
+        "min": 12
+      },
+      "days": 380,
+      "rewardReputation": 5,
+      "penaltyReputation": 0,
+      "text": "« Douze bilans mensuels positifs d'affilée. Pas un de moins. Les chiffres aiment la régularité. »",
+      "success": "« Douze sur douze. Mon tableur a émis un petit bip de satisfaction. »",
+      "failure": "« Un mois dans le rouge et tout s'écroule. C'est la beauté de la chose. »"
+    },
+    {
+      "id": "yvonPassoire",
+      "giver": "yvon",
+      "conditions": [
+        {
+          "stat": "passoires",
+          "min": 1
+        }
+      ],
+      "goal": {
+        "stat": "passoiresFixed",
+        "gain": 1
+      },
+      "days": 150,
+      "rewardReputation": 5,
+      "penaltyReputation": 0,
+      "text": "« Votre passoire thermique me fait de la peine. Sortez-la des classes E à G d'ici cinq mois, le fisc vous aidera. »",
+      "success": "« Rénovée ! Le déficit foncier vous dit merci. Moi aussi. »",
+      "failure": "« Elle fuit toujours. Les calories et l'argent. »"
+    },
+    {
+      "id": "hortenseTrust",
+      "giver": "hortense",
+      "conditions": [
+        {
+          "stat": "bankTrust",
+          "key": "rigueur",
+          "max": 45
+        }
+      ],
+      "goal": {
+        "stat": "bankTrust",
+        "key": "rigueur",
+        "min": 60
+      },
+      "days": 150,
+      "rewardReputation": 4,
+      "penaltyReputation": 0,
+      "text": "« Vous voulez travailler avec nous ? Prouvez-le. Une confiance de 60 d'ici cinq mois. Je ne répéterai pas. »",
+      "success": "« Bien. Vous pouvez vous asseoir. »",
+      "failure": "« C'est bien ce que je pensais. »"
+    },
+    {
+      "id": "gerardWorks",
+      "giver": "gerard",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 1
+        }
+      ],
+      "goal": {
+        "stat": "worksDone",
+        "gain": 1
+      },
+      "days": 120,
+      "rewardReputation": 4,
+      "penaltyReputation": 0,
+      "text": "« Un bien bien entretenu, c'est un bien qui rapporte. Terminez un chantier d'ici quatre mois, ça rassurerait tout le monde. »",
+      "success": "« Superbe travail. Je l'ai dit au comité, ils ont hoché la tête. »",
+      "failure": "« Les chantiers, ça prend du temps. Je comprends. Le comité, un peu moins. »"
+    },
+    {
+      "id": "gerardTenants",
+      "giver": "gerard",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 2
+        }
+      ],
+      "goal": {
+        "stat": "leasesSigned",
+        "gain": 2
+      },
+      "days": 150,
+      "rewardReputation": 4,
+      "penaltyReputation": 0,
+      "text": "« Deux nouveaux baux d'ici cinq mois ? Des loyers qui tombent, c'est ce que la banque préfère. »",
+      "success": "« Deux baux ! Vos dossiers sont un plaisir à lire. »",
+      "failure": "« Les logements vides, ça m'inquiète un peu. Juste un peu. »"
+    },
+    {
+      "id": "martinotFaster",
+      "giver": "martinot",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 2
+        }
+      ],
+      "goal": {
+        "stat": "worksDone",
+        "gain": 2
+      },
+      "days": 150,
+      "rewardReputation": 5,
+      "penaltyReputation": -1,
+      "text": "« On rénove plus vite que vous, et on le prouve : deux chantiers finis en cinq mois, chiche ? »",
+      "success": "« Bon, d'accord. Vous avez de bons artisans. On veut leurs numéros. »",
+      "failure": "« Ha ! Le marteau, ça ne s'improvise pas. »"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import { type Bubble, type StreetBuilding, toDayNumber } from '@cle/engine';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
-import { format, t } from '../texts.ts';
+import { anecdoteText, format, t } from '../texts.ts';
 import { Icon, type IconName } from '../ui/Icon.tsx';
 import { FacadeShape } from './FacadeShape.tsx';
 import { type FrameStats, type QualityLevel, StreetScene } from './StreetScene.ts';
@@ -62,7 +62,7 @@ export function bubbleLabel(bubble: Bubble): string {
 /** Strikes of the bells at the hours of content/monde.json (discreet: not the whole hour). */
 const BELL_STRIKES = 3;
 
-const ALERT_BUBBLES = new Set(['hazard', 'incident', 'arrears']);
+const ALERT_BUBBLES = new Set(['hazard', 'incident', 'arrears', 'event']);
 const BUBBLE_ICONS: Record<Bubble['kind'], IconName> = {
   hazard: 'alert',
   incident: 'alert',
@@ -75,6 +75,8 @@ const BUBBLE_ICONS: Record<Bubble['kind'], IconName> = {
   forSale: 'tag',
   toLet: 'key',
   compromis: 'assets',
+  event: 'info',
+  anecdote: 'person',
 };
 
 function buildingName(building: StreetBuilding): string {
@@ -85,7 +87,7 @@ function buildingName(building: StreetBuilding): string {
 }
 
 export function StreetWorld({ active }: { active: boolean }) {
-  const { state, settings, audio } = useGame();
+  const { state, settings, audio, notify } = useGame();
   const nav = useNav();
   const cityId = gameContent.start.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
@@ -251,6 +253,7 @@ export function StreetWorld({ active }: { active: boolean }) {
     const target = bubble.target;
     if (target.screen === 'property')
       nav.push({ name: 'property', id: target.id, tab: target.tab });
+    else if (target.screen === 'anecdote') notify(anecdoteText(state, target.anecdote));
     else nav.push({ name: target.screen, id: target.id });
   };
 

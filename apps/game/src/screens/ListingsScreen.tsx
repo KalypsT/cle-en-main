@@ -16,7 +16,9 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
   const { state } = useGame();
   const nav = useNav();
   const { property } = listing;
-  const planned = state.agenda.some((item) => item.listingId === listing.id);
+  const planned = state.agenda.some(
+    (item) => item.kind === 'visit' && item.listingId === listing.id,
+  );
   const favorite = state.favorites.includes(listing.id);
   return (
     <ListRow

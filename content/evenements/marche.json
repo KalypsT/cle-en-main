@@ -1,0 +1,558 @@
+{
+  "events": [
+    {
+      "id": "offMarketAgent",
+      "family": "market",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "reputation",
+            "min": 20
+          }
+        ]
+      },
+      "chancePerMonth": 0.15,
+      "cooldownDays": 60,
+      "pause": false,
+      "texts": [
+        "Un agent de {ville} vous appelle : « J'ai un bien qui n'est pas encore en ligne. Je pense à vous en premier. »",
+        "« Ne le dites à personne », chuchote un agent au téléphone. « Un bien hors marché, rien que pour vous, pendant quelques jours. »"
+      ],
+      "effects": [
+        {
+          "type": "offMarketListing"
+        }
+      ]
+    },
+    {
+      "id": "notarySuccession",
+      "family": "market",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.075,
+      "cooldownDays": 90,
+      "pause": false,
+      "texts": [
+        "Le notaire du quartier {quartier} règle une succession : les héritiers veulent vendre vite, sans passer par une annonce."
+      ],
+      "effects": [
+        {
+          "type": "offMarketListing"
+        }
+      ]
+    },
+    {
+      "id": "colleagueAunt",
+      "family": "market",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {
+        "employed": true
+      },
+      "chancePerMonth": 0.05,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "Un collègue vous glisse que sa tante vend son appartement. « Elle ne veut pas d'agence, elle veut quelqu'un de bien. »"
+      ],
+      "effects": [
+        {
+          "type": "offMarketListing"
+        }
+      ]
+    },
+    {
+      "id": "promoterRumour",
+      "family": "market",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": ["Rumeur : un promoteur s'intéresse au quartier {quartier}. Les prix frémissent."],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "neighbourhood",
+          "percent": 1.5
+        }
+      ]
+    },
+    {
+      "id": "badPress",
+      "family": "market",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.025,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Un article peu flatteur sur le quartier {quartier} fait le tour des réseaux. Les acheteurs hésitent."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "neighbourhood",
+          "percent": -1
+        }
+      ]
+    },
+    {
+      "id": "pricesSlowing",
+      "family": "market",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Les agences de {ville} constatent un tassement des prix : les acheteurs négocient plus fort."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "city",
+          "percent": -1
+        }
+      ]
+    },
+    {
+      "id": "pricesRising",
+      "family": "market",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "À {ville}, les biens partent en quelques jours : les agences parlent d'un marché « tendu »."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "city",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "squatters",
+      "family": "market",
+      "target": "vacant",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.1,
+      "cooldownDays": 120,
+      "pause": true,
+      "texts": [
+        "Des voisins ont vu des inconnus tourner autour de {bien}, toujours vide. Ils craignent un squat."
+      ],
+      "choices": [
+        {
+          "id": "locks",
+          "label": "Changer les serrures ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -350,
+                "max": -250
+              }
+            }
+          ],
+          "outcome": "Serrures neuves, voisins rassurés."
+        },
+        {
+          "id": "alarm",
+          "label": "Poser une alarme ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -700,
+                "max": -500
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "L'alarme sonne à la moindre mouche, mais personne n'entre."
+        },
+        {
+          "id": "nothing",
+          "label": "Ne rien faire",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -1200,
+                "max": -600
+              }
+            },
+            {
+              "type": "item",
+              "item": "joinery",
+              "delta": -1
+            }
+          ],
+          "outcome": "Une porte forcée et un nettoyage à payer."
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "nothing"
+    },
+    {
+      "id": "tvShow",
+      "family": "market",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "L'émission « Maisons à la loupe » veut filmer {bien}. Une petite somme, et votre nom à la télé."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter (+{montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": 300,
+                "max": 600
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            },
+            {
+              "type": "satisfaction",
+              "delta": -4
+            }
+          ],
+          "outcome": "Le tournage a duré trois jours et quatre heures de pause café."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser poliment",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "searchMandate",
+      "family": "market",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "purchases",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 120,
+      "pause": false,
+      "texts": [
+        "L'Agence Bonne Pioche propose de chercher pour vous un bien hors marché, moyennant {montant} d'honoraires d'approche."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Signer le mandat ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -400,
+                "max": -300
+              }
+            },
+            {
+              "type": "offMarketListing"
+            }
+          ],
+          "outcome": "L'agence a trouvé quelque chose. Elle a l'air fière d'elle."
+        },
+        {
+          "id": "refuse",
+          "label": "Chercher seul",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "bailiffTip",
+      "family": "market",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "Un huissier croisé au café vous parle d'un bien saisi qui sera vendu à l'amiable avant une enchère."
+      ],
+      "choices": [
+        {
+          "id": "lawyer",
+          "label": "Payer un avocat pour en savoir plus ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -500,
+                "max": -350
+              }
+            },
+            {
+              "type": "offMarketListing"
+            }
+          ],
+          "outcome": "L'avocat vous obtient un rendez-vous avec le vendeur."
+        },
+        {
+          "id": "ignore",
+          "label": "Laisser passer",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "investorsClub",
+      "family": "market",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.075,
+      "cooldownDays": 120,
+      "pause": false,
+      "texts": [
+        "Le club des investisseurs de {ville} vous invite à sa soirée mensuelle : petits fours et tableaux Excel."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y aller (2 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            }
+          ],
+          "outcome": "Vous repartez avec trois cartes de visite et une indigestion."
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "financeCoach",
+      "family": "market",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.06,
+      "cooldownDays": 240,
+      "pause": false,
+      "texts": [
+        "Un « coach en liberté financière » vous propose sa formation « Rentier en 90 jours » pour seulement {montant}."
+      ],
+      "choices": [
+        {
+          "id": "pay",
+          "label": "S'inscrire ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -1997,
+                "max": -1997
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ],
+          "outcome": "Module 1 : « Achetez ma formation suivante ». Hum."
+        },
+        {
+          "id": "decline",
+          "label": "Passer son chemin",
+          "effects": [],
+          "outcome": "Vous gardez vos 1 997 € et votre dignité."
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "notaryDinner",
+      "family": "market",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "purchases",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.05,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "Maître Duvernois, notaire, vous invite à dîner. « On parlera affaires, et surtout de mon voilier. »"
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Accepter (2 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            },
+            {
+              "type": "offMarketListing"
+            }
+          ],
+          "outcome": "Entre deux anecdotes de voilier, il mentionne un bien à vendre."
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "rivalGossip",
+      "family": "market",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "purchases",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "{rival} raconte partout que vous surpayez vos biens. Les agents commencent à sourire en vous voyant."
+      ],
+      "choices": [
+        {
+          "id": "answer",
+          "label": "Rétablir les faits (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "Chiffres à l'appui, vous remettez les pendules à l'heure."
+        },
+        {
+          "id": "ignore",
+          "label": "Laisser dire",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "photoShoot",
+      "family": "market",
+      "target": "vacant",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "Un photographe propose de louer {bien}, vide, pour une séance de mode. « Le parquet a une âme. »"
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter (+{montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": 150,
+                "max": 300
+              }
+            },
+            {
+              "type": "item",
+              "item": "floors",
+              "delta": -1
+            }
+          ],
+          "outcome": "Le parquet avait une âme ; il a maintenant des rayures."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "refuse"
+    }
+  ]
+}

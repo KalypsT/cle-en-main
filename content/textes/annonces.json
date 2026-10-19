@@ -48,7 +48,8 @@
     "investor": "Investisseur qui arbitre son portefeuille.",
     "testingTheMarket": "« On teste le marché, on n'est pas pressés. »",
     "debts": "Doit vendre vite, la banque s'impatiente.",
-    "martinotResale": "Rénové par les frères Martinot : « du travail de pro, ou presque ! »"
+    "martinotResale": "Rénové par les frères Martinot : « du travail de pro, ou presque ! »",
+    "offMarket": "Hors marché : un agent vous le propose avant de le publier, « parce que c'est vous »."
   },
   "defects": {
     "noisyNeighbours": "Voisin du dessus batteur amateur."

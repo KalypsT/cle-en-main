@@ -133,6 +133,12 @@
       "weight": 0,
       "priceFactor": { "min": 1.02, "max": 1.1 },
       "flexibility": 0.04
+    },
+    {
+      "id": "offMarket",
+      "weight": 0,
+      "priceFactor": { "min": 0.88, "max": 0.96 },
+      "flexibility": 0.05
     }
   ],
   "lifetime": {

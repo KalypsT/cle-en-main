@@ -1,6 +1,13 @@
 import { z } from 'zod';
 import { isValidDate, toDayNumber } from './calendar.ts';
-import { DPE_LABELS, EPOCHS, LEASE_TYPES, TIERS } from './content-constants.ts';
+import {
+  ADVICE_KINDS,
+  CHRONICLE_KINDS,
+  DPE_LABELS,
+  EPOCHS,
+  LEASE_TYPES,
+  TIERS,
+} from './content-constants.ts';
 import type { Condition, GameContent, ItemKind } from './content.ts';
 import { hashFloat, hashNormal } from './random.ts';
 import {
@@ -320,6 +327,51 @@ export const MIGRATIONS: MigrationRegistry = {
     history: [],
     lastStatement: null,
   }),
+  /**
+   * Version 7 (milestones 4 and 5) had no progression nor catalogue of
+   * events: the game is in the default mode, holds the starting title and
+   * gets its counters from what it owns (the past is not replayed). Titles
+   * and achievements already deserved are earned on the next day.
+   */
+  7: (raw, { content }) => {
+    const properties = (raw.properties as { lease: unknown }[] | undefined) ?? [];
+    const player = raw.player as { reputation?: number } | undefined;
+    const reputation = player?.reputation ?? content.start.reputation;
+    const startDate = raw.startDate as { year: number; month: number; day: number };
+    const history = ((raw.history as Record<string, unknown>[] | undefined) ?? []).map((point) => ({
+      ...point,
+      monthlyRent: 0,
+      reputation,
+    }));
+    const agenda = ((raw.agenda as Record<string, unknown>[] | undefined) ?? []).map((item) => ({
+      ...item,
+      kind: 'visit',
+    }));
+    return {
+      ...raw,
+      agenda,
+      history,
+      modeId: content.modes.defaultModeId,
+      rewinds: 0,
+      gameOver: null,
+      progress: {
+        titles: content.titles.filter((t) => t.step === 0).map((t) => ({ id: t.id, day: 0 })),
+        achievements: [],
+        counters: {
+          purchases: properties.length,
+          leasesSigned: properties.filter((owned) => owned.lease !== null).length,
+        },
+        records: { bestCapitalGain: 0, biggestWorks: 0, bestMonth: 0, maxNetWorth: 0 },
+        troubledYear: false,
+        challenge: null,
+        challengeHistory: [],
+        nextChallengeDay: 0,
+      },
+      chronicle: [{ day: toDayNumber(startDate), kind: 'start', ref: null, amount: null }],
+      catalog: { pending: [], lastDay: {}, anecdotes: [] },
+      lastYearReview: null,
+    };
+  },
 };
 
 /** Old defects (version 5) and the item each one becomes at state 1. */
@@ -657,6 +709,8 @@ const rateQuoteSchema = z
     bankMarginPercent: z.number(),
     profilePercent: z.number(),
     trustPercent: z.number(),
+    // Added in version 8; the offers of older saves had no such line.
+    reputationPercent: z.number().default(0),
     ratePercent: z.number(),
   })
   .strict();
@@ -733,6 +787,23 @@ const statementLineSchema = z.discriminatedUnion('kind', [
     .strict(),
   amountLine('overdraftInterest'),
 ]);
+
+const agendaBase = z.object({ id: z.string(), day, minutes: z.number().int().min(0) });
+const dayEntry = z.object({ id: z.string(), day }).strict();
+const noteBase = z.object({
+  day,
+  textIndex: z.number().int().min(0),
+  propertyId: z.string().nullable(),
+  vars: z
+    .object({
+      tenant: z.string().nullable(),
+      artisanId: z.string().nullable(),
+      neighbourhoodId: z.string(),
+      cityId: z.string(),
+      rivalId: z.string(),
+    })
+    .strict(),
+});
 
 const gameStateSchema = z
   .object({
@@ -944,15 +1015,11 @@ const gameStateSchema = z
         .strict(),
     ),
     agenda: z.array(
-      z
-        .object({
-          id: z.string(),
-          kind: z.literal('visit'),
-          listingId: z.string(),
-          day,
-          minutes: z.number().int().min(0),
-        })
-        .strict(),
+      z.discriminatedUnion('kind', [
+        agendaBase.extend({ kind: z.literal('visit'), listingId: z.string() }).strict(),
+        agendaBase.extend({ kind: z.literal('bankMeeting'), bankId: z.string() }).strict(),
+        agendaBase.extend({ kind: z.literal('selfRepair'), propertyId: z.string() }).strict(),
+      ]),
     ),
     rivals: z.record(
       z.string(),
@@ -1023,11 +1090,97 @@ const gameStateSchema = z
           balance: cents,
           debt: cents.min(0),
           cashFlow: cents,
+          monthlyRent: cents.min(0),
+          reputation: z.number().min(0).max(100),
         })
         .strict(),
     ),
     lastStatement: z
       .object({ date: calendarDateSchema, lines: z.array(statementLineSchema), balance: cents })
+      .strict()
+      .nullable(),
+    modeId: z.string(),
+    rewinds: z.number().int().min(0),
+    gameOver: z.object({ day }).strict().nullable(),
+    progress: z
+      .object({
+        titles: z.array(dayEntry),
+        achievements: z.array(dayEntry),
+        counters: z.record(z.string(), z.number()),
+        records: z
+          .object({
+            bestCapitalGain: cents,
+            biggestWorks: cents,
+            bestMonth: cents,
+            maxNetWorth: cents,
+          })
+          .strict(),
+        troubledYear: z.boolean(),
+        challenge: z
+          .object({
+            id: z.string(),
+            offeredDay: day,
+            deadlineDay: day,
+            accepted: z.boolean(),
+            baseline: z.number(),
+          })
+          .strict()
+          .nullable(),
+        challengeHistory: z.array(z.object({ id: z.string(), day, won: z.boolean() }).strict()),
+        nextChallengeDay: day,
+      })
+      .strict(),
+    chronicle: z.array(
+      z
+        .object({
+          day,
+          kind: z.enum(CHRONICLE_KINDS),
+          ref: z.string().nullable(),
+          amount: cents.nullable(),
+        })
+        .strict(),
+    ),
+    catalog: z
+      .object({
+        pending: z.array(
+          noteBase
+            .extend({
+              id: z.string(),
+              eventId: z.string(),
+              deadlineDay: day,
+              amounts: z.record(z.string(), cents),
+            })
+            .strict(),
+        ),
+        lastDay: z.record(z.string(), day),
+        anecdotes: z.array(noteBase.extend({ anecdoteId: z.string() }).strict()),
+      })
+      .strict(),
+    lastYearReview: z
+      .object({
+        year: z.number().int(),
+        netWorthStart: cents,
+        netWorthEnd: cents,
+        cashFlow: cents,
+        rents: cents,
+        reputationStart: z.number(),
+        reputationEnd: z.number(),
+        rentTax: cents.nullable(),
+        accountantFees: cents,
+        titles: z.array(z.string()),
+        achievements: z.array(z.string()),
+        advice: z.array(
+          z
+            .object({
+              kind: z.enum(ADVICE_KINDS),
+              propertyId: z.string().optional(),
+              amount: cents.optional(),
+              year: z.number().int().optional(),
+              ratio: z.number().optional(),
+            })
+            .strict(),
+        ),
+      })
       .strict()
       .nullable(),
   })

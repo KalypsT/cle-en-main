@@ -1,6 +1,6 @@
 import { gameContent, music, type TutorialTrigger } from '@cle/content';
 import type { GameAction, GameEvent } from '@cle/engine';
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
 import type { EffectName } from '../audio/effects.ts';
 import { engine } from '../engine.ts';
@@ -33,6 +33,15 @@ import { SectionScreen } from '../screens/SectionScreen.tsx';
 import { StreetTab } from '../screens/StreetTab.tsx';
 import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
 import { StreetWorld } from '../world/StreetWorld.tsx';
+import { AgendaScreen } from '../screens/AgendaScreen.tsx';
+import { ChallengeScreen } from '../screens/ChallengeScreen.tsx';
+import { EventScreen } from '../screens/EventScreen.tsx';
+import { ProgressionScreen } from '../screens/ProgressionScreen.tsx';
+import { MonthlyReviewScreen, YearReviewScreen } from '../screens/ReviewScreens.tsx';
+import { RewindScreen } from '../screens/RewindScreen.tsx';
+import { StatisticsScreen } from '../screens/StatisticsScreen.tsx';
+import type { Checkpoint } from '../storage/saves.ts';
+import { type Overlay, OverlayView } from './Overlays.tsx';
 
 const TABS: { id: TabId; icon: IconName }[] = [
   { id: 'street', icon: 'street' },
@@ -65,6 +74,7 @@ interface Props {
   slot: number;
   onSave: (silent?: boolean) => void;
   onExport: () => void;
+  onRewind: (checkpoint: Checkpoint) => void;
   onQuit: () => void;
   notify: (message: string) => void;
   settings: Settings;
@@ -93,8 +103,23 @@ function effectOf(event: GameEvent): EffectName | null {
   }
 }
 
-/** Celebration music after the new year's review, in real milliseconds. */
-const CELEBRATION_MS = 90_000;
+/** Overlays that play the celebration music (docs/05, 5.8). */
+const FESTIVE: ReadonlySet<Overlay['kind']> = new Set(['month', 'year', 'title']);
+
+/** What an engine event brings over the game (reviews, titles, fresh start, end). */
+function overlaysOf(events: GameEvent[], monthly: boolean): Overlay[] {
+  const overlays: Overlay[] = [];
+  for (const event of events) {
+    if (event.type === 'yearStarted') overlays.push({ kind: 'year' });
+    else if (event.type === 'monthStarted' && event.month !== 1 && monthly) {
+      overlays.push({ kind: 'month' });
+    } else if (event.type === 'titleEarned')
+      overlays.push({ kind: 'title', titleId: event.titleId });
+    else if (event.type === 'freshStart') overlays.push({ kind: 'freshStart' });
+    else if (event.type === 'gameOver') overlays.push({ kind: 'gameOver' });
+  }
+  return overlays;
+}
 
 /** The game: status bar, the five tabs and their screens (docs/04, 4.3 and 4.4). */
 export function GameShell({
@@ -102,6 +127,7 @@ export function GameShell({
   slot,
   onSave,
   onExport,
+  onRewind,
   onQuit,
   notify,
   settings,
@@ -145,7 +171,12 @@ export function GameShell({
   const ambience = engine.ambience(snapshot.state, gameContent.start.cityId);
   const night = ambience.moment === 'night';
   useEffect(() => onNight(night), [night, onNight]);
-  const [celebrating, setCelebrating] = useState(false);
+  const [overlays, setOverlays] = useState<Overlay[]>(() =>
+    session.getSnapshot().state.gameOver ? [{ kind: 'gameOver' }] : [],
+  );
+  const overlay = overlays[0];
+  const resumeSpeed = useRef<number | null>(null);
+  const celebrating = overlay !== undefined && FESTIVE.has(overlay.kind);
   useEffect(
     () => audio.setMusic(celebrating ? 'celebration' : music.slotByMoment[ambience.moment]),
     [audio, celebrating, ambience.moment],
@@ -156,16 +187,25 @@ export function GameShell({
         for (const event of events) {
           const effect = effectOf(event);
           if (effect) audio.effect(effect);
-          if (event.type === 'yearStarted') setCelebrating(true);
         }
+        const fresh = overlaysOf(events, settings.monthlyReview);
+        if (fresh.length === 0) return;
+        // The clock waits while a review or a celebration is open, then goes on at its speed.
+        if (resumeSpeed.current === null) {
+          resumeSpeed.current = session.getSnapshot().speed;
+          session.setSpeed(0);
+        }
+        setOverlays((queue) => [...queue, ...fresh]);
       }),
-    [session, audio],
+    [session, audio, settings.monthlyReview],
   );
-  useEffect(() => {
-    if (!celebrating) return;
-    const timer = setTimeout(() => setCelebrating(false), CELEBRATION_MS);
-    return () => clearTimeout(timer);
-  }, [celebrating]);
+  const closeOverlay = useCallback(() => {
+    setOverlays((queue) => queue.slice(1));
+    if (overlays.length <= 1 && resumeSpeed.current !== null) {
+      if (resumeSpeed.current > 0) session.setSpeed(resumeSpeed.current);
+      resumeSpeed.current = null;
+    }
+  }, [overlays.length, session]);
 
   const stack = stacks[tab];
   const route = stack.at(-1);
@@ -231,8 +271,22 @@ export function GameShell({
       quit: onQuit,
       slot,
       audio,
+      rewind: onRewind,
     }),
-    [session, snapshot, settings, onSettings, act, notify, onSave, onExport, onQuit, slot, audio],
+    [
+      session,
+      snapshot,
+      settings,
+      onSettings,
+      act,
+      notify,
+      onSave,
+      onExport,
+      onQuit,
+      slot,
+      audio,
+      onRewind,
+    ],
   );
 
   return (
@@ -251,6 +305,17 @@ export function GameShell({
             <div className="rotate-notice" role="status">
               <p>{t.common.rotate}</p>
             </div>
+          )}
+          {overlay && (
+            <OverlayView
+              overlay={overlay}
+              onClose={closeOverlay}
+              onQuit={onQuit}
+              onShowChronicle={() => {
+                setOverlays([]);
+                nav.goTab('menu', { name: 'progression' });
+              }}
+            />
           )}
           <nav className="tab-bar" aria-label={t.tabs.street}>
             {TABS.map(({ id, icon }) => (
@@ -303,6 +368,22 @@ function RouteScreen({ route }: { route: Route }) {
       return <RentScreen id={route.id} />;
     case 'settings':
       return <SettingsScreen />;
+    case 'event':
+      return <EventScreen id={route.id} />;
+    case 'challenge':
+      return <ChallengeScreen />;
+    case 'progression':
+      return <ProgressionScreen />;
+    case 'statistics':
+      return <StatisticsScreen />;
+    case 'agenda':
+      return <AgendaScreen />;
+    case 'monthReview':
+      return <MonthlyReviewScreen />;
+    case 'yearReview':
+      return <YearReviewScreen />;
+    case 'rewind':
+      return <RewindScreen />;
     case 'section':
       return (
         <SectionScreen neighbourhoodId={route.neighbourhoodId} buildingId={route.buildingId} />

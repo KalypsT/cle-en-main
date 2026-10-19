@@ -1,3 +1,4 @@
+import { toDayNumber } from '../calendar.ts';
 import { describe, expect, it } from 'vitest';
 import { advanceToNextMonth, content, engine, newGame } from '../../test/helpers.ts';
 import { deepClone } from '../clone.ts';
@@ -63,7 +64,8 @@ describe('rates', () => {
       quote.insurancePercent +
       quote.bankMarginPercent +
       quote.profilePercent +
-      quote.trustPercent;
+      quote.trustPercent +
+      quote.reputationPercent;
     expect(quote.ratePercent).toBeCloseTo(sum, 2);
     expect(quote.marketPercent).toBe(content.marketRate.startPercent);
     expect(quote.insurancePercent).toBe(content.credit.insurancePercent);
@@ -281,11 +283,21 @@ describe('meetings', () => {
     expect(engine.dispatch(monday, { type: 'bank/meet', bankId: 'zeroPapier' })).toMatchObject({
       reason: { code: 'bank.noMeetings' },
     });
+    // Without enough free time today, the meeting goes to the agenda (milestone 6).
     const tired = deepClone(monday);
     tired.player.freeTimeMinutes = 10;
-    expect(engine.dispatch(tired, { type: 'bank/meet', bankId: 'tirelire' })).toMatchObject({
-      reason: { code: 'time.notEnoughFreeTime' },
-    });
+    const planned = engine.dispatch(tired, { type: 'bank/meet', bankId: 'tirelire' });
+    if (!planned.ok) throw new Error(planned.reason.code);
+    expect(planned.events[0]).toMatchObject({ type: 'bankMeetingPlanned', bankId: 'tirelire' });
+    const item = planned.state.agenda[0];
+    expect(item).toMatchObject({ kind: 'bankMeeting', bankId: 'tirelire' });
+    expect(engine.dispatch(planned.state, { type: 'bank/meet', bankId: 'tirelire' }).ok).toBe(
+      false,
+    );
+    const until = ((item?.day ?? 0) - toDayNumber(tired.clock.date)) * 24 + 1;
+    const after = engine.advanceHours(planned.state, until);
+    expect(after.events.some((e) => e.type === 'bankMeetingHeld')).toBe(true);
+    expect(after.state.agenda).toEqual([]);
   });
 });
 

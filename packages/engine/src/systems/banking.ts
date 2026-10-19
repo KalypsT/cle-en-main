@@ -9,6 +9,8 @@ import {
 } from '../money.ts';
 import type { BankRelation, GameState, Loan } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { modeOf } from './modes.ts';
+import { progressMarginPercent } from './reputation.ts';
 import { expectedSalary } from './household.ts';
 import { roundRate } from './market-rate.ts';
 import { currentRents } from './renting.ts';
@@ -20,6 +22,11 @@ const MONTHS_PER_YEAR = 12;
 const DAYS_PER_YEAR = 365;
 
 /** Trust stays within 0 … 100, kept to a tenth to avoid floating-point drift. */
+/** A trust change, gains scaled by the game mode (docs/02, section 2.5). */
+export function trustChange(content: GameContent, state: GameState, change: number): number {
+  return change > 0 ? change * modeOf(content, state).trustGainFactor : change;
+}
+
 export function clampTrust(value: number): number {
   return Math.round(Math.min(100, Math.max(0, value)) * 10) / 10;
 }
@@ -83,6 +90,8 @@ export interface RateQuote {
   bankMarginPercent: number;
   profilePercent: number;
   trustPercent: number;
+  /** Reputation and titles held (negative: a discount). */
+  reputationPercent: number;
   ratePercent: number;
 }
 
@@ -102,6 +111,8 @@ export function quoteRate(
     profilePercent: rules.trust.marginByJobPercent[jobTrustLevel(content, state)],
     // Trust 50 is neutral; 100 removes the full swing, 0 adds it.
     trustPercent: (rules.trust.marginSwingPercent * (50 - trust)) / 50,
+    /** Reputation and titles (docs/02, sections 2.8 and 2.9). */
+    reputationPercent: progressMarginPercent(content, state),
   };
   const total =
     quote.marketPercent +
@@ -109,7 +120,8 @@ export function quoteRate(
     quote.insurancePercent +
     quote.bankMarginPercent +
     quote.profilePercent +
-    quote.trustPercent;
+    quote.trustPercent +
+    quote.reputationPercent;
   return { ...quote, ratePercent: roundRate(Math.max(rules.insurancePercent, total)) };
 }
 
@@ -370,7 +382,7 @@ export function runMonthlyTrust(ctx: SystemContext, paidBankIds: ReadonlySet<str
     relation.relationshipMonths += 1;
     let change = rules.relationshipMonth;
     if (paidBankIds.has(bank.id) && state.player.balance >= 0) change += rules.onTimePayment;
-    relation.trust = clampTrust(relation.trust + change);
+    relation.trust = clampTrust(relation.trust + trustChange(content, state, change));
   }
 }
 
@@ -433,6 +445,7 @@ export type BankActionRefusal =
   | 'bank.noMeetings'
   | 'bank.meetingTooSoon'
   | 'time.notEnoughFreeTime'
+  | 'time.noSlot'
   | 'loan.unknown'
   | 'loan.notWorthRefinancing'
   | 'loan.refinancingRefused'
@@ -455,7 +468,7 @@ export function holdMeeting(ctx: SystemContext, bankId: string): BankActionRefus
   if (state.player.freeTimeMinutes < rules.meetingMinutes) return 'time.notEnoughFreeTime';
   state.player.freeTimeMinutes -= rules.meetingMinutes;
   relation.lastMeetingDay = ctx.today;
-  relation.trust = clampTrust(relation.trust + rules.meeting);
+  relation.trust = clampTrust(relation.trust + trustChange(content, state, rules.meeting));
   ctx.events.push({ type: 'bankMeetingHeld', bankId: bank.id, trust: relation.trust });
   return null;
 }

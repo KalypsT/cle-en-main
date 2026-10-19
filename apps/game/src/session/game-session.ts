@@ -1,4 +1,4 @@
-import { timeSettings } from '@cle/content';
+import { gameContent, timeSettings } from '@cle/content';
 import {
   decisionKey,
   type DispatchResult,
@@ -40,6 +40,8 @@ export interface SessionSnapshot {
   decisions: PendingDecision[];
   /** The game paused itself for a decision. */
   autoPaused: boolean;
+  /** The automatic acceleration runs (the clock goes at its speed instead of `speed`). */
+  accelerated: boolean;
 }
 
 export interface SessionOptions {
@@ -47,6 +49,10 @@ export interface SessionOptions {
   realSecondsPerGameDay?: number;
   /** Read on each new decision: the player may switch the automatic pause off. */
   autoPause?: () => boolean;
+  /** Read on each frame: the automatic acceleration (docs/02, 2.3). */
+  autoSpeed?: () => boolean;
+  /** Told of every accepted action (the game log). */
+  onAction?: (action: GameAction, state: GameState) => void;
   /** Speed on start (×1 by default; end-to-end tests start paused). */
   initialSpeed?: number;
 }
@@ -65,6 +71,12 @@ export class GameSession {
   private readonly eventListeners = new Set<EventListener>();
   private readonly msPerHour: number;
   private readonly autoPause: () => boolean;
+  private readonly autoSpeed: () => boolean;
+  private readonly onAction: ((action: GameAction, state: GameState) => void) | undefined;
+  /** Engine's pace of the current state: nothing urgent waits for the player. */
+  private calm: boolean;
+  /** No acceleration before this game hour (quiet hours after a new decision). */
+  private quietUntil: number;
   /** Decisions already shown: only new ones pause the game. */
   private seenDecisions: Set<string>;
   private frame: number | null = null;
@@ -81,12 +93,17 @@ export class GameSession {
       feed: [],
       decisions,
       autoPaused: false,
+      accelerated: false,
     };
+    this.calm = engine.pace(state).calm;
+    this.quietUntil = state.clock.elapsedHours;
     this.seenDecisions = new Set(decisions.map(decisionKey));
     this.eventListeners.add(onEvents);
     const seconds = options.realSecondsPerGameDay ?? timeSettings.realSecondsPerGameDay;
     this.msPerHour = (seconds * 1000) / HOURS_PER_DAY;
     this.autoPause = options.autoPause ?? (() => true);
+    this.autoSpeed = options.autoSpeed ?? (() => false);
+    this.onAction = options.onAction;
   }
 
   readonly subscribe = (listener: Listener): (() => void) => {
@@ -115,12 +132,25 @@ export class GameSession {
 
   setSpeed(speed: number): void {
     this.pendingMs = 0;
-    this.update({ speed, autoPaused: false });
+    this.quietUntil = this.snapshot.state.clock.elapsedHours;
+    this.update({ speed, autoPaused: false, accelerated: false });
+  }
+
+  /** Speed the clock really runs at: the automatic acceleration only lifts ×1. */
+  private effectiveSpeed(): number {
+    const { speed, state } = this.snapshot;
+    const accelerate =
+      speed === 1 && this.autoSpeed() && this.calm && state.clock.elapsedHours >= this.quietUntil;
+    if (accelerate !== this.snapshot.accelerated) this.update({ accelerated: accelerate });
+    return accelerate ? gameContent.rhythm.autoSpeed.speed : speed;
   }
 
   dispatch(action: GameAction): DispatchResult {
     const result = engine.dispatch(this.snapshot.state, action);
-    if (result.ok) this.applyEvents(result.state, result.events, false);
+    if (result.ok) {
+      this.onAction?.(action, result.state);
+      this.applyEvents(result.state, result.events, false);
+    }
     return result;
   }
 
@@ -128,7 +158,7 @@ export class GameSession {
     const elapsed = this.lastFrameAt === null ? 0 : Math.min(now - this.lastFrameAt, MAX_FRAME_MS);
     this.lastFrameAt = now;
     if (this.snapshot.speed > 0) {
-      this.pendingMs += elapsed * this.snapshot.speed;
+      this.pendingMs += elapsed * this.effectiveSpeed();
       let state = this.snapshot.state;
       const events: GameEvent[] = [];
       let hours = 0;
@@ -167,6 +197,12 @@ export class GameSession {
       const fresh = decisions.filter((d) => !this.seenDecisions.has(decisionKey(d)));
       this.seenDecisions = new Set(decisions.map(decisionKey));
       changes.decisions = decisions;
+      this.calm = engine.pace(state).calm;
+      // A new decision brings the clock back to ×1 for a few hours.
+      if (fresh.length > 0) {
+        this.quietUntil = state.clock.elapsedHours + gameContent.rhythm.autoSpeed.quietHours;
+        changes.accelerated = false;
+      }
       if (ticking && this.autoPause() && fresh.some((decision) => decision.autoPause)) {
         this.pendingMs = 0;
         changes.speed = 0;
@@ -174,7 +210,7 @@ export class GameSession {
       }
     }
     const shown = events
-      .map((event) => ({ event, text: describeEvent(event) }))
+      .map((event) => ({ event, text: describeEvent(event, state) }))
       .filter((item): item is { event: GameEvent; text: string } => item.text !== null)
       // Calendar ticks are not news.
       .filter(({ event }) => event.type !== 'dayStarted' && event.type !== 'weekendStarted');

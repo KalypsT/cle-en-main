@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { toDayNumber } from './calendar.ts';
 import { advanceToNextMonth, content, defaultOptions, engine, newGame } from '../test/helpers.ts';
 import type { GameEvent } from './events.ts';
 import { toCents } from './money.ts';
@@ -142,5 +143,53 @@ describe('household', () => {
       state.player.balance - state.player.monthlyRent - toCents(content.livingCosts.minimum),
     );
     expect(next.player.freeTimeMinutes).toBe(content.unemployedFreeTimeMinutes);
+  });
+});
+
+describe('modes, rewind and pace (milestone 6)', () => {
+  it('creates a game in a mode, and refuses an unknown one', () => {
+    expect(newGame({ modeId: 'serene' }).modeId).toBe('serene');
+    expect(newGame().modeId).toBe(content.modes.defaultModeId);
+    expect(() => newGame({ modeId: 'nope' })).toThrow(RangeError);
+  });
+
+  it('goes back to a monthly point, counting rewinds across the rewind itself', () => {
+    const start = newGame();
+    const point = advanceToNextMonth(start).state;
+    const later = engine.advanceHours(point, 24 * 40).state;
+    const first = engine.rewind(later, point);
+    if (!first.ok) throw new Error(first.reason);
+    expect(first.state.clock).toEqual(point.clock);
+    expect(first.state.rewinds).toBe(1);
+    expect(first.state.chronicle.at(-1)?.kind).toBe('rewind');
+    expect(engine.rewindsLeft(first.state)).toBe(2);
+    // A point from the future, or from another game, is refused.
+    expect(engine.rewind(point, later)).toEqual({ ok: false, reason: 'rewind.invalidPoint' });
+    // Exigeant: none at all.
+    const demanding = { ...later, modeId: 'demanding' };
+    expect(engine.rewind(demanding, point)).toEqual({ ok: false, reason: 'rewind.noneLeft' });
+    // Serein: unlimited.
+    expect(engine.rewindsLeft({ ...later, modeId: 'serene' })).toBeNull();
+  });
+
+  it('is calm when nothing waits for the player', () => {
+    const state = newGame();
+    expect(engine.pace(state).calm).toBe(true);
+    const tired = { ...state, player: { ...state.player, freeTimeMinutes: 0 } };
+    const listing = tired.listings[0];
+    if (!listing) throw new Error('No listing');
+    const planned = engine.dispatch(tired, { type: 'market/visit', listingId: listing.id });
+    if (!planned.ok) throw new Error(planned.reason.code);
+    const soon = planned.state.agenda[0]?.day === toDayNumber(state.clock.date) + 1;
+    expect(engine.pace(planned.state).calm).toBe(!soon);
+  });
+
+  it('stops the clock and the actions once the game is over', () => {
+    const over = { ...newGame(), gameOver: { day: 1 } };
+    expect(engine.tick(over).state).toBe(over);
+    expect(engine.dispatch(over, { type: 'job/resign' })).toMatchObject({
+      ok: false,
+      reason: { code: 'game.over' },
+    });
   });
 });

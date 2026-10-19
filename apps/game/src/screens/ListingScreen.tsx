@@ -79,7 +79,9 @@ function ListingBody({ listing }: { listing: Listing }) {
   const view = engine.listingView(state, listing.id);
   const catalog = engine.worksCatalog(state, listing.id) ?? [];
   const today = toDayNumber(state.clock.date);
-  const planned = state.agenda.find((item) => item.listingId === listing.id);
+  const planned = state.agenda.find(
+    (item) => item.kind === 'visit' && item.listingId === listing.id,
+  );
   const motivation = gameContent.listingTexts.motivations[listing.motivationId];
   const noisy = property.defects.find((defect) => defect.revealed);
   const rules = gameContent.market.negotiation;

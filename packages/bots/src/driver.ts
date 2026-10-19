@@ -79,6 +79,22 @@ export interface GameOptions {
 
 const DEFAULT_DECISION_HOUR = 18;
 
+/**
+ * What every bot does with the decisions its strategy ignores, as a player
+ * would: it answers the catalogue's events with their default choice right
+ * away and takes up the challenges (they cost nothing).
+ */
+function answerTheRest(api: BotApi): void {
+  for (const instance of [...api.state.catalog.pending]) {
+    const event = engine.content.events.find((candidate) => candidate.id === instance.eventId);
+    if (event?.defaultChoice) {
+      api.act({ type: 'event/choose', eventId: instance.id, choiceId: event.defaultChoice });
+    }
+  }
+  const challenge = api.state.progress.challenge;
+  if (challenge && !challenge.accepted) api.act({ type: 'challenge/answer', accept: true });
+}
+
 /** Plays one game with a strategy and returns its measures. Stops at bankruptcy. */
 export function playGame(strategy: Strategy, options: GameOptions): GameMetrics {
   const state = engine.createGame({
@@ -98,15 +114,27 @@ export function playGame(strategy: Strategy, options: GameOptions): GameMetrics 
     }
   };
   const ticks = options.days * HOURS_PER_DAY;
+  // Real time of each day, with the pace left once the day's decisions are taken.
+  let calm = engine.pace(api.state).calm;
   for (let i = 0; i < ticks; i++) {
     const result = engine.tick(api.state);
     api.state = result.state;
+    if (result.events.some((event) => event.type === 'dayStarted'))
+      metrics.addTime(HOURS_PER_DAY, calm);
     metrics.record(result.events, api.state);
+    if (result.events.some((event) => event.type === 'dayStarted')) {
+      metrics.observeDecisions(api.state);
+      calm = engine.pace(api.state).calm;
+    }
     react(result.events);
-    if (api.state.player.bankruptDay !== null) break;
+    // The first bankruptcy ends the measured game (a fresh start would follow).
+    if (metrics.bankrupt) break;
     if (api.state.clock.hour === decisionHour && strategy.daily) {
       strategy.daily(api);
+      if (strategy.id !== 'inactif') answerTheRest(api);
       react(api.takeQueued());
+      metrics.observeDecisions(api.state);
+      calm = engine.pace(api.state).calm;
     }
   }
   return metrics.finish(api.state);

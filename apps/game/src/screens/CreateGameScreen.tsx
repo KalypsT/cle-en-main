@@ -10,6 +10,7 @@ export interface NewGameChoices {
   avatar: AvatarParts;
   jobId: string;
   tutorial: boolean;
+  modeId: string;
 }
 
 const PARTS = ['face', 'hair', 'skin', 'outfit'] as const;
@@ -40,6 +41,7 @@ export function CreateGameScreen({
   const [avatar, setAvatar] = useState<AvatarParts>({ face: 0, hair: 0, skin: 0, outfit: 0 });
   const [jobId, setJobId] = useState(start.defaultJobId);
   const [tutorial, setTutorial] = useState(true);
+  const [modeId, setModeId] = useState(gameContent.modes.defaultModeId);
 
   const shift = (part: (typeof PARTS)[number], delta: number) =>
     setAvatar((current) => ({
@@ -121,11 +123,21 @@ export function CreateGameScreen({
         </div>
       </Card>
       <Card title={t.creation.mode}>
-        <button type="button" className="option-card" aria-pressed="true">
-          <span className="strong">{t.creation.classic}</span>
-          <span className="small muted">{t.creation.classicDescription}</span>
-        </button>
-        <p className="small muted">{t.creation.modesLater}</p>
+        <div className="stack">
+          {gameContent.modes.modes.map((mode) => (
+            <button
+              key={mode.id}
+              type="button"
+              className="option-card"
+              aria-pressed={mode.id === modeId}
+              data-testid={`mode-${mode.id}`}
+              onClick={() => setModeId(mode.id)}
+            >
+              <span className="strong">{mode.name}</span>
+              <span className="small muted">{mode.description}</span>
+            </button>
+          ))}
+        </div>
       </Card>
       <Card>
         <Switch
@@ -138,7 +150,7 @@ export function CreateGameScreen({
       <button
         type="button"
         className="button primary block"
-        onClick={() => onStart({ name, avatar, jobId, tutorial })}
+        onClick={() => onStart({ name, avatar, jobId, tutorial, modeId })}
       >
         {t.creation.start}
       </button>

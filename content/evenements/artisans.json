@@ -1,0 +1,652 @@
+{
+  "events": [
+    {
+      "id": "artisanLate",
+      "family": "artisans",
+      "target": "works",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 1,
+      "cooldownDays": 30,
+      "pause": false,
+      "artisanTrade": "mason",
+      "texts": [
+        "{artisan} appelle : « Petit souci de planning, j'aurai une semaine de retard sur {bien}. »"
+      ],
+      "choices": [
+        {
+          "id": "bonus",
+          "label": "Proposer une prime pour tenir le délai ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -500,
+                "max": -300
+              }
+            }
+          ],
+          "outcome": "Miracle : le planning s'est libéré."
+        },
+        {
+          "id": "insist",
+          "label": "Insister au téléphone (30 min)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 30
+            },
+            {
+              "type": "worksDelay",
+              "days": 3
+            }
+          ],
+          "outcome": "Il gagne quatre jours, en soupirant."
+        },
+        {
+          "id": "patient",
+          "label": "Être patient",
+          "effects": [
+            {
+              "type": "worksDelay",
+              "days": 7
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 2,
+      "defaultChoice": "patient"
+    },
+    {
+      "id": "artisanEarly",
+      "family": "artisans",
+      "target": "works",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.6,
+      "cooldownDays": 30,
+      "pause": false,
+      "artisanTrade": "painter",
+      "texts": ["Bonne nouvelle : {artisan} a eu une annulation et avance sur {bien}."],
+      "effects": [
+        {
+          "type": "worksDelay",
+          "days": -3
+        }
+      ]
+    },
+    {
+      "id": "wallTreasure",
+      "family": "artisans",
+      "target": "works",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.2,
+      "cooldownDays": 365,
+      "pause": false,
+      "artisanTrade": "mason",
+      "texts": [
+        "En cassant une cloison de {bien}, {artisan} trouve une boîte en fer pleine de vieilles pièces de monnaie."
+      ],
+      "choices": [
+        {
+          "id": "keep",
+          "label": "Les faire estimer et les vendre (+{montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": 200,
+                "max": 900
+              }
+            }
+          ],
+          "outcome": "Un numismate de Besançon s'est déplacé exprès."
+        },
+        {
+          "id": "museum",
+          "label": "Les offrir au musée de {ville}",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": 3
+            }
+          ],
+          "outcome": "Une petite vitrine porte désormais votre nom."
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "keep"
+    },
+    {
+      "id": "tilerSlot",
+      "family": "artisans",
+      "target": "owned",
+      "kind": "opportunity",
+      "conditions": {
+        "item": {
+          "kind": "bathroom",
+          "maxState": 3
+        }
+      },
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "artisanTrade": "tiler",
+      "texts": [
+        "{artisan} a un trou dans son planning : il peut rafraîchir la salle de bains de {bien} à prix d'ami."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -800,
+                "max": -500
+              }
+            },
+            {
+              "type": "item",
+              "item": "bathroom",
+              "delta": 1
+            },
+            {
+              "type": "satisfaction",
+              "delta": 4
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "siteNoise",
+      "family": "artisans",
+      "target": "works",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.75,
+      "cooldownDays": 60,
+      "pause": false,
+      "texts": [
+        "Les voisins de {bien} se plaignent du bruit du chantier. Une pétition circule déjà."
+      ],
+      "choices": [
+        {
+          "id": "flowers",
+          "label": "Leur offrir des fleurs et un mot ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -60,
+                "max": -40
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "nothing",
+          "label": "Ne rien faire",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "nothing"
+    },
+    {
+      "id": "toolsStolen",
+      "family": "artisans",
+      "target": "works",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.3,
+      "cooldownDays": 120,
+      "pause": false,
+      "artisanTrade": "electrician",
+      "texts": [
+        "Cette nuit, la camionnette de {artisan} a été visitée devant {bien}. Plus de perceuse, plus de chantier pendant quelques jours."
+      ],
+      "effects": [
+        {
+          "type": "worksDelay",
+          "days": 4
+        }
+      ]
+    },
+    {
+      "id": "apprentice",
+      "family": "artisans",
+      "target": "works",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.4,
+      "cooldownDays": 120,
+      "pause": false,
+      "artisanTrade": "carpenter",
+      "texts": [
+        "{artisan} demande s'il peut former un apprenti sur le chantier de {bien}. « Il est motivé, mais lent. »"
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": 2
+            },
+            {
+              "type": "worksDelay",
+              "days": 2
+            }
+          ],
+          "outcome": "L'apprenti vous a fait un petit tabouret pour vous remercier."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "doubleInvoice",
+      "family": "artisans",
+      "target": "owned",
+      "kind": "mishap",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "worksDone",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "artisanTrade": "plumber",
+      "texts": [
+        "Vous recevez une facture de {artisan} pour {bien}… que vous aviez déjà payée, il semblerait."
+      ],
+      "choices": [
+        {
+          "id": "check",
+          "label": "Vérifier ses comptes (30 min)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 30
+            }
+          ],
+          "outcome": "C'était bien un doublon. Il s'excuse."
+        },
+        {
+          "id": "pay",
+          "label": "Payer pour avoir la paix ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -600,
+                "max": -300
+              }
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "pay"
+    },
+    {
+      "id": "looseTiles",
+      "family": "artisans",
+      "target": "owned",
+      "kind": "mishap",
+      "conditions": {
+        "propertyKinds": ["house", "building"],
+        "item": {
+          "kind": "roof",
+          "maxState": 3
+        }
+      },
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "artisanTrade": "carpenter",
+      "texts": ["{artisan}, de passage, a repéré des tuiles déplacées sur le toit de {bien}."],
+      "choices": [
+        {
+          "id": "fix",
+          "label": "Faire réparer ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -600,
+                "max": -300
+              }
+            },
+            {
+              "type": "item",
+              "item": "roof",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre",
+          "effects": [
+            {
+              "type": "item",
+              "item": "roof",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "chimneySweep",
+      "family": "artisans",
+      "target": "owned",
+      "kind": "neutral",
+      "conditions": {
+        "months": [9, 10, 11],
+        "propertyKinds": ["house", "building"]
+      },
+      "chancePerMonth": 0.6,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": ["C'est l'heure du ramonage annuel de {bien}. Le ramoneur a déjà son chapeau."],
+      "choices": [
+        {
+          "id": "do",
+          "label": "Faire ramoner ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -100,
+                "max": -70
+              }
+            }
+          ]
+        },
+        {
+          "id": "skip",
+          "label": "Sauter cette année",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -1
+            },
+            {
+              "type": "item",
+              "item": "heating",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 7,
+      "defaultChoice": "skip"
+    },
+    {
+      "id": "dangerousPanel",
+      "family": "artisans",
+      "target": "owned",
+      "kind": "mishap",
+      "conditions": {
+        "item": {
+          "kind": "electricity",
+          "maxState": 2
+        }
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 365,
+      "pause": true,
+      "artisanTrade": "electrician",
+      "texts": [
+        "{artisan} est formel : le tableau électrique de {bien} est dangereux. « Je n'y mettrais pas mon chat. »"
+      ],
+      "choices": [
+        {
+          "id": "replace",
+          "label": "Le remplacer ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -1400,
+                "max": -900
+              }
+            },
+            {
+              "type": "item",
+              "item": "electricity",
+              "delta": 2
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "patch",
+          "label": "Rafistoler ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -250,
+                "max": -150
+              }
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "Ignorer",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -2
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "artisanTip",
+      "family": "artisans",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "worksDone",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.04,
+      "cooldownDays": 180,
+      "pause": false,
+      "artisanTrade": "plumber",
+      "texts": [
+        "{artisan} vous glisse qu'un de ses clients, un vieux monsieur, veut vendre sans agence."
+      ],
+      "effects": [
+        {
+          "type": "offMarketListing"
+        }
+      ]
+    },
+    {
+      "id": "siteVisit",
+      "family": "artisans",
+      "target": "works",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.6,
+      "cooldownDays": 60,
+      "pause": false,
+      "artisanTrade": "kitchenFitter",
+      "texts": [
+        "{artisan} voudrait que vous passiez sur le chantier de {bien} pour valider un détail."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y passer (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "worksDelay",
+              "days": -1
+            }
+          ],
+          "outcome": "Détail validé, chantier relancé."
+        },
+        {
+          "id": "phone",
+          "label": "Valider par téléphone",
+          "effects": [
+            {
+              "type": "worksDelay",
+              "days": 1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 2,
+      "defaultChoice": "phone"
+    },
+    {
+      "id": "vacantLeak",
+      "family": "artisans",
+      "target": "vacant",
+      "kind": "mishap",
+      "conditions": {
+        "item": {
+          "kind": "plumbing",
+          "maxState": 3
+        }
+      },
+      "chancePerMonth": 0.075,
+      "cooldownDays": 365,
+      "pause": true,
+      "texts": [
+        "Le voisin du dessous signale une tache au plafond : une fuite dans {bien}, vide depuis un moment."
+      ],
+      "choices": [
+        {
+          "id": "plumber",
+          "label": "Envoyer un plombier ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -500,
+                "max": -200
+              }
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -1000,
+                "max": -600
+              }
+            },
+            {
+              "type": "item",
+              "item": "floors",
+              "delta": -1
+            }
+          ],
+          "outcome": "La fuite a fini par abîmer le parquet."
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "paintLeftover",
+      "family": "artisans",
+      "target": "works",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.25,
+      "cooldownDays": 365,
+      "pause": false,
+      "artisanTrade": "painter",
+      "texts": [
+        "{artisan} a des pots de peinture de grande marque en trop. Il vous les cède pour une bouchée de pain."
+      ],
+      "choices": [
+        {
+          "id": "buy",
+          "label": "Les prendre ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -60,
+                "max": -40
+              }
+            },
+            {
+              "type": "item",
+              "item": "walls",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 2,
+      "defaultChoice": "decline"
+    }
+  ]
+}

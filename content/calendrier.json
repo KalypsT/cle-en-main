@@ -1,0 +1,13 @@
+{
+  "publicHolidays": {
+    "fixed": ["01-01", "05-01", "05-08", "07-14", "08-15", "11-01", "11-11", "12-25"],
+    "easterOffsets": [1, 39, 50]
+  },
+  "schoolHolidays": [
+    { "id": "toussaint", "name": "vacances de la Toussaint", "from": "10-16", "days": 16 },
+    { "id": "christmas", "name": "vacances de Noël", "from": "12-18", "days": 16 },
+    { "id": "winter", "name": "vacances d'hiver", "from": "02-07", "days": 16 },
+    { "id": "spring", "name": "vacances de printemps", "from": "04-04", "days": 16 },
+    { "id": "summer", "name": "grandes vacances", "from": "07-01", "until": "08-31" }
+  ]
+}

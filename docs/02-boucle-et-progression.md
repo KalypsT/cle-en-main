@@ -18,12 +18,16 @@
 | **Chaque mois** | Salaire, loyers, mensualités, charges, honoraires d'agence, petit bilan affiché, sauvegarde automatique de secours |
 | **Chaque année** | Impôts, taxe foncière (automne), réévaluation des biens, révision des loyers, assemblées de copropriété, **bilan annuel**, nouveau titre éventuel |
 
+> **Jalon 6** : le **bilan mensuel** s'ouvre le 1er de chaque mois (désactivable dans les Réglages) : flux du mois par famille, solde, patrimoine net et son évolution, loyers, réputation, série de mois positifs, titres et succès du mois. Le **bilan annuel** s'ouvre le 1er janvier, à la place du bilan mensuel : Yvon Tableur salue, donne au plus 4 conseils choisis par le moteur (évolution du patrimoine, interdiction DPE proche, réserve mince, endettement, logement vide, meilleur régime fiscal, impôt nul ou élevé, déficit reporté, crédit à renégocier, année positive ou négative, premier achat), puis les chiffres de l'année (patrimoine, solde, loyers, impôt sur les loyers, honoraires, réputation, titres et succès). Textes et seuils dans `content/textes/yvon.json`. Les deux bilans jouent l'emplacement de musique « célébration ».
+
 ## 2.3 La vitesse du temps
 
 - Vitesses : **pause, ×1, ×2, ×4**.
 - À **×1**, une journée de jeu dure **environ 20 secondes**. Un mois dure environ 10 minutes, une année environ 2 heures.
 - **Accélération automatique** (activée par défaut, désactivable) : quand aucune décision n'est en attente et que rien n'est prévu, le temps passe en ×4, puis revient en ×1 au prochain événement.
 - **Pause automatique** pour les décisions importantes : offre reçue, incident grave, enchère, assemblée de copropriété.
+
+> **Jalon 6** : l'accélération automatique (réglage activé par défaut) ne s'applique qu'à la vitesse ×1. Le moteur dit si la partie est « calme » (`pace`) : aucune décision dont l'échéance tombe dans le jour qui vient, rien dans l'agenda dans les 24 heures. Les décisions durables (logement vide, avertissement DPE, renégociation possible, devis qui expire, alerte de trésorerie) ne retiennent jamais l'accélération. Toute **nouvelle** décision ramène le temps à ×1 pendant 4 heures de jeu. Valeurs dans `content/rythme.json`. La pause automatique s'étend aux défis proposés, aux incidents graves (chauffe-eau, fuite, chauffage : `content/decisions.json`) et aux événements du catalogue marqués `pause`. Les bilans et la célébration d'un titre arrêtent aussi l'horloge tant qu'ils sont ouverts.
 
 ## 2.4 La boucle principale
 
@@ -50,6 +54,8 @@ Choisis à la création, ils règlent la faillite, le retour en arrière et, rai
 | Faillite | seulement des saisies | nouveau départ | fin de partie |
 | Retours en arrière | illimités | 3 par partie | aucun |
 
+> **Jalon 6** : table dans `content/modes.json`. Serein : imprévus et incidents ×0,7, rivaux ×0,75, gains de confiance ×1,3 ; Exigeant : ×1,2, ×1,25 et ×0,75. Les coefficients s'appliquent aux incidents des locataires, aux imprévus de chantier, aux événements « fâcheux » du catalogue, à l'agressivité des rivaux et aux seuls gains de confiance des banquiers (jamais aux pertes). « Seulement des saisies » en Serein : les ventes forcées ont lieu, mais la faillite devient un nouveau départ qui garde **toute** la réputation (choix de Thibaud).
+
 ## 2.6 La faillite
 
 ### Une descente progressive
@@ -66,10 +72,12 @@ La faillite doit se voir venir et pouvoir s'éviter :
 
 ### Le nouveau départ (mode Classique)
 
-Le joueur reste dans le **même monde** et redevient salarié dans son métier, à Dole, avec un petit apport (valeur à calibrer, par exemple 5 000 €).
+Le joueur reste dans le **même monde** et redevient salarié dans son métier, à Dole, avec un petit apport de **5 000 €**.
 
-Il **garde** : ses titres, ses succès, sa chronique, son carnet d'artisans et une partie de sa réputation (par exemple 50 %).
+Il **garde** : ses titres, ses succès, sa chronique, son carnet d'artisans et **50 %** de sa réputation.
 Il **perd** : tous ses biens, ses crédits et sa trésorerie.
+
+> **Jalon 6** (point ouvert n° 11, tranché) : 5 000 € et 50 % de la réputation en Classique, 100 % en Serein. Le joueur redevient locataire au loyer de départ ; ses achats en cours (compromis) et ses offres sont abandonnés, ses dettes fiscales effacées, et chaque banquier lui retire 20 points de confiance (10 en Serein). En mode Exigeant, la partie s'arrête (`gameOver`) : le temps ne passe plus, les actions sont refusées, la chronique et les statistiques restent consultables.
 
 La partie n'est jamais perdue, mais la chute fait mal.
 
@@ -79,6 +87,8 @@ La partie n'est jamais perdue, mais la chute fait mal.
 - Écran « **Revenir en arrière** » : liste des points avec la date et le patrimoine net à cette date.
 - Nombre de retours selon le mode : illimité (Serein), 3 par partie (Classique), aucun (Exigeant).
 - Techniquement simple : l'état complet du jeu est sérialisable (voir [07-architecture.md](07-architecture.md)).
+
+> **Jalon 6** : les points sont pris par l'application à la sauvegarde automatique du 1er de chaque mois et rangés dans l'emplacement de sauvegarde (`checkpoints`, date, patrimoine net et partie). Revenir en arrière (`engine.rewind`) reprend la partie du point, mais **garde le compteur de retours de la partie en cours** : remonter le temps ne rend jamais les retours déjà utilisés. Les points postérieurs sont effacés ; le retour s'inscrit dans la chronique.
 
 ## 2.8 La réputation
 
@@ -93,6 +103,8 @@ La partie n'est jamais perdue, mais la chute fait mal.
 | Années sans incident | Conflit avec un locataire |
 
 **Effets** : meilleures conditions bancaires, biens hors marché proposés par les agents, priorité chez les bons artisans, respect (ou jalousie) des rivaux.
+
+> **Jalon 6** (point ouvert n° 5, valeurs de départ dans `content/progression.json`) : départ à 10. Gains : +3 par achat, +2 par revente avec plus-value, +1 par chantier terminé et +1 par classe DPE gagnée, +2 par année tranquille (des biens, ni vente forcée, ni procédure, ni expulsion, ni logement indécent loué), +1 par locataire satisfait (70 ou plus) au 1er janvier, la récompense des défis, et certains choix d'événements. Pertes : −8 par vente forcée, −4 par procédure, −2 par expulsion, −2 quand un locataire part à cause d'un incident laissé sans réparation, −5 par an et par logement indécent loué, en plus de la relance d'impayé du jalon 2. Effets : marge bancaire réduite de 0,05 point à 50, 0,10 à 70, 0,20 à 90 (ligne « Réputation et titres » du détail du taux) ; à partir de 30, un agent propose un bien hors marché environ une fois tous les 4 mois (motivation `offMarket`, 4 à 12 % sous la valeur, visible du seul joueur pendant 5 jours) ; la priorité chez les artisans existait déjà (file d'attente raccourcie avec la réputation, jalon 3). La notoriété locale par ville attend le jalon 7.
 
 ## 2.9 Les titres
 
@@ -109,6 +121,8 @@ Deux branches qui se rejoignent. Les seuils sont à calibrer.
 | Ultime | **Baron de la pierre** (5 M€ net, 4 villes, réputation de 90) | **Baron de la pierre** |
 
 Chaque titre apporte un **petit avantage** (une marge bancaire réduite, un agent de plus qui appelle) et une **scène de célébration** dans la rue.
+
+> **Jalon 6** (`content/titres.json`) : chaque titre demande un titre de l'étape précédente de sa branche. Rénovateur : 3 chantiers d'au moins 10 000 € chacun. Bailleur : 3 biens loués en même temps. La condition des 2 villes (Investisseur aguerri) et des 4 villes (Baron) est écrite mais inactive jusqu'au jalon 7 ; Promoteur arrive au jalon 8, et Magnat suit donc directement Investisseur aguerri ou Marchand de biens. Avantages : −0,05 point de marge par titre de Primo-investisseur à Magnat ; Bailleur et Rénovateur ajoutent un agent qui propose des biens hors marché (+15 % de chance par mois), Investisseur aguerri, Marchand de biens et Magnat +10 % chacun. Un nouveau titre ouvre une scène de célébration (confettis, musique « célébration »).
 
 Durées cibles, voir [08-equilibrage.md](08-equilibrage.md).
 
@@ -129,3 +143,9 @@ Durées cibles, voir [08-equilibrage.md](08-equilibrage.md).
 - **Statistiques** : courbes sur le long terme (patrimoine, loyers, endettement, cash-flow) et records (meilleure plus-value, plus beau chantier).
 
 Les succès et les statistiques suffisent comme moteur à long terme : pas de collection ni d'objectif imposé.
+
+> **Jalon 6** :
+> - **44 succès** dans `content/succes.json`, décrits par des conditions sur des **statistiques** (compteurs tenus par le moteur, ou valeurs lues dans l'état : patrimoine, loyers, confiance d'un banquier…). « Mme Delaporte en larmes » compte les compromis signés sur une annonce qui intéressait Monique Delaporte. Un succès peut être secret (« Le phénix »).
+> - **13 défis** dans `content/defis.json`, lancés par Gérard, Kévin, Hortense, Yvon, Monique ou les frères Martinot : à accepter dans les 5 jours, à réussir en 4 à 5 mois le plus souvent (12 mois pour la série de bilans positifs, la fin de l'année pour « Zéro impôt »), récompense de 4 à 6 points de réputation, petite pénalité pour certains. Un seul à la fois, puis 45 jours de répit : 2 à 3 par an. Kévin Boost propose pour l'instant un bien « avant quatre mois » à Dole ; Besançon viendra avec les villes.
+> - **Chronique** : départ, premiers achat, bail, chantier et revente, résidence principale, titres, succès, défis, grands événements nationaux, vente forcée, faillite, nouveau départ, fin de partie, retour en arrière, record de plus-value.
+> - **Statistiques** : le point mensuel de la courbe garde aussi les loyers en cours et la réputation ; courbes du patrimoine, des loyers, des dettes, du bilan mensuel et de la réputation ; records (patrimoine le plus haut, plus belle plus-value, plus beau chantier, meilleur mois) et compteurs.

@@ -55,6 +55,26 @@ export interface BotSummary {
     realRegimeShare: number;
     furnishedShare: number;
   };
+  /** Density of decisions (docs/03-systemes/07) and progression (docs/02, 2.8 to 2.10). */
+  rhythm: {
+    /** Real seconds at ×1 (automatic acceleration on) per decision, over all games. */
+    interval: number;
+    intervalByJob: Record<string, number>;
+    decisionsPerYear: number;
+    catalogPerYear: number;
+    interestingPerYear: number;
+    challengesPerYear: number;
+    challengesWonPerYear: number;
+    anecdotesPerYear: number;
+    /** Share of the game time the acceleration would run. */
+    calmShare: number;
+    /** Real hours a year of play. */
+    realHoursPerYear: number;
+    medianAchievements: number;
+    medianReputation: number;
+    /** Share of games earning each title, and the median years over those that do. */
+    titles: Record<string, { share: number; years: number | null }>;
+  };
   works: {
     /** Means per game. */
     projects: number;
@@ -161,6 +181,7 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
     ),
     byJob,
     renting: rentingSummary(games),
+    rhythm: rhythmSummary(games),
     works: {
       projects: mean(games.map((g) => g.worksProjects)),
       cost: mean(games.map((g) => g.worksCost)),
@@ -179,6 +200,49 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
           games.reduce((sum, g) => sum + g.finalProperties, 0),
         ),
     },
+  };
+}
+
+function intervalOf(games: readonly GameMetrics[]): number {
+  const decisions = games.reduce((sum, g) => sum + g.decisions, 0);
+  const seconds = games.reduce((sum, g) => sum + g.realSeconds, 0);
+  return decisions > 0 ? seconds / decisions : Number.POSITIVE_INFINITY;
+}
+
+function rhythmSummary(games: GameMetrics[]): BotSummary['rhythm'] {
+  const years = games.reduce((sum, g) => sum + g.days / DAYS_PER_YEAR, 0) || 1;
+  const perYear = (pick: (g: GameMetrics) => number) =>
+    games.reduce((sum, g) => sum + pick(g), 0) / years;
+  const intervalByJob: Record<string, number> = {};
+  for (const job of jobs) {
+    const ofJob = games.filter((game) => game.jobId === job.id);
+    if (ofJob.length > 0) intervalByJob[job.id] = intervalOf(ofJob);
+  }
+  const titles: BotSummary['rhythm']['titles'] = {};
+  for (const title of gameContent.titles) {
+    if (title.step === 0 || !title.available) continue;
+    const days = games
+      .map((g) => g.titleDays[title.id])
+      .filter((day): day is number => day !== undefined);
+    titles[title.id] = {
+      share: days.length / Math.max(1, games.length),
+      years: days.length > 0 ? median(days) / DAYS_PER_YEAR : null,
+    };
+  }
+  return {
+    interval: intervalOf(games),
+    intervalByJob,
+    decisionsPerYear: perYear((g) => g.decisions),
+    catalogPerYear: perYear((g) => g.catalogEvents),
+    interestingPerYear: perYear((g) => g.interestingListings),
+    challengesPerYear: perYear((g) => g.challengesOffered),
+    challengesWonPerYear: perYear((g) => g.challengesWon),
+    anecdotesPerYear: perYear((g) => g.anecdotes),
+    calmShare: games.reduce((sum, g) => sum + g.calmDays, 0) / Math.max(1, years * DAYS_PER_YEAR),
+    realHoursPerYear: perYear((g) => g.realSeconds) / 3600,
+    medianAchievements: median(games.map((g) => g.achievements)),
+    medianReputation: median(games.map((g) => g.finalReputation)),
+    titles,
   };
 }
 
@@ -252,16 +316,30 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
       ok: graded ? months !== null && months >= 1 && months <= 6 : null,
     });
     list.push({
-      label: `Titre Bailleur, 3 biens loués (${BOT_NAMES[id]})`,
+      label: `Titre Bailleur (${BOT_NAMES[id]})`,
       target: '2 à 4 ans',
       measured: `${num(s.bailleurYears)} ans (atteint dans ${pct(s.bailleurShare)} des parties)`,
       ok: graded ? s.bailleurYears >= 2 && s.bailleurYears <= 4 : null,
     });
     list.push({
-      label: `Investisseur aguerri, 250 k€ nets (${BOT_NAMES[id]})`,
+      label: `Titre Investisseur aguerri (${BOT_NAMES[id]})`,
       target: '6 à 10 ans (sans la condition des 2 villes)',
       measured: `${num(s.seasonedYears)} ans (atteint dans ${pct(s.seasonedShare)} des parties)`,
       ok: graded ? s.seasonedYears >= 6 && s.seasonedYears <= 10 : null,
+    });
+  }
+  // Docs/08, 8.1: one interesting decision every 30 to 60 real seconds at ×1, for every job.
+  for (const id of ['chasseur', 'prudent'] as const) {
+    const s = get(id);
+    if (!s) continue;
+    const intervals = Object.values(s.rhythm.intervalByJob);
+    const low = Math.min(...intervals);
+    const high = Math.max(...intervals);
+    list.push({
+      label: `Densité de décisions (${BOT_NAMES[id]})`,
+      target: 'une décision toutes les 30 à 60 s réelles à ×1, pour chaque métier',
+      measured: `${num(s.rhythm.interval)} s en moyenne (de ${num(low)} à ${num(high)} s selon le métier)`,
+      ok: low >= 30 && high <= 60,
     });
   }
   const prudent = get('prudent');
@@ -523,6 +601,61 @@ export function formatReport(report: Report, title: string): string {
         num(s.works.dpeClassesGained),
         num(s.works.sales),
         pct(s.works.passoireShare),
+      ]),
+    ),
+    '',
+    '## Rythme et progression',
+    '',
+    'Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×4 quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).',
+    '',
+    table(
+      [
+        'Bot',
+        'Secondes par décision',
+        'Décisions/an',
+        'Événements/an',
+        'Annonces intéressantes/an',
+        'Défis proposés/an (réussis)',
+        'Anecdotes/an',
+        'Temps accéléré',
+        'Heures réelles/an',
+        'Succès (médiane)',
+        'Réputation finale (médiane)',
+      ],
+      summaries.map((s) => [
+        name(s),
+        num(s.rhythm.interval),
+        num(s.rhythm.decisionsPerYear),
+        num(s.rhythm.catalogPerYear),
+        num(s.rhythm.interestingPerYear),
+        `${num(s.rhythm.challengesPerYear)} (${num(s.rhythm.challengesWonPerYear)})`,
+        num(s.rhythm.anecdotesPerYear),
+        pct(s.rhythm.calmShare),
+        num(s.rhythm.realHoursPerYear),
+        num(s.rhythm.medianAchievements),
+        num(s.rhythm.medianReputation),
+      ]),
+    ),
+    '',
+    table(
+      ['Bot', ...jobs.map((job) => `${job.name} (s/décision)`)],
+      summaries.map((s) => [
+        name(s),
+        ...jobs.map((job) => num(s.rhythm.intervalByJob[job.id] ?? Number.NaN)),
+      ]),
+    ),
+    '',
+    table(
+      ['Bot', ...gameContent.titles.filter((t) => t.step > 0 && t.available).map((t) => t.name)],
+      summaries.map((s) => [
+        name(s),
+        ...gameContent.titles
+          .filter((t) => t.step > 0 && t.available)
+          .map((t) => {
+            const title = s.rhythm.titles[t.id];
+            if (!title || title.share === 0) return '—';
+            return `${pct(title.share)} · ${num(title.years ?? 0)} ans`;
+          }),
       ]),
     ),
     '',

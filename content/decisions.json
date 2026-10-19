@@ -1,5 +1,6 @@
 {
   "quoteWarningDays": 3,
   "cashForecastDays": 30,
-  "autoPause": ["counterOffer", "saleOffer", "worksHazard", "coproVote"]
+  "autoPause": ["counterOffer", "saleOffer", "worksHazard", "coproVote", "challengeOffer"],
+  "seriousIncidents": ["waterHeater", "leak", "heating"]
 }

@@ -12,7 +12,7 @@ import {
 } from '../content.ts';
 import { EPOCHS, MOMENTS, SEASONS, WEATHERS } from '../content-constants.ts';
 import { hashFloat } from '../random.ts';
-import type { GameState, OwnedProperty, Property, PropertyKind } from '../state.ts';
+import type { AnecdoteNote, GameState, OwnedProperty, Property, PropertyKind } from '../state.ts';
 import { believedView, weightedState } from './dwelling.ts';
 import { worksPlan } from './works-view.ts';
 
@@ -37,6 +37,7 @@ export interface Ambience {
 
 export type BubbleKind =
   | 'hazard'
+  | 'event'
   | 'incident'
   | 'arrears'
   | 'saleOffer'
@@ -46,11 +47,13 @@ export type BubbleKind =
   | 'sold'
   | 'forSale'
   | 'toLet'
-  | 'compromis';
+  | 'compromis'
+  | 'anecdote';
 
 /** Bubbles by priority: the first ones are shown when there are too many. */
 export const BUBBLE_PRIORITY: readonly BubbleKind[] = [
   'hazard',
+  'event',
   'incident',
   'arrears',
   'saleOffer',
@@ -61,13 +64,18 @@ export const BUBBLE_PRIORITY: readonly BubbleKind[] = [
   'forSale',
   'toLet',
   'compromis',
+  'anecdote',
 ];
 
 /** Which existing sheet a bubble opens. */
 export type BubbleTarget =
   | { screen: 'listing'; id: string }
   | { screen: 'purchase'; id: string }
-  | { screen: 'property'; id: string; tab: 'overview' | 'rooms' | 'rental' };
+  | { screen: 'property'; id: string; tab: 'overview' | 'rooms' | 'rental' }
+  /** A catalogue event waiting for an answer. */
+  | { screen: 'event'; id: string }
+  /** An anecdote heard lately: its text, with no stakes. */
+  | { screen: 'anecdote'; anecdote: AnecdoteNote };
 
 export interface Bubble {
   kind: BubbleKind;
@@ -365,6 +373,10 @@ function ownedBubbles(content: GameContent, state: GameState, owned: OwnedProper
     tab,
   });
   if (owned.works?.hazard) bubbles.push({ kind: 'hazard', target: property('rooms') });
+  for (const instance of state.catalog.pending) {
+    if (instance.propertyId === id)
+      bubbles.push({ kind: 'event', target: { screen: 'event', id: instance.id } });
+  }
   if (owned.lease?.incident) bubbles.push({ kind: 'incident', target: property('rental') });
   if (owned.lease?.arrears) bubbles.push({ kind: 'arrears', target: property('rental') });
   if (owned.sale && !owned.sale.agreement && owned.sale.offers.length > 0) {
@@ -394,6 +406,14 @@ function ownedBubbles(content: GameContent, state: GameState, owned: OwnedProper
   if (owned.rental && owned.rental.applications.length === 0) {
     bubbles.push({ kind: 'toLet', target: property('rental') });
   }
+  const today = toDayNumber(state.clock.date);
+  const recent = [...state.catalog.anecdotes]
+    .reverse()
+    .find(
+      (note) =>
+        note.propertyId === id && today - note.day < content.rhythm.events.anecdoteBubbleDays,
+    );
+  if (recent) bubbles.push({ kind: 'anecdote', target: { screen: 'anecdote', anecdote: recent } });
   return bubbles;
 }
 

@@ -1,6 +1,15 @@
 import { decisionKey, type GameState, type PendingDecision } from '@cle/engine';
 import { useGame, useNav, type Route } from '../game/context.tsx';
-import { format, formatEuros, formatPercent, formatWhen, propertyLabel, t } from '../texts.ts';
+import {
+  findCatalogEvent,
+  format,
+  formatEuros,
+  formatPercent,
+  formatWhen,
+  giverName,
+  propertyLabel,
+  t,
+} from '../texts.ts';
 import { Badge, Empty, ListRow, ScreenHeader } from '../ui/components.tsx';
 import type { IconName } from '../ui/Icon.tsx';
 
@@ -19,6 +28,8 @@ const ICONS: Record<PendingDecision['kind'], IconName> = {
   vacant: 'key',
   renegotiation: 'bank',
   cashAlert: 'alert',
+  catalogEvent: 'info',
+  challengeOffer: 'trophy',
 };
 
 export function decisionTitle(decision: PendingDecision): string {
@@ -39,6 +50,9 @@ export function decisionTitle(decision: PendingDecision): string {
       return format(texts.renegotiation, { rate: formatPercent(decision.marketPercent) });
     case 'cashAlert':
       return format(texts.cashAlert, { amount: formatEuros(decision.lowest) });
+    case 'challengeOffer':
+      return format(texts.challengeOffer, { giver: giverName(decision.challengeId) });
+    case 'catalogEvent':
     case 'loanNeeded':
     case 'loanAnswer':
     case 'incident':
@@ -49,8 +63,14 @@ export function decisionTitle(decision: PendingDecision): string {
   }
 }
 
-/** What the decision is about: the property's label. */
+/** What the decision is about: the property's label, or the event's family. */
 function decisionSubject(decision: PendingDecision, state: GameState): string | null {
+  if (decision.kind === 'catalogEvent') {
+    const instance = state.catalog.pending.find((p) => p.id === decision.instanceId);
+    const owned = state.properties.find((o) => o.property.id === instance?.propertyId);
+    const family = findCatalogEvent(decision.eventId)?.family;
+    return owned ? propertyLabel(owned.property) : family ? t.event.families[family] : null;
+  }
   if ('listingId' in decision) {
     const listing = state.listings.find((l) => l.id === decision.listingId);
     return listing ? propertyLabel(listing.property) : null;
@@ -86,6 +106,10 @@ export function decisionRoute(decision: PendingDecision): Route | null {
     case 'dpeWarning':
     case 'vacant':
       return { name: 'property', id: decision.propertyId };
+    case 'catalogEvent':
+      return { name: 'event', id: decision.instanceId };
+    case 'challengeOffer':
+      return { name: 'challenge' };
     case 'renegotiation':
     case 'cashAlert':
       return null;

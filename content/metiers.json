@@ -9,7 +9,7 @@
         "kind": "regular",
         "weekdayMinutes": 150,
         "weekendMinutes": 360,
-        "regularDaysOff": true
+        "rtt": { "weekday": 5, "minutes": 480 }
       },
       "bankTrust": "veryHigh",
       "perk": "Le profil le plus rassurant pour les banques."

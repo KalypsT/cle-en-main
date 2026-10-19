@@ -3,6 +3,7 @@ import { createContext, useContext } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
 import type { GameSession, SessionSnapshot } from '../session/game-session.ts';
 import type { Settings } from '../settings.ts';
+import type { Checkpoint } from '../storage/saves.ts';
 
 export type TabId = 'street' | 'map' | 'decisions' | 'assets' | 'menu';
 
@@ -16,7 +17,15 @@ export type Route =
   | { name: 'property'; id: string; tab?: PropertyTab }
   | { name: 'rent'; id: string }
   | { name: 'section'; neighbourhoodId: string; buildingId: string }
-  | { name: 'settings' };
+  | { name: 'settings' }
+  | { name: 'event'; id: string }
+  | { name: 'challenge' }
+  | { name: 'progression' }
+  | { name: 'statistics' }
+  | { name: 'agenda' }
+  | { name: 'monthReview' }
+  | { name: 'yearReview' }
+  | { name: 'rewind' };
 
 /** A screen the tutorial waits for (content/textes/didacticiel.json). */
 export type TrackedScreen = 'listings' | 'listing' | 'financing';
@@ -45,6 +54,8 @@ export interface GameContextValue {
   quit: () => void;
   slot: number;
   audio: AudioMixer;
+  /** Goes back to a monthly point (docs/02, 2.7): the session is replaced. */
+  rewind: (checkpoint: Checkpoint) => void;
 }
 
 export const GameContext = createContext<GameContextValue | null>(null);

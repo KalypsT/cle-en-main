@@ -4,6 +4,7 @@ import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextRange, pickWeighted } from '../random.ts';
 import type { Lease, OwnedProperty } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { modeOf } from './modes.ts';
 import {
   DAYS_PER_YEAR,
   findOwned,
@@ -26,7 +27,7 @@ import { knownArtisans } from './works.ts';
 const DAYS_PER_MONTH = 30;
 const SATISFACTION_MAX = 100;
 
-function clampSatisfaction(value: number): number {
+export function clampSatisfaction(value: number): number {
   return Math.min(SATISFACTION_MAX, Math.max(0, value));
 }
 
@@ -34,7 +35,7 @@ function costRange(ctx: SystemContext, range: { min: number; max: number }): Cen
   return toCents(Math.round(nextRange(ctx.state.rng, range.min, range.max)));
 }
 
-function giveNotice(
+export function giveNotice(
   ctx: SystemContext,
   owned: OwnedProperty,
   lease: Lease,
@@ -342,7 +343,9 @@ function dailyIncident(ctx: SystemContext, owned: OwnedProperty, lease: Lease): 
       k.monthlyProbability * interpolateByState(rules.incidentStateFactors, worst),
     ] as const;
   });
-  const total = chances.reduce((sum, [, chance]) => sum + Number(chance), 0);
+  const total =
+    chances.reduce((sum, [, chance]) => sum + Number(chance), 0) *
+    modeOf(content, state).incidentFactor;
   if (nextFloat(state.rng) >= total / DAYS_PER_MONTH) return;
   const kindId = pickWeighted(state.rng, Object.fromEntries(chances));
   const kind = rules.incidents.find((k) => k.id === kindId);

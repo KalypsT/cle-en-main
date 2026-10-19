@@ -1,0 +1,250 @@
+{
+  "events": [
+    {
+      "id": "rateShock",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.008,
+      "cooldownDays": 2190,
+      "pause": true,
+      "major": true,
+      "texts": [
+        "Choc de taux : la Banque centrale européenne relève brutalement ses taux. Les crédits immobiliers s'envolent."
+      ],
+      "effects": [
+        {
+          "type": "marketRate",
+          "delta": 1.2
+        },
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": -2
+        }
+      ]
+    },
+    {
+      "id": "rateCut",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.008,
+      "cooldownDays": 2190,
+      "pause": false,
+      "major": true,
+      "texts": [
+        "La Banque centrale européenne baisse ses taux. Les banquiers ressortent leurs simulateurs."
+      ],
+      "effects": [
+        {
+          "type": "marketRate",
+          "delta": -0.8
+        },
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": 1.5
+        }
+      ]
+    },
+    {
+      "id": "financialCrisis",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.004,
+      "cooldownDays": 3650,
+      "pause": true,
+      "major": true,
+      "texts": [
+        "Crise financière mondiale : les marchés s'effondrent, les acheteurs disparaissent. Les prix de l'immobilier chutent."
+      ],
+      "effects": [
+        {
+          "type": "priceIndex",
+          "scope": "france",
+          "percent": -8
+        },
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": -3
+        },
+        {
+          "type": "marketRate",
+          "delta": 0.5
+        }
+      ]
+    },
+    {
+      "id": "diagnosisLaw",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "letProperties",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.004,
+      "cooldownDays": 3650,
+      "pause": false,
+      "major": true,
+      "texts": [
+        "Nouvelle loi : un « diagnostic de bonne gestion » devient obligatoire pour les bailleurs. Les contrevenants seront mal vus."
+      ],
+      "choices": [
+        {
+          "id": "comply",
+          "label": "Faire le diagnostic tout de suite ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -300,
+                "max": -150
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre les décrets",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -2
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 7,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "renovationBonus",
+      "family": "france",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "passoires",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 0.005,
+      "cooldownDays": 3650,
+      "pause": false,
+      "major": true,
+      "texts": [
+        "Le gouvernement lance « MaPrime Rénov' Plus » : une aide exceptionnelle pour rénover les passoires thermiques."
+      ],
+      "choices": [
+        {
+          "id": "apply",
+          "label": "Déposer un dossier (2 h, +{montant})",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "money",
+              "euros": {
+                "min": 800,
+                "max": 2000
+              }
+            }
+          ]
+        },
+        {
+          "id": "skip",
+          "label": "Laisser passer",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 10,
+      "defaultChoice": "skip"
+    },
+    {
+      "id": "inflationSpike",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.005,
+      "cooldownDays": 2920,
+      "pause": false,
+      "major": true,
+      "texts": [
+        "Poussée d'inflation : les prix grimpent, les taux suivent. La pierre redevient une valeur refuge."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": 1
+        },
+        {
+          "type": "marketRate",
+          "delta": 0.4
+        }
+      ]
+    },
+    {
+      "id": "housingBoom",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.004,
+      "cooldownDays": 3650,
+      "pause": false,
+      "major": true,
+      "texts": [
+        "Engouement national pour l'immobilier des villes moyennes : tout le monde veut sa maison à une heure de Paris."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": 2.5
+        }
+      ]
+    },
+    {
+      "id": "energyShock",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.004,
+      "cooldownDays": 3650,
+      "pause": false,
+      "major": true,
+      "texts": [
+        "Choc des prix de l'énergie : les passoires thermiques ne trouvent plus preneur, les biens rénovés s'arrachent."
+      ],
+      "effects": [
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": -1
+        }
+      ]
+    }
+  ]
+}

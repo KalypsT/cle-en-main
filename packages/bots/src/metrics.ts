@@ -1,5 +1,7 @@
+import { gameContent, timeSettings } from '@cle/content';
 import {
   debtRatio,
+  decisionKey,
   type DpeLabel,
   DPE_LABELS,
   type Engine,
@@ -10,9 +12,12 @@ import {
 } from '@cle/engine';
 
 const DAYS_PER_YEAR = 365;
-const BAILLEUR_LET_PROPERTIES = 3;
-const SEASONED_NET_WORTH = 250_000_00;
+const HOURS_PER_DAY = 24;
 const PASSOIRES: readonly DpeLabel[] = ['E', 'F', 'G'];
+/** A new listing counts as a decision when it is this far under the estimate (docs/08, 8.1). */
+const INTERESTING_DISCOUNT = 0.05;
+/** …and the bot could pay the notary fees and a little more from its account. */
+const INTERESTING_CASH_SHARE = 0.1;
 
 /** What one game tells the balancing report. Amounts in euros, durations in days. */
 export interface GameMetrics {
@@ -43,10 +48,29 @@ export interface GameMetrics {
   /** Monthly rent paid by tenants at the end, before costs. */
   finalMonthlyRent: number;
   finalDebtRatio: number;
-  /** First day with 3 let properties (stand-in for the Bailleur title). */
+  /** Day the Bailleur title was earned (milestone 6: the real titles). */
   bailleurDay: number | null;
-  /** First month-start with a net worth of 250 k€ (Investisseur aguerri, one city). */
+  /** Day the Investisseur aguerri title was earned (one city until milestone 7). */
   seasonedDay: number | null;
+  /** Day each title was earned. */
+  titleDays: Record<string, number>;
+  achievements: number;
+  finalReputation: number;
+  /**
+   * Density of decisions (docs/03-systemes/07): new entries of the decision
+   * box, catalogue events with choices and interesting listings, over the
+   * real time the game would take at ×1 with the automatic acceleration.
+   */
+  decisions: number;
+  interestingListings: number;
+  catalogEvents: number;
+  catalogChoices: number;
+  anecdotes: number;
+  challengesOffered: number;
+  challengesWon: number;
+  realSeconds: number;
+  /** Days the automatic acceleration would have run. */
+  calmDays: number;
   overdraftDays: number;
   minBalance: number;
   /** Renting: property-months let, over property-months owned (main residence excluded). */
@@ -79,6 +103,9 @@ const euros = (cents: number) => Math.round(cents / 100);
 export class MetricsRecorder {
   private readonly startDay: number;
   private readonly visited = new Set<string>();
+  /** Decisions already counted (their keys), as the interface tells new ones from old ones. */
+  private seen = new Set<string>();
+  private freshToday = 0;
   private readonly metrics: GameMetrics;
   private readonly engine: Engine;
 
@@ -114,6 +141,18 @@ export class MetricsRecorder {
       finalDebtRatio: 0,
       bailleurDay: null,
       seasonedDay: null,
+      titleDays: {},
+      achievements: 0,
+      finalReputation: 0,
+      decisions: 0,
+      interestingListings: 0,
+      catalogEvents: 0,
+      catalogChoices: 0,
+      anecdotes: 0,
+      challengesOffered: 0,
+      challengesWon: 0,
+      realSeconds: 0,
+      calmDays: 0,
       overdraftDays: 0,
       minBalance: euros(state.player.balance),
       letMonths: 0,
@@ -149,17 +188,46 @@ export class MetricsRecorder {
           const day = this.day(state);
           if (state.player.balance < 0) m.overdraftDays += 1;
           m.minBalance = Math.min(m.minBalance, euros(state.player.balance));
-          const let_ = state.properties.filter((owned) => owned.lease).length;
-          if (m.bailleurDay === null && let_ >= BAILLEUR_LET_PROPERTIES) m.bailleurDay = day;
           if (day > 0 && day % DAYS_PER_YEAR === 0) {
             m.netWorthByYear.push(euros(this.engine.netWorth(state)));
           }
           break;
         }
-        case 'monthStarted': {
-          if (m.seasonedDay === null && this.engine.netWorth(state) >= SEASONED_NET_WORTH) {
-            m.seasonedDay = this.day(state);
+        case 'titleEarned':
+          m.titleDays[event.titleId] ??= this.day(state);
+          if (event.titleId === 'landlord') m.bailleurDay ??= this.day(state);
+          if (event.titleId === 'seasonedInvestor') m.seasonedDay ??= this.day(state);
+          break;
+        case 'achievementEarned':
+          m.achievements += 1;
+          break;
+        case 'catalogEventStarted':
+          m.catalogEvents += 1;
+          break;
+        case 'catalogEventHappened':
+          m.catalogEvents += 1;
+          break;
+        case 'catalogEventResolved':
+          if (!event.auto) m.catalogChoices += 1;
+          break;
+        case 'anecdote':
+          m.anecdotes += 1;
+          break;
+        case 'challengeOffered':
+          m.challengesOffered += 1;
+          break;
+        case 'challengeWon':
+          m.challengesWon += 1;
+          break;
+        case 'listingPublished':
+        case 'offMarketOffered':
+          if (this.interesting(state, event.listingId)) {
+            m.interestingListings += 1;
+            m.decisions += 1;
+            this.freshToday += 1;
           }
+          break;
+        case 'monthStarted': {
           const rented = state.properties.filter(
             (owned) => owned.property.id !== state.player.homePropertyId,
           );
@@ -219,7 +287,7 @@ export class MetricsRecorder {
           m.capitalGainsTax += euros(event.capitalGainsTax);
           break;
         case 'bankrupt':
-          m.bankruptDay = this.day(state);
+          m.bankruptDay ??= this.day(state);
           break;
         case 'worksCompleted':
           m.worksProjects += 1;
@@ -238,6 +306,49 @@ export class MetricsRecorder {
     }
   }
 
+  get bankrupt(): boolean {
+    return this.metrics.bankruptDay !== null;
+  }
+
+  /** A new listing worth a look: well under the estimate, and affordable. */
+  private interesting(state: GameState, listingId: string): boolean {
+    const listing = state.listings.find((candidate) => candidate.id === listingId);
+    const estimate = this.engine.estimate(state, listingId);
+    if (!listing || !estimate) return false;
+    return (
+      listing.askingPrice <= estimate.estimate * (1 - INTERESTING_DISCOUNT) &&
+      state.player.balance >= listing.askingPrice * INTERESTING_CASH_SHARE
+    );
+  }
+
+  /** Counts the decisions that appeared since the last look (the decision box). */
+  observeDecisions(state: GameState): void {
+    const keys = this.engine.pendingDecisions(state).map(decisionKey);
+    for (const key of keys) {
+      if (this.seen.has(key)) continue;
+      this.metrics.decisions += 1;
+      this.freshToday += 1;
+    }
+    this.seen = new Set(keys);
+  }
+
+  /**
+   * Real time of a part of the day at ×1 with the automatic acceleration:
+   * every hour at ×1 while something waits for the player, otherwise a few
+   * quiet hours after any new decision, then the accelerated speed.
+   */
+  addTime(hours: number, calm: boolean): void {
+    const rules = gameContent.rhythm.autoSpeed;
+    const perHour = timeSettings.realSecondsPerGameDay / HOURS_PER_DAY;
+    const quiet = this.freshToday > 0 ? Math.min(hours, rules.quietHours) : 0;
+    const seconds = calm
+      ? quiet * perHour + ((hours - quiet) * perHour) / rules.speed
+      : hours * perHour;
+    if (calm) this.metrics.calmDays += hours / HOURS_PER_DAY;
+    this.metrics.realSeconds += seconds;
+    this.freshToday = 0;
+  }
+
   finish(state: GameState): GameMetrics {
     const m = this.metrics;
     m.days = this.day(state);
@@ -248,11 +359,12 @@ export class MetricsRecorder {
     m.finalPassoires = state.properties.filter((owned) =>
       PASSOIRES.includes(owned.property.dpe),
     ).length;
+    m.finalReputation = state.player.reputation;
     m.finalMonthlyRent = euros(
       state.properties.reduce((sum, owned) => sum + (owned.lease?.monthlyRent ?? 0), 0),
     );
     const ratio = debtRatio(this.engine.content, state);
     m.finalDebtRatio = monthlyLoanPayments(state) === 0 ? 0 : Number.isFinite(ratio) ? ratio : 9.99;
-    return { ...m, rivalPurchases: { ...m.rivalPurchases } };
+    return { ...m, rivalPurchases: { ...m.rivalPurchases }, titleDays: { ...m.titleDays } };
   }
 }

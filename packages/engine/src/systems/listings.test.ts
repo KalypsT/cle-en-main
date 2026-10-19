@@ -75,6 +75,8 @@ describe('listings', () => {
     const agent = advanceDays(newGame({ jobId: 'realEstateAgent' }), 90).state;
     expect(agent.listings.some((l) => l.publicDay > l.publishedDay)).toBe(true);
     const civil = advanceDays(newGame(), 90).state;
-    expect(civil.listings.every((l) => l.publicDay === l.publishedDay)).toBe(true);
+    // Off-market offers (milestone 6) aside, everyone sees a listing on the same day.
+    const ordinary = civil.listings.filter((l) => l.motivationId !== 'offMarket');
+    expect(ordinary.every((l) => l.publicDay === l.publishedDay)).toBe(true);
   });
 });

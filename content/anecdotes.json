@@ -1,0 +1,557 @@
+{
+  "anecdotes": [
+    {
+      "id": "catPhoto",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 2,
+      "texts": [
+        "{locataire} vous envoie une photo de son chat installé sur le rebord de la fenêtre de {bien}. Il a l'air propriétaire, lui aussi.",
+        "Nouvelle photo du chat de {locataire}. Cette fois, il dort dans un carton. 4 étoiles."
+      ]
+    },
+    {
+      "id": "plants",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "{locataire} a transformé le balcon de {bien} en jungle. Un voisin jure avoir vu un perroquet."
+      ]
+    },
+    {
+      "id": "birthdayCake",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "{locataire} fête ses 30 ans. Vous recevez une part de gâteau par la poste. Elle a voyagé."
+      ]
+    },
+    {
+      "id": "tomatoes",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {
+        "months": [7, 8, 9]
+      },
+      "weight": 1,
+      "texts": [
+        "{locataire} vous offre les premières tomates de son potager. « Bio, et presque rondes. »"
+      ]
+    },
+    {
+      "id": "parcel",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "{locataire} vous demande si vous avez commandé un kayak gonflable. Le livreur l'a laissé devant {bien}."
+      ]
+    },
+    {
+      "id": "moving",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "{locataire} a enfin accroché ses tableaux. Il vous envoie une visite virtuelle de {bien}, musique comprise."
+      ]
+    },
+    {
+      "id": "neighbourCake",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["{locataire} et la voisine du dessus se sont réconciliés autour d'un clafoutis."]
+    },
+    {
+      "id": "snowman",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {
+        "months": [12, 1, 2]
+      },
+      "weight": 1,
+      "texts": [
+        "{locataire} a fait un bonhomme de neige devant {bien}. Il porte une écharpe du club de foot local."
+      ]
+    },
+    {
+      "id": "christmasCard",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {
+        "months": [12, 1]
+      },
+      "weight": 1,
+      "texts": ["{locataire} vous envoie une carte de vœux. Il y a des paillettes. Partout."]
+    },
+    {
+      "id": "radiatorSong",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {
+        "months": [11, 12, 1, 2]
+      },
+      "weight": 1,
+      "texts": [
+        "{locataire} dit que le radiateur de {bien} « chante » la nuit. Plutôt du jazz, d'après lui."
+      ]
+    },
+    {
+      "id": "marathon",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "{locataire} a couru le semi-marathon de {ville}. Il a dépassé un homme déguisé en baguette."
+      ]
+    },
+    {
+      "id": "homework",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Le fils de {locataire} a dessiné {bien} pour l'école. Vous êtes représenté en roi, avec une couronne."
+      ]
+    },
+    {
+      "id": "wifiName",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["Le wifi de {locataire} s'appelle « Le propriétaire est sympa ». Vous êtes touché."]
+    },
+    {
+      "id": "djSet",
+      "speaker": "tenant",
+      "target": "lease",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "{locataire} vous invite à son « set électro acoustique » au café du coin. Vous trouvez une excuse."
+      ]
+    },
+    {
+      "id": "gossipBaker",
+      "speaker": "neighbour",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "La boulangère du quartier {quartier} vous appelle « le monsieur des appartements ». Vous ne savez pas comment le prendre."
+      ]
+    },
+    {
+      "id": "dogWalker",
+      "speaker": "neighbour",
+      "target": "owned",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["Le voisin de {bien} promène son teckel en poussette. Le teckel a l'air ravi."]
+    },
+    {
+      "id": "garageSale",
+      "speaker": "neighbour",
+      "target": "none",
+      "conditions": {
+        "months": [4, 5, 6, 9]
+      },
+      "weight": 1,
+      "texts": [
+        "Vide-grenier dans la rue de {bien} : vous avez acheté une lampe en forme de canard. Personne ne sait pourquoi."
+      ]
+    },
+    {
+      "id": "bellRinger",
+      "speaker": "neighbour",
+      "target": "owned",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "La voisine de {bien} sonne chez vous pour vous offrir des confitures de mirabelles. Elle s'appelle Josiane."
+      ]
+    },
+    {
+      "id": "lostCat",
+      "speaker": "neighbour",
+      "target": "owned",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Avis de recherche dans la rue de {bien} : « Chat roux, répond au nom de Patrimoine »."
+      ]
+    },
+    {
+      "id": "petanque",
+      "speaker": "neighbour",
+      "target": "none",
+      "conditions": {
+        "months": [5, 6, 7, 8, 9]
+      },
+      "weight": 1,
+      "texts": [
+        "Partie de pétanque endiablée sur la place du quartier {quartier}. Vous avez pointé, vous avez perdu."
+      ]
+    },
+    {
+      "id": "accordion",
+      "speaker": "neighbour",
+      "target": "owned",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Un accordéoniste s'est installé sous les fenêtres de {bien}. Il ne connaît que deux morceaux, mais il les joue bien."
+      ]
+    },
+    {
+      "id": "snail",
+      "speaker": "neighbour",
+      "target": "owned",
+      "conditions": {
+        "months": [5, 6]
+      },
+      "weight": 1,
+      "texts": [
+        "Course d'escargots organisée par les enfants de la rue de {bien}. Le favori s'appelait Turbo."
+      ]
+    },
+    {
+      "id": "solarEclipse",
+      "speaker": "neighbour",
+      "target": "owned",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Les voisins de {bien} observent le ciel avec des passoires. Quelqu'un leur a dit que ça marchait."
+      ]
+    },
+    {
+      "id": "holiday",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "plumber",
+      "texts": [
+        "{artisan} vous raconte ses vacances au camping : « Trois semaines, et j'ai refait le bloc sanitaire. »"
+      ]
+    },
+    {
+      "id": "radio",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "painter",
+      "texts": [
+        "Sur le chantier de {bien}, {artisan} écoute la radio à fond. Vous connaissez maintenant tous les tubes de 1987."
+      ]
+    },
+    {
+      "id": "coffee",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "mason",
+      "texts": [
+        "{artisan} demande son café « serré, sans sucre, avec un sucre ». Vous n'osez pas demander."
+      ]
+    },
+    {
+      "id": "dog",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "carpenter",
+      "texts": ["{artisan} vient avec son chien sur le chantier de {bien}. Il s'appelle Placo."]
+    },
+    {
+      "id": "pencil",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "carpenter",
+      "texts": ["{artisan} a perdu son crayon de charpentier. Il est derrière son oreille."]
+    },
+    {
+      "id": "sandwich",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "tiler",
+      "texts": [
+        "À midi, {artisan} mange son sandwich assis sur un seau retourné, avec la dignité d'un roi."
+      ]
+    },
+    {
+      "id": "level",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "mason",
+      "texts": [
+        "{artisan} vous montre son niveau à bulle comme d'autres montrent une montre de luxe."
+      ]
+    },
+    {
+      "id": "oldNewspaper",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "electrician",
+      "texts": [
+        "En ouvrant un mur de {bien}, {artisan} trouve un journal de 1962. Le prix du pain vous fait rêver."
+      ]
+    },
+    {
+      "id": "songWhistle",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "heatingEngineer",
+      "texts": [
+        "{artisan} siffle en travaillant. Toujours la même chanson. Vous l'avez maintenant dans la tête."
+      ]
+    },
+    {
+      "id": "perfectJoint",
+      "speaker": "artisan",
+      "target": "works",
+      "conditions": {},
+      "weight": 1,
+      "artisanTrade": "tiler",
+      "texts": [
+        "{artisan} contemple un joint de carrelage pendant une minute entière. « Celui-là, il est parfait. »"
+      ]
+    },
+    {
+      "id": "gerardTie",
+      "speaker": "banker",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["Gérard Prudhomme a changé de cravate. Elle est toujours en laine, mais bleue."]
+    },
+    {
+      "id": "kevinPodcast",
+      "speaker": "banker",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Kévin Boost lance son podcast : « Le patrimoine, c'est dans la tête ». Épisode 1 : 2 h 40."
+      ]
+    },
+    {
+      "id": "hortenseSmile",
+      "speaker": "banker",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["On raconte qu'Hortense Rigueur a souri une fois, en 2011. Personne n'a de preuve."]
+    },
+    {
+      "id": "leoChatbot",
+      "speaker": "banker",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Léo, le conseiller virtuel de ZéroPapier, vous souhaite un joyeux anniversaire. Ce n'est pas votre anniversaire."
+      ]
+    },
+    {
+      "id": "yvonSpreadsheet",
+      "speaker": "banker",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Yvon Tableur vous envoie un tableau. Il y a des couleurs, des onglets et un graphique en camembert « juste pour le plaisir »."
+      ]
+    },
+    {
+      "id": "gerardPhoto",
+      "speaker": "banker",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Gérard Prudhomme vous montre la photo de son petit-fils. Puis la deuxième. Puis la quinzième."
+      ]
+    },
+    {
+      "id": "moniqueHat",
+      "speaker": "rival",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Monique Delaporte a été vue à une visite avec un chapeau à plumes. Elle a acheté avant la fin de la visite."
+      ]
+    },
+    {
+      "id": "martinotVan",
+      "speaker": "rival",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "La camionnette des frères Martinot est garée en double file devant une boulangerie. Ils achètent 14 croissants."
+      ]
+    },
+    {
+      "id": "moniqueTea",
+      "speaker": "rival",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Monique Delaporte vous salue au salon de thé. Son sourire dit « je vous ai vu, je vous surveille »."
+      ]
+    },
+    {
+      "id": "martinotArgue",
+      "speaker": "rival",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Les frères Martinot se disputent en pleine rue pour savoir qui a oublié le mètre ruban."
+      ]
+    },
+    {
+      "id": "moniqueCard",
+      "speaker": "rival",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Monique Delaporte laisse sa carte de visite dans votre boîte aux lettres. Au dos : « Vendez-moi tout. »"
+      ]
+    },
+    {
+      "id": "pasteur",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Un car de touristes s'arrête devant la maison natale de Pasteur. Le guide parle très fort."
+      ]
+    },
+    {
+      "id": "canal",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Les péniches défilent sur le canal des Tanneurs. Un pêcheur attend depuis l'aube. Il a l'air heureux."
+      ]
+    },
+    {
+      "id": "market",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Jour de marché à {ville} : comté, saucisse de Morteau et conversations sur le prix de l'immobilier."
+      ]
+    },
+    {
+      "id": "collegiale",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": [
+        "Les cloches de la collégiale sonnent pour un mariage. Les pigeons s'envolent en chœur."
+      ]
+    },
+    {
+      "id": "rain",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["Il pleut sur {ville}. Les parapluies fleurissent, les agents immobiliers aussi."]
+    },
+    {
+      "id": "fogQuay",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {
+        "months": [10, 11, 12, 1, 2]
+      },
+      "weight": 1,
+      "texts": [
+        "Le brouillard monte du Doubs. On dirait un décor de film. Un film sur les crédits à taux fixe."
+      ]
+    },
+    {
+      "id": "summerConcert",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {
+        "months": [6, 7, 8]
+      },
+      "weight": 1,
+      "texts": [
+        "Concert gratuit sur la place aux Fleurs. Un orchestre joue de la variété avec passion."
+      ]
+    },
+    {
+      "id": "rugby",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {},
+      "weight": 1,
+      "texts": ["Le club de rugby a gagné ! Toute la ville klaxonne pendant une heure."]
+    },
+    {
+      "id": "autumnLeaves",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {
+        "months": [10, 11]
+      },
+      "weight": 1,
+      "texts": [
+        "Les feuilles tombent dans le parc. Les agents de la ville les ramassent, le vent les redistribue."
+      ]
+    },
+    {
+      "id": "springBlossom",
+      "speaker": "city",
+      "target": "none",
+      "conditions": {
+        "months": [3, 4, 5]
+      },
+      "weight": 1,
+      "texts": [
+        "Les cerisiers fleurissent le long du Doubs. Les annonces immobilières parlent soudain toutes « d'un cadre exceptionnel »."
+      ]
+    }
+  ]
+}

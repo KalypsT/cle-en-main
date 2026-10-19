@@ -11,14 +11,17 @@ interface Entry {
   later?: boolean;
 }
 
-/** « Menu » (docs/04, 4.4): Villes, Banque, Agenda, Carnet, Progression, Statistiques, Réglages. */
+/** « Menu » (docs/04, 4.4): Villes, Agenda, bilans, Progression, Statistiques, Réglages. */
 export function MenuTab() {
   const { save, exportGame, quit } = useGame();
   const nav = useNav();
   const entries: Entry[] = [
     { label: t.menu.cities, icon: 'globe', later: true },
-    { label: t.menu.progression, icon: 'trophy', later: true },
-    { label: t.menu.statistics, icon: 'chart', later: true },
+    { label: t.menu.agenda, icon: 'calendar', route: { name: 'agenda' } },
+    { label: t.menu.statement, icon: 'euro', route: { name: 'monthReview' } },
+    { label: t.menu.yearReview, icon: 'book', route: { name: 'yearReview' } },
+    { label: t.menu.progression, icon: 'trophy', route: { name: 'progression' } },
+    { label: t.menu.statistics, icon: 'chart', route: { name: 'statistics' } },
     { label: t.menu.settings, icon: 'settings', route: { name: 'settings' } },
   ];
   return (

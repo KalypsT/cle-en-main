@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { content, engine, newGame } from '../../test/helpers.ts';
+import { content, defaultOptions, quietContent } from '../../test/helpers.ts';
+import { createEngine } from '../engine.ts';
+
+// The rate model alone: no rate shocks from the catalogue of events.
+const engine = createEngine(quietContent());
+const newGame = (options: { seed: number }) => engine.createGame({ ...defaultOptions, ...options });
 
 describe('market rate', () => {
   it('moves slowly, stays within bounds and is reproducible', () => {

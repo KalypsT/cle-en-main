@@ -1,0 +1,119 @@
+{
+  "titles": [
+    {
+      "id": "ambitiousTenant",
+      "name": "Locataire ambitieux",
+      "step": 0,
+      "branch": "both",
+      "description": "Un T2 à Dole, 15 000 € d'épargne et de grands projets.",
+      "conditions": [],
+      "requiresAny": [],
+      "available": true,
+      "perks": {},
+      "perkText": null
+    },
+    {
+      "id": "firstInvestor",
+      "name": "Primo-investisseur",
+      "step": 1,
+      "branch": "both",
+      "description": "Acheter son premier bien.",
+      "conditions": [{ "stat": "purchases", "min": 1 }],
+      "requiresAny": ["ambitiousTenant"],
+      "available": true,
+      "perks": { "bankMarginPercent": -0.05 },
+      "perkText": "Les banques retirent 0,05 point à leur marge."
+    },
+    {
+      "id": "landlord",
+      "name": "Bailleur",
+      "step": 2,
+      "branch": "landlord",
+      "description": "Louer 3 biens en même temps.",
+      "conditions": [{ "stat": "letProperties", "min": 3 }],
+      "requiresAny": ["firstInvestor"],
+      "available": true,
+      "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.15 },
+      "perkText": "Encore 0,05 point de marge en moins, et un agent de plus vous appelle pour des biens hors marché."
+    },
+    {
+      "id": "renovator",
+      "name": "Rénovateur",
+      "step": 2,
+      "branch": "dealer",
+      "description": "Terminer 3 chantiers d'au moins 10 000 € chacun.",
+      "conditions": [{ "stat": "bigWorksDone", "min": 3 }],
+      "requiresAny": ["firstInvestor"],
+      "available": true,
+      "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.15 },
+      "perkText": "Encore 0,05 point de marge en moins, et un agent de plus vous appelle pour des biens à rénover hors marché."
+    },
+    {
+      "id": "seasonedInvestor",
+      "name": "Investisseur aguerri",
+      "step": 3,
+      "branch": "landlord",
+      "description": "Un patrimoine net de 250 000 € (et des biens dans 2 villes, à partir du jalon des villes).",
+      "conditions": [
+        { "stat": "netWorth", "min": 250000 },
+        { "stat": "cities", "min": 2, "active": false }
+      ],
+      "requiresAny": ["landlord", "renovator"],
+      "available": true,
+      "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.1 },
+      "perkText": "Encore 0,05 point de marge en moins, et plus de biens hors marché."
+    },
+    {
+      "id": "propertyDealer",
+      "name": "Marchand de biens",
+      "step": 3,
+      "branch": "dealer",
+      "description": "Revendre 5 biens avec une plus-value.",
+      "conditions": [{ "stat": "salesWithGain", "min": 5 }],
+      "requiresAny": ["landlord", "renovator"],
+      "available": true,
+      "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.1 },
+      "perkText": "Encore 0,05 point de marge en moins, et plus de biens hors marché."
+    },
+    {
+      "id": "developer",
+      "name": "Promoteur",
+      "step": 4,
+      "branch": "both",
+      "description": "Diviser ou transformer un bien (arrive avec la profondeur, jalon 8).",
+      "conditions": [{ "stat": "netWorth", "min": 0, "active": false }],
+      "requiresAny": ["seasonedInvestor", "propertyDealer"],
+      "available": false,
+      "perks": { "bankMarginPercent": -0.05 },
+      "perkText": "Encore 0,05 point de marge en moins."
+    },
+    {
+      "id": "magnate",
+      "name": "Magnat",
+      "step": 5,
+      "branch": "both",
+      "description": "Un patrimoine net de 1,3 million d'euros. L'IFI vous guette.",
+      "conditions": [{ "stat": "netWorth", "min": 1300000 }],
+      "requiresAny": ["developer", "seasonedInvestor", "propertyDealer"],
+      "available": true,
+      "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.1 },
+      "perkText": "Encore 0,05 point de marge en moins, et les plus beaux biens vous sont proposés en premier."
+    },
+    {
+      "id": "baron",
+      "name": "Baron de la pierre",
+      "step": 6,
+      "branch": "both",
+      "description": "5 millions d'euros nets, une réputation de 90 (et 4 villes, à partir du jalon des villes).",
+      "conditions": [
+        { "stat": "netWorth", "min": 5000000 },
+        { "stat": "reputation", "min": 90 },
+        { "stat": "cities", "min": 4, "active": false }
+      ],
+      "requiresAny": ["magnate"],
+      "available": true,
+      "perks": {},
+      "perkText": "La ville vous salue. Les rivaux aussi, du bout des lèvres."
+    }
+  ]
+}

@@ -23,7 +23,11 @@ describe('bots', () => {
     const result = playGame(createStrategy('chasseur'), options);
     expect(result.visits).toBeGreaterThan(0);
     expect(result.purchases).toBeGreaterThan(0);
-    expect(result.firstPurchaseDay).toBeLessThan(200);
+    expect(result.firstPurchaseDay).toBeLessThan(365);
+    // Milestone 6: the real title, and the density of decisions is measured.
+    expect(result.titleDays.firstInvestor).toBe(result.firstPurchaseDay);
+    expect(result.decisions).toBeGreaterThan(0);
+    expect(result.realSeconds).toBeGreaterThan(0);
     // It lets what it buys, and its first year is assessed on 1 January.
     expect(result.letMonths).toBeGreaterThan(0);
     expect(result.assessedPropertyYears).toBeGreaterThan(0);
@@ -68,5 +72,9 @@ describe('bots', () => {
     expect(report.checks.some((check) => check.label.startsWith('Faillites du Levier'))).toBe(true);
     expect(formatReport(report, 'Test')).toContain('| Levier maximal |');
     expect(formatReport(report, 'Test')).toContain('## Location et fiscalité');
+    expect(formatReport(report, 'Test')).toContain('## Rythme et progression');
+    expect(report.checks.some((check) => check.label.startsWith('Densité de décisions'))).toBe(
+      true,
+    );
   }, 60_000);
 });

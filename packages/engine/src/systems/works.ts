@@ -19,6 +19,7 @@ import type {
   WorksTask,
 } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { modeOf } from './modes.ts';
 import {
   dpeOf,
   energyNeeds,
@@ -426,9 +427,14 @@ export function startWorks(
   return null;
 }
 
-function hazardChance(property: Property, rule: HazardRule, item: WorkItem): number {
+function hazardChance(
+  factor: number,
+  property: Property,
+  rule: HazardRule,
+  item: WorkItem,
+): number {
   if (!rule.items.includes(item.kind) || item.state > rule.maxState) return 0;
-  return Math.min(1, rule.probability * rule.epochMultipliers[property.epoch]);
+  return Math.min(1, rule.probability * rule.epochMultipliers[property.epoch] * factor);
 }
 
 /** Does starting this task reveal a hazard? Postponed ones come back for sure. */
@@ -457,7 +463,7 @@ function drawHazard(
             .some((other) => other.state <= required.maxState && !inProject.has(itemId(other)));
           if (!worst) continue;
         }
-        const chance = hazardChance(property, rule, item);
+        const chance = hazardChance(modeOf(content, state).hazardFactor, property, rule, item);
         happens = chance > 0 && nextFloat(state.rng) < chance;
       }
       if (!happens) continue;

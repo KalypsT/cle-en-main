@@ -67,8 +67,15 @@ describe('unpaid rents', () => {
     // The procedure ends in winter: the eviction waits for April.
     expect(evicted.clock.date.month).toBe(4);
     expect(evicted.clock.date.day).toBe(1);
+    const gains = engine.content.progression.reputation;
     expect(evicted.player.reputation).toBe(
-      state.player.reputation - engine.content.renting.unpaid.reputationPenalty,
+      Math.max(
+        0,
+        state.player.reputation -
+          engine.content.renting.unpaid.reputationPenalty +
+          gains.procedure +
+          gains.eviction,
+      ),
     );
     // The deposit covers part of the debt: nothing is given back.
     const left = events.find((e) => e.type === 'tenantLeft');
@@ -113,7 +120,9 @@ describe('incidents', () => {
         method: 'self',
       },
     );
-    expect(tired.ok ? null : tired.reason.code).toBe('time.notEnoughFreeTime');
+    // No free time left today: the repair is planned in the agenda.
+    if (!tired.ok) throw new Error(tired.reason.code);
+    expect(tired.state.agenda[0]).toMatchObject({ kind: 'selfRepair', propertyId: PROPERTY });
     const rested = { ...state, player: { ...state.player, freeTimeMinutes: leak.selfMinutes } };
     const fixed = engine.dispatch(rested, {
       type: 'rent/repair',

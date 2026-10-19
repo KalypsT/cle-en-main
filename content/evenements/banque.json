@@ -1,0 +1,511 @@
+{
+  "events": [
+    {
+      "id": "bankerReview",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "hasLoan": true
+      },
+      "chancePerMonth": 0.1,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": ["{banquier} vous propose un rendez-vous pour faire le point sur vos crédits."],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Accepter (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "trust",
+              "delta": 3
+            }
+          ],
+          "outcome": "Café, dossiers, sourire. La confiance monte."
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": [
+            {
+              "type": "trust",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "insurancePush",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.075,
+      "cooldownDays": 240,
+      "pause": false,
+      "texts": [
+        "Votre banque insiste pour vous vendre une assurance « tous risques sauf ceux qui arrivent »."
+      ],
+      "choices": [
+        {
+          "id": "subscribe",
+          "label": "Souscrire ({montant} par an)",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -200,
+                "max": -120
+              }
+            },
+            {
+              "type": "trust",
+              "delta": 3
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "trust",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "cardFraud",
+      "family": "bank",
+      "target": "none",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 365,
+      "pause": true,
+      "texts": [
+        "Alerte : un achat de 312 € de croquettes pour chat en Lettonie avec votre carte bancaire."
+      ],
+      "choices": [
+        {
+          "id": "block",
+          "label": "Faire opposition tout de suite (30 min)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 30
+            }
+          ],
+          "outcome": "Carte bloquée, achats remboursés."
+        },
+        {
+          "id": "later",
+          "label": "S'en occuper plus tard",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -400,
+                "max": -150
+              }
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 2,
+      "defaultChoice": "later"
+    },
+    {
+      "id": "feesUp",
+      "family": "bank",
+      "target": "none",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Votre banque revoit ses tarifs « pour mieux vous servir ». Traduction : {montant} de frais cette année."
+      ],
+      "effects": [
+        {
+          "type": "money",
+          "euros": {
+            "min": -60,
+            "max": -30
+          }
+        }
+      ]
+    },
+    {
+      "id": "loyaltyGift",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "Pour vous remercier de votre fidélité, votre banque vous offre une enceinte connectée. Elle ne s'allume pas."
+      ],
+      "effects": [
+        {
+          "type": "trust",
+          "delta": 1
+        }
+      ]
+    },
+    {
+      "id": "worriedBanker",
+      "family": "bank",
+      "target": "none",
+      "kind": "mishap",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "balance",
+            "max": 300
+          }
+        ]
+      },
+      "chancePerMonth": 0.4,
+      "cooldownDays": 120,
+      "pause": false,
+      "texts": ["{banquier} a vu passer votre solde et s'inquiète un peu. « On en parle ? »"],
+      "choices": [
+        {
+          "id": "meet",
+          "label": "Le rassurer en rendez-vous (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "trust",
+              "delta": 2
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "Faire le mort",
+          "effects": [
+            {
+              "type": "trust",
+              "delta": -3
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "kevinAfterwork",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.075,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "Kévin Boost vous invite à son « afterwork investisseurs » : mojitos, slides et motivation."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y aller (2 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 120
+            },
+            {
+              "type": "trust",
+              "delta": 4,
+              "bankId": "fougueux"
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "Vous connaissez maintenant le mot « disruptif » dans six langues."
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "hortenseAudit",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.06,
+      "cooldownDays": 240,
+      "pause": false,
+      "texts": [
+        "Hortense Rigueur vous demande vos trois derniers avis d'imposition. « Pour mémoire. Le mien est excellent. »"
+      ],
+      "choices": [
+        {
+          "id": "send",
+          "label": "Envoyer un dossier impeccable (1 h 30)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 90
+            },
+            {
+              "type": "trust",
+              "delta": 5,
+              "bankId": "rigueur"
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "Ne pas répondre",
+          "effects": [
+            {
+              "type": "trust",
+              "delta": -3,
+              "bankId": "rigueur"
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "poachingBank",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Une banque en ligne vous propose 150 € pour ouvrir un compte chez elle. {banquier} l'apprend."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Prendre les 150 € (+{montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": 150,
+                "max": 150
+              }
+            },
+            {
+              "type": "trust",
+              "delta": -2
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Rester fidèle",
+          "effects": [
+            {
+              "type": "trust",
+              "delta": 1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "yvonPapers",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {
+        "months": [3, 4],
+        "stats": [
+          {
+            "stat": "letProperties",
+            "min": 1
+          }
+        ]
+      },
+      "chancePerMonth": 1,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "Yvon Tableur : « Pensez à m'envoyer vos justificatifs. Les tickets froissés, je les repasse, mais ça se paie. »"
+      ],
+      "choices": [
+        {
+          "id": "send",
+          "label": "Tout classer et envoyer (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            }
+          ]
+        },
+        {
+          "id": "later",
+          "label": "Plus tard",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -100,
+                "max": -50
+              }
+            }
+          ],
+          "outcome": "Yvon a dû tout reconstituer. Il vous facture ses heures."
+        }
+      ],
+      "deadlineDays": 7,
+      "defaultChoice": "later"
+    },
+    {
+      "id": "taxAudit",
+      "family": "bank",
+      "target": "none",
+      "kind": "mishap",
+      "conditions": {
+        "stats": [
+          {
+            "stat": "letProperties",
+            "min": 2
+          }
+        ]
+      },
+      "chancePerMonth": 0.015,
+      "cooldownDays": 1095,
+      "pause": true,
+      "texts": ["Contrôle fiscal ! L'administration s'intéresse à vos revenus fonciers."],
+      "choices": [
+        {
+          "id": "yvon",
+          "label": "Confier le dossier à Yvon ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -800,
+                "max": -400
+              }
+            }
+          ],
+          "outcome": "Yvon a passé trois nuits blanches. Redressement : zéro."
+        },
+        {
+          "id": "alone",
+          "label": "S'en charger soi-même (4 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 240
+            },
+            {
+              "type": "money",
+              "euros": {
+                "min": -400,
+                "max": 0
+              }
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "yvon"
+    },
+    {
+      "id": "bankAppBug",
+      "family": "bank",
+      "target": "none",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "L'application de votre banque affiche un solde de 0 € pendant une matinée. Frayeur, puis excuses et un geste commercial."
+      ],
+      "effects": [
+        {
+          "type": "money",
+          "euros": {
+            "min": 20,
+            "max": 30
+          }
+        }
+      ]
+    },
+    {
+      "id": "savingsChallenge",
+      "family": "bank",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{banquier} vous propose un « point patrimonial » gratuit d'une heure. Il a même des graphiques."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y aller (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "trust",
+              "delta": 2
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": []
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "decline"
+    }
+  ]
+}

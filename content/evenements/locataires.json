@@ -1,0 +1,1345 @@
+{
+  "events": [
+    {
+      "id": "neighbourWaterDamage",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {
+        "propertyKinds": ["apartment"]
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 180,
+      "pause": true,
+      "texts": [
+        "Dégât des eaux : la salle de bains de {bien} a inondé le voisin du dessous. Il est furieux, et très mouillé."
+      ],
+      "choices": [
+        {
+          "id": "insurance",
+          "label": "Passer par l'assurance (franchise {montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -150,
+                "max": -150
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": -2
+            }
+          ],
+          "outcome": "Le dossier suivra son cours, lentement."
+        },
+        {
+          "id": "pay",
+          "label": "Dédommager le voisin ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -800,
+                "max": -400
+              }
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ],
+          "outcome": "Le voisin vous offre un café. Sec."
+        },
+        {
+          "id": "wait",
+          "label": "Attendre",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -2
+            },
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "pistachioPaint",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} voudrait repeindre le salon de {bien} en vert pistache. « C'est très tendance », assure-t-il."
+      ],
+      "choices": [
+        {
+          "id": "allow",
+          "label": "Accepter",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": 6
+            },
+            {
+              "type": "item",
+              "item": "walls",
+              "delta": -1
+            }
+          ],
+          "outcome": "Le salon est vert. Très vert."
+        },
+        {
+          "id": "offer",
+          "label": "Offrir la peinture, en blanc ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -250,
+                "max": -150
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 8
+            },
+            {
+              "type": "item",
+              "item": "walls",
+              "delta": 1
+            }
+          ],
+          "outcome": "Compromis : blanc cassé. Tout le monde est content."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -4
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "newDog",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} a adopté un labrador de 40 kilos. Il demande si c'est un problème. Le labrador, lui, ne demande rien."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Bienvenue au chien",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": 6
+            },
+            {
+              "type": "item",
+              "item": "floors",
+              "delta": -1
+            }
+          ],
+          "outcome": "Le parquet a souffert, mais quelle joie de vivre."
+        },
+        {
+          "id": "refuse",
+          "label": "Rappeler le règlement",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "accept"
+    },
+    {
+      "id": "jobLossRebate",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": true,
+      "texts": ["{locataire} a perdu son emploi. Il vous demande un geste le temps de rebondir."],
+      "choices": [
+        {
+          "id": "month",
+          "label": "Offrir un mois de loyer ({montant})",
+          "effects": [
+            {
+              "type": "rentMoney",
+              "share": -1
+            },
+            {
+              "type": "satisfaction",
+              "delta": 12
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            }
+          ],
+          "outcome": "{locataire} a retrouvé du travail. Il ne vous oubliera pas."
+        },
+        {
+          "id": "half",
+          "label": "Offrir un demi-mois ({montant})",
+          "effects": [
+            {
+              "type": "rentMoney",
+              "share": -0.5
+            },
+            {
+              "type": "satisfaction",
+              "delta": 7
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ]
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -10
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "roommateBrother",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} voudrait héberger son frère « quelques mois, le temps qu'il trouve ». Vous connaissez la chanson."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": 5
+            },
+            {
+              "type": "item",
+              "item": "floors",
+              "delta": -1
+            }
+          ]
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -5
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "accept"
+    },
+    {
+      "id": "partyComplaints",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "Les voisins de {bien} se plaignent des soirées de {locataire} : karaoké jusqu'à deux heures du matin."
+      ],
+      "choices": [
+        {
+          "id": "talk",
+          "label": "Aller lui parler (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "satisfaction",
+              "delta": -2
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "{locataire} promet de passer au karaoké silencieux."
+        },
+        {
+          "id": "letter",
+          "label": "Envoyer un courrier",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "Ignorer",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -2
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "gardenDeal",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {
+        "propertyKinds": ["house"]
+      },
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} propose d'entretenir le jardin de {bien} contre une petite baisse de loyer."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter (−3 % de loyer)",
+          "effects": [
+            {
+              "type": "rent",
+              "share": -0.03
+            },
+            {
+              "type": "item",
+              "item": "garden",
+              "delta": 1
+            },
+            {
+              "type": "satisfaction",
+              "delta": 5
+            }
+          ],
+          "outcome": "Les rosiers n'ont jamais été aussi beaux."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -2
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "kitchenSplit",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "opportunity",
+      "conditions": {
+        "item": {
+          "kind": "kitchen",
+          "maxState": 3
+        }
+      },
+      "chancePerMonth": 0.03,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "{locataire} rêve d'une nouvelle cuisine pour {bien}. Il propose d'en payer la moitié si vous payez l'autre."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Payer la moitié ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -2500,
+                "max": -1500
+              }
+            },
+            {
+              "type": "item",
+              "item": "kitchen",
+              "delta": 2
+            },
+            {
+              "type": "satisfaction",
+              "delta": 10
+            }
+          ],
+          "outcome": "Une cuisine neuve pour moitié prix. Qui dit mieux ?"
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -3
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "lateOnce",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.06,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "{locataire} prévient : le loyer arrivera avec dix jours de retard ce mois-ci. « Une histoire de virement. »"
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Pas de souci",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ]
+        },
+        {
+          "id": "reminder",
+          "label": "Rappeler les règles par écrit",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -5
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "accept"
+    },
+    {
+      "id": "brokenWindow",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": ["Un ballon de foot a traversé une fenêtre de {bien}. Le ballon va bien."],
+      "choices": [
+        {
+          "id": "repair",
+          "label": "Faire remplacer la vitre ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -400,
+                "max": -200
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 2
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -8
+            },
+            {
+              "type": "item",
+              "item": "windows",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "bathroomMould",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {
+        "item": {
+          "kind": "ventilation",
+          "maxState": 2
+        }
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} envoie des photos : des moisissures noires gagnent le plafond de la salle de bains de {bien}."
+      ],
+      "choices": [
+        {
+          "id": "vmc",
+          "label": "Installer une VMC ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -900,
+                "max": -500
+              }
+            },
+            {
+              "type": "item",
+              "item": "ventilation",
+              "set": 4
+            },
+            {
+              "type": "satisfaction",
+              "delta": 8
+            }
+          ],
+          "outcome": "L'air circule enfin. Les moisissures déménagent."
+        },
+        {
+          "id": "bleach",
+          "label": "Passer à l'eau de Javel soi-même (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "satisfaction",
+              "delta": -2
+            }
+          ],
+          "outcome": "Propre… pour l'instant."
+        },
+        {
+          "id": "ignore",
+          "label": "Ignorer",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -10
+            },
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "weddingInvite",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {
+        "satisfaction": {
+          "min": 60,
+          "max": 100
+        }
+      },
+      "chancePerMonth": 0.03,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "{locataire} se marie et vous invite ! « Sans vous, on n'aurait jamais trouvé un si bel appartement. »"
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Y aller (3 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 180
+            },
+            {
+              "type": "satisfaction",
+              "delta": 10
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "Vous avez dansé la chenille. Il y a des photos."
+        },
+        {
+          "id": "gift",
+          "label": "Envoyer un cadeau ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -120,
+                "max": -80
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 6
+            }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "Décliner",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "fiveStars",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {
+        "satisfaction": {
+          "min": 75,
+          "max": 100
+        }
+      },
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} parle de vous en bien au marché. « Un propriétaire qui répond au téléphone, ça existe ! »"
+      ],
+      "effects": [
+        {
+          "type": "reputation",
+          "delta": 1
+        }
+      ]
+    },
+    {
+      "id": "angryReview",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {
+        "satisfaction": {
+          "min": 0,
+          "max": 35
+        }
+      },
+      "chancePerMonth": 0.075,
+      "cooldownDays": 180,
+      "pause": true,
+      "texts": [
+        "{locataire} publie un avis furieux sur un groupe du quartier : « Propriétaire fantôme, logement en ruine. »"
+      ],
+      "choices": [
+        {
+          "id": "fix",
+          "label": "Répondre et faire venir un artisan ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -600,
+                "max": -300
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 10
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "L'avis est devenu « Propriétaire réactif, finalement »."
+        },
+        {
+          "id": "ignore",
+          "label": "Laisser couler",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -3
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "transferNotice",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.02,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} est muté à l'autre bout de la France. Il donne son préavis, la larme à l'œil."
+      ],
+      "effects": [
+        {
+          "type": "tenantNotice"
+        }
+      ]
+    },
+    {
+      "id": "bikeShed",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "{locataire} demande un abri pour son vélo électrique, « qui vaut plus cher que ma voiture »."
+      ],
+      "choices": [
+        {
+          "id": "build",
+          "label": "Installer un abri ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -500,
+                "max": -300
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 6
+            }
+          ]
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -3
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "noInsurance",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Vous découvrez que {locataire} n'a plus d'assurance habitation depuis trois mois."
+      ],
+      "choices": [
+        {
+          "id": "remind",
+          "label": "Le relancer (30 min)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 30
+            },
+            {
+              "type": "satisfaction",
+              "delta": -1
+            }
+          ],
+          "outcome": "Attestation reçue le lendemain."
+        },
+        {
+          "id": "pay",
+          "label": "Souscrire pour son compte ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -180,
+                "max": -120
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 2
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "Ignorer",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "ignore"
+    },
+    {
+      "id": "heatwave",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {
+        "months": [6, 7, 8]
+      },
+      "chancePerMonth": 0.2,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "Canicule : il fait 33 °C dans {bien}. {locataire} vit les volets fermés et demande de l'aide."
+      ],
+      "choices": [
+        {
+          "id": "fans",
+          "label": "Offrir deux ventilateurs ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -100,
+                "max": -60
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 4
+            }
+          ]
+        },
+        {
+          "id": "ac",
+          "label": "Installer une climatisation ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -2500,
+                "max": -1500
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 12
+            }
+          ],
+          "outcome": "{locataire} a dormi sous la couette en juillet."
+        },
+        {
+          "id": "refuse",
+          "label": "Conseiller de boire de l'eau",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "coldSnap",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {
+        "months": [12, 1, 2],
+        "item": {
+          "kind": "heating",
+          "maxState": 3
+        }
+      },
+      "chancePerMonth": 0.2,
+      "cooldownDays": 300,
+      "pause": true,
+      "texts": [
+        "Vague de froid : le chauffage de {bien} peine à dépasser 16 °C. {locataire} porte un bonnet à l'intérieur."
+      ],
+      "choices": [
+        {
+          "id": "engineer",
+          "label": "Envoyer un chauffagiste ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -300,
+                "max": -150
+              }
+            },
+            {
+              "type": "item",
+              "item": "heating",
+              "delta": 1
+            },
+            {
+              "type": "satisfaction",
+              "delta": 5
+            }
+          ]
+        },
+        {
+          "id": "heaters",
+          "label": "Prêter des radiateurs d'appoint ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -120,
+                "max": -80
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 2
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "Attendre le redoux",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -8
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 3,
+      "defaultChoice": "wait"
+    },
+    {
+      "id": "lockedOut",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 180,
+      "pause": false,
+      "texts": [
+        "23 h : {locataire} est enfermé dehors, sans clés, en pantoufles. Il vous appelle."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Apporter le double (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "satisfaction",
+              "delta": 8
+            }
+          ],
+          "outcome": "Vous êtes un héros en pyjama."
+        },
+        {
+          "id": "locksmith",
+          "label": "Envoyer un serrurier ({montant})",
+          "effects": [
+            {
+              "type": "money",
+              "euros": {
+                "min": -250,
+                "max": -150
+              }
+            },
+            {
+              "type": "satisfaction",
+              "delta": 4
+            }
+          ]
+        },
+        {
+          "id": "tomorrow",
+          "label": "« Demain matin, promis »",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 1,
+      "defaultChoice": "tomorrow"
+    },
+    {
+      "id": "noisyNeighbourWorks",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.05,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "Le voisin de {bien} refait tout son appartement. Perceuse à 7 h, marteau à 8 h. {locataire} n'en peut plus."
+      ],
+      "choices": [
+        {
+          "id": "talk",
+          "label": "Négocier des horaires avec le voisin (1 h)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 60
+            },
+            {
+              "type": "satisfaction",
+              "delta": 4
+            }
+          ]
+        },
+        {
+          "id": "gesture",
+          "label": "Offrir un geste sur le loyer ({montant})",
+          "effects": [
+            {
+              "type": "rentMoney",
+              "share": -0.2
+            },
+            {
+              "type": "satisfaction",
+              "delta": 6
+            }
+          ]
+        },
+        {
+          "id": "nothing",
+          "label": "Compatir",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -6
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "nothing"
+    },
+    {
+      "id": "muralRequest",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {
+        "propertyKinds": ["house"]
+      },
+      "chancePerMonth": 0.025,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "{locataire}, artiste, voudrait peindre une fresque sur le mur du jardin de {bien}."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": 8
+            },
+            {
+              "type": "reputation",
+              "delta": 2
+            }
+          ],
+          "outcome": "La fresque a été photographiée par le journal local."
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -4
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "dpeRebate",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {
+        "dpe": ["F", "G"]
+      },
+      "chancePerMonth": 0.075,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} a reçu sa facture de chauffage. Elle est salée. Il demande une baisse de loyer, DPE à l'appui."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Baisser le loyer de 5 %",
+          "effects": [
+            {
+              "type": "rent",
+              "share": -0.05
+            },
+            {
+              "type": "satisfaction",
+              "delta": 8
+            }
+          ]
+        },
+        {
+          "id": "refuse",
+          "label": "Refuser",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -8
+            },
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "refuse"
+    },
+    {
+      "id": "sublet",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.03,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "Surprise : {bien} apparaît sur une plateforme de location touristique. {locataire} sous-loue sans vous le dire."
+      ],
+      "choices": [
+        {
+          "id": "notice",
+          "label": "Mise en demeure",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -10
+            },
+            {
+              "type": "reputation",
+              "delta": 1
+            }
+          ],
+          "outcome": "Annonce retirée dans l'heure."
+        },
+        {
+          "id": "deal",
+          "label": "Négocier une hausse de loyer de 5 %",
+          "effects": [
+            {
+              "type": "rent",
+              "share": 0.05
+            },
+            {
+              "type": "satisfaction",
+              "delta": -3
+            }
+          ]
+        },
+        {
+          "id": "tolerate",
+          "label": "Fermer les yeux",
+          "effects": [
+            {
+              "type": "reputation",
+              "delta": -2
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "tolerate"
+    },
+    {
+      "id": "tenantThanks",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "neutral",
+      "conditions": {
+        "satisfaction": {
+          "min": 70,
+          "max": 100
+        }
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 365,
+      "pause": false,
+      "texts": [
+        "{locataire} vous dépose une tarte aux mirabelles « pour vous remercier d'être réactif ». Elle est délicieuse."
+      ],
+      "effects": [
+        {
+          "type": "satisfaction",
+          "delta": 2
+        }
+      ]
+    },
+    {
+      "id": "smokeDetector",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "mishap",
+      "conditions": {},
+      "chancePerMonth": 0.04,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "Le détecteur de fumée de {bien} bipe toutes les 40 secondes depuis trois jours. {locataire} devient fou."
+      ],
+      "choices": [
+        {
+          "id": "go",
+          "label": "Changer la pile soi-même (30 min)",
+          "effects": [
+            {
+              "type": "freeTime",
+              "minutes": 30
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "« Il suffit d'enlever la pile »",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -4
+            },
+            {
+              "type": "reputation",
+              "delta": -1
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 2,
+      "defaultChoice": "ignore"
+    }
+  ]
+}

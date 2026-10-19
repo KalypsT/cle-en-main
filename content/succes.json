@@ -1,0 +1,498 @@
+{
+  "achievements": [
+    {
+      "id": "firstStone",
+      "name": "Première pierre",
+      "description": "Acheter un premier bien.",
+      "conditions": [
+        {
+          "stat": "purchases",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "collector",
+      "name": "Collectionneur",
+      "description": "Posséder 5 biens en même temps.",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 5
+        }
+      ]
+    },
+    {
+      "id": "keyring",
+      "name": "Le trousseau qui déborde",
+      "description": "Posséder 10 biens en même temps.",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "atHome",
+      "name": "Chez moi",
+      "description": "Acheter sa résidence principale et s'y installer.",
+      "conditions": [
+        {
+          "stat": "homeBought",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "bargainHunter",
+      "name": "Flair de fouine",
+      "description": "Acheter un bien au moins 10 % sous votre estimation.",
+      "conditions": [
+        {
+          "stat": "bargainPurchases",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "bornHunter",
+      "name": "Chasseur né",
+      "description": "Acheter 5 biens au moins 10 % sous votre estimation.",
+      "conditions": [
+        {
+          "stat": "bargainPurchases",
+          "min": 5
+        }
+      ]
+    },
+    {
+      "id": "welcomeHome",
+      "name": "Bienvenue chez vous",
+      "description": "Signer un premier bail.",
+      "conditions": [
+        {
+          "stat": "leasesSigned",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "tenLeases",
+      "name": "Dix baux",
+      "description": "Signer 10 baux.",
+      "conditions": [
+        {
+          "stat": "leasesSigned",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "thousandAMonth",
+      "name": "Mille par mois",
+      "description": "Encaisser 1 000 € de loyers par mois (hors charges).",
+      "conditions": [
+        {
+          "stat": "monthlyRent",
+          "min": 1000
+        }
+      ]
+    },
+    {
+      "id": "fiveThousandAMonth",
+      "name": "Cinq mille par mois",
+      "description": "Encaisser 5 000 € de loyers par mois (hors charges).",
+      "conditions": [
+        {
+          "stat": "monthlyRent",
+          "min": 5000
+        }
+      ]
+    },
+    {
+      "id": "rightAmount",
+      "name": "Le compte est bon",
+      "description": "12 mois de suite avec un bilan mensuel positif.",
+      "conditions": [
+        {
+          "stat": "bestPositiveStreak",
+          "min": 12
+        }
+      ]
+    },
+    {
+      "id": "metronome",
+      "name": "Métronome",
+      "description": "36 mois de suite avec un bilan mensuel positif.",
+      "conditions": [
+        {
+          "stat": "bestPositiveStreak",
+          "min": 36
+        }
+      ]
+    },
+    {
+      "id": "sold",
+      "name": "Vendu !",
+      "description": "Revendre un bien.",
+      "conditions": [
+        {
+          "stat": "sales",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "capitalGain",
+      "name": "Plus-value",
+      "description": "Revendre un bien plus cher qu'il ne vous a coûté.",
+      "conditions": [
+        {
+          "stat": "salesWithGain",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "businessSense",
+      "name": "Sens des affaires",
+      "description": "Revendre 10 biens avec une plus-value.",
+      "conditions": [
+        {
+          "stat": "salesWithGain",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "firstDig",
+      "name": "Premier coup de pioche",
+      "description": "Terminer un premier chantier.",
+      "conditions": [
+        {
+          "stat": "worksDone",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "siteManager",
+      "name": "Chef de chantier",
+      "description": "Terminer 10 chantiers.",
+      "conditions": [
+        {
+          "stat": "worksDone",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "gToB",
+      "name": "De G à B",
+      "description": "Rénover un bien de la classe G à la classe B (ou mieux).",
+      "conditions": [
+        {
+          "stat": "dpeGToB",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "leakHunter",
+      "name": "Chasse aux passoires",
+      "description": "Sortir 3 biens des classes E, F et G.",
+      "conditions": [
+        {
+          "stat": "passoiresFixed",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "sundayHandyman",
+      "name": "Bricoleur du dimanche",
+      "description": "Faire 3 travaux soi-même.",
+      "conditions": [
+        {
+          "stat": "diyTasks",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "goldenHands",
+      "name": "Des mains en or",
+      "description": "Faire 15 travaux soi-même.",
+      "conditions": [
+        {
+          "stat": "diyTasks",
+          "min": 15
+        }
+      ]
+    },
+    {
+      "id": "sheSmiled",
+      "name": "Elle a souri",
+      "description": "Obtenir la confiance maximale d'Hortense Rigueur.",
+      "conditions": [
+        {
+          "stat": "bankTrust",
+          "key": "rigueur",
+          "min": 100
+        }
+      ]
+    },
+    {
+      "id": "kevinsBuddy",
+      "name": "Pote de Kévin",
+      "description": "Une confiance de 90 au Crédit Fougueux.",
+      "conditions": [
+        {
+          "stat": "bankTrust",
+          "key": "fougueux",
+          "min": 90
+        }
+      ]
+    },
+    {
+      "id": "loyalCustomer",
+      "name": "Fidèle au poste",
+      "description": "Une confiance de 90 à La Tirelire Comtoise.",
+      "conditions": [
+        {
+          "stat": "bankTrust",
+          "key": "tirelire",
+          "min": 90
+        }
+      ]
+    },
+    {
+      "id": "regular",
+      "name": "Habitué des agences",
+      "description": "Aller à 10 rendez-vous bancaires.",
+      "conditions": [
+        {
+          "stat": "bankMeetings",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "renegotiator",
+      "name": "Renégociateur",
+      "description": "Faire racheter un crédit à meilleur taux.",
+      "conditions": [
+        {
+          "stat": "refinances",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "lastPayment",
+      "name": "Dernière mensualité",
+      "description": "Rembourser entièrement un crédit.",
+      "conditions": [
+        {
+          "stat": "loansRepaid",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "debtFree",
+      "name": "Libre comme l'air",
+      "description": "Posséder des biens sans aucun crédit en cours.",
+      "conditions": [
+        {
+          "stat": "properties",
+          "min": 1
+        },
+        {
+          "stat": "debt",
+          "max": 0
+        }
+      ]
+    },
+    {
+      "id": "delaporteInTears",
+      "name": "Mme Delaporte en larmes",
+      "description": "Battre Monique Delaporte 5 fois sur une affaire.",
+      "conditions": [
+        {
+          "stat": "rivalBeaten",
+          "key": "delaporte",
+          "min": 5
+        }
+      ]
+    },
+    {
+      "id": "martinotKo",
+      "name": "Les Martinot au tapis",
+      "description": "Battre les frères Martinot 3 fois sur une affaire.",
+      "conditions": [
+        {
+          "stat": "rivalBeaten",
+          "key": "martinot",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "zeroTax",
+      "name": "Zéro impôt",
+      "description": "Une année de loyers sans impôt sur les loyers.",
+      "conditions": [
+        {
+          "stat": "rentTaxFreeYears",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "quietYear",
+      "name": "Une année tranquille",
+      "description": "Une année entière sans vente forcée, procédure ni logement indécent.",
+      "conditions": [
+        {
+          "stat": "quietYears",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "quietDecade",
+      "name": "Dix ans sans histoire",
+      "description": "10 années tranquilles.",
+      "conditions": [
+        {
+          "stat": "quietYears",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "talkOfTheTown",
+      "name": "On parle de vous",
+      "description": "Une réputation de 50.",
+      "conditions": [
+        {
+          "stat": "reputation",
+          "min": 50
+        }
+      ]
+    },
+    {
+      "id": "reference",
+      "name": "Une référence",
+      "description": "Une réputation de 80.",
+      "conditions": [
+        {
+          "stat": "reputation",
+          "min": 80
+        }
+      ]
+    },
+    {
+      "id": "hundredK",
+      "name": "Cent mille",
+      "description": "Un patrimoine net de 100 000 €.",
+      "conditions": [
+        {
+          "stat": "netWorth",
+          "min": 100000
+        }
+      ]
+    },
+    {
+      "id": "halfMillion",
+      "name": "Demi-million",
+      "description": "Un patrimoine net de 500 000 €.",
+      "conditions": [
+        {
+          "stat": "netWorth",
+          "min": 500000
+        }
+      ]
+    },
+    {
+      "id": "millionaire",
+      "name": "Millionnaire",
+      "description": "Un patrimoine net d'un million d'euros.",
+      "conditions": [
+        {
+          "stat": "netWorth",
+          "min": 1000000
+        }
+      ]
+    },
+    {
+      "id": "challengeAccepted",
+      "name": "Défi relevé",
+      "description": "Réussir un défi.",
+      "conditions": [
+        {
+          "stat": "challengesWon",
+          "min": 1
+        }
+      ]
+    },
+    {
+      "id": "alwaysIn",
+      "name": "Toujours partant",
+      "description": "Réussir 5 défis.",
+      "conditions": [
+        {
+          "stat": "challengesWon",
+          "min": 5
+        }
+      ]
+    },
+    {
+      "id": "phoenix",
+      "name": "Le phénix",
+      "description": "Repartir de zéro après une faillite.",
+      "conditions": [
+        {
+          "stat": "freshStarts",
+          "min": 1
+        }
+      ],
+      "secret": true
+    },
+    {
+      "id": "tenYears",
+      "name": "Dix ans de pierre",
+      "description": "Jouer 10 ans.",
+      "conditions": [
+        {
+          "stat": "yearsPlayed",
+          "min": 10
+        }
+      ]
+    },
+    {
+      "id": "gossip",
+      "name": "Commère du quartier",
+      "description": "Entendre 50 anecdotes.",
+      "conditions": [
+        {
+          "stat": "anecdotes",
+          "min": 50
+        }
+      ]
+    },
+    {
+      "id": "decider",
+      "name": "Décideur",
+      "description": "Répondre soi-même à 50 événements.",
+      "conditions": [
+        {
+          "stat": "eventChoices",
+          "min": 50
+        }
+      ]
+    }
+  ]
+}
