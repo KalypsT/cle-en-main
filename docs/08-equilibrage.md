@@ -94,6 +94,43 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > Le Chasseur qui reste à Dole perd environ 10 % de patrimoine par rapport au jalon 6 sur 100 parties (non significatif, 1,6 écart-type) ; sur 1 000 parties sa médiane est de 87 k€.
 
+> **Jalon 8, profondeur** : un bot s'ajoute, le **Promoteur**, et le Chasseur se sert de la SCI.
+>
+> | Bot | Réglages principaux |
+> |---|---|
+> | Chasseur | crée la SCI dès son 2e bien ; y achète quand son propre crédit est épuisé, en apportant lui-même les frais (par prudence : à 110 %, 4 parties sur 8 finissaient en faillite lors des essais) ; loue nu |
+> | Promoteur | un Chasseur qui n'achète que ce qu'il peut transformer : immeuble vendu à la découpe, maison divisée, combles, construction sur un terrain. Il juge une annonce sur la valeur de ce que la transformation produit, son coût (+20 %) et 8 % de marge déduits ; écarte ce qui ne serait pas louable tout de suite ou interdit avant 5 ans ; crée la SCI dès son 1er bien et y fait prêter les frais ; réserve de 2 mensualités, plus les mois de chantier à venir ; cherche aussi à Dijon et à Besançon dès son 1er bien (Immo Zen) ; garde et loue nu les lots produits |
+>
+> **Cibles du jalon** (validées avant la mesure ; séries de 25 ans, seulement pour le Promoteur et le Chasseur) :
+>
+> | Repère | Cible |
+> |---|---|
+> | Magnat | atteint dans 25 à 50 % des parties en 25 ans (Chasseur et Promoteur), en 15 à 25 ans (médiane) |
+> | Baron de la pierre | moins de 5 % des parties en 25 ans |
+> | Promoteur | plus de 50 % des parties du bot Promoteur en 10 ans |
+>
+> **Mesure du jalon 8** (`packages/bots/rapports/jalon-8.md` : 300 parties de 25 ans pour le Promoteur et le Chasseur) :
+>
+> | Repère | Résultat |
+> |---|---|
+> | Baron de la pierre | 0 % pour les deux bots : **atteint** (aucune partie ne s'en approche : 5 M€ nets et 4 villes) |
+> | Magnat (Promoteur) | **manqué** : 14,3 % des parties, en 21,4 ans (médiane) ; la durée est dans la cible, pas la fréquence |
+> | Magnat (Chasseur) | **manqué** : 0 %. Il ne transforme jamais, et Magnat suit Promoteur (chapitre 02) ; même sans ce prérequis, seules 16 parties sur 300 (5 %) dépassent un jour 1 M€ |
+> | Promoteur (bot Promoteur) | **manqué** : 13,3 % des parties en 10 ans ; 60 % en 25 ans, en 13,4 ans (médiane) |
+> | Patrimoine à 25 ans | Chasseur 274 k€ (D1 35 k€, D9 824 k€) ; Promoteur 226 k€ (D1 9 k€, D9 1,43 M€), très dispersé selon le métier (53 k€ pour un fonctionnaire, 834 k€ pour un développeur) |
+> | Faillites en 25 ans | Chasseur 7,7 %, Promoteur 8 % ; une vente forcée dans 89 à 91 % des parties |
+> | Densité de décisions | Chasseur 40,6 s : dans la cible ; Promoteur 16,5 s, trop dense, car il voit beaucoup d'annonces qu'il pourrait financer (160 par an, avec ses prêts à 110 %) |
+> | Réputation finale (médiane) | Chasseur 94,5, Promoteur 91,7 : les gains décroissants et l'érosion ne suffisent pas à garder la réputation sous 90 (point ouvert n° 14) |
+> | SCI Horizon | arrive dans 40 % (Chasseur) à 49 % (Promoteur) des parties, vers 18 à 20 ans, et achète 0,8 à 1,4 bien par an |
+> | IFI | payé dans 12 % des parties du Promoteur (2 758 € par partie en moyenne), jamais par le Chasseur |
+>
+> **Pourquoi le Promoteur reste loin de la cible** : il part avec 15 000 € et n'achète que ce qu'il peut transformer, des biens chers (immeubles, grandes maisons) dont les frais doivent être apportés tant qu'il n'a pas de SCI. Son premier achat arrive au 40e mois en médiane (21 parties sur 300 n'achètent jamais), sa première transformation vers 13 ans. Les métiers les mieux payés (développeur, commercial, agent immobilier) l'obtiennent dans 76 à 88 % des parties ; un fonctionnaire ou un électricien dans 37 à 42 %. Trois réglages du bot ont été essayés sur 42 parties de 25 ans (mêmes graines ; la série retenue y donne 21 % de Promoteur en 10 ans, 26 % de Magnat, 2 % de faillites) et **refusés** :
+> - acheter aussi les bonnes affaires ordinaires, au prix du Chasseur ou avec 10 % de marge en plus : 90 à 98 % de faillites (les prêts de la SCI à 110 % sur des biens à cash-flow nul) ;
+> - les mêmes, mais en apportant les frais des achats ordinaires : 29 % de faillites, 12 % de Promoteur en 10 ans, 14 % de Magnat ;
+> - créer la SCI et chercher à Dijon et à Besançon dès le départ : 5 % de Promoteur en 10 ans, 7 % de Magnat, 10 % de faillites (la SCI coûte 1 500 € sur 15 000).
+>
+> Le constat de fond (déjà vu en cours de jalon) : une location nue financée à crédit a un cash-flow à peu près nul. Le patrimoine ne grandit vite que par la création de valeur (transformations) et par le levier de la SCI, et c'est la trésorerie de départ qui freine. Les leviers restants sont des décisions de conception, pas des réglages de bot (voir le récapitulatif du jalon et le point ouvert n° 5) : un seuil de Magnat plus bas ou sans le prérequis Promoteur pour le Chasseur, des cibles revues, ou des transformations moins chères.
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :
