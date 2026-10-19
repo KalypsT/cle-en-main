@@ -38,10 +38,14 @@ export async function newGame(
 }
 
 export async function pause(page: Page) {
-  await dismissOverlays(page);
   const button = page.getByRole('button', { name: t.status.pause });
-  await button.click();
-  await expect(button).toHaveAttribute('aria-pressed', 'true');
+  // A review can open on the 1st while the clock runs: close it, then pause.
+  await expect(async () => {
+    await dismissOverlays(page);
+    if ((await button.getAttribute('aria-pressed')) !== 'true')
+      await button.click({ timeout: 2_000 });
+    await expect(button).toHaveAttribute('aria-pressed', 'true', { timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
   // Let React render the last hour ticked before the pause: the time stops changing.
   const time = page.getByTestId('game-time');
   await expect(async () => {
@@ -49,6 +53,37 @@ export async function pause(page: Page) {
     await page.waitForTimeout(150);
     expect(await time.textContent()).toBe(before);
   }).toPass();
+}
+
+/** The date and the hour on the status bar. */
+export async function clockStamp(page: Page): Promise<string> {
+  const date = await page.getByTestId('game-date').textContent();
+  const time = await page.getByTestId('game-time').textContent();
+  return `${date} ${time}`;
+}
+
+/**
+ * Lets time run at ×4 until the clock moves (reviews and decisions may stop it:
+ * they are closed and the speed is set again on each try), leaving it running.
+ */
+export async function runClock(page: Page, from: string) {
+  await expect(async () => {
+    await dismissOverlays(page);
+    await speed(page, 4);
+    expect(await clockStamp(page)).not.toBe(from);
+  }).toPass({ timeout: 15_000 });
+}
+
+/** Lets time run until the date changes, then pauses (free time is renewed each day). */
+export async function waitNextDay(page: Page) {
+  const date = page.getByTestId('game-date');
+  const before = (await date.textContent()) ?? '';
+  await expect(async () => {
+    await dismissOverlays(page);
+    await speed(page, 4);
+    await expect(date).not.toHaveText(before, { timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  await pause(page);
 }
 
 export async function speed(page: Page, value: number) {

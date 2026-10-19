@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { fill, newGame, openGame, pause, speed, t, tab, ui } from './helpers.ts';
+import { clockStamp, fill, newGame, openGame, pause, runClock, t, tab, ui } from './helpers.ts';
 
 test('starts, creates a game, saves it and loads it back', async ({ page }) => {
   await openGame(page);
@@ -8,9 +8,7 @@ test('starts, creates a game, saves it and loads it back', async ({ page }) => {
 
   // The clock runs; ×4, then wait for the hour to change.
   const time = page.getByTestId('game-time');
-  const startTime = await time.textContent();
-  await speed(page, 4);
-  await expect(time).not.toHaveText(startTime ?? '', { timeout: 5_000 });
+  await runClock(page, await clockStamp(page));
 
   // Pause, then save from the menu.
   await pause(page);

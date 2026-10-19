@@ -10,6 +10,7 @@ import {
   tab,
   tutorial,
   waitForDecision,
+  waitNextDay,
 } from './helpers.ts';
 
 /** Milestone 4: a game played through the interface up to the first let property. */
@@ -84,14 +85,34 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   await page.getByRole('button', { name: t.rent.publish }).click();
 
   // A candidate applies: choose them.
-  const candidates = await waitForDecision(page, 'candidates');
+  let candidates = await waitForDecision(page, 'candidates');
   await candidates.click();
   const candidate = page.getByTestId('candidate').first();
   await capture(page, '12-candidatures');
   await candidate.getByRole('button', { name: t.rent.accept }).click();
 
-  // The property is let.
+  // The property is let. Moving a tenant in takes 2 hours of free time: when the day's
+  // are spent, the game refuses, and the player tries again the next day.
   await tab(page, 'assets');
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const isLet = await expect(page.getByText(t.assets.status.let))
+      .toBeVisible({ timeout: 2_000 })
+      .then(
+        () => true,
+        () => false,
+      );
+    if (isLet) break;
+    await waitNextDay(page);
+    await tab(page, 'decisions');
+    candidates = page.getByTestId('decision-candidates').first();
+    await candidates.click();
+    await page
+      .getByTestId('candidate')
+      .first()
+      .getByRole('button', { name: t.rent.accept })
+      .click();
+    await tab(page, 'assets');
+  }
   await expect(page.getByText(t.assets.status.let)).toBeVisible();
   await capture(page, '13-patrimoine');
   await page.locator('[data-testid^="property-"]').first().click();
