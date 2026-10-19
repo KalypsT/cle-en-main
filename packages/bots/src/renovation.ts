@@ -4,7 +4,9 @@ import {
   DPE_LABELS,
   type HazardChoice,
   type ItemChoice,
+  type Listing,
   type OwnedProperty,
+  type Property,
   type Tier,
   type Trade,
   type WorksEstimate,
@@ -104,6 +106,18 @@ export function chooseWorks(
   return { choices: [...chosen].map(([itemId, tier]) => ({ itemId, tier })), estimate };
 }
 
+function samePlan(a: WorksProjectPlan | null, b: WorksProjectPlan | null): boolean {
+  if (a === null || b === null) return a === b;
+  if (a.choices.length !== b.choices.length) return false;
+  for (let i = 0; i < a.choices.length; i++) {
+    const x = a.choices[i];
+    const y = b.choices[i];
+    if (x?.itemId !== y?.itemId || x?.tier !== y?.tier) return false;
+  }
+  const keys = Object.keys(a.estimate) as (keyof WorksEstimate)[];
+  return keys.every((key) => a.estimate[key] === b.estimate[key]);
+}
+
 /** Bot memory of the works in preparation: the quotes asked, by property. */
 export class RenovationDesk {
   private readonly plans = new Map<string, { choices: ItemChoice[]; quotes: Map<Trade, string> }>();
@@ -112,23 +126,55 @@ export class RenovationDesk {
     { key: unknown; month: number; plan: WorksProjectPlan | null }
   >();
   private readonly profile: RenovationProfile;
+  /** Items chosen for each listing's property (null: nothing to do). */
+  private readonly choices = new WeakMap<Property, ItemChoice[] | null>();
 
   constructor(profile: RenovationProfile) {
     this.profile = profile;
   }
 
-  /** The project of a listing, recomputed when its items or the month change. */
-  projectFor(api: BotApi, listingId: string): WorksProjectPlan | null {
-    const listing = api.state.listings.find((l) => l.id === listingId);
-    if (!listing) return null;
-    const month = Math.floor(api.today / MONTH_KEY_DAYS);
-    const cached = this.listingCache.get(listingId);
+  /** Period of the listings' works plans: they are recomputed when it changes. */
+  monthOf(api: BotApi): number {
+    return Math.floor(api.today / MONTH_KEY_DAYS);
+  }
+
+  /**
+   * The project of a listing, recomputed when its items or the month change. A recomputed
+   * project equal to the previous one is the same object, so that what depends on it can be
+   * kept.
+   */
+  projectFor(api: BotApi, listing: Listing): WorksProjectPlan | null {
+    const month = this.monthOf(api);
+    const cached = this.listingCache.get(listing.id);
     if (cached && cached.key === listing.property.items && cached.month === month) {
       return cached.plan;
     }
-    const plan = chooseWorks(api, listingId, this.profile);
-    this.listingCache.set(listingId, { key: listing.property.items, month, plan });
+    let plan = this.planListing(api, listing);
+    if (cached && cached.key === listing.property.items && samePlan(cached.plan, plan)) {
+      plan = cached.plan;
+    }
+    this.listingCache.set(listing.id, { key: listing.property.items, month, plan });
     return plan;
+  }
+
+  /**
+   * The items chosen for a listing depend only on its property (what the player knows of it),
+   * except for the `profitable` scope, which weighs values: they are kept, and only their
+   * estimate (prices, rents) is recomputed.
+   */
+  private planListing(api: BotApi, listing: Listing): WorksProjectPlan | null {
+    if (this.profile.scope === 'profitable' || !Object.isFrozen(listing.property)) {
+      return chooseWorks(api, listing.id, this.profile);
+    }
+    const known = this.choices.get(listing.property);
+    if (known === undefined) {
+      const plan = chooseWorks(api, listing.id, this.profile);
+      this.choices.set(listing.property, plan?.choices ?? null);
+      return plan;
+    }
+    if (known === null) return null;
+    const estimate = api.engine.worksEstimate(api.state, listing.id, known);
+    return estimate ? { choices: known, estimate } : null;
   }
 
   forget(listingIds: ReadonlySet<string>): void {

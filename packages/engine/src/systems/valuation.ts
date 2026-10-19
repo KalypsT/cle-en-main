@@ -312,7 +312,38 @@ export interface Estimate {
  * count fully, the others by their probability given what visits have (not)
  * shown.
  */
+/** Estimates of frozen properties, like their real values (see realValueCache). */
+const estimateCache = new WeakMap<
+  Property,
+  { content: GameContent; priceIndex: number; visited: boolean; value: Estimate }[]
+>();
+
 export function estimateValue(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  visited: boolean,
+): Estimate {
+  if (!Object.isFrozen(property)) return computeEstimate(content, state, property, visited);
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  let entries = estimateCache.get(property);
+  const hit = entries?.find(
+    (entry) =>
+      entry.content === content && entry.priceIndex === priceIndex && entry.visited === visited,
+  );
+  if (hit) return hit.value;
+  const value = computeEstimate(content, state, property, visited);
+  // One entry per visited flag, at the latest price level.
+  entries = (entries ?? []).filter(
+    (entry) => entry.content === content && entry.visited !== visited,
+  );
+  entries.push({ content, priceIndex, visited, value });
+  estimateCache.set(property, entries);
+  return value;
+}
+
+function computeEstimate(
   content: GameContent,
   state: GameState,
   property: Property,

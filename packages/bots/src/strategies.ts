@@ -7,7 +7,12 @@ import {
 } from '@cle/engine';
 import type { BotApi, Strategy } from './driver.ts';
 import { toDayNumber } from '@cle/engine';
-import { chooseWorks, RenovationDesk, type RenovationProfile } from './renovation.ts';
+import {
+  chooseWorks,
+  RenovationDesk,
+  type RenovationProfile,
+  type WorksProjectPlan,
+} from './renovation.ts';
 
 /**
  * The investor bots of docs/08-equilibrage.md (section 8.2), as profiles of
@@ -99,6 +104,12 @@ const VACANCY_ALLOWANCE = 0.05;
 /** A careful owner waits this long for several candidates, then takes the best one. */
 const CANDIDATE_WAIT_DAYS = 5;
 const DECEMBER = 12;
+
+interface Appraisal {
+  value: number;
+  works: number;
+  rentAfter: number | null;
+}
 
 interface Plan {
   bankIds: string[];
@@ -372,10 +383,68 @@ export function investor(profile: InvestorProfile): Strategy {
     return done;
   }
 
+  /**
+   * Appraisals of frozen listings (shared by the copies of the state, replaced when they change).
+   * Besides the listing, an appraisal depends only on its neighbourhood's price index, the
+   * desk's works project for it and which DPE ban dates (and the bot's horizon before them)
+   * are past: the result is the same as recomputing it, without the work.
+   */
+  const appraisals = new WeakMap<
+    Listing,
+    {
+      priceIndex: number;
+      project: WorksProjectPlan | null;
+      flags: string;
+      value: Appraisal | null;
+    }
+  >();
+
+  let banFlagsCache: { day: number; flags: string } | null = null;
+
+  /** Which ban dates, and which ban dates minus the bot's horizon, are past today. */
+  function banFlags(api: BotApi): string {
+    const today = api.today;
+    if (banFlagsCache?.day === today) return banFlagsCache.flags;
+    const horizon = profile.minLettableYears * DAYS_PER_YEAR;
+    let flags = '';
+    for (const iso of Object.values(api.engine.content.renting.dpe.letBanFrom)) {
+      if (!iso) continue;
+      const [year, month, day] = iso.split('-').map(Number);
+      const banDay = toDayNumber({ year: year ?? 0, month: month ?? 1, day: day ?? 1 });
+      flags += `${today >= banDay ? 1 : 0}${today >= banDay - horizon ? 1 : 0}`;
+    }
+    banFlagsCache = { day: today, flags };
+    return flags;
+  }
+
+  function appraise(api: BotApi, listing: Listing): Appraisal | null {
+    const project = desk.projectFor(api, listing);
+    if (!Object.isFrozen(listing)) return appraiseNow(api, listing, project);
+    const { property } = listing;
+    const priceIndex =
+      api.state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+    const flags = banFlags(api);
+    const cached = appraisals.get(listing);
+    if (
+      cached &&
+      cached.priceIndex === priceIndex &&
+      cached.project === project &&
+      cached.flags === flags
+    ) {
+      return cached.value;
+    }
+    const value = appraiseNow(api, listing, project);
+    appraisals.set(listing, { priceIndex, project, flags, value });
+    return value;
+  }
+
   /** What the bot would pay for a listing: the value after its works, the works deducted. */
-  function appraise(api: BotApi, listing: Listing) {
+  function appraiseNow(
+    api: BotApi,
+    listing: Listing,
+    project: WorksProjectPlan | null,
+  ): Appraisal | null {
     const { engine, state } = api;
-    const project = desk.projectFor(api, listing.id);
     if (project && profile.appraisal === 'asIs') {
       // Premium everywhere: bought on its value as it is, the works financed on top.
       const value = engine.estimate(state, listing.id)?.estimate ?? 0;

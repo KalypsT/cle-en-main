@@ -173,8 +173,21 @@ export function blankItems(
   return items;
 }
 
+/** Rooms of frozen layouts by id (items look up their room for every cost and weight). */
+const spaceIndex = new WeakMap<readonly Space[], Map<string, Space>>();
+
 function spaceOf(property: Property, spaceId: string | null): Space | undefined {
-  return spaceId === null ? undefined : property.spaces.find((space) => space.id === spaceId);
+  if (spaceId === null) return undefined;
+  const { spaces } = property;
+  if (!Object.isFrozen(spaces)) return spaces.find((space) => space.id === spaceId);
+  let index = spaceIndex.get(spaces);
+  if (!index) {
+    index = new Map();
+    // The first room of an id wins, as with find().
+    for (const space of spaces) if (!index.has(space.id)) index.set(space.id, space);
+    spaceIndex.set(spaces, index);
+  }
+  return index.get(spaceId);
 }
 
 /** Quantity of an item's cost basis: m², windows or units. */
