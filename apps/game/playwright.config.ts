@@ -7,6 +7,9 @@ export default defineConfig({
   testDir: './e2e',
   forbidOnly: !!process.env.CI,
   retries: 0,
+  // PixiJS renders in software on CI and in containers: two tests at a time, and room to breathe.
+  timeout: 60_000,
+  workers: 2,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://localhost:4173/cle-en-main/',
