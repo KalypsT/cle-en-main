@@ -80,6 +80,20 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 
 > **Jalon 7, réponses aux événements** : l'écart de mesure du jalon 6 (réputation finale de 0 ou 1) est corrigé : tous les bots investisseurs, sauf le Naïf, pèsent les choix des événements (argent, 300 € par point de réputation, 15 € par point de satisfaction). Conséquence : leur réputation finale monte à 100 et le Chasseur gagne environ 10 % de patrimoine à 10 ans (essai sur 60 parties : 84,8 k€ contre 76,0 k€ en 100 parties). **Le seuil de réputation de 90 du Baron de la pierre n'est donc plus un obstacle** (point ouvert n° 14). La notoriété locale d'une ville où le joueur n'a encore rien reste à zéro : elle ne facilite pas un premier achat, seulement les suivants.
 
+> **Mesure du jalon 7** (`packages/bots/rapports/jalon-7.md` : 1 000 parties de 10 ans pour le Chasseur et le Chasseur à Dijon, 300 pour les autres bots) :
+>
+> | Repère | Résultat |
+> |---|---|
+> | Expansion à Dijon viable | médiane de 84 k€ contre 87 k€ pour le Chasseur (96 %), faillites 3 % contre 2,5 % : **atteint** |
+> | Expansion à Dijon avec un vrai effort | premier achat à Dijon au 60e mois, 37 % des parties y achètent, 0,6 h de route par an : **atteint** |
+> | Besançon, Chalon (information) | Besançon 86 k€ (57 % y achètent, au 49e mois) ; Chalon 80 k€ (87 % y achètent dès le 11e mois, faillites 4 %) |
+> | Densité de décisions | Chasseur 50,6 s, Prudent 33,5 s : dans la cible de 30 à 60 s |
+> | Investisseur aguerri (Chasseur à Dijon) | **manqué** : aucune partie n'atteint 250 k€ nets en 10 ans (écart connu depuis le jalon 1c ; seuil, durée cible ou rentabilité à trancher) |
+> | Bailleur (Chasseur) | **manqué** : plus de 10 ans (atteint dans 41 % des parties) |
+> | Le Levier peut progresser vite | **manqué** (écart connu) : 74 % de faillites, 9e décile de 29 k€ |
+>
+> Le Chasseur qui reste à Dole perd environ 10 % de patrimoine par rapport au jalon 6 sur 100 parties (non significatif, 1,6 écart-type) ; sur 1 000 parties sa médiane est de 87 k€.
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :
