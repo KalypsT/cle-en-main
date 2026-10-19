@@ -91,7 +91,7 @@ interface Plan {
 }
 
 /** Margin the bots put on the engine's estimate of works (hazards, artisans). */
-const WORKS_MARGIN = 1.1;
+const WORKS_MARGIN = 1.2;
 /** A marchand's resale: asking price over the estimate, cut every month unsold. */
 const RESALE_MARKUP = 1.03;
 const RESALE_CUT = 0.03;
