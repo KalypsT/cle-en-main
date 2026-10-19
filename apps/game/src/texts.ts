@@ -360,6 +360,12 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':
       return events.resigned;
+    case 'companyCreated':
+      return format(events.companyCreated, { amount: formatMoney(event.cost) });
+    case 'purchaseHolderSet':
+      return null;
+    case 'rivalArrived':
+      return format(events.rivalArrived, { rival: rivalName(event.rivalId) });
     case 'listingPublished':
       return events.listingPublished;
     case 'listingSold':
@@ -439,6 +445,9 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
     case 'propertyTaxCharged':
       return format(events.propertyTaxCharged, { amount: formatMoney(event.amount) });
     case 'taxAssessed':
+      if (event.wealthTax > 0) {
+        return format(events.wealthTax, { year: event.year, amount: formatMoney(event.wealthTax) });
+      }
       if (event.total === 0) return null;
       return event.total > 0
         ? format(events.taxAssessed, { year: event.year, amount: formatMoney(event.total) })

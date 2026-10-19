@@ -179,6 +179,7 @@ export function sampleOwned(
   });
   return {
     property: { ...property, ...overrides.property },
+    holder: 'player',
     purchasePrice: 80_000_00,
     acquisitionCost: 86_800_00,
     purchaseDate: { year: 2026, month: 12, day: 15 },
@@ -212,6 +213,7 @@ export function sampleOwned(
             noticeEndDay: null,
             incident: null,
             arrears: null,
+            missedDays: 0,
           },
     furniture: null,
     taxRegime: 'auto',

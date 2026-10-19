@@ -55,6 +55,7 @@ import { remoteManagementFee } from './systems/cities.ts';
 import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
+import { createCompany, setPurchaseHolder } from './systems/company.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
 import { netWorth } from './systems/net-worth.ts';
 import { answerCounter, makeOffer } from './systems/offers.ts';
@@ -193,6 +194,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     startDate: { ...startDate },
     clock: createClock(startDate, startHour),
     nextId: 1,
+    company: null,
     player: {
       name: playerName(content, options.name),
       avatar: { ...(options.avatar ?? { face: 0, hair: 0, skin: 0, outfit: 0 }) },
@@ -492,6 +494,12 @@ export function createEngine(content: GameContent) {
           if (!Number.isInteger(action.step) || action.step < 0) refusal = 'tutorial.invalidStep';
           else draft.tutorial.step = action.step;
         }
+        break;
+      case 'company/create':
+        refusal = createCompany(ctx);
+        break;
+      case 'purchase/setHolder':
+        refusal = setPurchaseHolder(ctx, action.purchaseId, action.holder);
         break;
       case 'job/resign':
         if (!draft.player.employed) {

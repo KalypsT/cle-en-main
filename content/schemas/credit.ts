@@ -85,6 +85,8 @@ export const bankSchema = z
     counterOffers: z.boolean(),
     /** Whether the banker takes meetings (a chatbot does not). */
     meetings: z.boolean(),
+    /** Whether the bank lends to an SCI (milestone 8). */
+    lendsToCompanies: z.boolean(),
   })
   .strict();
 

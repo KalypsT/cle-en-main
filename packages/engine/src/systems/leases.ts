@@ -100,8 +100,21 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
     }
     const lease = owned.lease;
     if (!lease) continue;
-    const recoverable = recoverableCharges(content, owned.property);
-    const due = lease.monthlyRent + recoverable;
+    const leaseRules = rules.leaseTypes[lease.leaseType];
+    const recoverable = leaseRules.recoverableCharges
+      ? recoverableCharges(content, owned.property)
+      : 0;
+    // A short-term let earns with the season, less the days the owner could not see to.
+    const shortTerm = leaseRules.shortTerm;
+    const rent = shortTerm
+      ? Math.round(
+          lease.monthlyRent *
+            (shortTerm.seasonality[state.clock.date.month - 1] ?? 1) *
+            Math.max(0, 1 - lease.missedDays / DAYS_PER_MONTH),
+        )
+      : lease.monthlyRent;
+    lease.missedDays = 0;
+    const due = rent + recoverable;
     const arrears = lease.arrears;
     const stopped =
       arrears !== null && (arrears.reminderFailed || arrears.procedureEndDay !== null);
@@ -124,7 +137,7 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
     // The unpaid-rent insurance pays in the tenant's place.
     if (pays || lease.insured) {
       state.player.balance += due;
-      addRent(state, owned, lease.monthlyRent);
+      addRent(state, owned, rent);
       addCost(state, owned, -recoverable);
       lines.push({ kind: 'rentalIncome', propertyId, amount: due });
       collected = true;
@@ -257,6 +270,11 @@ export function runDailyLeases(ctx: SystemContext): void {
     if (ctx.today >= lease.termDay) renewOrEnd(ctx, owned, lease);
     if (!owned.lease) continue;
     if (ctx.today >= lease.anniversaryDay) anniversary(ctx, owned, lease);
+    // Short-term let managed by the owner: check-ins and cleaning every day.
+    const shortTerm = rules.leaseTypes[lease.leaseType].shortTerm;
+    if (shortTerm && !useFreeTime(ctx, owned, lease, shortTerm.selfMinutesPerDay)) {
+      lease.missedDays += 1;
+    }
     dailyIncident(ctx, owned, lease);
   }
 }

@@ -1,6 +1,7 @@
 import type { CityData } from './schemas/city.ts';
 import type { DecisionRules } from './schemas/decisions.ts';
 import type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
+import type { CompanyRules } from './schemas/company.ts';
 import type { Job } from './schemas/jobs.ts';
 import type { ListingTexts, MarketRules } from './schemas/market.ts';
 import type { RentingRules, TenantTexts } from './schemas/renting.ts';
@@ -28,6 +29,8 @@ export interface GameContent {
   unemployedFreeTimeMinutes: number;
   credit: CreditRules;
   banks: Bank[];
+  /** The SCI (milestone 8). */
+  company: CompanyRules;
   marketRate: MarketRate;
   market: MarketRules;
   listingTexts: ListingTexts;

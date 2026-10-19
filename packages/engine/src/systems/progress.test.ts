@@ -12,7 +12,7 @@ import { toDayNumber } from '../calendar.ts';
 import { createEngine } from '../engine.ts';
 import type { GameState } from '../state.ts';
 import { checkMilestones, recordProgress, runYearlyProgress, statValue } from './progress.ts';
-import { progressMarginPercent } from './reputation.ts';
+import { changeReputation, progressMarginPercent } from './reputation.ts';
 
 describe('progression (docs/02, sections 2.8 to 2.10)', () => {
   it('starts as a Locataire ambitieux, with a chronicle', () => {
@@ -105,6 +105,30 @@ describe('progression (docs/02, sections 2.8 to 2.10)', () => {
     expect(ctx.state.player.reputation).toBe(
       state.player.reputation + gains.worksDone + 5 * gains.dpeClassGained + gains.saleWithGain,
     );
+  });
+
+  it('makes the last reputation points hard to earn and lets a high reputation erode', () => {
+    const rules = content.progression.reputation;
+    const ctx = systemContext(newGame());
+    ctx.state.player.reputation = 50;
+    changeReputation(ctx, 3);
+    expect(ctx.state.player.reputation).toBe(53);
+    // At 85, a gain of 3 is worth (100 − 85) / 30 of it.
+    ctx.state.player.reputation = 85;
+    changeReputation(ctx, 3);
+    expect(ctx.state.player.reputation).toBe(
+      85 + Math.round(((3 * 15) / rules.diminishingSpan) * 10) / 10,
+    );
+    // Losses are never scaled.
+    changeReputation(ctx, -4);
+    expect(ctx.state.player.reputation).toBeCloseTo(82.5, 5);
+    // Yearly: above 80, a little fame fades, never below 80.
+    ctx.state.player.reputation = 95;
+    runYearlyProgress(ctx);
+    expect(ctx.state.player.reputation).toBe(95 - rules.erosionPerYear);
+    ctx.state.player.reputation = 81;
+    runYearlyProgress(ctx);
+    expect(ctx.state.player.reputation).toBe(rules.erosionAbove);
   });
 
   it('rewards a quiet year and punishes indecent lets at the yearly review', () => {

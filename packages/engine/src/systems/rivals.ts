@@ -2,6 +2,7 @@ import type { GameContent, Rival } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
 import { hashNormal, nextFloat, nextRange } from '../random.ts';
 import type { GameState, Listing, Property, RivalState } from '../state.ts';
+import { toDayNumber } from '../calendar.ts';
 import type { SystemContext } from './context.ts';
 import { modeOf } from './modes.ts';
 import { listingFor, removeListing } from './listings.ts';
@@ -28,9 +29,14 @@ export function initialRivals(content: GameContent): Record<string, RivalState> 
   return Object.fromEntries(
     content.rivals.map((rival) => [
       rival.id,
-      { budget: toCents(rival.budget.start), purchases: 0, projects: [] },
+      { arrivedDay: null, budget: toCents(rival.budget.start), purchases: 0, projects: [] },
     ]),
   );
+}
+
+/** A rival acts from the start, or once it has arrived (SCI Horizon). */
+export function isRivalActive(state: GameState, rival: Rival): boolean {
+  return rival.active || (state.rivals[rival.id]?.arrivedDay ?? null) !== null;
 }
 
 export function findRival(content: GameContent, rivalId: string): Rival | undefined {
@@ -72,7 +78,7 @@ export function rivalEstimate(
 function stateOf(ctx: SystemContext, rivalId: string): RivalState {
   let rivalState = ctx.state.rivals[rivalId];
   if (!rivalState) {
-    rivalState = { budget: 0, purchases: 0, projects: [] };
+    rivalState = { arrivedDay: null, budget: 0, purchases: 0, projects: [] };
     ctx.state.rivals[rivalId] = rivalState;
   }
   return rivalState;
@@ -99,16 +105,33 @@ export function rivalAcquired(
   }
 }
 
-/** Monthly budgets. */
+/** Monthly: late rivals arrive when their time has come, then the budgets grow. */
 export function runMonthlyRivals(ctx: SystemContext): void {
   for (const rival of ctx.content.rivals) {
-    if (!rival.active) continue;
+    if (!isRivalActive(ctx.state, rival)) {
+      arriveIfDue(ctx, rival);
+      continue;
+    }
     const rivalState = stateOf(ctx, rival.id);
     rivalState.budget = Math.min(
       toCents(rival.budget.max),
       rivalState.budget + toCents(rival.budget.monthlyIncome),
     );
   }
+}
+
+const DAYS_PER_YEAR = 365;
+
+/** The SCI Horizon comes once the game is old enough and the player rich enough. */
+function arriveIfDue(ctx: SystemContext, rival: Rival): void {
+  const arrival = rival.arrival;
+  if (!arrival) return;
+  const { content, state } = ctx;
+  const yearsPlayed = (ctx.today - toDayNumber(state.startDate)) / DAYS_PER_YEAR;
+  if (yearsPlayed < arrival.fromYear - 1) return;
+  if (netWorth(content, state) < toCents(arrival.minPlayerNetWorth)) return;
+  stateOf(ctx, rival.id).arrivedDay = ctx.today;
+  ctx.events.push({ type: 'rivalArrived', rivalId: rival.id });
 }
 
 /** Finished renovations go back on the market as new listings. */
@@ -205,7 +228,7 @@ function offerOnPlayerSales(
  */
 export function runDailyRivals(ctx: SystemContext): void {
   const { content, state } = ctx;
-  const active = content.rivals.filter((rival) => rival.active);
+  const active = content.rivals.filter((rival) => isRivalActive(state, rival));
   if (active.length === 0) return;
   const boldness = aggressiveness(content, state);
   for (const rival of active) {

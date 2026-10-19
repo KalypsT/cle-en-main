@@ -298,7 +298,11 @@
       "invalidDuration": "durée impossible pour ce projet.",
       "insufficientContribution": "l'apport doit couvrir au moins les frais.",
       "overFinancing": "le prêt dépasse le coût du projet.",
-      "debtRatio": "taux d'endettement trop élevé ({ratio})."
+      "debtRatio": "taux d'endettement trop élevé ({ratio}).",
+      "noCompany": "il faut d'abord créer votre SCI.",
+      "companyNotServed": "cette banque ne prête pas aux sociétés.",
+      "rentCoverage": "le loyer du bien ne couvre pas la mensualité.",
+      "leverage": "votre SCI doit déjà trop par rapport à votre patrimoine."
     }
   },
   "value": {
@@ -405,7 +409,9 @@
     "tenant": "Locataire",
     "leaseType": {
       "bare": "Location nue",
-      "furnished": "Location meublée"
+      "furnished": "Location meublée",
+      "shared": "Colocation",
+      "shortTerm": "Location courte durée"
     },
     "monthlyRent": "Loyer hors charges",
     "since": "Depuis le {date}",
@@ -714,6 +720,7 @@
     "leasesSigned": "Baux signés",
     "incidentsRepaired": "Incidents réparés",
     "diyTasks": "Travaux faits soi-même",
+    "transformations": "Transformations menées à bien",
     "bankMeetings": "Rendez-vous bancaires",
     "refinances": "Crédits rachetés",
     "loansRepaid": "Crédits remboursés",

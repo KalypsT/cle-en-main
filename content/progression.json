@@ -14,7 +14,11 @@
     "procedure": -4,
     "eviction": -2,
     "tenantConflict": -2,
-    "indecentLet": -5
+    "indecentLet": -5,
+    "diminishingFrom": 70,
+    "diminishingSpan": 30,
+    "erosionAbove": 80,
+    "erosionPerYear": 2
   },
   "effects": {
     "bankMargin": [

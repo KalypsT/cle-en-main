@@ -26,6 +26,8 @@ export const STATS = [
   'incidentsRepaired',
   /** Works tasks done by the player himself. */
   'diyTasks',
+  /** Transformations completed: a house divided, an attic converted, a house built (milestone 8). */
+  'transformations',
   'bankMeetings',
   'refinances',
   'loansRepaid',
@@ -214,6 +216,15 @@ export const progressionRulesSchema = z
         tenantConflict: delta,
         /** Yearly, for each let property that is not decent. */
         indecentLet: delta,
+        /**
+         * Gains made from this reputation on are scaled by (100 − reputation) / span: the last
+         * points are the hardest (milestone 8, open point 14).
+         */
+        diminishingFrom: z.number().min(0).max(100),
+        diminishingSpan: z.number().positive(),
+        /** At the yearly review, a reputation above this loses `erosionPerYear` (not below it). */
+        erosionAbove: z.number().min(0).max(100),
+        erosionPerYear: z.number().min(0),
       })
       .strict(),
     effects: z

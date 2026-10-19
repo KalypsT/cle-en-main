@@ -69,6 +69,7 @@ function setup(): GameState {
   });
   const today = toDayNumber(state.clock.date);
   const owned: OwnedProperty = {
+    holder: 'player',
     property: dwelling({
       id: 'property-t2',
       cityId: 'dole',
@@ -115,6 +116,7 @@ function setup(): GameState {
       noticeEndDay: null,
       incident: null,
       arrears: null,
+      missedDays: 0,
     },
     furniture: null,
     taxRegime: 'auto',

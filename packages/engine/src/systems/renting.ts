@@ -46,6 +46,10 @@ export function monthsToDays(months: number): number {
 }
 
 export type RentRefusal =
+  | 'rent.notEnoughRooms'
+  | 'agency.leaseType'
+  | 'company.leaseType'
+  | 'company.noHome'
   | 'property.unknown'
   | 'sale.agreed'
   | 'rent.isHome'
@@ -204,10 +208,17 @@ export function listForRent(
   if (state.player.homePropertyId === propertyId) return 'rent.isHome';
   if (owned.lease) return 'rent.alreadyLet';
   if (owned.sale?.agreement) return 'sale.agreed';
+  if (owned.holder === 'company' && !content.company.leaseTypes.includes(terms.leaseType)) {
+    return 'company.leaseType';
+  }
   const block = lettingBlock(content, owned.property, ctx.today);
   if (block) return block;
   if (heavyWorksInProgress(content, owned)) return 'works.inProgress';
-  if (terms.agencyId !== null && !findAgency(content, terms.agencyId)) return 'agency.unknown';
+  const leaseRules = content.renting.leaseTypes[terms.leaseType];
+  if (owned.property.rooms < leaseRules.minRooms) return 'rent.notEnoughRooms';
+  const agency = terms.agencyId === null ? undefined : findAgency(content, terms.agencyId);
+  if (terms.agencyId !== null && !agency) return 'agency.unknown';
+  if (agency && !agency.leaseTypes.includes(terms.leaseType)) return 'agency.leaseType';
   const range = rentRange(content, state, owned.property, terms.leaseType);
   if (
     !Number.isInteger(terms.monthlyRent) ||
@@ -216,7 +227,7 @@ export function listForRent(
   ) {
     return 'rent.invalidRent';
   }
-  if (terms.leaseType === 'furnished' && !owned.furniture) {
+  if (leaseRules.furnished && !owned.furniture) {
     const cost = furnitureCost(content, owned.property);
     if (state.player.balance < cost) return 'account.insufficientFunds';
     state.player.balance -= cost;
@@ -226,12 +237,38 @@ export function listForRent(
   owned.rental = { ...terms, listedDay: ctx.today, applications: [] };
   ledgerOf(state, owned).category = terms.leaseType;
   ctx.events.push({ type: 'rentalListed', propertyId, ...terms });
+  const shortTerm = leaseRules.shortTerm;
+  if (shortTerm) {
+    // No tenant to choose: the guests come at once.
+    const market = marketRent(content, state, owned.property, terms.leaseType);
+    moveIn(ctx, owned, {
+      id: `application-${state.nextId++}`,
+      tenant: drawTenant(ctx, terms.leaseType, terms.monthlyRent, market, agency),
+      expiresDay: ctx.today,
+    });
+  }
   return null;
+}
+
+/** A short-term let stops: no tenant to see out, the property is simply free again. */
+function endShortTerm(ctx: SystemContext, owned: OwnedProperty): void {
+  owned.lease = null;
+  ctx.events.push({
+    type: 'tenantLeft',
+    propertyId: owned.property.id,
+    reason: 'notice',
+    damages: 0,
+    depositReturned: 0,
+  });
 }
 
 export function withdrawRental(ctx: SystemContext, propertyId: string): RentRefusal | null {
   const owned = findOwned(ctx.state, propertyId);
   if (!owned) return 'property.unknown';
+  if (owned.lease && ctx.content.renting.leaseTypes[owned.lease.leaseType].shortTerm) {
+    endShortTerm(ctx, owned);
+    return null;
+  }
   if (!owned.rental) return 'rent.notListed';
   owned.rental = null;
   ctx.events.push({ type: 'rentalWithdrawn', propertyId });
@@ -279,6 +316,7 @@ function moveIn(ctx: SystemContext, owned: OwnedProperty, application: RentalApp
     noticeEndDay: null,
     incident: null,
     arrears: null,
+    missedDays: 0,
   };
   state.player.balance += deposit;
   owned.lease = lease;
@@ -361,6 +399,7 @@ export function runDailyRentalListings(ctx: SystemContext): void {
         rules.dailyProbability *
         (content.citiesRules.demand[owned.property.cityId]?.tenants ?? 1) *
         (agency?.applicationRate ?? 1) *
+        content.renting.leaseTypes[rental.leaseType].applicationRate *
         Math.exp(-rules.rentSensitivity * (rental.monthlyRent / market - 1));
       if (nextFloat(state.rng) < Math.min(1, chance))
         receiveApplication(ctx, owned, rental, market);
@@ -476,6 +515,7 @@ export function moveIntoHome(ctx: SystemContext, propertyId: string): RentRefusa
   const owned = findOwned(state, propertyId);
   if (!owned) return 'property.unknown';
   if (state.player.homePropertyId === propertyId) return 'home.already';
+  if (owned.holder === 'company') return 'company.noHome';
   if (owned.lease) return 'rent.alreadyLet';
   if (owned.sale?.agreement) return 'sale.agreed';
   owned.rental = null;

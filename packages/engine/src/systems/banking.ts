@@ -7,13 +7,14 @@ import {
   splitPayment,
   toCents,
 } from '../money.ts';
-import type { BankRelation, GameState, Loan } from '../state.ts';
+import type { BankRelation, GameState, Holder, Loan } from '../state.ts';
 import type { SystemContext } from './context.ts';
 import { modeOf } from './modes.ts';
 import { progressMarginPercent } from './reputation.ts';
 import { expectedSalary } from './household.ts';
 import { roundRate } from './market-rate.ts';
-import { currentRents } from './renting.ts';
+import { companyDebt, heldByCompany, isCompanyLoan, potentialRent } from './company.ts';
+import { netWorth } from './net-worth.ts';
 
 export type JobTrustLevel = 'mediumLow' | 'medium' | 'high' | 'veryHigh';
 const JOB_TRUST_ORDER: readonly JobTrustLevel[] = ['mediumLow', 'medium', 'high', 'veryHigh'];
@@ -134,20 +135,38 @@ export function marketOffer(content: GameContent, state: GameState, durationYear
   );
 }
 
-/** Monthly income the banks take into account. */
-export function retainedIncome(content: GameContent, state: GameState): Cents {
-  return Math.round(
-    expectedSalary(content, state.player) + content.credit.retainedRentShare * currentRents(state),
+/** Rents of the player's own leases (the SCI's are not his income for the banks). */
+function personalRents(state: GameState): Cents {
+  return state.properties.reduce(
+    (sum, owned) => sum + (heldByCompany(owned) ? 0 : (owned.lease?.monthlyRent ?? 0)),
+    0,
   );
 }
 
+/** Monthly income the banks take into account. */
+export function retainedIncome(content: GameContent, state: GameState): Cents {
+  return Math.round(
+    expectedSalary(content, state.player) + content.credit.retainedRentShare * personalRents(state),
+  );
+}
+
+/** Every loan's payment, the SCI's included. */
 export function monthlyLoanPayments(state: GameState): Cents {
   return state.loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
 }
 
+/** Payments of the player's own loans: the SCI's are judged on their rents (milestone 8). */
+export function personalLoanPayments(state: GameState): Cents {
+  return state.loans.reduce(
+    (sum, loan) => sum + (isCompanyLoan(state, loan) ? 0 : loan.monthlyPayment),
+    0,
+  );
+}
+
+/** The player's own debt ratio, the SCI's loans and rents aside. */
 export function debtRatio(content: GameContent, state: GameState, extraPayment: Cents = 0): number {
   const income = retainedIncome(content, state);
-  const payments = monthlyLoanPayments(state) + extraPayment;
+  const payments = personalLoanPayments(state) + extraPayment;
   if (payments === 0) return 0;
   return income > 0 ? payments / income : Number.POSITIVE_INFINITY;
 }
@@ -165,6 +184,10 @@ export interface LoanRequest {
   works: Cents;
   /** Personal money put into the project. */
   contribution: Cents;
+  /** Buyer: through the SCI, the loan is judged on the property's rent (milestone 8). */
+  holder?: Holder;
+  /** Listing or purchase financed: the SCI's bank counts its potential rent. */
+  propertyId?: string;
 }
 
 export interface LoanOffer {
@@ -176,7 +199,10 @@ export interface LoanOffer {
   monthlyPayment: Cents;
   /** Total interest and insurance over the whole loan. */
   totalCost: Cents;
+  /** The player's own debt ratio after the loan (unchanged by an SCI loan). */
   debtRatioAfter: number;
+  /** SCI loan: the rent the bank counts over the payment (1 or more: it pays for itself). */
+  rentCoverage: number | null;
 }
 
 export type LoanRefusalCode =
@@ -188,7 +214,11 @@ export type LoanRefusalCode =
   | 'invalidDuration'
   | 'insufficientContribution'
   | 'overFinancing'
-  | 'debtRatio';
+  | 'debtRatio'
+  | 'noCompany'
+  | 'companyNotServed'
+  | 'rentCoverage'
+  | 'leverage';
 
 export type LoanDecision =
   | { decision: 'accepted'; offer: LoanOffer }
@@ -215,6 +245,8 @@ function buildOffer(
   bank: Bank,
   amount: Cents,
   durationYears: number,
+  /** SCI loan: the rent the bank counts (the player's debt ratio does not move). */
+  companyRent: Cents | null = null,
 ): LoanOffer {
   const rate = quoteRate(content, state, bank, durationYears);
   const months = durationYears * MONTHS_PER_YEAR;
@@ -227,7 +259,9 @@ function buildOffer(
     rate,
     monthlyPayment,
     totalCost: monthlyPayment * months - amount,
-    debtRatioAfter: debtRatio(content, state, monthlyPayment),
+    debtRatioAfter: debtRatio(content, state, companyRent === null ? monthlyPayment : 0),
+    rentCoverage:
+      companyRent === null ? null : monthlyPayment > 0 ? companyRent / monthlyPayment : 0,
   };
 }
 
@@ -275,13 +309,20 @@ export function evaluateLoan(
   ) {
     return { decision: 'refused', reason: 'invalidDuration' };
   }
+  const company = request.holder === 'company';
+  if (company && !state.company) return { decision: 'refused', reason: 'noCompany' };
+  if (company && !bank.lendsToCompanies) return { decision: 'refused', reason: 'companyNotServed' };
   const fees = requiredContribution(content, request.price);
-  if (request.contribution < fees) {
+  const extra = company
+    ? Math.round(request.price * content.company.credit.extraContributionShare)
+    : 0;
+  if (request.contribution < fees + extra) {
     return { decision: 'refused', reason: 'insufficientContribution' };
   }
   if (request.amount > request.price + request.works + fees - request.contribution) {
     return { decision: 'refused', reason: 'overFinancing' };
   }
+  if (company) return evaluateCompanyLoan(content, state, bank, request, maxYears);
 
   const limit = debtRatioLimit(content, state, bank);
   const offer = buildOffer(content, state, bank, request.amount, request.durationYears);
@@ -303,7 +344,7 @@ export function evaluateLoan(
   }
 
   // Partial agreement: the largest amount that fits at the requested duration.
-  const room = Math.floor(limit * retainedIncome(content, state)) - monthlyLoanPayments(state);
+  const room = Math.floor(limit * retainedIncome(content, state)) - personalLoanPayments(state);
   const rate = quoteRate(content, state, bank, request.durationYears);
   const amount =
     room > 0
@@ -317,6 +358,59 @@ export function evaluateLoan(
     };
   }
   return { decision: 'refused', reason: 'debtRatio', debtRatioAfter: offer.debtRatioAfter };
+}
+
+/**
+ * An SCI loan (milestone 8), judged « au différentiel »: the property's potential rent must
+ * cover the payment, and the SCI's debts must stay within a multiple of the player's net worth.
+ */
+function evaluateCompanyLoan(
+  content: GameContent,
+  state: GameState,
+  bank: Bank,
+  request: LoanRequest,
+  maxYears: number,
+): LoanDecision {
+  const rules = content.company.credit;
+  const id = request.propertyId;
+  const property =
+    id === undefined
+      ? undefined
+      : (state.listings.find((l) => l.id === id)?.property ??
+        state.purchases.find((p) => p.id === id)?.property ??
+        state.properties.find((o) => o.property.id === id)?.property);
+  const rent = property ? potentialRent(content, state, property, request.works > 0) : 0;
+  const counted = Math.round(rent * rules.rentCoverageShare);
+  const ceiling = rules.maxLeverage * Math.max(0, netWorth(content, state));
+  if (companyDebt(state) + request.amount > ceiling) {
+    return { decision: 'refused', reason: 'leverage' };
+  }
+  const offer = buildOffer(content, state, bank, request.amount, request.durationYears, counted);
+  if (offer.monthlyPayment <= counted) return { decision: 'accepted', offer };
+  if (!bank.counterOffers) return { decision: 'refused', reason: 'rentCoverage' };
+  for (let years = request.durationYears + 1; years <= maxYears; years++) {
+    const longer = buildOffer(content, state, bank, request.amount, years, counted);
+    if (longer.monthlyPayment <= counted) {
+      return {
+        decision: 'counterOffer',
+        offer: longer,
+        requestedDurationYears: request.durationYears,
+      };
+    }
+  }
+  const rate = quoteRate(content, state, bank, request.durationYears);
+  const amount =
+    counted > 0
+      ? principalForPayment(counted, rate.ratePercent, request.durationYears * MONTHS_PER_YEAR)
+      : 0;
+  if (amount >= content.credit.partialAgreementMinShare * request.amount) {
+    return {
+      decision: 'partial',
+      offer: buildOffer(content, state, bank, amount, request.durationYears, counted),
+      requestedAmount: request.amount,
+    };
+  }
+  return { decision: 'refused', reason: 'rentCoverage' };
 }
 
 /** Creates the loan of an accepted offer and pays its amount into the current account. */

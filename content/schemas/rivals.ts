@@ -16,8 +16,16 @@ const rivalSchema = z
     name: z.string().min(1),
     strategy: z.string().min(1),
     personality: z.string().min(1),
-    /** Inactive rivals are described but do not act yet (SCI Horizon: milestone 8). */
+    /** Inactive rivals are described but do not act, unless they arrive later (`arrival`). */
     active: z.boolean(),
+    /**
+     * Arrives later in the game (SCI Horizon, milestone 8): from this game year on (1 is the
+     * first), once the player's net worth reaches this amount. Null: active or not from the start.
+     */
+    arrival: z
+      .object({ fromYear: z.number().int().min(1), minPlayerNetWorth: euros })
+      .strict()
+      .nullable(),
     cities: z.array(id).min(1),
     preferences: z
       .object({

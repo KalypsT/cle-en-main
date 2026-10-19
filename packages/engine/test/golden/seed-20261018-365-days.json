@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 9,
+    "formatVersion": 10,
     "seed": 20261018,
     "rng": [
       3601477382,
@@ -23,6 +23,7 @@
       "elapsedHours": 8760
     },
     "nextId": 4761,
+    "company": null,
     "player": {
       "name": "Camille",
       "avatar": {
@@ -435,6 +436,7 @@
           "annualPropertyTax": 63700,
           "monthlyCharges": 10800
         },
+        "holder": "player",
         "purchasePrice": 7600000,
         "acquisitionCost": 8284000,
         "purchaseDate": {
@@ -473,7 +475,8 @@
             "day": 21090,
             "repair": null
           },
-          "arrears": null
+          "arrears": null,
+          "missedDays": 0
         },
         "furniture": null,
         "taxRegime": "auto",
@@ -499,11 +502,13 @@
     "agenda": [],
     "rivals": {
       "delaporte": {
+        "arrivedDay": null,
         "budget": 6447500,
         "purchases": 5,
         "projects": []
       },
       "martinot": {
+        "arrivedDay": null,
         "budget": 11227500,
         "purchases": 11,
         "projects": [
@@ -1952,6 +1957,7 @@
         ]
       },
       "horizon": {
+        "arrivedDay": null,
         "budget": 200000000,
         "purchases": 0,
         "projects": []
@@ -1964,6 +1970,7 @@
         "property-717": {
           "category": "bare",
           "regime": "auto",
+          "company": false,
           "rents": 487000,
           "costs": 108890,
           "works": 16400,
@@ -1983,6 +1990,8 @@
         "socialContributions": 0,
         "accountantFees": 0,
         "deficitOnSalary": 0,
+        "wealthTax": 0,
+        "taxableWealth": 372300,
         "properties": [
           {
             "propertyId": "property-717",

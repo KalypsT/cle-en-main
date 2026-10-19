@@ -1,5 +1,6 @@
 import {
   type GameEvent,
+  type Holder,
   type LeaseType,
   type Listing,
   type OwnedProperty,
@@ -33,8 +34,16 @@ export interface ExpansionProfile {
   visitsPerTrip: number;
 }
 
+/** An investor who buys through an SCI once his own credit runs out (milestone 8). */
+export interface CompanyProfile {
+  /** Creates the SCI once he owns this many properties. */
+  afterProperties: number;
+}
+
 export interface InvestorProfile {
   id: string;
+  /** Uses an SCI; undefined or null: buys in his own name only. */
+  company?: CompanyProfile | null;
   /** Plays beyond his base city; undefined or null: stays in his base. */
   expansion?: ExpansionProfile | null;
   /** Answers the events by weighing their choices (a reader), rather than by default. */
@@ -112,6 +121,7 @@ interface Appraisal {
 }
 
 interface Plan {
+  holder: Holder;
   bankIds: string[];
   amount: number;
   works: number;
@@ -189,9 +199,26 @@ export function investor(profile: InvestorProfile): Strategy {
     works = 0,
     rentAfter: number | null = null,
   ): Plan | null {
+    const own = planFor(api, 'player', price, rentId, deposit, works, rentAfter);
+    if (own || !profile.company || !api.state.company) return own;
+    // His own credit exhausted: through the SCI, on the property's rent.
+    return planFor(api, 'company', price, rentId, deposit, works, rentAfter);
+  }
+
+  function planFor(
+    api: BotApi,
+    holder: Holder,
+    price: number,
+    rentId: string,
+    deposit = 0,
+    works = 0,
+    rentAfter: number | null = null,
+  ): Plan | null {
     const { engine, state } = api;
     const fees = Math.round(price * feesShare(api));
-    const contribution = fees + Math.round(price * profile.extraContributionShare);
+    const companyShare =
+      holder === 'company' ? engine.content.company.credit.extraContributionShare : 0;
+    const contribution = fees + Math.round(price * (profile.extraContributionShare + companyShare));
     const amount = price + works + fees - contribution;
     const durationYears =
       works >= engine.content.credit.worksShareForLongerDuration * (price + works)
@@ -215,6 +242,8 @@ export function investor(profile: InvestorProfile): Strategy {
         price,
         works,
         contribution: Math.min(cash, contribution),
+        holder,
+        propertyId: rentId,
       });
       if (decision.decision === 'refused' || decision.decision === 'partial') continue;
       if (decision.decision === 'counterOffer' && !profile.acceptsLongerLoans) continue;
@@ -226,7 +255,9 @@ export function investor(profile: InvestorProfile): Strategy {
       }
       bankIds.push(bankId);
     }
-    return bankIds.length > 0 ? { bankIds, amount, works, durationYears, maxPrice: price } : null;
+    return bankIds.length > 0
+      ? { holder, bankIds, amount, works, durationYears, maxPrice: price }
+      : null;
   }
 
   /** Monthly rent left after the owner's costs and the agency, before the loan and tax. */
@@ -616,8 +647,19 @@ export function investor(profile: InvestorProfile): Strategy {
     }
   }
 
+  /** Creates the SCI once his portfolio is under way and the cash is there. */
+  function createCompany(api: BotApi): void {
+    const company = profile.company;
+    if (!company || api.state.company) return;
+    if (api.state.properties.length < company.afterProperties) return;
+    const cost = api.engine.content.company.creationCost * 100;
+    if (api.state.player.balance - cost < reserve(api, 0)) return;
+    api.act({ type: 'company/create' });
+  }
+
   function daily(api: BotApi): void {
     memory.startDay ??= api.today;
+    createCompany(api);
     desk.daily(api, reserve(api, 0), () => false);
     manageSales(api);
     if (!profile.resell) manageLets(api);
@@ -683,7 +725,14 @@ export function investor(profile: InvestorProfile): Strategy {
       const bankId = banks.shift();
       if (!bankId) break;
       const works = memory.worksBudget.get(purchaseId) ?? 0;
-      const financing = plan(api, purchase.price, purchaseId, purchase.deposit, works);
+      const financing = planFor(
+        api,
+        purchase.holder,
+        purchase.price,
+        purchaseId,
+        purchase.deposit,
+        works,
+      );
       const amount = financing?.amount ?? purchase.price + works;
       if (
         api.act({
@@ -745,6 +794,9 @@ export function investor(profile: InvestorProfile): Strategy {
           works,
           project?.estimate.rentAfter ?? null,
         );
+        if (financing?.holder === 'company') {
+          api.act({ type: 'purchase/setHolder', purchaseId: purchase.id, holder: 'company' });
+        }
         memory.banksLeft.set(purchase.id, financing ? [...financing.bankIds] : [...profile.banks]);
         askNextBank(api, purchase.id);
         return;
@@ -913,6 +965,7 @@ const BASE_PROFILES = {
   },
   chasseur: {
     id: 'chasseur',
+    company: { afterProperties: 2 },
     smartAnswers: true,
     visits: true,
     visitsPerDay: 4,

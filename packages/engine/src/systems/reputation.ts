@@ -4,14 +4,21 @@ import { changeRenown } from './cities.ts';
 import type { SystemContext } from './context.ts';
 
 /**
- * Changes the global reputation, kept between 0 and 100 (docs/02, section 2.8). With a
+ * Changes the global reputation, kept between 0 and 100 (docs/02, section 2.8); gains above
+ * `diminishingFrom` are scaled down (milestone 8). With a
  * `cityId`, the renown of that city moves too (what happened there is known there).
  */
 export function changeReputation(ctx: SystemContext, delta: number, cityId?: string): void {
   if (delta === 0) return;
   if (cityId !== undefined) changeRenown(ctx, cityId, delta);
   const { player } = ctx.state;
-  const reputation = Math.max(0, Math.min(100, player.reputation + delta));
+  const rules = ctx.content.progression.reputation;
+  // The last points are the hardest: gains shrink near 100 (kept to a tenth).
+  const scaled =
+    delta > 0 && player.reputation >= rules.diminishingFrom
+      ? Math.round(((delta * (100 - player.reputation)) / rules.diminishingSpan) * 10) / 10
+      : delta;
+  const reputation = Math.max(0, Math.min(100, player.reputation + scaled));
   if (reputation === player.reputation) return;
   const applied = reputation - player.reputation;
   player.reputation = reputation;

@@ -11,6 +11,7 @@
       "strategy": "Petites surfaces près des gares, très rapide sur les bonnes affaires.",
       "personality": "Retraitée redoutable, polie et implacable.",
       "active": true,
+      "arrival": null,
       "cities": ["dole"],
       "preferences": {
         "kinds": ["apartment"],
@@ -37,6 +38,7 @@
       "strategy": "Marchands de biens : achètent pour rénover et revendre.",
       "personality": "Bruyants, toujours deux à parler en même temps.",
       "active": true,
+      "arrival": null,
       "cities": ["dole"],
       "preferences": {
         "kinds": ["apartment", "house", "building"],
@@ -68,7 +70,8 @@
       "strategy": "Arrive plus tard dans la partie, achète des immeubles entiers à Dijon et Besançon.",
       "personality": "Fonds impersonnel : « nous reviendrons vers vous ».",
       "active": false,
-      "cities": ["dole"],
+      "arrival": { "fromYear": 8, "minPlayerNetWorth": 400000 },
+      "cities": ["dijon", "besancon", "dole"],
       "preferences": {
         "kinds": ["building"],
         "maxSurface": 2000,

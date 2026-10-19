@@ -17,7 +17,8 @@
         "maxDebtRatio": 0.38
       },
       "counterOffers": true,
-      "meetings": true
+      "meetings": true,
+      "lendsToCompanies": true
     },
     {
       "id": "fougueux",
@@ -36,7 +37,8 @@
         "maxDebtRatio": 0.4
       },
       "counterOffers": true,
-      "meetings": true
+      "meetings": true,
+      "lendsToCompanies": true
     },
     {
       "id": "rigueur",
@@ -55,7 +57,8 @@
         "maxDebtRatio": 0.37
       },
       "counterOffers": false,
-      "meetings": true
+      "meetings": true,
+      "lendsToCompanies": true
     },
     {
       "id": "zeroPapier",
@@ -71,7 +74,8 @@
       "minJobTrust": "medium",
       "derogation": null,
       "counterOffers": false,
-      "meetings": false
+      "meetings": false,
+      "lendsToCompanies": false
     }
   ]
 }

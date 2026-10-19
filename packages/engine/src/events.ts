@@ -1,7 +1,7 @@
 import type { CalendarDate, Weekday } from './calendar.ts';
 import type { Cents } from './money.ts';
 import type { DpeLabel, LeaseType, Trade } from './content.ts';
-import type { AnecdoteNote, CatalogEventInstance, SaleMode } from './state.ts';
+import type { AnecdoteNote, CatalogEventInstance, Holder, SaleMode } from './state.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 export type StatementLine =
@@ -49,6 +49,11 @@ export type GameEvent =
   | { type: 'loanRefinanced'; oldLoanId: string; newLoanId: string; fees: Cents }
   | { type: 'bankMeetingHeld'; bankId: string; trust: number }
   | { type: 'resigned' }
+  /** A late rival (the SCI Horizon) enters the market (milestone 8). */
+  | { type: 'rivalArrived'; rivalId: string }
+  /** The player created his SCI (milestone 8). */
+  | { type: 'companyCreated'; cost: Cents }
+  | { type: 'purchaseHolderSet'; purchaseId: string; holder: Holder }
   // Market (docs/03-systemes/03).
   | { type: 'propertyPricesUpdated' }
   | { type: 'listingPublished'; listingId: string }
@@ -259,7 +264,14 @@ export type GameEvent =
     }
   // Taxes (docs/03-systemes/06).
   | { type: 'propertyTaxCharged'; amount: Cents }
-  | { type: 'taxAssessed'; year: number; total: Cents; accountantFees: Cents }
+  | {
+      type: 'taxAssessed';
+      year: number;
+      /** Income tax, social contributions and IFI, paid in instalments this year. */
+      total: Cents;
+      accountantFees: Cents;
+      wealthTax: Cents;
+    }
   // Descent towards bankruptcy (docs/02, section 2.6).
   | {
       type: 'forcedSale';

@@ -51,6 +51,7 @@ export function signCompromis(ctx: SystemContext, listing: Listing, price: Cents
   state.player.balance -= deposit;
   const purchase: Purchase = {
     id: `purchase-${state.nextId++}`,
+    holder: 'player',
     listingId: listing.id,
     property: { ...listing.property },
     price,
@@ -93,6 +94,8 @@ export function loanRequestFor(
     price: purchase.price,
     works,
     contribution: Math.min(cash, needed),
+    holder: purchase.holder,
+    propertyId: purchase.id,
   };
 }
 
@@ -266,6 +269,7 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
   state.purchases = state.purchases.filter((p) => p.id !== purchase.id);
   state.properties.push({
     property: purchase.property,
+    holder: purchase.holder,
     purchasePrice: purchase.price,
     acquisitionCost: purchase.price + fees.notary + fees.bank,
     purchaseDate: { ...state.clock.date },

@@ -215,6 +215,7 @@ export const MIGRATIONS: MigrationRegistry = {
           noticeEndDay: null,
           incident: null,
           arrears: null,
+          missedDays: 0,
         };
         owned.lease = lease;
         state.player.balance += deposit;
@@ -402,6 +403,23 @@ export const MIGRATIONS: MigrationRegistry = {
       seedListings({ content, state, events: [], today: toDayNumber(state.clock.date) }, cityId);
     }
     return state as unknown as Record<string, unknown>;
+  },
+  /** Version 9 (milestone 7) to 10 (milestone 8): IFI in the assessment, the SCI and who holds each property. */
+  9: (raw) => {
+    const tax = raw.tax as Record<string, unknown>;
+    const last = tax.lastAssessment as Record<string, unknown> | null;
+    const owned = (raw.properties as Record<string, unknown>[]) ?? [];
+    const purchases = (raw.purchases as Record<string, unknown>[]) ?? [];
+    return {
+      ...raw,
+      company: null,
+      properties: owned.map((entry) => ({ ...entry, holder: 'player' })),
+      purchases: purchases.map((entry) => ({ ...entry, holder: 'player' })),
+      tax: {
+        ...tax,
+        lastAssessment: last && { ...last, wealthTax: 0, taxableWealth: 0 },
+      },
+    };
   },
 };
 
@@ -665,6 +683,7 @@ const worksProjectSchema = z
   })
   .strict();
 const taxRegimeSchema = z.enum(['auto', 'micro', 'real']);
+const holderSchema = z.enum(['player', 'company']);
 
 const tenantSchema = z
   .object({
@@ -729,6 +748,8 @@ const leaseSchema = z
       })
       .strict()
       .nullable(),
+    // Added in version 10 (short-term lets).
+    missedDays: z.number().int().min(0).default(0),
   })
   .strict();
 
@@ -756,6 +777,8 @@ const loanOfferSchema = z
     monthlyPayment: cents.min(0),
     totalCost: cents,
     debtRatioAfter: z.number(),
+    // Added in version 10 (the SCI): older offers were all personal.
+    rentCoverage: z.number().min(0).nullable().default(null),
   })
   .strict();
 
@@ -784,6 +807,10 @@ const loanDecisionSchema = z.discriminatedUnion('decision', [
         'insufficientContribution',
         'overFinancing',
         'debtRatio',
+        'noCompany',
+        'companyNotServed',
+        'rentCoverage',
+        'leverage',
       ]),
       debtRatioAfter: z.number().optional(),
     })
@@ -879,6 +906,7 @@ const gameStateSchema = z
         renown: z.record(z.string(), z.number().min(0).max(100)),
       })
       .strict(),
+    company: z.object({ createdDay: day }).strict().nullable(),
     banks: z.record(
       z.string(),
       z
@@ -949,6 +977,7 @@ const gameStateSchema = z
       z
         .object({
           id: z.string(),
+          holder: holderSchema,
           listingId: z.string(),
           property: propertySchema,
           price: cents.positive(),
@@ -978,6 +1007,7 @@ const gameStateSchema = z
       z
         .object({
           property: propertySchema,
+          holder: holderSchema,
           purchasePrice: cents.positive(),
           acquisitionCost: cents.positive(),
           purchaseDate: calendarDateSchema,
@@ -1061,6 +1091,8 @@ const gameStateSchema = z
       z.string(),
       z
         .object({
+          // Added in version 10 (the SCI Horizon arrives).
+          arrivedDay: day.nullable().default(null),
           budget: cents,
           purchases: z.number().int().min(0),
           projects: z.array(z.object({ property: propertySchema, resaleDay: day }).strict()),
@@ -1077,6 +1109,8 @@ const gameStateSchema = z
             .object({
               category: leaseTypeSchema.nullable(),
               regime: taxRegimeSchema,
+              // Added in version 10 (the SCI).
+              company: z.boolean().default(false),
               rents: cents,
               costs: cents,
               works: cents,
@@ -1099,6 +1133,8 @@ const gameStateSchema = z
             socialContributions: cents,
             accountantFees: cents.min(0),
             deficitOnSalary: cents.min(0),
+            wealthTax: cents.min(0),
+            taxableWealth: cents.min(0),
             properties: z.array(
               z
                 .object({

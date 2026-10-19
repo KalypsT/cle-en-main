@@ -9,7 +9,7 @@ import { estimateValue } from './valuation.ts';
 import { currentMonthlyRent, statementNet } from './history.ts';
 import { netWorth } from './net-worth.ts';
 import { changeReputation } from './reputation.ts';
-import { interest } from './rivals.ts';
+import { interest, isRivalActive } from './rivals.ts';
 import { isIndecent } from './dwelling.ts';
 import { changeRenown } from './cities.ts';
 
@@ -152,7 +152,7 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
         const purchase = state.purchases.find((p) => p.id === event.purchaseId);
         if (!purchase) break;
         for (const rival of content.rivals) {
-          if (rival.active && interest(content, rival, purchase.property) > 0) {
+          if (isRivalActive(state, rival) && interest(content, rival, purchase.property) > 0) {
             bump(state, 'rivalBeaten', 1, rival.id);
           }
         }
@@ -291,6 +291,14 @@ export function runYearlyProgress(ctx: SystemContext): void {
     }
   }
   state.progress.troubledYear = false;
+  // Fame fades without new deeds: a high reputation erodes a little every year.
+  const { player } = state;
+  if (player.reputation > gains.erosionAbove) {
+    const reputation = Math.max(gains.erosionAbove, player.reputation - gains.erosionPerYear);
+    const delta = Math.round((reputation - player.reputation) * 10) / 10;
+    player.reputation = Math.round(reputation * 10) / 10;
+    ctx.events.push({ type: 'reputationChanged', delta, reputation: player.reputation });
+  }
 }
 
 /** Titles and achievements whose conditions now hold (several may come at once). */

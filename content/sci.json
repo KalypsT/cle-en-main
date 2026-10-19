@@ -1,0 +1,11 @@
+{
+  "creationCost": 1500,
+  "accountantFees": { "first": 1200, "perExtraProperty": 150 },
+  "leaseTypes": ["bare"],
+  "credit": {
+    "extraContributionShare": 0.1,
+    "rentCoverageShare": 0.8,
+    "maxLeverage": 6,
+    "renovatedState": 4
+  }
+}

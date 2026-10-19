@@ -40,7 +40,12 @@ export const CONDITIONS = [
   'good',
   'renovated',
 ] as const satisfies readonly Condition[];
-export const LEASE_TYPES = ['bare', 'furnished'] as const satisfies readonly LeaseType[];
+export const LEASE_TYPES = [
+  'bare',
+  'furnished',
+  'shared',
+  'shortTerm',
+] as const satisfies readonly LeaseType[];
 export const TIERS = ['eco', 'standard', 'premium'] as const satisfies readonly Tier[];
 
 /** Moments of the day, seasons and weathers of the living world, in order. */

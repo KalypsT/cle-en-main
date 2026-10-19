@@ -16,7 +16,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 9;
+export const FORMAT_VERSION = 10;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -211,9 +211,19 @@ export interface LoanApplication {
   decision: LoanDecision | null;
 }
 
+/** Who owns a property: the player in his own name, or his SCI (milestone 8). */
+export type Holder = 'player' | 'company';
+
+/** The player's SCI: one balance sheet with him, created once. */
+export interface CompanyState {
+  createdDay: number;
+}
+
 /** A purchase under compromis: the property waits for its loan and the deed. */
 export interface Purchase {
   id: string;
+  /** Buyer: chosen before any loan request. */
+  holder: Holder;
   listingId: string;
   property: Property;
   price: Cents;
@@ -330,6 +340,8 @@ export interface Lease {
   noticeEndDay: number | null;
   incident: Incident | null;
   arrears: Arrears | null;
+  /** Short-term let managed by the owner: days of this month he could not see to (lost). */
+  missedDays: number;
 }
 
 export type TaxRegimeChoice = 'auto' | 'micro' | 'real';
@@ -421,6 +433,7 @@ export interface CoproMeeting {
 
 export interface OwnedProperty {
   property: Property;
+  holder: Holder;
   purchasePrice: Cents;
   /** Price plus notary and bank fees. */
   acquisitionCost: Cents;
@@ -453,6 +466,8 @@ export interface RivalProject {
 
 /** A named rival: only a budget and a few projects, no full simulation of its wealth. */
 export interface RivalState {
+  /** Day a late rival arrived (SCI Horizon); null before, and for the others. */
+  arrivedDay: number | null;
   budget: Cents;
   purchases: number;
   projects: RivalProject[];
@@ -590,6 +605,8 @@ export interface GameState {
   /** Counter for generated identifiers. */
   nextId: number;
   player: PlayerState;
+  /** The player's SCI; null until he creates one (milestone 8). */
+  company: CompanyState | null;
   banks: Record<string, BankRelation>;
   market: MarketState;
   loans: Loan[];
@@ -675,6 +692,8 @@ export interface PropertyLedger {
   /** Kind of let this year (the last lease's type); null if never let. */
   category: LeaseType | null;
   regime: TaxRegimeChoice;
+  /** Held by the SCI (milestone 8): always at the real regime. */
+  company: boolean;
   /** Rents received, charges excluded (unpaid rents are not income). */
   rents: Cents;
   /** Deductible costs, interest and works excluded. */
@@ -695,6 +714,9 @@ export interface TaxAssessment {
   accountantFees: Cents;
   /** Landlord deficit deducted from the salary. */
   deficitOnSalary: Cents;
+  /** Impôt sur la fortune immobilière of 1 January (milestone 8), and its base. */
+  wealthTax: Cents;
+  taxableWealth: Cents;
   properties: {
     propertyId: string;
     category: LeaseType;
