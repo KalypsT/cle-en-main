@@ -42,8 +42,9 @@ export async function pause(page: Page) {
   // A review can open on the 1st while the clock runs: close it, then pause.
   await expect(async () => {
     await dismissOverlays(page);
-    if ((await button.getAttribute('aria-pressed')) !== 'true')
-      await button.click({ timeout: 2_000 });
+    // Dispatched straight to the button: waiting for it to be « stable » never ends while the
+    // street starves the page of frames at ×4.
+    if ((await button.getAttribute('aria-pressed')) !== 'true') await button.dispatchEvent('click');
     await expect(button).toHaveAttribute('aria-pressed', 'true', { timeout: 1_000 });
   }).toPass({ timeout: 15_000 });
   // Let React render the last hour ticked before the pause: the time stops changing.
