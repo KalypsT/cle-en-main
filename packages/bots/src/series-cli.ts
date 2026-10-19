@@ -1,8 +1,9 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { jobs, timeSettings } from '@cle/content';
 import { parseIsoDate } from '@cle/engine';
+import type { GameMetrics } from './metrics.ts';
 import { buildReport, formatReport } from './report.ts';
 import { defaultWorkers, runTasks, seriesTasks } from './series.ts';
 import { BOT_IDS, type BotId } from './strategies.ts';
@@ -17,6 +18,8 @@ const USAGE = `Usage : pnpm bots:series [--games <n>] [--years <n>] [--bots a,b]
   --start    date de début (défaut 2027-01-01)
   --workers  fils de calcul (défaut : nombre de cœurs)
   --out      écrit le rapport Markdown (et le JSON à côté)
+  --raw      écrit aussi les mesures de chaque partie (JSON), pour fusionner des séries
+  --from     ne simule rien : fusionne des fichiers --raw (séparés par des virgules)
   --check    code de sortie 1 si une cible est manquée`;
 
 function fail(message: string): never {
@@ -40,6 +43,8 @@ const { values } = parseArgs({
     start: { type: 'string', default: '2027-01-01' },
     workers: { type: 'string' },
     out: { type: 'string' },
+    raw: { type: 'string' },
+    from: { type: 'string' },
     check: { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h', default: false },
   },
@@ -66,24 +71,41 @@ const options = {
   workers: values.workers ? positive('workers', values.workers) : defaultWorkers(),
 };
 
-const tasks = seriesTasks(options);
-const startedAt = performance.now();
-let lastShown = 0;
-const results = await runTasks(tasks, options.workers, (done, total) => {
-  const now = performance.now();
-  if (process.stderr.isTTY && (now - lastShown > 1000 || done === total)) {
-    lastShown = now;
-    process.stderr.write(`\r${done} / ${total} parties`);
-  }
-});
-if (process.stderr.isTTY) process.stderr.write('\n');
-const elapsed = (performance.now() - startedAt) / 1000;
+const here = (path: string) => resolve(process.env.INIT_CWD ?? process.cwd(), path);
+let results: GameMetrics[];
+let footer: string;
+if (values.from) {
+  // Series run in several parts (one bot at a time), merged into one report.
+  results = values.from
+    .split(',')
+    .flatMap((path) => JSON.parse(readFileSync(here(path.trim()), 'utf8')) as GameMetrics[]);
+  footer = `Calcul : ${results.length} parties, fusionnées depuis ${values.from.split(',').length} série(s).`;
+} else {
+  const tasks = seriesTasks(options);
+  const startedAt = performance.now();
+  let lastShown = 0;
+  results = await runTasks(tasks, options.workers, (done, total) => {
+    const now = performance.now();
+    if (process.stderr.isTTY && (now - lastShown > 1000 || done === total)) {
+      lastShown = now;
+      process.stderr.write(`\r${done} / ${total} parties`);
+    }
+  });
+  if (process.stderr.isTTY) process.stderr.write('\n');
+  const elapsed = (performance.now() - startedAt) / 1000;
+  footer = `Calcul : ${tasks.length} parties en ${elapsed.toFixed(0)} s sur ${options.workers} fil(s).`;
+}
+if (values.raw) {
+  const raw = here(values.raw);
+  mkdirSync(dirname(raw), { recursive: true });
+  writeFileSync(raw, JSON.stringify(results));
+}
 
 const report = buildReport(results, years);
-const markdown = `${formatReport(report, 'Rapport d’équilibrage')}\nCalcul : ${tasks.length} parties en ${elapsed.toFixed(0)} s sur ${options.workers} fil(s).\n`;
+const markdown = `${formatReport(report, 'Rapport d’équilibrage')}\n${footer}\n`;
 console.log(markdown);
 if (values.out) {
-  const out = resolve(process.env.INIT_CWD ?? process.cwd(), values.out);
+  const out = here(values.out);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, markdown);
   writeFileSync(out.replace(/\.md$/, '') + '.json', `${JSON.stringify(report, null, 2)}\n`);
