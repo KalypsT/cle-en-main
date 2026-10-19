@@ -131,7 +131,13 @@ export type {
   EventTarget,
   RhythmRules,
 } from './schemas/events.ts';
-export { ANECDOTE_SPEAKERS, EVENT_FAMILIES, EVENT_TARGETS } from './schemas/events.ts';
+export {
+  ANECDOTE_SPEAKERS,
+  CRISIS_MODIFIERS,
+  EVENT_FAMILIES,
+  EVENT_TARGETS,
+} from './schemas/events.ts';
+export type { CrisisModifier } from './schemas/events.ts';
 export type { CalendarRules, Mode, ModesFile } from './schemas/modes.ts';
 export type {
   Achievement,

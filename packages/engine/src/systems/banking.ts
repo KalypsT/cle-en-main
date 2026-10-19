@@ -15,6 +15,7 @@ import { expectedSalary } from './household.ts';
 import { roundRate } from './market-rate.ts';
 import { companyDebt, heldByCompany, isCompanyLoan, potentialRent } from './company.ts';
 import { netWorth } from './net-worth.ts';
+import { crisisFactor } from './crises.ts';
 
 export type JobTrustLevel = 'mediumLow' | 'medium' | 'high' | 'veryHigh';
 const JOB_TRUST_ORDER: readonly JobTrustLevel[] = ['mediumLow', 'medium', 'high', 'veryHigh'];
@@ -267,10 +268,12 @@ function buildOffer(
 
 function debtRatioLimit(content: GameContent, state: GameState, bank: Bank): number {
   const derogation = bank.derogation;
+  // A credit crunch lowers every limit for a while.
+  const crunch = crisisFactor(state, 'credit');
   if (derogation && relationOf(state, bank.id).trust >= derogation.minTrust) {
-    return Math.max(content.credit.maxDebtRatio, derogation.maxDebtRatio);
+    return Math.max(content.credit.maxDebtRatio, derogation.maxDebtRatio) * crunch;
   }
-  return content.credit.maxDebtRatio;
+  return content.credit.maxDebtRatio * crunch;
 }
 
 /** Checks that a bank is willing to lend to the player at all. */
@@ -380,7 +383,7 @@ function evaluateCompanyLoan(
         state.purchases.find((p) => p.id === id)?.property ??
         state.properties.find((o) => o.property.id === id)?.property);
   const rent = property ? potentialRent(content, state, property, request.works > 0) : 0;
-  const counted = Math.round(rent * rules.rentCoverageShare);
+  const counted = Math.round(rent * rules.rentCoverageShare * crisisFactor(state, 'credit'));
   const ceiling = rules.maxLeverage * Math.max(0, netWorth(content, state));
   if (companyDebt(state) + request.amount > ceiling) {
     return { decision: 'refused', reason: 'leverage' };

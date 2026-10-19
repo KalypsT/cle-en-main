@@ -18,6 +18,7 @@ import type {
   WorksProject,
   WorksTask,
 } from '../state.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { modeOf } from './modes.ts';
 import {
@@ -220,7 +221,8 @@ function writeQuote(
   for (const choice of choices) {
     const item = findItem(property, choice.itemId);
     if (!item) continue;
-    const noise = 1 + content.works.quotes.noise * nextNormal(state.rng);
+    const noise =
+      (1 + content.works.quotes.noise * nextNormal(state.rng)) * crisisFactor(state, 'worksCosts');
     const price = toCents(
       Math.round((referenceCost(content, property, item, choice.tier) * factor * noise) / 100),
     );

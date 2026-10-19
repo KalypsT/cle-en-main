@@ -52,6 +52,17 @@ export const eventConditionsSchema = z
   })
   .strict();
 
+/** What a lasting national crisis acts upon. */
+export const CRISIS_MODIFIERS = [
+  'unpaidRents',
+  'worksCosts',
+  'tenantDemand',
+  'buyerDemand',
+  'credit',
+] as const;
+
+export type CrisisModifier = (typeof CRISIS_MODIFIERS)[number];
+
 /** Closed vocabulary of effects. Money and deltas are signed: negative costs. */
 export const eventEffectSchema = z.discriminatedUnion('type', [
   /** Euros drawn in a range when the event fires. */
@@ -99,6 +110,18 @@ export const eventEffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('offMarketListing') }).strict(),
   /** The running works of the target finish later (or sooner). */
   z.object({ type: z.literal('worksDelay'), days: z.number().int() }).strict(),
+  /**
+   * A national crisis that lasts (milestone 8): for `months`, a factor on unpaid rents, the
+   * artisans' prices, the candidates for a let, the buyers, or the banks' limits.
+   */
+  z
+    .object({
+      type: z.literal('crisis'),
+      modifier: z.enum(CRISIS_MODIFIERS),
+      factor: z.number().positive(),
+      months: z.number().int().min(1),
+    })
+    .strict(),
 ]);
 
 export const eventChoiceSchema = z

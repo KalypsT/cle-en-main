@@ -26,6 +26,7 @@ import {
   weightedState,
 } from './dwelling.ts';
 import { realValue } from './valuation.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { addCost, addRent, ledgerOf } from './taxes.ts';
 import { drawTenant, visibleReliability } from './tenants.ts';
@@ -429,6 +430,7 @@ export function runDailyRentalListings(ctx: SystemContext): void {
         (content.citiesRules.demand[owned.property.cityId]?.tenants ?? 1) *
         (agency?.applicationRate ?? 1) *
         content.renting.leaseTypes[rental.leaseType].applicationRate *
+        crisisFactor(state, 'tenantDemand') *
         Math.exp(-rules.rentSensitivity * (rental.monthlyRent / market - 1));
       if (nextFloat(state.rng) < Math.min(1, chance))
         receiveApplication(ctx, owned, rental, market);

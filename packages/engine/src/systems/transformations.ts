@@ -3,6 +3,7 @@ import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextRange } from '../random.ts';
 import type { GameState, OwnedProperty, Property, TransformationKind, WorkItem } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { crisisFactor } from './crises.ts';
 import {
   blankItems,
   calibrateEnergy,
@@ -105,8 +106,9 @@ export function transformationQuote(
   const index = content.works.cityCostIndex[property.cityId] ?? 1;
   const value = realValue(content, state, property).value;
   const works = Math.round(
-    toCents(rules.costPerM2 * area + rules.costPerLot * (lots?.length ?? 0)) * index +
-      value * rules.costShareOfValue,
+    (toCents(rules.costPerM2 * area + rules.costPerLot * (lots?.length ?? 0)) * index +
+      value * rules.costShareOfValue) *
+      crisisFactor(state, 'worksCosts'),
   );
   const fee = Math.round(works * content.works.projectManager.feeShare);
   return {

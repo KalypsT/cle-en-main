@@ -1,5 +1,6 @@
 import type {
   AdviceKind,
+  CrisisModifier,
   DpeLabel,
   Epoch,
   ItemKind,
@@ -100,6 +101,8 @@ export interface MarketState {
   laggedRatePercent: number;
   /** Price levels by city, then by neighbourhood. */
   cities: Record<string, Record<string, NeighbourhoodMarket>>;
+  /** Lasting national crises under way (milestone 8). */
+  crises: { modifier: CrisisModifier; factor: number; untilDay: number }[];
 }
 
 /** Dwellings, then the kinds of the depth (milestone 8): shops, parking spaces, building land. */

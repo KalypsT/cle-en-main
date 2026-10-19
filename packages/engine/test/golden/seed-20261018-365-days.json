@@ -3,10 +3,10 @@
     "formatVersion": 10,
     "seed": 20261018,
     "rng": [
-      3952879237,
-      54533774,
-      4165892584,
-      2453728727
+      1587905662,
+      254316734,
+      478368430,
+      3561345589
     ],
     "startDate": {
       "year": 2026,
@@ -22,7 +22,7 @@
       "hour": 8,
       "elapsedHours": 8760
     },
-    "nextId": 4708,
+    "nextId": 4908,
     "company": null,
     "player": {
       "name": "Camille",
@@ -34,25 +34,25 @@
       },
       "jobId": "civilServant",
       "employed": true,
-      "balance": 960115,
+      "balance": 713094,
       "overdraftDays": 0,
       "overdraftInterestThisMonth": 0,
       "monthlyRent": 52000,
       "freeTimeMinutes": 150,
-      "reputation": 14,
-      "rentalHistoryMonths": 10,
+      "reputation": 15,
+      "rentalHistoryMonths": 8,
       "bankruptDay": null,
       "homePropertyId": null,
       "baseCityId": "dole",
       "tripsToday": [],
       "lastMoveDay": null,
       "renown": {
-        "dole": 4
+        "dole": 5
       }
     },
     "banks": {
       "tirelire": {
-        "trust": 97.4,
+        "trust": 100,
         "relationshipMonths": 12,
         "lastMeetingDay": 21093
       },
@@ -62,7 +62,7 @@
         "lastMeetingDay": null
       },
       "rigueur": {
-        "trust": 60,
+        "trust": 57,
         "relationshipMonths": 0,
         "lastMeetingDay": null
       },
@@ -73,133 +73,134 @@
       }
     },
     "market": {
-      "ratePercent": 4.17,
+      "ratePercent": 4.51,
       "cyclePhase": 0.35761811328120546,
-      "laggedRatePercent": 4.00098321571521,
+      "laggedRatePercent": 4.0301072765429495,
       "cities": {
         "dole": {
           "centreHistorique": {
-            "priceIndex": 1.0180020376439756,
-            "trendPercent": 2.675724174722803
+            "priceIndex": 1.0222900229488825,
+            "trendPercent": 3.1443629500001884
           },
           "mesnilsPasteur": {
-            "priceIndex": 1.0176988374390428,
-            "trendPercent": 1.751998965189632
+            "priceIndex": 1.004344020048068,
+            "trendPercent": 2.7689677475488925
           },
           "paters": {
-            "priceIndex": 0.9906587803286336,
-            "trendPercent": 0.7403300380591317
+            "priceIndex": 1.024554534048978,
+            "trendPercent": 3.898679191377052
           },
           "plumontValFleuri": {
-            "priceIndex": 1.0142065743711552,
-            "trendPercent": 2.173154898384218
+            "priceIndex": 1.0128348829706961,
+            "trendPercent": 2.79996916312448
           },
           "azans": {
-            "priceIndex": 1.0171966839674675,
-            "trendPercent": 3.047620587310374
+            "priceIndex": 1.0163880601391517,
+            "trendPercent": 3.186699337942882
           }
         },
         "dijon": {
           "centreHistorique": {
-            "priceIndex": 0.9944105875200072,
-            "trendPercent": 0.4829759158195488
+            "priceIndex": 0.9737757822283158,
+            "trendPercent": 0.19933787176709983
           },
           "montchapetRepublique": {
-            "priceIndex": 0.9862673197743115,
-            "trendPercent": 0.7046729494731336
+            "priceIndex": 0.9872702278697345,
+            "trendPercent": -0.31674919981928895
           },
           "universiteVoltaire": {
-            "priceIndex": 0.9646744434671144,
-            "trendPercent": 0.20683375810064714
+            "priceIndex": 0.9683602682638814,
+            "trendPercent": -0.4994231968737206
           },
           "gareArsenal": {
-            "priceIndex": 0.9617291226079372,
-            "trendPercent": -0.24694061522406768
+            "priceIndex": 0.9875711756270537,
+            "trendPercent": 0.9329555561913644
           },
           "bourrochesLarrey": {
-            "priceIndex": 0.9872836605299184,
-            "trendPercent": 1.4980588368185364
+            "priceIndex": 0.9940704101650937,
+            "trendPercent": 1.6411984019758477
           },
           "lacFontaineDOuche": {
-            "priceIndex": 0.9524864114579442,
-            "trendPercent": -2.095679340890811
+            "priceIndex": 0.9565247609093138,
+            "trendPercent": -1.1107814766390032
           },
           "gresillesStalingrad": {
-            "priceIndex": 1.0157461187247026,
-            "trendPercent": 1.1066577308553591
+            "priceIndex": 0.9906764969672228,
+            "trendPercent": 2.8162967374113967
           },
           "toisonDOr": {
-            "priceIndex": 0.9909086262821467,
-            "trendPercent": 1.373937282863776
+            "priceIndex": 0.9706662814363929,
+            "trendPercent": 1.4675713337841993
           }
         },
         "besancon": {
           "centreAncien": {
-            "priceIndex": 0.9868838118142643,
-            "trendPercent": -0.803766048453791
+            "priceIndex": 0.9777942728266362,
+            "trendPercent": 0.6080740498242062
           },
           "chapraisMouillere": {
-            "priceIndex": 0.9685034090654414,
-            "trendPercent": -0.8764385902740747
+            "priceIndex": 0.9544223198576545,
+            "trendPercent": 0.18789741337910681
           },
           "montrapon": {
-            "priceIndex": 0.9977944036621497,
-            "trendPercent": -0.23306868031609917
+            "priceIndex": 0.9819904079427423,
+            "trendPercent": 1.1227167175726032
           },
           "grettBregille": {
-            "priceIndex": 0.9944121093569931,
-            "trendPercent": 1.3034992956135487
+            "priceIndex": 1.0061496003889898,
+            "trendPercent": 2.5604721110476114
           },
           "viotteVesoul": {
-            "priceIndex": 0.9529805411575577,
-            "trendPercent": -0.7443324943764783
+            "priceIndex": 0.9884805410043397,
+            "trendPercent": 2.2927456068324563
           },
           "palenteSaragosse": {
-            "priceIndex": 0.9779409158232188,
-            "trendPercent": 1.3376810595078499
+            "priceIndex": 1.00921220458725,
+            "trendPercent": 1.6306176934085588
           },
           "planoise": {
-            "priceIndex": 1.0168005181734692,
-            "trendPercent": 0.9091806800097323
+            "priceIndex": 1.025786418276438,
+            "trendPercent": 1.8159707306148447
           }
         },
         "chalon": {
           "centreSaintLaurent": {
-            "priceIndex": 0.9924892073024957,
-            "trendPercent": 2.0127590623385254
+            "priceIndex": 1.032394234816092,
+            "trendPercent": 3.5540705038934215
           },
           "saintCosmeBellevue": {
-            "priceIndex": 1.0557973825602576,
-            "trendPercent": 3.4151945406776902
+            "priceIndex": 1.0422896930759789,
+            "trendPercent": 3.856144390392996
           },
           "presSaintJean": {
-            "priceIndex": 1.0178042183032334,
-            "trendPercent": 2.251182687116476
+            "priceIndex": 1.0093141116856175,
+            "trendPercent": 2.522446298886998
           },
           "saintJeanDesVignes": {
-            "priceIndex": 1.0592597779740163,
-            "trendPercent": 3.643401450986969
+            "priceIndex": 1.0229006157304834,
+            "trendPercent": 3.0246823275216967
           },
           "stadeFontaineAuxLoups": {
-            "priceIndex": 0.9786506456759178,
-            "trendPercent": 0.9235645171796669
+            "priceIndex": 0.999080020390976,
+            "trendPercent": 2.303614806905971
           },
           "champFleuriVerrerie": {
-            "priceIndex": 1.0454926381165355,
-            "trendPercent": 2.737328851590889
+            "priceIndex": 1.0071571800145773,
+            "trendPercent": 3.8449562752936046
           }
         }
-      }
+      },
+      "crises": []
     },
     "loans": [
       {
-        "id": "loan-1171",
+        "id": "loan-1214",
         "bankId": "tirelire",
-        "principal": 6300000,
-        "ratePercent": 4.07,
+        "principal": 4600000,
+        "ratePercent": 4.03,
         "durationMonths": 240,
-        "monthlyPayment": 38410,
-        "remaining": 6126953,
+        "monthlyPayment": 27948,
+        "remaining": 4473097,
         "paymentsMade": 10,
         "startDate": {
           "year": 2026,
@@ -207,34 +208,34 @@
           "day": 3
         },
         "renegotiationSuggested": false,
-        "propertyId": "property-745"
+        "propertyId": "property-99"
       }
     ],
     "purchases": [],
     "properties": [
       {
         "property": {
-          "id": "property-745",
+          "id": "property-99",
           "cityId": "dole",
           "neighbourhoodId": "centreHistorique",
           "kind": "apartment",
           "atticSurface": 0,
-          "surface": 41,
-          "rooms": 2,
+          "surface": 27,
+          "rooms": 1,
           "floor": 2,
           "lots": [],
-          "epoch": "before1948",
-          "dpe": "D",
+          "epoch": "from1948to1974",
+          "dpe": "E",
           "spaces": [
             {
               "id": "entry",
               "kind": "entry",
-              "surface": 2.5
+              "surface": 2
             },
             {
               "id": "living",
               "kind": "living",
-              "surface": 19.5
+              "surface": 16.5
             },
             {
               "id": "kitchen",
@@ -245,23 +246,13 @@
               "id": "bathroom",
               "kind": "bathroom",
               "surface": 3.5
-            },
-            {
-              "id": "wc",
-              "kind": "wc",
-              "surface": 1.5
-            },
-            {
-              "id": "bedroom1",
-              "kind": "bedroom",
-              "surface": 9
             }
           ],
           "items": [
             {
               "kind": "floors",
               "spaceId": "entry",
-              "state": 3,
+              "state": 2,
               "tier": "standard",
               "known": true
             },
@@ -282,7 +273,7 @@
             {
               "kind": "floors",
               "spaceId": "living",
-              "state": 2,
+              "state": 3,
               "tier": "standard",
               "known": true
             },
@@ -296,14 +287,14 @@
             {
               "kind": "joinery",
               "spaceId": "living",
-              "state": 3,
+              "state": 2,
               "tier": "standard",
               "known": true
             },
             {
               "kind": "floors",
               "spaceId": "kitchen",
-              "state": 3,
+              "state": 2,
               "tier": "standard",
               "known": true
             },
@@ -317,14 +308,14 @@
             {
               "kind": "kitchen",
               "spaceId": "kitchen",
-              "state": 2,
+              "state": 3,
               "tier": "standard",
               "known": true
             },
             {
               "kind": "floors",
               "spaceId": "bathroom",
-              "state": 4,
+              "state": 2,
               "tier": "standard",
               "known": true
             },
@@ -343,52 +334,17 @@
               "known": true
             },
             {
-              "kind": "walls",
-              "spaceId": "wc",
-              "state": 3,
-              "tier": "standard",
-              "known": true
-            },
-            {
-              "kind": "wcUnit",
-              "spaceId": "wc",
-              "state": 2,
-              "tier": "standard",
-              "known": true
-            },
-            {
-              "kind": "floors",
-              "spaceId": "bedroom1",
-              "state": 2,
-              "tier": "standard",
-              "known": true
-            },
-            {
-              "kind": "walls",
-              "spaceId": "bedroom1",
-              "state": 2,
-              "tier": "standard",
-              "known": true
-            },
-            {
-              "kind": "joinery",
-              "spaceId": "bedroom1",
-              "state": 2,
-              "tier": "standard",
-              "known": true
-            },
-            {
               "kind": "electricity",
               "spaceId": null,
-              "state": 3,
+              "state": 2,
               "tier": "standard",
               "known": true
             },
             {
               "kind": "plumbing",
               "spaceId": null,
-              "state": 2,
-              "tier": "standard",
+              "state": 5,
+              "tier": "eco",
               "known": true
             },
             {
@@ -401,7 +357,7 @@
             {
               "kind": "insulation",
               "spaceId": null,
-              "state": 4,
+              "state": 2,
               "tier": "standard",
               "known": true
             },
@@ -415,7 +371,7 @@
             {
               "kind": "ventilation",
               "spaceId": null,
-              "state": 1,
+              "state": 3,
               "tier": "standard",
               "known": true
             },
@@ -427,19 +383,19 @@
               "known": true
             }
           ],
-          "energyFactor": 0.5980380548221698,
+          "energyFactor": 0.7686407823800385,
           "copro": {
-            "lots": 20,
-            "meetingMonth": 11
+            "lots": 18,
+            "meetingMonth": 7
           },
           "postponedHazards": [],
           "defects": [],
-          "annualPropertyTax": 53300,
-          "monthlyCharges": 9000
+          "annualPropertyTax": 35100,
+          "monthlyCharges": 5900
         },
         "holder": "player",
-        "purchasePrice": 6300000,
-        "acquisitionCost": 6867000,
+        "purchasePrice": 4600000,
+        "acquisitionCost": 5014000,
         "purchaseDate": {
           "year": 2026,
           "month": 12,
@@ -450,25 +406,25 @@
         "lease": {
           "leaseType": "bare",
           "tenant": {
-            "firstName": "Inès",
-            "lastName": "Laurent",
+            "firstName": "Lucas",
+            "lastName": "Arnaud",
             "profileId": "employee",
             "traitId": "amateurChef",
-            "monthlyIncome": 116000,
+            "monthlyIncome": 124000,
             "guarantor": false,
-            "desiredYears": 3,
-            "reliability": 0.857,
+            "desiredYears": 4,
+            "reliability": 0.804,
             "mobility": 0.9
           },
-          "monthlyRent": 39400,
-          "startDay": 20793,
-          "termDay": 21888,
-          "anniversaryDay": 21158,
-          "revisionFactor": 1.008092576840065,
-          "deposit": 39400,
+          "monthlyRent": 26100,
+          "startDay": 20821,
+          "termDay": 21916,
+          "anniversaryDay": 21186,
+          "revisionFactor": 1.0027961538229224,
+          "deposit": 26100,
           "agencyId": null,
           "insured": false,
-          "satisfaction": 50.96998350976885,
+          "satisfaction": 57.103751891376874,
           "noticeEndDay": null,
           "incident": null,
           "arrears": null,
@@ -485,303 +441,39 @@
         "quotes": [],
         "works": null,
         "worksFund": null,
-        "worksForCapitalGains": 45395,
+        "worksForCapitalGains": 274295,
         "coproMeeting": null,
-        "coproCalls": []
+        "coproCalls": [
+          {
+            "monthly": 5183,
+            "monthsLeft": 3
+          }
+        ]
       }
     ],
     "agenda": [],
     "rivals": {
       "delaporte": {
         "arrivedDay": null,
-        "budget": 9350000,
-        "purchases": 5,
+        "budget": 1932500,
+        "purchases": 6,
         "projects": []
       },
       "martinot": {
         "arrivedDay": null,
-        "budget": 2402500,
-        "purchases": 8,
+        "budget": 8590000,
+        "purchases": 14,
         "projects": [
           {
             "property": {
-              "id": "property-2746",
+              "id": "property-1200",
               "cityId": "dole",
-              "neighbourhoodId": "mesnilsPasteur",
-              "kind": "house",
-              "atticSurface": 29,
-              "surface": 76,
-              "rooms": 3,
-              "floor": null,
-              "lots": [],
-              "epoch": "from1975to1988",
-              "dpe": "D",
-              "spaces": [
-                {
-                  "id": "entry",
-                  "kind": "entry",
-                  "surface": 4.5
-                },
-                {
-                  "id": "living",
-                  "kind": "living",
-                  "surface": 34.5
-                },
-                {
-                  "id": "kitchen",
-                  "kind": "kitchen",
-                  "surface": 9
-                },
-                {
-                  "id": "bathroom",
-                  "kind": "bathroom",
-                  "surface": 5.5
-                },
-                {
-                  "id": "wc",
-                  "kind": "wc",
-                  "surface": 1.5
-                },
-                {
-                  "id": "bedroom1",
-                  "kind": "bedroom",
-                  "surface": 10.5
-                },
-                {
-                  "id": "bedroom2",
-                  "kind": "bedroom",
-                  "surface": 10.5
-                },
-                {
-                  "id": "garden",
-                  "kind": "garden",
-                  "surface": 152
-                }
-              ],
-              "items": [
-                {
-                  "kind": "floors",
-                  "spaceId": "entry",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "entry",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "entry",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "living",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "living",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "living",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "kitchen",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "kitchen",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "kitchen",
-                  "spaceId": "kitchen",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bathroom",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bathroom",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "bathroom",
-                  "spaceId": "bathroom",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "wc",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "wcUnit",
-                  "spaceId": "wc",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom1",
-                  "state": 4,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom2",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom2",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom2",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "garden",
-                  "spaceId": "garden",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "electricity",
-                  "spaceId": null,
-                  "state": 4,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "plumbing",
-                  "spaceId": null,
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "heating",
-                  "spaceId": null,
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "insulation",
-                  "spaceId": null,
-                  "state": 4,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "windows",
-                  "spaceId": null,
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "ventilation",
-                  "spaceId": null,
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "roof",
-                  "spaceId": null,
-                  "state": 4,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "facade",
-                  "spaceId": null,
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                }
-              ],
-              "energyFactor": 0.739648105347702,
-              "copro": null,
-              "postponedHazards": [],
-              "defects": [],
-              "annualPropertyTax": 83600,
-              "monthlyCharges": 0
-            },
-            "resaleDay": 21129
-          },
-          {
-            "property": {
-              "id": "property-1980",
-              "cityId": "dole",
-              "neighbourhoodId": "azans",
-              "kind": "house",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
               "atticSurface": 0,
-              "surface": 142,
-              "rooms": 6,
-              "floor": null,
+              "surface": 41,
+              "rooms": 2,
+              "floor": 2,
               "lots": [],
               "epoch": "before1948",
               "dpe": "D",
@@ -789,22 +481,22 @@
                 {
                   "id": "entry",
                   "kind": "entry",
-                  "surface": 8
+                  "surface": 2.5
                 },
                 {
                   "id": "living",
                   "kind": "living",
-                  "surface": 30.5
+                  "surface": 19.5
                 },
                 {
                   "id": "kitchen",
                   "kind": "kitchen",
-                  "surface": 14
+                  "surface": 5
                 },
                 {
                   "id": "bathroom",
                   "kind": "bathroom",
-                  "surface": 8
+                  "surface": 3.5
                 },
                 {
                   "id": "wc",
@@ -814,39 +506,231 @@
                 {
                   "id": "bedroom1",
                   "kind": "bedroom",
-                  "surface": 16
-                },
-                {
-                  "id": "bedroom2",
-                  "kind": "bedroom",
-                  "surface": 16
-                },
-                {
-                  "id": "bedroom3",
-                  "kind": "bedroom",
-                  "surface": 16
-                },
-                {
-                  "id": "bedroom4",
-                  "kind": "bedroom",
-                  "surface": 16
-                },
-                {
-                  "id": "bedroom5",
-                  "kind": "bedroom",
-                  "surface": 16
-                },
-                {
-                  "id": "garden",
-                  "kind": "garden",
-                  "surface": 284
+                  "surface": 9
                 }
               ],
               "items": [
                 {
                   "kind": "floors",
                   "spaceId": "entry",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "entry",
                   "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "living",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "kitchen",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "kitchen",
+                  "spaceId": "kitchen",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bathroom",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "bathroom",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "wc",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "wcUnit",
+                  "spaceId": "wc",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom1",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom1",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom1",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "electricity",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "plumbing",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "heating",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "insulation",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "windows",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "ventilation",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "commonParts",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                }
+              ],
+              "energyFactor": 0.7554919058261157,
+              "copro": {
+                "lots": 5,
+                "meetingMonth": 9
+              },
+              "postponedHazards": [],
+              "defects": [],
+              "annualPropertyTax": 53300,
+              "monthlyCharges": 9000
+            },
+            "resaleDay": 21155
+          },
+          {
+            "property": {
+              "id": "property-1761",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "atticSurface": 0,
+              "surface": 33,
+              "rooms": 1,
+              "floor": 1,
+              "lots": [],
+              "epoch": "before1948",
+              "dpe": "E",
+              "spaces": [
+                {
+                  "id": "entry",
+                  "kind": "entry",
+                  "surface": 2
+                },
+                {
+                  "id": "living",
+                  "kind": "living",
+                  "surface": 22.5
+                },
+                {
+                  "id": "kitchen",
+                  "kind": "kitchen",
+                  "surface": 5
+                },
+                {
+                  "id": "bathroom",
+                  "kind": "bathroom",
+                  "surface": 3.5
+                }
+              ],
+              "items": [
+                {
+                  "kind": "floors",
+                  "spaceId": "entry",
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
@@ -860,7 +744,7 @@
                 {
                   "kind": "joinery",
                   "spaceId": "entry",
-                  "state": 2,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -881,7 +765,7 @@
                 {
                   "kind": "joinery",
                   "spaceId": "living",
-                  "state": 2,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -895,7 +779,7 @@
                 {
                   "kind": "walls",
                   "spaceId": "kitchen",
-                  "state": 1,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
@@ -916,7 +800,7 @@
                 {
                   "kind": "walls",
                   "spaceId": "bathroom",
-                  "state": 2,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -928,135 +812,9 @@
                   "known": false
                 },
                 {
-                  "kind": "walls",
-                  "spaceId": "wc",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "wcUnit",
-                  "spaceId": "wc",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom1",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom1",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom1",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom2",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom2",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom2",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom3",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom3",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom3",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom4",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom4",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom4",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom5",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom5",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom5",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "garden",
-                  "spaceId": "garden",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
                   "kind": "electricity",
                   "spaceId": null,
-                  "state": 1,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
@@ -1084,7 +842,260 @@
                 {
                   "kind": "windows",
                   "spaceId": null,
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "ventilation",
+                  "spaceId": null,
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "commonParts",
+                  "spaceId": null,
                   "state": 2,
+                  "tier": "standard",
+                  "known": false
+                }
+              ],
+              "energyFactor": 0.5623061310368442,
+              "copro": {
+                "lots": 26,
+                "meetingMonth": 7
+              },
+              "postponedHazards": [],
+              "defects": [],
+              "annualPropertyTax": 42900,
+              "monthlyCharges": 7300
+            },
+            "resaleDay": 21128
+          },
+          {
+            "property": {
+              "id": "property-687",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "atticSurface": 0,
+              "surface": 69,
+              "rooms": 3,
+              "floor": 1,
+              "lots": [],
+              "epoch": "from1948to1974",
+              "dpe": "C",
+              "spaces": [
+                {
+                  "id": "entry",
+                  "kind": "entry",
+                  "surface": 4
+                },
+                {
+                  "id": "living",
+                  "kind": "living",
+                  "surface": 31
+                },
+                {
+                  "id": "kitchen",
+                  "kind": "kitchen",
+                  "surface": 8.5
+                },
+                {
+                  "id": "bathroom",
+                  "kind": "bathroom",
+                  "surface": 5
+                },
+                {
+                  "id": "wc",
+                  "kind": "wc",
+                  "surface": 1.5
+                },
+                {
+                  "id": "bedroom1",
+                  "kind": "bedroom",
+                  "surface": 9.5
+                },
+                {
+                  "id": "bedroom2",
+                  "kind": "bedroom",
+                  "surface": 9.5
+                }
+              ],
+              "items": [
+                {
+                  "kind": "floors",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "living",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "living",
+                  "state": 4,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "kitchen",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "kitchen",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "bathroom",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "wc",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "wcUnit",
+                  "spaceId": "wc",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom1",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom1",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom1",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom2",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom2",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom2",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "electricity",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "plumbing",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "heating",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "insulation",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "windows",
+                  "spaceId": null,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
@@ -1096,9 +1107,456 @@
                   "known": false
                 },
                 {
-                  "kind": "roof",
+                  "kind": "commonParts",
+                  "spaceId": null,
+                  "state": 4,
+                  "tier": "standard",
+                  "known": false
+                }
+              ],
+              "energyFactor": 0.44228336793045625,
+              "copro": {
+                "lots": 22,
+                "meetingMonth": 4
+              },
+              "postponedHazards": [],
+              "defects": [],
+              "annualPropertyTax": 89700,
+              "monthlyCharges": 15200
+            },
+            "resaleDay": 21110
+          },
+          {
+            "property": {
+              "id": "property-2187",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "atticSurface": 0,
+              "surface": 28,
+              "rooms": 1,
+              "floor": 4,
+              "lots": [],
+              "epoch": "before1948",
+              "dpe": "D",
+              "spaces": [
+                {
+                  "id": "entry",
+                  "kind": "entry",
+                  "surface": 2
+                },
+                {
+                  "id": "living",
+                  "kind": "living",
+                  "surface": 17.5
+                },
+                {
+                  "id": "kitchen",
+                  "kind": "kitchen",
+                  "surface": 5
+                },
+                {
+                  "id": "bathroom",
+                  "kind": "bathroom",
+                  "surface": 3.5
+                }
+              ],
+              "items": [
+                {
+                  "kind": "floors",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "entry",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "living",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "kitchen",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bathroom",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "bathroom",
+                  "spaceId": "bathroom",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "electricity",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "plumbing",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "heating",
                   "spaceId": null,
                   "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "insulation",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "windows",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "ventilation",
+                  "spaceId": null,
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "commonParts",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                }
+              ],
+              "energyFactor": 0.5007734165945612,
+              "copro": {
+                "lots": 11,
+                "meetingMonth": 7
+              },
+              "postponedHazards": [],
+              "defects": [],
+              "annualPropertyTax": 36400,
+              "monthlyCharges": 6200
+            },
+            "resaleDay": 21208
+          },
+          {
+            "property": {
+              "id": "property-3584",
+              "cityId": "dole",
+              "neighbourhoodId": "paters",
+              "kind": "house",
+              "atticSurface": 0,
+              "surface": 63,
+              "rooms": 3,
+              "floor": null,
+              "lots": [],
+              "epoch": "from1948to1974",
+              "dpe": "F",
+              "spaces": [
+                {
+                  "id": "entry",
+                  "kind": "entry",
+                  "surface": 4
+                },
+                {
+                  "id": "living",
+                  "kind": "living",
+                  "surface": 27.5
+                },
+                {
+                  "id": "kitchen",
+                  "kind": "kitchen",
+                  "surface": 7.5
+                },
+                {
+                  "id": "bathroom",
+                  "kind": "bathroom",
+                  "surface": 4.5
+                },
+                {
+                  "id": "wc",
+                  "kind": "wc",
+                  "surface": 1.5
+                },
+                {
+                  "id": "bedroom1",
+                  "kind": "bedroom",
+                  "surface": 9
+                },
+                {
+                  "id": "bedroom2",
+                  "kind": "bedroom",
+                  "surface": 9
+                },
+                {
+                  "id": "garden",
+                  "kind": "garden",
+                  "surface": 126
+                }
+              ],
+              "items": [
+                {
+                  "kind": "floors",
+                  "spaceId": "entry",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "living",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "living",
+                  "state": 4,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "kitchen",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "kitchen",
+                  "spaceId": "kitchen",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bathroom",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "bathroom",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "wc",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "wcUnit",
+                  "spaceId": "wc",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom1",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom1",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom1",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom2",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom2",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom2",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "garden",
+                  "spaceId": "garden",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "electricity",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "plumbing",
+                  "spaceId": null,
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "heating",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "insulation",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "windows",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "ventilation",
+                  "spaceId": null,
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "roof",
+                  "spaceId": null,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -1110,18 +1568,18 @@
                   "known": false
                 }
               ],
-              "energyFactor": 0.4477843621044717,
+              "energyFactor": 0.6358819643136698,
               "copro": null,
               "postponedHazards": [],
               "defects": [],
-              "annualPropertyTax": 156200,
+              "annualPropertyTax": 69300,
               "monthlyCharges": 0
             },
-            "resaleDay": 21223
+            "resaleDay": 21124
           },
           {
             "property": {
-              "id": "property-2974",
+              "id": "property-3942",
               "cityId": "dole",
               "neighbourhoodId": "centreHistorique",
               "kind": "apartment",
@@ -1131,7 +1589,7 @@
               "floor": 5,
               "lots": [],
               "epoch": "from1948to1974",
-              "dpe": "D",
+              "dpe": "C",
               "spaces": [
                 {
                   "id": "entry",
@@ -1168,14 +1626,14 @@
                 {
                   "kind": "floors",
                   "spaceId": "entry",
-                  "state": 3,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "walls",
                   "spaceId": "entry",
-                  "state": 2,
+                  "state": 4,
                   "tier": "standard",
                   "known": false
                 },
@@ -1217,7 +1675,7 @@
                 {
                   "kind": "walls",
                   "spaceId": "kitchen",
-                  "state": 1,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
@@ -1245,7 +1703,7 @@
                 {
                   "kind": "bathroom",
                   "spaceId": "bathroom",
-                  "state": 2,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
@@ -1273,21 +1731,21 @@
                 {
                   "kind": "walls",
                   "spaceId": "bedroom1",
-                  "state": 4,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "joinery",
                   "spaceId": "bedroom1",
-                  "state": 2,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "electricity",
                   "spaceId": null,
-                  "state": 2,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
@@ -1301,21 +1759,21 @@
                 {
                   "kind": "heating",
                   "spaceId": null,
-                  "state": 3,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "insulation",
                   "spaceId": null,
-                  "state": 3,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "windows",
                   "spaceId": null,
-                  "state": 1,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
@@ -1329,317 +1787,33 @@
                 {
                   "kind": "commonParts",
                   "spaceId": null,
-                  "state": 2,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 }
               ],
-              "energyFactor": 0.513124847706616,
+              "energyFactor": 0.342679843229502,
               "copro": {
-                "lots": 19,
-                "meetingMonth": 12
+                "lots": 21,
+                "meetingMonth": 8
               },
               "postponedHazards": [],
-              "defects": [
-                {
-                  "id": "noisyNeighbours",
-                  "revealed": false
-                }
-              ],
+              "defects": [],
               "annualPropertyTax": 72800,
               "monthlyCharges": 12300
             },
-            "resaleDay": 21134
+            "resaleDay": 21217
           },
           {
             "property": {
-              "id": "property-3617",
+              "id": "property-3787",
               "cityId": "dole",
               "neighbourhoodId": "centreHistorique",
               "kind": "apartment",
               "atticSurface": 0,
-              "surface": 86,
-              "rooms": 4,
-              "floor": 4,
-              "lots": [],
-              "epoch": "from1948to1974",
-              "dpe": "C",
-              "spaces": [
-                {
-                  "id": "entry",
-                  "kind": "entry",
-                  "surface": 5
-                },
-                {
-                  "id": "living",
-                  "kind": "living",
-                  "surface": 27
-                },
-                {
-                  "id": "kitchen",
-                  "kind": "kitchen",
-                  "surface": 10.5
-                },
-                {
-                  "id": "bathroom",
-                  "kind": "bathroom",
-                  "surface": 6
-                },
-                {
-                  "id": "wc",
-                  "kind": "wc",
-                  "surface": 1.5
-                },
-                {
-                  "id": "bedroom1",
-                  "kind": "bedroom",
-                  "surface": 12
-                },
-                {
-                  "id": "bedroom2",
-                  "kind": "bedroom",
-                  "surface": 12
-                },
-                {
-                  "id": "bedroom3",
-                  "kind": "bedroom",
-                  "surface": 12
-                }
-              ],
-              "items": [
-                {
-                  "kind": "floors",
-                  "spaceId": "entry",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "entry",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "entry",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "living",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "living",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "living",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "kitchen",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "kitchen",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "kitchen",
-                  "spaceId": "kitchen",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bathroom",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bathroom",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "bathroom",
-                  "spaceId": "bathroom",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "wc",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "wcUnit",
-                  "spaceId": "wc",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom2",
-                  "state": 4,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom2",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom2",
-                  "state": 1,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom3",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom3",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom3",
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "electricity",
-                  "spaceId": null,
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "plumbing",
-                  "spaceId": null,
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "heating",
-                  "spaceId": null,
-                  "state": 4,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "insulation",
-                  "spaceId": null,
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "windows",
-                  "spaceId": null,
-                  "state": 2,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "ventilation",
-                  "spaceId": null,
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "commonParts",
-                  "spaceId": null,
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                }
-              ],
-              "energyFactor": 0.3649262330060126,
-              "copro": {
-                "lots": 18,
-                "meetingMonth": 7
-              },
-              "postponedHazards": [],
-              "defects": [],
-              "annualPropertyTax": 111800,
-              "monthlyCharges": 18900
-            },
-            "resaleDay": 21241
-          },
-          {
-            "property": {
-              "id": "property-4304",
-              "cityId": "dole",
-              "neighbourhoodId": "paters",
-              "kind": "apartment",
-              "atticSurface": 0,
-              "surface": 37,
-              "rooms": 2,
-              "floor": 5,
+              "surface": 19,
+              "rooms": 1,
+              "floor": 3,
               "lots": [],
               "epoch": "from1948to1974",
               "dpe": "C",
@@ -1652,7 +1826,7 @@
                 {
                   "id": "living",
                   "kind": "living",
-                  "surface": 17.5
+                  "surface": 8.5
                 },
                 {
                   "id": "kitchen",
@@ -1663,11 +1837,6 @@
                   "id": "bathroom",
                   "kind": "bathroom",
                   "surface": 3.5
-                },
-                {
-                  "id": "bedroom1",
-                  "kind": "bedroom",
-                  "surface": 9
                 }
               ],
               "items": [
@@ -1681,21 +1850,21 @@
                 {
                   "kind": "walls",
                   "spaceId": "entry",
-                  "state": 3,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "joinery",
                   "spaceId": "entry",
-                  "state": 4,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "floors",
                   "spaceId": "living",
-                  "state": 2,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
@@ -1716,14 +1885,14 @@
                 {
                   "kind": "floors",
                   "spaceId": "kitchen",
-                  "state": 3,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "walls",
                   "spaceId": "kitchen",
-                  "state": 3,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -1737,14 +1906,14 @@
                 {
                   "kind": "floors",
                   "spaceId": "bathroom",
-                  "state": 2,
+                  "state": 3,
                   "tier": "standard",
                   "known": false
                 },
                 {
                   "kind": "walls",
                   "spaceId": "bathroom",
-                  "state": 3,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
@@ -1752,27 +1921,6 @@
                   "kind": "bathroom",
                   "spaceId": "bathroom",
                   "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "floors",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "walls",
-                  "spaceId": "bedroom1",
-                  "state": 3,
-                  "tier": "standard",
-                  "known": false
-                },
-                {
-                  "kind": "joinery",
-                  "spaceId": "bedroom1",
-                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -1800,7 +1948,7 @@
                 {
                   "kind": "insulation",
                   "spaceId": null,
-                  "state": 3,
+                  "state": 2,
                   "tier": "standard",
                   "known": false
                 },
@@ -1808,6 +1956,285 @@
                   "kind": "windows",
                   "spaceId": null,
                   "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "ventilation",
+                  "spaceId": null,
+                  "state": 4,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "commonParts",
+                  "spaceId": null,
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                }
+              ],
+              "energyFactor": 0.2696611579963495,
+              "copro": {
+                "lots": 26,
+                "meetingMonth": 1
+              },
+              "postponedHazards": [],
+              "defects": [],
+              "annualPropertyTax": 24700,
+              "monthlyCharges": 4200
+            },
+            "resaleDay": 21312
+          },
+          {
+            "property": {
+              "id": "property-2968",
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique",
+              "kind": "apartment",
+              "atticSurface": 0,
+              "surface": 90,
+              "rooms": 4,
+              "floor": 0,
+              "lots": [],
+              "epoch": "before1948",
+              "dpe": "C",
+              "spaces": [
+                {
+                  "id": "entry",
+                  "kind": "entry",
+                  "surface": 5.5
+                },
+                {
+                  "id": "living",
+                  "kind": "living",
+                  "surface": 28
+                },
+                {
+                  "id": "kitchen",
+                  "kind": "kitchen",
+                  "surface": 11
+                },
+                {
+                  "id": "bathroom",
+                  "kind": "bathroom",
+                  "surface": 6.5
+                },
+                {
+                  "id": "wc",
+                  "kind": "wc",
+                  "surface": 1.5
+                },
+                {
+                  "id": "bedroom1",
+                  "kind": "bedroom",
+                  "surface": 12.5
+                },
+                {
+                  "id": "bedroom2",
+                  "kind": "bedroom",
+                  "surface": 12.5
+                },
+                {
+                  "id": "bedroom3",
+                  "kind": "bedroom",
+                  "surface": 12.5
+                }
+              ],
+              "items": [
+                {
+                  "kind": "floors",
+                  "spaceId": "entry",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "entry",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "entry",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "living",
+                  "state": 4,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "living",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "kitchen",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "kitchen",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "kitchen",
+                  "spaceId": "kitchen",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bathroom",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "bathroom",
+                  "spaceId": "bathroom",
+                  "state": 2,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "wc",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "wcUnit",
+                  "spaceId": "wc",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom1",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom1",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom1",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom2",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom2",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom2",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "floors",
+                  "spaceId": "bedroom3",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "walls",
+                  "spaceId": "bedroom3",
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "joinery",
+                  "spaceId": "bedroom3",
+                  "state": 1,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "electricity",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "plumbing",
+                  "spaceId": null,
+                  "state": 4,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "heating",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "insulation",
+                  "spaceId": null,
+                  "state": 3,
+                  "tier": "standard",
+                  "known": false
+                },
+                {
+                  "kind": "windows",
+                  "spaceId": null,
+                  "state": 1,
                   "tier": "standard",
                   "known": false
                 },
@@ -1826,17 +2253,17 @@
                   "known": false
                 }
               ],
-              "energyFactor": 0.44808888695118687,
+              "energyFactor": 0.5127330122095425,
               "copro": {
-                "lots": 6,
-                "meetingMonth": 9
+                "lots": 25,
+                "meetingMonth": 1
               },
               "postponedHazards": [],
               "defects": [],
-              "annualPropertyTax": 48100,
-              "monthlyCharges": 8100
+              "annualPropertyTax": 117000,
+              "monthlyCharges": 19800
             },
-            "resaleDay": 21311
+            "resaleDay": 21352
           }
         ]
       },
@@ -1851,15 +2278,15 @@
       "year": 2027,
       "salary": 2000000,
       "ledgers": {
-        "property-745": {
+        "property-99": {
           "category": "bare",
           "regime": "auto",
           "company": false,
-          "rents": 394000,
-          "costs": 92090,
-          "works": 0,
+          "rents": 234900,
+          "costs": 66970,
+          "works": 132661,
           "energyRenovation": false,
-          "interest": 211053,
+          "interest": 152577,
           "sold": false
         }
       },
@@ -1875,20 +2302,17 @@
         "accountantFees": 0,
         "deficitOnSalary": 0,
         "wealthTax": 0,
-        "taxableWealth": 718300,
-        "properties": [
-          {
-            "propertyId": "property-745",
-            "category": "bare",
-            "regime": "micro",
-            "taxable": 0
-          }
-        ]
+        "taxableWealth": 0,
+        "properties": []
       }
     },
-    "artisans": {},
+    "artisans": {
+      "aquaDoloise": {
+        "jobs": 1
+      }
+    },
     "worksDone": {
-      "dole": 1
+      "dole": 2
     },
     "favorites": [],
     "tutorial": {
@@ -1929,7 +2353,7 @@
           "day": 1
         },
         "netWorth": 1526000,
-        "balance": 1211000,
+        "balance": 1296000,
         "debt": 0,
         "cashFlow": 13000,
         "monthlyRent": 0,
@@ -1941,11 +2365,11 @@
           "month": 1,
           "day": 1
         },
-        "netWorth": 1639758,
-        "balance": 963116,
-        "debt": 6282958,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
+        "netWorth": 843441,
+        "balance": 698741,
+        "debt": 4587500,
+        "cashFlow": -21852,
+        "monthlyRent": 0,
         "reputation": 17
       },
       {
@@ -1954,12 +2378,12 @@
           "month": 2,
           "day": 1
         },
-        "netWorth": 1660969,
-        "balance": 973227,
-        "debt": 6265858,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 15
+        "netWorth": 840861,
+        "balance": 702619,
+        "debt": 4574958,
+        "cashFlow": 8378,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -1967,12 +2391,12 @@
           "month": 3,
           "day": 1
         },
-        "netWorth": 1675638,
-        "balance": 983338,
-        "debt": 6248700,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 15
+        "netWorth": 870623,
+        "balance": 710997,
+        "debt": 4562374,
+        "cashFlow": 8378,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -1980,12 +2404,12 @@
           "month": 4,
           "day": 1
         },
-        "netWorth": 1660665,
-        "balance": 952749,
-        "debt": 6231484,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 15
+        "netWorth": 899227,
+        "balance": 719375,
+        "debt": 4549748,
+        "cashFlow": 8378,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -1993,12 +2417,12 @@
           "month": 5,
           "day": 1
         },
-        "netWorth": 1714451,
-        "balance": 962860,
-        "debt": 6214209,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 15
+        "netWorth": 931273,
+        "balance": 727753,
+        "debt": 4537080,
+        "cashFlow": 8378,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -2006,12 +2430,12 @@
           "month": 6,
           "day": 1
         },
-        "netWorth": 1748895,
-        "balance": 972971,
-        "debt": 6196876,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 14
+        "netWorth": 965862,
+        "balance": 730231,
+        "debt": 4524369,
+        "cashFlow": 8378,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -2019,12 +2443,12 @@
           "month": 7,
           "day": 1
         },
-        "netWorth": 1797498,
-        "balance": 983082,
-        "debt": 6179484,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 14
+        "netWorth": 1019894,
+        "balance": 738609,
+        "debt": 4511615,
+        "cashFlow": 8378,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -2032,12 +2456,12 @@
           "month": 8,
           "day": 1
         },
-        "netWorth": 1816860,
-        "balance": 993193,
-        "debt": 6162033,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 14
+        "netWorth": 1107685,
+        "balance": 741804,
+        "debt": 4498819,
+        "cashFlow": 3195,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -2045,12 +2469,12 @@
           "month": 9,
           "day": 1
         },
-        "netWorth": 1827881,
-        "balance": 1003304,
-        "debt": 6144523,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 14
+        "netWorth": 1066689,
+        "balance": 714769,
+        "debt": 4485980,
+        "cashFlow": -27035,
+        "monthlyRent": 26100,
+        "reputation": 17
       },
       {
         "date": {
@@ -2058,12 +2482,12 @@
           "month": 10,
           "day": 1
         },
-        "netWorth": 1877462,
-        "balance": 1013415,
-        "debt": 6126953,
-        "cashFlow": 10111,
-        "monthlyRent": 39400,
-        "reputation": 14
+        "netWorth": 1112597,
+        "balance": 748194,
+        "debt": 4473097,
+        "cashFlow": 3195,
+        "monthlyRent": 26100,
+        "reputation": 17
       }
     ],
     "lastStatement": {
@@ -2087,28 +2511,33 @@
         },
         {
           "kind": "propertyCharges",
-          "propertyId": "property-745",
-          "amount": 9000
+          "propertyId": "property-99",
+          "amount": 5900
         },
         {
           "kind": "ownerInsurance",
-          "propertyId": "property-745",
-          "amount": 1179
+          "propertyId": "property-99",
+          "amount": 1004
         },
         {
           "kind": "rentalIncome",
-          "propertyId": "property-745",
-          "amount": 45700
+          "propertyId": "property-99",
+          "amount": 30230
+        },
+        {
+          "kind": "coproCall",
+          "propertyId": "property-99",
+          "amount": 5183
         },
         {
           "kind": "loanPayment",
-          "loanId": "loan-1171",
-          "amount": 38410,
-          "interest": 20840,
-          "capital": 17570
+          "loanId": "loan-1214",
+          "amount": 27948,
+          "interest": 15065,
+          "capital": 12883
         }
       ],
-      "balance": 1013415
+      "balance": 748194
     },
     "modeId": "classic",
     "rewinds": 0,
@@ -2131,61 +2560,52 @@
         },
         {
           "id": "firstDig",
-          "day": 20793
-        },
-        {
-          "id": "welcomeHome",
-          "day": 20793
-        },
-        {
-          "id": "zeroTax",
-          "day": 20819
+          "day": 20796
         },
         {
           "id": "quietYear",
           "day": 20819
         },
         {
+          "id": "welcomeHome",
+          "day": 20821
+        },
+        {
           "id": "gossip",
-          "day": 20892
+          "day": 20900
         },
         {
           "id": "loyalCustomer",
-          "day": 21032
+          "day": 21001
         },
         {
           "id": "regular",
           "day": 21063
-        },
-        {
-          "id": "rightAmount",
-          "day": 21092
         }
       ],
       "counters": {
-        "anecdotes": 119,
-        "positiveStreak": 12,
-        "bestPositiveStreak": 12,
+        "anecdotes": 102,
+        "positiveStreak": 1,
+        "bestPositiveStreak": 7,
         "bankMeetings": 11,
         "rivalBeaten.martinot": 1,
         "purchases": 1,
         "diyTasks": 1,
-        "worksDone": 1,
+        "worksDone": 2,
         "dpeClassesGained": 0,
-        "leasesSigned": 1,
         "quietYears": 1,
-        "rentTaxFreeYears": 1
+        "leasesSigned": 1
       },
       "records": {
         "bestCapitalGain": 0,
-        "biggestWorks": 45395,
+        "biggestWorks": 209055,
         "bestMonth": 13000,
-        "maxNetWorth": 1877462
+        "maxNetWorth": 1526000
       },
       "troubledYear": false,
       "challenge": null,
       "challengeHistory": [],
-      "nextChallengeDay": 21133
+      "nextChallengeDay": 21052
     },
     "chronicle": [
       {
@@ -2198,7 +2618,7 @@
         "day": 20790,
         "kind": "firstPurchase",
         "ref": null,
-        "amount": 6300000
+        "amount": 4600000
       },
       {
         "day": 20790,
@@ -2213,33 +2633,15 @@
         "amount": null
       },
       {
-        "day": 20793,
+        "day": 20796,
         "kind": "firstWorks",
         "ref": null,
-        "amount": 45395
+        "amount": 209055
       },
       {
-        "day": 20793,
+        "day": 20796,
         "kind": "achievement",
         "ref": "firstDig",
-        "amount": null
-      },
-      {
-        "day": 20793,
-        "kind": "firstLease",
-        "ref": null,
-        "amount": 39400
-      },
-      {
-        "day": 20793,
-        "kind": "achievement",
-        "ref": "welcomeHome",
-        "amount": null
-      },
-      {
-        "day": 20819,
-        "kind": "achievement",
-        "ref": "zeroTax",
         "amount": null
       },
       {
@@ -2249,15 +2651,33 @@
         "amount": null
       },
       {
-        "day": 20892,
+        "day": 20821,
+        "kind": "firstLease",
+        "ref": null,
+        "amount": 26100
+      },
+      {
+        "day": 20821,
+        "kind": "achievement",
+        "ref": "welcomeHome",
+        "amount": null
+      },
+      {
+        "day": 20900,
         "kind": "achievement",
         "ref": "gossip",
         "amount": null
       },
       {
-        "day": 21032,
+        "day": 21001,
         "kind": "achievement",
         "ref": "loyalCustomer",
+        "amount": null
+      },
+      {
+        "day": 21008,
+        "kind": "majorEvent",
+        "ref": "inflationSpike",
         "amount": null
       },
       {
@@ -2265,101 +2685,39 @@
         "kind": "achievement",
         "ref": "regular",
         "amount": null
-      },
-      {
-        "day": 21092,
-        "kind": "achievement",
-        "ref": "rightAmount",
-        "amount": null
       }
     ],
     "catalog": {
-      "pending": [
-        {
-          "id": "event-4693",
-          "eventId": "bathroomMould",
-          "day": 21108,
-          "deadlineDay": 21112,
-          "textIndex": 0,
-          "propertyId": "property-745",
-          "vars": {
-            "tenant": "Inès",
-            "artisanId": null,
-            "neighbourhoodId": "centreHistorique",
-            "cityId": "dole",
-            "rivalId": "delaporte"
-          },
-          "amounts": {
-            "vmc": -50400,
-            "bleach": 0,
-            "ignore": 0
-          }
-        }
-      ],
+      "pending": [],
       "lastDay": {
-        "kevinAfterwork": 21023,
-        "fibre": 20794,
-        "badPress": 20808,
-        "bankerReview": 21030,
-        "liftBroken": 20826,
-        "artisanTip": 20827,
-        "partyComplaints": 20833,
-        "insurancePush": 20849,
-        "councilSeat": 20883,
-        "yvonPapers": 20890,
-        "commonRoofLeak": 20905,
-        "smokeDetector": 20938,
-        "newSchool": 20950,
-        "bailiffTip": 20961,
-        "jobLossRebate": 21022,
-        "heatwave": 21047,
-        "pistachioPaint": 21059,
-        "notaryDinner": 21094,
-        "bathroomMould": 21108
+        "hortenseAudit": 20751,
+        "artisanLate": 20791,
+        "pricesSlowing": 20799,
+        "apprentice": 20805,
+        "kevinAfterwork": 21032,
+        "badPress": 20817,
+        "notaryDinner": 20826,
+        "commonRoofLeak": 20840,
+        "tilerSlot": 20866,
+        "councilSeat": 20869,
+        "yvonPapers": 20937,
+        "artisanTip": 20942,
+        "conciergeRetires": 20947,
+        "financeCoach": 20966,
+        "poachingBank": 20989,
+        "insulationGrant": 21004,
+        "inflationSpike": 21008,
+        "tvShow": 21010,
+        "bikeShed": 21017,
+        "searchMandate": 21031,
+        "notarySuccession": 21091,
+        "brokenWindow": 21105,
+        "partyComplaints": 21106
       },
       "anecdotes": [
         {
-          "anecdoteId": "bellRinger",
-          "day": 21093,
-          "textIndex": 0,
-          "propertyId": "property-745",
-          "vars": {
-            "tenant": "Inès",
-            "artisanId": null,
-            "neighbourhoodId": "centreHistorique",
-            "cityId": "dole",
-            "rivalId": "martinot"
-          }
-        },
-        {
-          "anecdoteId": "djSet",
-          "day": 21104,
-          "textIndex": 0,
-          "propertyId": "property-745",
-          "vars": {
-            "tenant": "Inès",
-            "artisanId": null,
-            "neighbourhoodId": "centreHistorique",
-            "cityId": "dole",
-            "rivalId": "delaporte"
-          }
-        },
-        {
-          "anecdoteId": "kevinPodcast",
-          "day": 21105,
-          "textIndex": 0,
-          "propertyId": null,
-          "vars": {
-            "tenant": null,
-            "artisanId": null,
-            "neighbourhoodId": "centreAncien",
-            "cityId": "besancon",
-            "rivalId": "delaporte"
-          }
-        },
-        {
-          "anecdoteId": "martinotVan",
-          "day": 21106,
+          "anecdoteId": "yvonSpreadsheet",
+          "day": 21078,
           "textIndex": 0,
           "propertyId": null,
           "vars": {
@@ -2367,16 +2725,55 @@
             "artisanId": null,
             "neighbourhoodId": "saintCosmeBellevue",
             "cityId": "chalon",
+            "rivalId": "delaporte"
+          }
+        },
+        {
+          "anecdoteId": "gerardPhoto",
+          "day": 21080,
+          "textIndex": 0,
+          "propertyId": null,
+          "vars": {
+            "tenant": null,
+            "artisanId": null,
+            "neighbourhoodId": "plumontValFleuri",
+            "cityId": "dole",
+            "rivalId": "delaporte"
+          }
+        },
+        {
+          "anecdoteId": "catPhoto",
+          "day": 21090,
+          "textIndex": 0,
+          "propertyId": "property-99",
+          "vars": {
+            "tenant": "Lucas",
+            "artisanId": null,
+            "neighbourhoodId": "centreHistorique",
+            "cityId": "dole",
+            "rivalId": "delaporte"
+          }
+        },
+        {
+          "anecdoteId": "martinotArgue",
+          "day": 21093,
+          "textIndex": 0,
+          "propertyId": null,
+          "vars": {
+            "tenant": null,
+            "artisanId": null,
+            "neighbourhoodId": "montchapetRepublique",
+            "cityId": "dijon",
             "rivalId": "martinot"
           }
         },
         {
-          "anecdoteId": "plants",
-          "day": 21108,
+          "anecdoteId": "accordion",
+          "day": 21102,
           "textIndex": 0,
-          "propertyId": "property-745",
+          "propertyId": "property-99",
           "vars": {
-            "tenant": "Inès",
+            "tenant": "Lucas",
             "artisanId": null,
             "neighbourhoodId": "centreHistorique",
             "cityId": "dole",
@@ -2384,15 +2781,15 @@
           }
         },
         {
-          "anecdoteId": "pasteur",
-          "day": 21109,
+          "anecdoteId": "market",
+          "day": 21104,
           "textIndex": 0,
           "propertyId": null,
           "vars": {
             "tenant": null,
             "artisanId": null,
-            "neighbourhoodId": "universiteVoltaire",
-            "cityId": "dijon",
+            "neighbourhoodId": "saintCosmeBellevue",
+            "cityId": "chalon",
             "rivalId": "delaporte"
           }
         }
@@ -2401,469 +2798,464 @@
     "lastYearReview": {
       "year": 2026,
       "netWorthStart": 1500000,
-      "netWorthEnd": 1639758,
-      "cashFlow": 36111,
+      "netWorthEnd": 843441,
+      "cashFlow": 4148,
       "rents": 0,
       "reputationStart": 10,
       "reputationEnd": 17,
-      "rentTax": 0,
+      "rentTax": null,
       "accountantFees": 0,
       "titles": [
         "firstInvestor"
       ],
       "achievements": [
         "firstStone",
-        "firstDig",
-        "welcomeHome"
+        "firstDig"
       ],
       "advice": [
         {
-          "kind": "netWorthUp",
-          "amount": 139758
+          "kind": "netWorthDown",
+          "amount": 656559
         },
         {
-          "kind": "taxFree"
-        },
-        {
-          "kind": "autoRegime"
+          "kind": "vacancy",
+          "propertyId": "property-99"
         },
         {
           "kind": "goodYear",
-          "amount": 36111
+          "amount": 4148
+        },
+        {
+          "kind": "firstYear"
         }
       ]
     }
   },
   "listings": {
-    "count": 414,
-    "totalAskingPrice": 6006700000,
+    "count": 409,
+    "totalAskingPrice": 6214900000,
     "ids": [
-      "listing-2739",
-      "listing-2759",
-      "listing-2807",
-      "listing-2811",
-      "listing-2838",
-      "listing-2886",
-      "listing-2888",
-      "listing-2916",
-      "listing-2920",
-      "listing-2947",
+      "listing-2902",
+      "listing-2944",
+      "listing-2946",
+      "listing-2957",
       "listing-2965",
-      "listing-2967",
       "listing-2989",
+      "listing-3015",
       "listing-3055",
-      "listing-3067",
-      "listing-3068",
-      "listing-3085",
-      "listing-3087",
-      "listing-3093",
-      "listing-3117",
-      "listing-3153",
-      "listing-3161",
-      "listing-3167",
-      "listing-3173",
-      "listing-3177",
-      "listing-3205",
-      "listing-3223",
-      "listing-3225",
-      "listing-3227",
-      "listing-3229",
-      "listing-3233",
-      "listing-3243",
-      "listing-3255",
-      "listing-3279",
+      "listing-3064",
+      "listing-3072",
+      "listing-3094",
+      "listing-3102",
+      "listing-3104",
+      "listing-3106",
+      "listing-3118",
+      "listing-3124",
+      "listing-3126",
+      "listing-3130",
+      "listing-3166",
+      "listing-3182",
+      "listing-3196",
+      "listing-3214",
+      "listing-3218",
+      "listing-3220",
+      "listing-3226",
+      "listing-3232",
+      "listing-3236",
+      "listing-3240",
+      "listing-3252",
+      "listing-3258",
+      "listing-3262",
+      "listing-3272",
       "listing-3283",
       "listing-3285",
-      "listing-3289",
+      "listing-3287",
+      "listing-3291",
       "listing-3293",
+      "listing-3301",
       "listing-3311",
-      "listing-3313",
-      "listing-3337",
-      "listing-3341",
-      "listing-3347",
-      "listing-3349",
-      "listing-3365",
-      "listing-3377",
-      "listing-3379",
-      "listing-3383",
-      "listing-3385",
-      "listing-3387",
-      "listing-3391",
-      "listing-3393",
-      "listing-3395",
-      "listing-3399",
-      "listing-3403",
-      "listing-3409",
-      "listing-3411",
-      "listing-3429",
-      "listing-3441",
-      "listing-3443",
-      "listing-3447",
-      "listing-3449",
-      "listing-3463",
-      "listing-3465",
-      "listing-3467",
-      "listing-3477",
-      "listing-3481",
-      "listing-3483",
-      "listing-3499",
-      "listing-3503",
-      "listing-3515",
-      "listing-3517",
-      "listing-3531",
-      "listing-3533",
-      "listing-3539",
-      "listing-3543",
-      "listing-3545",
-      "listing-3547",
-      "listing-3557",
-      "listing-3565",
-      "listing-3567",
-      "listing-3575",
-      "listing-3577",
-      "listing-3585",
+      "listing-3327",
+      "listing-3329",
+      "listing-3345",
+      "listing-3351",
+      "listing-3366",
+      "listing-3374",
+      "listing-3376",
+      "listing-3380",
+      "listing-3382",
+      "listing-3384",
+      "listing-3386",
+      "listing-3388",
+      "listing-3390",
+      "listing-3392",
+      "listing-3430",
+      "listing-3436",
+      "listing-3438",
+      "listing-3442",
+      "listing-3446",
+      "listing-3450",
+      "listing-3456",
+      "listing-3470",
+      "listing-3474",
+      "listing-3492",
+      "listing-3506",
+      "listing-3535",
+      "listing-3537",
+      "listing-3559",
+      "listing-3571",
       "listing-3589",
-      "listing-3593",
-      "listing-3594",
-      "listing-3598",
-      "listing-3604",
-      "listing-3608",
-      "listing-3612",
-      "listing-3614",
-      "listing-3622",
-      "listing-3628",
-      "listing-3630",
-      "listing-3646",
-      "listing-3658",
-      "listing-3662",
-      "listing-3664",
-      "listing-3666",
-      "listing-3686",
-      "listing-3688",
-      "listing-3692",
-      "listing-3696",
-      "listing-3698",
-      "listing-3700",
-      "listing-3702",
-      "listing-3710",
+      "listing-3601",
+      "listing-3603",
+      "listing-3605",
+      "listing-3609",
+      "listing-3615",
+      "listing-3635",
+      "listing-3643",
+      "listing-3645",
+      "listing-3663",
+      "listing-3671",
+      "listing-3675",
+      "listing-3693",
+      "listing-3699",
+      "listing-3705",
+      "listing-3712",
       "listing-3716",
-      "listing-3724",
-      "listing-3726",
-      "listing-3730",
-      "listing-3734",
-      "listing-3737",
-      "listing-3739",
-      "listing-3747",
-      "listing-3756",
-      "listing-3758",
-      "listing-3762",
-      "listing-3768",
-      "listing-3774",
-      "listing-3776",
-      "listing-3780",
-      "listing-3784",
-      "listing-3786",
-      "listing-3796",
-      "listing-3798",
-      "listing-3812",
-      "listing-3814",
-      "listing-3818",
-      "listing-3820",
+      "listing-3720",
+      "listing-3736",
+      "listing-3744",
+      "listing-3759",
+      "listing-3761",
+      "listing-3763",
+      "listing-3767",
+      "listing-3777",
+      "listing-3779",
+      "listing-3781",
+      "listing-3790",
+      "listing-3792",
+      "listing-3800",
+      "listing-3810",
+      "listing-3816",
       "listing-3824",
-      "listing-3826",
-      "listing-3828",
-      "listing-3832",
       "listing-3836",
-      "listing-3839",
-      "listing-3843",
-      "listing-3845",
-      "listing-3847",
-      "listing-3849",
-      "listing-3851",
-      "listing-3855",
-      "listing-3859",
-      "listing-3861",
-      "listing-3867",
+      "listing-3840",
+      "listing-3844",
+      "listing-3863",
+      "listing-3865",
       "listing-3869",
       "listing-3875",
       "listing-3877",
-      "listing-3879",
       "listing-3885",
+      "listing-3887",
       "listing-3889",
       "listing-3891",
       "listing-3893",
-      "listing-3895",
-      "listing-3897",
+      "listing-3901",
       "listing-3905",
+      "listing-3907",
       "listing-3909",
-      "listing-3911",
-      "listing-3913",
+      "listing-3915",
       "listing-3917",
-      "listing-3923",
-      "listing-3925",
+      "listing-3919",
       "listing-3927",
-      "listing-3931",
+      "listing-3933",
+      "listing-3935",
+      "listing-3937",
       "listing-3939",
-      "listing-3947",
-      "listing-3951",
-      "listing-3955",
-      "listing-3963",
+      "listing-3941",
+      "listing-3959",
       "listing-3965",
       "listing-3967",
-      "listing-3969",
+      "listing-3973",
       "listing-3975",
-      "listing-3977",
-      "listing-3979",
-      "listing-3981",
-      "listing-3983",
-      "listing-3985",
       "listing-3991",
-      "listing-3993",
-      "listing-3995",
-      "listing-3999",
       "listing-4001",
-      "listing-4003",
-      "listing-4005",
-      "listing-4017",
-      "listing-4021",
-      "listing-4025",
-      "listing-4029",
-      "listing-4031",
+      "listing-4007",
+      "listing-4016",
+      "listing-4018",
+      "listing-4033",
       "listing-4035",
-      "listing-4040",
-      "listing-4044",
-      "listing-4050",
-      "listing-4052",
-      "listing-4058",
-      "listing-4060",
-      "listing-4062",
-      "listing-4068",
-      "listing-4072",
-      "listing-4074",
-      "listing-4080",
-      "listing-4082",
-      "listing-4084",
-      "listing-4086",
-      "listing-4088",
-      "listing-4090",
-      "listing-4092",
-      "listing-4096",
-      "listing-4102",
-      "listing-4108",
-      "listing-4110",
-      "listing-4118",
-      "listing-4120",
-      "listing-4124",
-      "listing-4126",
-      "listing-4130",
-      "listing-4138",
-      "listing-4140",
-      "listing-4146",
-      "listing-4148",
-      "listing-4150",
-      "listing-4152",
-      "listing-4154",
-      "listing-4156",
-      "listing-4158",
-      "listing-4164",
-      "listing-4166",
+      "listing-4039",
+      "listing-4051",
+      "listing-4053",
+      "listing-4063",
+      "listing-4065",
+      "listing-4067",
+      "listing-4071",
+      "listing-4075",
+      "listing-4079",
+      "listing-4083",
+      "listing-4085",
+      "listing-4097",
+      "listing-4103",
+      "listing-4105",
+      "listing-4109",
+      "listing-4111",
+      "listing-4117",
+      "listing-4119",
+      "listing-4123",
+      "listing-4133",
+      "listing-4137",
+      "listing-4141",
+      "listing-4145",
+      "listing-4153",
+      "listing-4167",
       "listing-4171",
-      "listing-4173",
+      "listing-4175",
+      "listing-4179",
       "listing-4183",
       "listing-4185",
       "listing-4187",
-      "listing-4189",
-      "listing-4191",
       "listing-4193",
-      "listing-4195",
       "listing-4197",
       "listing-4199",
       "listing-4201",
-      "listing-4205",
-      "listing-4207",
       "listing-4211",
       "listing-4213",
-      "listing-4217",
-      "listing-4221",
-      "listing-4225",
+      "listing-4219",
+      "listing-4223",
       "listing-4227",
       "listing-4231",
       "listing-4233",
-      "listing-4235",
       "listing-4239",
-      "listing-4241",
-      "listing-4245",
-      "listing-4251",
-      "listing-4253",
+      "listing-4243",
+      "listing-4249",
+      "listing-4255",
       "listing-4257",
-      "listing-4261",
       "listing-4263",
       "listing-4265",
       "listing-4267",
-      "listing-4271",
-      "listing-4273",
+      "listing-4269",
       "listing-4275",
       "listing-4277",
+      "listing-4279",
+      "listing-4281",
       "listing-4283",
-      "listing-4285",
+      "listing-4287",
       "listing-4289",
-      "listing-4293",
-      "listing-4301",
+      "listing-4297",
       "listing-4303",
-      "listing-4309",
+      "listing-4305",
+      "listing-4307",
       "listing-4311",
       "listing-4315",
       "listing-4317",
       "listing-4321",
-      "listing-4325",
+      "listing-4323",
+      "listing-4327",
+      "listing-4329",
       "listing-4331",
       "listing-4333",
-      "listing-4337",
       "listing-4339",
-      "listing-4343",
       "listing-4345",
-      "listing-4347",
-      "listing-4349",
+      "listing-4351",
       "listing-4353",
+      "listing-4355",
       "listing-4357",
-      "listing-4361",
       "listing-4363",
       "listing-4365",
-      "listing-4369",
+      "listing-4367",
       "listing-4371",
-      "listing-4375",
+      "listing-4373",
       "listing-4377",
-      "listing-4379",
-      "listing-4383",
+      "listing-4381",
+      "listing-4385",
       "listing-4387",
       "listing-4389",
+      "listing-4391",
       "listing-4393",
-      "listing-4399",
+      "listing-4395",
       "listing-4401",
-      "listing-4403",
       "listing-4405",
       "listing-4407",
-      "listing-4411",
-      "listing-4415",
-      "listing-4417",
+      "listing-4409",
+      "listing-4413",
+      "listing-4419",
+      "listing-4421",
       "listing-4423",
       "listing-4425",
       "listing-4427",
-      "listing-4429",
-      "listing-4433",
-      "listing-4435",
-      "listing-4441",
-      "listing-4443",
-      "listing-4445",
-      "listing-4447",
-      "listing-4449",
-      "listing-4451",
-      "listing-4457",
-      "listing-4459",
-      "listing-4461",
-      "listing-4463",
-      "listing-4465",
-      "listing-4467",
-      "listing-4469",
-      "listing-4471",
-      "listing-4479",
-      "listing-4481",
-      "listing-4485",
-      "listing-4487",
-      "listing-4489",
-      "listing-4499",
-      "listing-4513",
-      "listing-4517",
-      "listing-4519",
-      "listing-4521",
-      "listing-4525",
-      "listing-4527",
-      "listing-4529",
-      "listing-4531",
-      "listing-4533",
-      "listing-4535",
-      "listing-4537",
-      "listing-4539",
-      "listing-4541",
-      "listing-4543",
-      "listing-4547",
-      "listing-4549",
-      "listing-4551",
-      "listing-4555",
+      "listing-4431",
+      "listing-4432",
+      "listing-4436",
+      "listing-4438",
+      "listing-4444",
+      "listing-4446",
+      "listing-4450",
+      "listing-4452",
+      "listing-4454",
+      "listing-4456",
+      "listing-4458",
+      "listing-4462",
+      "listing-4464",
+      "listing-4466",
+      "listing-4468",
+      "listing-4470",
+      "listing-4472",
+      "listing-4474",
+      "listing-4480",
+      "listing-4482",
+      "listing-4486",
+      "listing-4488",
+      "listing-4490",
+      "listing-4492",
+      "listing-4494",
+      "listing-4496",
+      "listing-4500",
+      "listing-4502",
+      "listing-4504",
+      "listing-4506",
+      "listing-4510",
+      "listing-4518",
+      "listing-4520",
+      "listing-4522",
+      "listing-4524",
+      "listing-4528",
+      "listing-4532",
+      "listing-4534",
+      "listing-4538",
+      "listing-4540",
+      "listing-4550",
+      "listing-4554",
+      "listing-4556",
       "listing-4558",
-      "listing-4560",
       "listing-4562",
       "listing-4564",
       "listing-4566",
-      "listing-4568",
       "listing-4572",
-      "listing-4574",
       "listing-4578",
-      "listing-4580",
-      "listing-4582",
       "listing-4584",
       "listing-4586",
       "listing-4588",
       "listing-4590",
+      "listing-4594",
       "listing-4596",
       "listing-4598",
       "listing-4600",
-      "listing-4602",
+      "listing-4604",
       "listing-4606",
       "listing-4608",
-      "listing-4610",
-      "listing-4612",
       "listing-4614",
       "listing-4616",
       "listing-4618",
-      "listing-4622",
-      "listing-4624",
-      "listing-4630",
+      "listing-4620",
+      "listing-4626",
       "listing-4632",
       "listing-4636",
       "listing-4638",
-      "listing-4640",
       "listing-4642",
       "listing-4646",
+      "listing-4648",
       "listing-4650",
-      "listing-4654",
       "listing-4656",
-      "listing-4660",
+      "listing-4658",
       "listing-4662",
       "listing-4664",
-      "listing-4666",
       "listing-4668",
       "listing-4670",
       "listing-4672",
       "listing-4674",
       "listing-4676",
-      "listing-4678",
       "listing-4680",
-      "listing-4682",
-      "listing-4684",
-      "listing-4686",
-      "listing-4688",
-      "listing-4690",
-      "listing-4692",
-      "listing-4695",
+      "listing-4691",
+      "listing-4693",
       "listing-4697",
       "listing-4699",
-      "listing-4701",
-      "listing-4703",
-      "listing-4705",
-      "listing-4707"
+      "listing-4700",
+      "listing-4702",
+      "listing-4706",
+      "listing-4708",
+      "listing-4710",
+      "listing-4712",
+      "listing-4714",
+      "listing-4716",
+      "listing-4718",
+      "listing-4720",
+      "listing-4724",
+      "listing-4726",
+      "listing-4728",
+      "listing-4730",
+      "listing-4734",
+      "listing-4738",
+      "listing-4744",
+      "listing-4752",
+      "listing-4754",
+      "listing-4758",
+      "listing-4760",
+      "listing-4764",
+      "listing-4768",
+      "listing-4770",
+      "listing-4772",
+      "listing-4774",
+      "listing-4776",
+      "listing-4780",
+      "listing-4784",
+      "listing-4786",
+      "listing-4788",
+      "listing-4790",
+      "listing-4792",
+      "listing-4794",
+      "listing-4796",
+      "listing-4798",
+      "listing-4802",
+      "listing-4804",
+      "listing-4808",
+      "listing-4810",
+      "listing-4812",
+      "listing-4814",
+      "listing-4816",
+      "listing-4818",
+      "listing-4820",
+      "listing-4822",
+      "listing-4823",
+      "listing-4825",
+      "listing-4827",
+      "listing-4829",
+      "listing-4831",
+      "listing-4835",
+      "listing-4837",
+      "listing-4839",
+      "listing-4841",
+      "listing-4843",
+      "listing-4845",
+      "listing-4847",
+      "listing-4851",
+      "listing-4853",
+      "listing-4855",
+      "listing-4857",
+      "listing-4862",
+      "listing-4865",
+      "listing-4867",
+      "listing-4869",
+      "listing-4871",
+      "listing-4873",
+      "listing-4875",
+      "listing-4877",
+      "listing-4879",
+      "listing-4881",
+      "listing-4883",
+      "listing-4885",
+      "listing-4887",
+      "listing-4891",
+      "listing-4893",
+      "listing-4895",
+      "listing-4897",
+      "listing-4899",
+      "listing-4901",
+      "listing-4903",
+      "listing-4905",
+      "listing-4907"
     ]
   },
-  "netWorth": 1824162,
+  "netWorth": 1024597,
   "eventCounts": {
     "dayStarted": 365,
-    "listingSold": 1790,
-    "listingPriceDropped": 1893,
-    "listingPublished": 2007,
-    "anecdote": 119,
+    "listingSold": 1894,
+    "listingPriceDropped": 1947,
+    "listingPublished": 2105,
+    "anecdote": 102,
     "weekendStarted": 52,
-    "challengeOffered": 6,
-    "challengeDeclined": 6,
+    "catalogEventStarted": 18,
+    "catalogEventResolved": 18,
     "monthStarted": 12,
     "marketRateChanged": 12,
     "propertyPricesUpdated": 12,
@@ -2877,24 +3269,32 @@
     "loanAnswered": 1,
     "loanChosen": 1,
     "deedSigned": 1,
-    "renownChanged": 6,
-    "reputationChanged": 6,
+    "renownChanged": 5,
+    "reputationChanged": 5,
     "titleEarned": 1,
-    "achievementEarned": 9,
-    "worksStarted": 1,
-    "rentalListed": 1,
-    "worksTaskStarted": 1,
-    "applicationReceived": 1,
-    "worksTaskDone": 1,
-    "worksCompleted": 1,
-    "catalogEventStarted": 17,
-    "tenantMovedIn": 1,
-    "catalogEventResolved": 16,
-    "catalogEventHappened": 4,
+    "achievementEarned": 7,
+    "worksStarted": 2,
+    "worksHazard": 1,
+    "worksHazardResolved": 1,
+    "worksTaskStarted": 2,
+    "worksTaskDone": 2,
+    "worksCompleted": 2,
+    "quoteReceived": 1,
+    "worksDelegated": 1,
+    "catalogEventHappened": 6,
+    "challengeOffered": 4,
+    "challengeDeclined": 4,
     "yearStarted": 1,
     "taxAssessed": 1,
-    "offMarketOffered": 1,
+    "rentalListed": 1,
+    "applicationReceived": 1,
+    "tenantMovedIn": 1,
     "listingWithdrawn": 137,
+    "offMarketOffered": 2,
+    "coproMeetingCalled": 1,
+    "coproMeetingHeld": 1,
+    "rentMissed": 1,
+    "reminderSent": 1,
     "propertyTaxCharged": 1
   }
 }

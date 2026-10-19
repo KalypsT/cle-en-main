@@ -944,6 +944,24 @@ const gameStateSchema = z
             z.object({ priceIndex: z.number().positive(), trendPercent: z.number() }).strict(),
           ),
         ),
+        // Added in version 10 (lasting national crises).
+        crises: z
+          .array(
+            z
+              .object({
+                modifier: z.enum([
+                  'unpaidRents',
+                  'worksCosts',
+                  'tenantDemand',
+                  'buyerDemand',
+                  'credit',
+                ]),
+                factor: z.number().positive(),
+                untilDay: day,
+              })
+              .strict(),
+          )
+          .default([]),
       })
       .strict(),
     loans: z.array(

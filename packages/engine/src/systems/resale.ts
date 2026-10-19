@@ -3,6 +3,7 @@ import { toCents } from '../money.ts';
 import { nextFloat, nextRange } from '../random.ts';
 import type { OwnedProperty, SaleMode } from '../state.ts';
 import { refinancingFees } from './banking.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { moveOutOfHome } from './renting.ts';
 import { rivalAcquired } from './rivals.ts';
@@ -217,6 +218,7 @@ export function runDailyResale(ctx: SystemContext): void {
     const chance =
       rules.dailyVisitProbability *
       (sale.mode === 'agency' ? rules.agencyVisitMultiplier : 1) *
+      crisisFactor(state, 'buyerDemand') *
       Math.exp(-rules.priceSensitivity * overpricing);
     if (nextFloat(state.rng) >= Math.min(1, chance)) continue;
     if (sale.mode === 'self') {

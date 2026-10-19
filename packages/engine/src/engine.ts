@@ -56,6 +56,7 @@ import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
 import { createCompany, setPurchaseHolder } from './systems/company.ts';
+import { expireCrises } from './systems/crises.ts';
 import {
   runDailyTransformations,
   startTransformation,
@@ -226,6 +227,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       cyclePhase: nextFloat(rng),
       laggedRatePercent: startRate,
       cities: initialCityMarkets(content, startDate),
+      crises: [],
     },
     loans: [],
     listings: [],
@@ -281,6 +283,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   if (monthStarted) {
     runMonthlyMarketRate(ctx);
     runMonthlyPrices(ctx);
+    expireCrises(ctx);
     const lines: StatementLine[] = [];
     runMonthlyRivals(ctx);
     runMonthlyHousehold(ctx, lines);

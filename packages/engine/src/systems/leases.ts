@@ -3,6 +3,7 @@ import type { StatementLine } from '../events.ts';
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextRange, pickWeighted } from '../random.ts';
 import type { Lease, OwnedProperty } from '../state.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { modeOf } from './modes.ts';
 import {
@@ -120,7 +121,10 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
       arrears !== null && (arrears.reminderFailed || arrears.procedureEndDay !== null);
     const pays =
       !stopped &&
-      nextFloat(state.rng) >= rules.unpaid.monthlyProbability * (1 - lease.tenant.reliability);
+      nextFloat(state.rng) >=
+        rules.unpaid.monthlyProbability *
+          crisisFactor(state, 'unpaidRents') *
+          (1 - lease.tenant.reliability);
     if (!pays) {
       lease.arrears = arrears ?? {
         amount: 0,

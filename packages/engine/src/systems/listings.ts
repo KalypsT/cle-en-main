@@ -11,6 +11,7 @@ import {
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextNormal, nextPoisson, nextRange, pickWeighted } from '../random.ts';
 import type { GameState, Listing, OtherKind, Property, PropertyKind } from '../state.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import {
   conditionLabel,
@@ -319,7 +320,10 @@ export function otherBuyerProbability(ctx: SystemContext, listing: Listing): num
   const demand = ctx.content.citiesRules.demand[listing.property.cityId]?.buyers ?? 1;
   return Math.min(
     rules.maxDailyProbability,
-    rules.baseDailyProbability * demand * Math.exp(rules.dealSensitivity * bargain),
+    rules.baseDailyProbability *
+      demand *
+      crisisFactor(ctx.state, 'buyerDemand') *
+      Math.exp(rules.dealSensitivity * bargain),
   );
 }
 

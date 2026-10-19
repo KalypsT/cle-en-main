@@ -4,6 +4,7 @@ import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextRange, pickWeighted } from '../random.ts';
 import type { AnecdoteNote, CatalogEventInstance, GameState, OwnedProperty } from '../state.ts';
 import { clampTrust, trustChange } from './banking.ts';
+import { startCrisis } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { clampState, freezeItems } from './dwelling.ts';
 import { clampSatisfaction, giveNotice } from './leases.ts';
@@ -235,6 +236,9 @@ function applyEffects(
         break;
       case 'offMarketListing':
         offerOffMarket(ctx, instance.vars.cityId);
+        break;
+      case 'crisis':
+        startCrisis(ctx, effect.modifier, effect.factor, effect.months);
         break;
       case 'worksDelay': {
         const works = owned?.works;
