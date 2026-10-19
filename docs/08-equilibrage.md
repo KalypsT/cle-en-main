@@ -78,6 +78,8 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > Besançon et Chalon sont donnés pour information.
 
+> **Jalon 7, réponses aux événements** : l'écart de mesure du jalon 6 (réputation finale de 0 ou 1) est corrigé : tous les bots investisseurs, sauf le Naïf, pèsent les choix des événements (argent, 300 € par point de réputation, 15 € par point de satisfaction). Conséquence : leur réputation finale monte à 100 et le Chasseur gagne environ 10 % de patrimoine à 10 ans (essai sur 60 parties : 84,8 k€ contre 76,0 k€ en 100 parties). **Le seuil de réputation de 90 du Baron de la pierre n'est donc plus un obstacle** (point ouvert n° 14). La notoriété locale d'une ville où le joueur n'a encore rien reste à zéro : elle ne facilite pas un premier achat, seulement les suivants.
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :

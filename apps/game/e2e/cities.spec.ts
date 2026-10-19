@@ -31,6 +31,20 @@ test('shows the region, looks at Dijon and moves there', async ({ page }) => {
   await capture(page, '02-annonces-dijon', MILESTONE);
   await page.getByRole('button', { name: t.common.back }).click();
 
+  // The street of Dijon, with its own streets and neighbourhoods.
+  await openMenuEntry(page, t.menu.cities);
+  await page.getByTestId('region-city-dijon').click();
+  await page
+    .getByTestId('city-sheet-dijon')
+    .getByRole('button', { name: t.cities.seeStreet })
+    .click();
+  await streetReady(page);
+  await expect(page.getByTestId('street-name')).not.toBeEmpty();
+  await capture(page, '03-rue-dijon', MILESTONE);
+  await page.getByTestId('street-neighbourhood').selectOption({ index: 3 });
+  await streetReady(page);
+  await capture(page, '04-quartier-dijon', MILESTONE);
+
   // Moving to Dijon changes the base.
   await openMenuEntry(page, t.menu.cities);
   await page.getByTestId('region-city-dijon').click();
@@ -40,5 +54,5 @@ test('shows the region, looks at Dijon and moves there', async ({ page }) => {
   await expect(page.getByTestId('city-sheet-dijon')).toContainText(t.cities.noTrip);
   await page.getByTestId('region-city-dole').click();
   await expect(page.getByTestId('city-sheet-dole')).not.toContainText(t.cities.noTrip);
-  await capture(page, '03-apres-demenagement', MILESTONE);
+  await capture(page, '05-apres-demenagement', MILESTONE);
 });

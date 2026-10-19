@@ -117,7 +117,7 @@
     "shops": [
       "Boulangerie",
       "Pharmacie",
-      "Café du Doubs",
+      "Café de la Place",
       "Fleuriste",
       "Librairie",
       "Primeur",
@@ -126,7 +126,7 @@
       "Boucherie",
       "Coiffure",
       "Opticien",
-      "Comtoise d'assurances"
+      "Mutuelle de proximité"
     ],
     "bubbles": {
       "forSale": "À vendre",

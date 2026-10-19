@@ -70,7 +70,7 @@ Chaque événement est un objet JSON dans `content/evenements/` (un fichier par 
 > **Défis** : voir [02-boucle-et-progression.md](../02-boucle-et-progression.md#210-succès-défis-chronique-et-statistiques) ; ils apparaissent dans la boîte de décisions et mettent le jeu en pause.
 
 - On peut **ajouter des événements sans toucher au code** ; `pnpm validate-content` vérifie le schéma et les références (banques, rivaux, métiers, effets compatibles avec la cible).
-- Les bots vérifient qu'un nouvel événement ne casse pas l'équilibre : ils répondent aux événements par leur choix par défaut, tout de suite.
+- Les bots vérifient qu'un nouvel événement ne casse pas l'équilibre : ils répondent tout de suite aux événements, par leur choix par défaut (le Naïf) ou, depuis le jalon 7, en **pesant chaque choix** (argent, plus 300 € par point de réputation et 15 € par point de satisfaction) et en prenant le meilleur de ceux qu'ils peuvent faire.
 
 ## Le rythme sans idle
 

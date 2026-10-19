@@ -17,6 +17,7 @@
 | 11 | **Apport du nouveau départ** après faillite et part de réputation conservée | Jalon 6 | **Tranché au jalon 6** : 5 000 € et 50 % en Classique ; Serein garde 100 % de la réputation ; Exigeant met fin à la partie |
 | 12 | **Quartiers et noms de rues** de Dijon, Besançon et Chalon-sur-Saône | Jalon 9 | Choisis au jalon 7 sans vérification sur place (`tools/data/cities/*.ts`, `content/monde.json`) : à relire par Thibaud |
 | 13 | **Trajets hors Dole**, prix et loyers des nouvelles villes, flux d'annonces et demande par ville | Jalon 7 (relecture), jalon 9 | Valeurs de départ du jalon 7 (`content/villes.json`) ; à confirmer en jouant, puis à recaler avec les bots |
+| 14 | **Réputation trop facile à maximiser** | Jalon 9 | Mesuré au jalon 7 : des bots qui pèsent les choix des événements atteignent 100 de réputation (médiane) en 10 ans ; la condition de 90 du Baron et les avantages (marge bancaire, offres hors marché) en perdent leur intérêt. À recaler (gains, plafond, seuils) |
 
 ## Journal des décisions
 

@@ -574,6 +574,14 @@ function table(header: string[], rows: string[][]): string {
   ].join('\n');
 }
 
+/** « 1000 parties », or « de 300 à 1000 parties » when the bots did not play as many. */
+function gamesLabel(summaries: readonly BotSummary[]): string {
+  const counts = summaries.map((s) => s.games);
+  const low = Math.min(...counts);
+  const high = Math.max(...counts);
+  return low === high ? `${high} parties` : `De ${low} à ${high} parties`;
+}
+
 export function formatReport(report: Report, title: string): string {
   const { summaries, years } = report;
   const last = years - 1;
@@ -582,7 +590,7 @@ export function formatReport(report: Report, title: string): string {
   const lines = [
     `# ${title}`,
     '',
-    `${report.games} parties de ${years} ans par bot, mêmes graines et mêmes métiers pour chaque bot (les 7 métiers à tour de rôle sauf mention contraire). Les repères de la section 8.1 (« joueur raisonnable ») sont jugés sur le Chasseur ; ceux du Prudent sont donnés pour information.`,
+    `${gamesLabel(summaries)} de ${years} ans par bot, mêmes graines et mêmes métiers pour chaque bot (les 7 métiers à tour de rôle sauf mention contraire). Les repères de la section 8.1 (« joueur raisonnable ») sont jugés sur le Chasseur ; ceux du Prudent sont donnés pour information.`,
     '',
     '## Cibles',
     '',
