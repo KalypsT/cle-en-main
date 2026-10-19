@@ -51,6 +51,7 @@ import {
 import { runDailyDistress } from './systems/distress.ts';
 import type { SystemContext } from './systems/context.ts';
 import { citySheet, citySheets, visitQuote } from './systems/city-views.ts';
+import { remoteManagementFee } from './systems/cities.ts';
 import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
@@ -612,6 +613,9 @@ export function createEngine(content: GameContent) {
           recoverableCharges(content, property) +
           Math.round(property.annualPropertyTax / 12) +
           ownerInsurance(content, property),
+        /** Monthly fee if he manages it himself from another city (an agency avoids it). */
+        remoteManagementFee:
+          property.cityId === state.player.baseCityId ? 0 : remoteManagementFee(content),
         furnitureCost: furnitureCost(content, property),
       };
     },

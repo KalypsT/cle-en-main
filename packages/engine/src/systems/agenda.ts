@@ -75,14 +75,24 @@ function addedMinutes(
 /** First later day with enough free time for `minutes` in `cityId`, within the planning horizon. */
 function firstSlot(ctx: SystemContext, minutes: number, cityId: string): number | null {
   const { content, state } = ctx;
+  const groupDays = content.citiesRules.dayOnSite.groupWithinDays;
   let date: CalendarDate = state.clock.date;
+  let first: number | null = null;
   for (let offset = 1; offset <= content.market.visit.planningHorizonDays; offset++) {
     date = nextDay(date);
     const day = ctx.today + offset;
     const free = dailyFreeTime(content, state, date) - plannedMinutes(ctx, day);
-    if (free >= addedMinutes(ctx, day, minutes, cityId)) return day;
+    if (free < addedMinutes(ctx, day, minutes, cityId)) continue;
+    // The day on site: a day that already has a trip to this city saves another one.
+    const grouped =
+      cityId !== state.player.baseCityId &&
+      offset <= groupDays &&
+      itemsOn(ctx, day).some((item) => itemCity(ctx, item) === cityId);
+    if (grouped) return day;
+    first ??= day;
+    if (offset > groupDays || cityId === state.player.baseCityId) break;
   }
-  return null;
+  return first;
 }
 
 /** Plans an action on the first day with enough free time. */

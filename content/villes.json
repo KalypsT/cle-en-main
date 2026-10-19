@@ -47,6 +47,7 @@
     "besancon": 0.3,
     "chalon": 0.55
   },
+  "dayOnSite": { "groupWithinDays": 7 },
   "remote": {
     "monthlyFeePerPropertyEuros": 35
   },

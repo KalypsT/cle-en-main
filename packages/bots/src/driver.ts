@@ -1,4 +1,4 @@
-import { gameContent } from '@cle/content';
+import { type GameContent, gameContent } from '@cle/content';
 import {
   type CalendarDate,
   createEngine,
@@ -13,6 +13,8 @@ import {
   toDayNumber,
 } from '@cle/engine';
 import { MetricsRecorder, type GameMetrics } from './metrics.ts';
+
+type EventChoice = NonNullable<GameContent['events'][number]['choices']>[number];
 
 export const engine = createEngine(gameContent);
 
@@ -61,6 +63,11 @@ export class BotApi {
 
 export interface Strategy {
   id: string;
+  /**
+   * How it answers the catalogue's events: with their default choice, or by weighing each choice
+   * (money, reputation, satisfaction), as a player who reads them would.
+   */
+  answers?: 'default' | 'smart';
   /** Reaction to each engine event (financing a compromis, answering a counter-offer…). */
   onEvent?(api: BotApi, event: GameEvent): void;
   /** Daily decisions, once a day at the decision hour. */
@@ -84,10 +91,38 @@ const DEFAULT_DECISION_HOUR = 18;
  * would: it answers the catalogue's events with their default choice right
  * away and takes up the challenges (they cost nothing).
  */
-function answerTheRest(api: BotApi): void {
+/** What one reputation point is worth to a bot weighing the choices of an event (euros). */
+const REPUTATION_VALUE = 300;
+const SATISFACTION_VALUE = 15;
+
+/** Value of an event's choice: the money it costs or brings, and what it does to reputation. */
+function choiceScore(
+  instance: GameState['catalog']['pending'][number],
+  choice: EventChoice,
+): number {
+  let score = (instance.amounts[choice.id] ?? 0) / 100;
+  for (const effect of choice.effects) {
+    if (effect.type === 'reputation') score += REPUTATION_VALUE * effect.delta;
+    if (effect.type === 'satisfaction') score += SATISFACTION_VALUE * effect.delta;
+  }
+  return score;
+}
+
+function answerTheRest(api: BotApi, smart: boolean): void {
   for (const instance of [...api.state.catalog.pending]) {
     const event = engine.content.events.find((candidate) => candidate.id === instance.eventId);
-    if (event?.defaultChoice) {
+    if (!event) continue;
+    if (smart && event.choices && event.choices.length > 0) {
+      const ranked = [...event.choices].sort(
+        (a, b) => choiceScore(instance, b) - choiceScore(instance, a),
+      );
+      // The best choice that can be made now (it may need free time), else the default.
+      const done = ranked.some((choice) =>
+        api.act({ type: 'event/choose', eventId: instance.id, choiceId: choice.id }),
+      );
+      if (done) continue;
+    }
+    if (event.defaultChoice) {
       api.act({ type: 'event/choose', eventId: instance.id, choiceId: event.defaultChoice });
     }
   }
@@ -131,7 +166,7 @@ export function playGame(strategy: Strategy, options: GameOptions): GameMetrics 
     if (metrics.bankrupt) break;
     if (api.state.clock.hour === decisionHour && strategy.daily) {
       strategy.daily(api);
-      if (strategy.id !== 'inactif') answerTheRest(api);
+      if (strategy.id !== 'inactif') answerTheRest(api, strategy.answers === 'smart');
       react(api.takeQueued());
       metrics.observeDecisions(api.state);
       calm = engine.pace(api.state).calm;

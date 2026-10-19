@@ -64,6 +64,20 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 > | Marchand de biens | achète avec 22 % de marge sur la valeur après travaux, refait les postes à 3 ou moins qui rapportent plus qu'ils ne coûtent, la décence et le DPE à C, revend lui-même (3 % au-dessus de l'estimation, −3 % par mois) |
 > | Rénovateur premium | achète sur la valeur actuelle (à l'estimation, 5 % en dessous avant le suivi du jalon 3), refait en Premium tout poste à 4 ou moins et vise le DPE B, artisans les plus fiables |
 
+> **Jalon 7** : trois bots s'ajoutent, le **Chasseur à Dijon**, le **Chasseur à Besançon** et le **Chasseur à Chalon**. Ce sont des Chasseurs qui, **dès leur premier bien**, cherchent aussi dans une autre ville : ils n'y visitent que les annonces qu'ils pourraient financer (au plus 3 visites en attente, qui se regroupent sur un même jour avec un seul trajet), exigent **2 % de marge de plus** (« pour la peine »), et confient à l'agence Immo Zen (8 %) les biens qu'ils y achètent, ce qui supprime les frais de gestion à distance et les trajets de location. Le Chasseur sédentaire reste le « joueur raisonnable » de la section 8.1.
+>
+> Les bots ne comptent dans leur densité de décisions que les annonces des villes où ils habitent ou possèdent un bien.
+>
+> **Cibles du jalon** (le critère de la feuille de route, « une expansion à Dijon est viable mais demande un vrai effort », se mesure ainsi) :
+>
+> | Repère | Cible |
+> |---|---|
+> | Viable | médiane à 10 ans du Chasseur à Dijon d'au moins 90 % de celle du Chasseur, et pas plus de 3 points de faillites en plus |
+> | Un vrai effort | premier achat à Dijon après plus de 24 mois (médiane), et moins de la moitié des parties y achètent en 10 ans |
+> | Investisseur aguerri | 6 à 10 ans pour le Chasseur à Dijon (250 k€ nets et 2 villes) |
+>
+> Besançon et Chalon sont donnés pour information.
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :

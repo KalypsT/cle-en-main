@@ -114,7 +114,10 @@ function drawVars(
   const artisans = trade
     ? content.artisans.filter((a) => a.trade === trade && a.cities.includes(cityId))
     : [];
-  const rivals = content.rivals.filter((rival) => rival.active && rival.cities.includes(cityId));
+  // The rivals are in Dole; elsewhere, an event that names a rival names one of them all the same.
+  const active = content.rivals.filter((rival) => rival.active);
+  const local = active.filter((rival) => rival.cities.includes(cityId));
+  const rivals = local.length > 0 ? local : active;
   return {
     tenant: owned?.lease?.tenant.firstName ?? null,
     artisanId:

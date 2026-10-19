@@ -14,8 +14,26 @@ import { chooseWorks, RenovationDesk, type RenovationProfile } from './renovatio
  * one decision routine. They play only through engine actions and see only
  * what the player sees: estimates, never real values.
  */
+/** An investor who looks for properties beyond his base city (milestone 7). */
+export interface ExpansionProfile {
+  /** Cities he travels to. */
+  cities: string[];
+  /** Starts once he owns this many properties. */
+  afterProperties: number;
+  /** Agency managing what he owns far from his base (no fee, no trips for tenants). */
+  remoteAgencyId: string | null;
+  /** Extra margin asked of a faraway deal, for the trouble (share of the price). */
+  premium: number;
+  /** Visits planned per decision in another city: a day on site shares one trip. */
+  visitsPerTrip: number;
+}
+
 export interface InvestorProfile {
   id: string;
+  /** Plays beyond his base city; undefined or null: stays in his base. */
+  expansion?: ExpansionProfile | null;
+  /** Answers the events by weighing their choices (a reader), rather than by default. */
+  smartAnswers?: boolean;
   /** Visits a listing before making an offer. */
   visits: boolean;
   /** Visits planned per decision, free time permitting. */
@@ -206,11 +224,15 @@ export function investor(profile: InvestorProfile): Strategy {
     const leaseFactor = engine.content.renting.leaseTypes[profile.leaseType].rentFactor;
     const market = rentAfter !== null ? rentAfter * leaseFactor : quote.block ? 0 : quote.market;
     const rent = market * profile.rentShare;
-    const agency = engine.content.renting.agencies.find((a) => a.id === profile.agencyId);
+    const agencyId = agencyFor(api, id);
+    const agency = engine.content.renting.agencies.find((a) => a.id === agencyId);
     const insurance = profile.insured ? engine.content.renting.unpaidRentInsurance.premiumShare : 0;
+    // Managed from afar without an agency, a property costs its monthly fee.
+    const remoteFee = agencyId === null ? quote.remoteManagementFee : 0;
     return (
       rent * (1 - VACANCY_ALLOWANCE) * (1 - (agency?.feeShare ?? 0) - insurance) -
-      quote.monthlyOwnerCosts
+      quote.monthlyOwnerCosts -
+      remoteFee
     );
   }
 
@@ -241,7 +263,7 @@ export function investor(profile: InvestorProfile): Strategy {
       propertyId: id,
       leaseType,
       monthlyRent,
-      agencyId: profile.agencyId,
+      agencyId: agencyFor(api, id),
       insured: profile.insured,
     });
   }
@@ -381,9 +403,33 @@ export function investor(profile: InvestorProfile): Strategy {
     return { value: estimate.valueAfter - works, works, rentAfter: estimate.rentAfter };
   }
 
-  /** Cities where the bot looks for properties: its base (it never travels yet). */
+  const expansion = profile.expansion ?? null;
+
+  /** Cities where the bot looks for properties: its base, then the cities it expands to. */
   function workCities(api: BotApi): string[] {
-    return [api.state.player.baseCityId];
+    const base = api.state.player.baseCityId;
+    if (!expansion || api.state.properties.length < expansion.afterProperties) return [base];
+    return [base, ...expansion.cities.filter((cityId) => cityId !== base)];
+  }
+
+  /** City of a listing, a purchase or an owned property. */
+  function cityOf(api: BotApi, id: string): string {
+    const { state } = api;
+    return (
+      state.listings.find((l) => l.id === id)?.property.cityId ??
+      state.purchases.find((p) => p.id === id)?.property.cityId ??
+      state.properties.find((o) => o.property.id === id)?.property.cityId ??
+      state.player.baseCityId
+    );
+  }
+
+  const isRemote = (api: BotApi, id: string) => cityOf(api, id) !== api.state.player.baseCityId;
+
+  /** Agency of a property: far from home, the expansion's agency when there is one. */
+  function agencyFor(api: BotApi, id: string): string | null {
+    return expansion?.remoteAgencyId && isRemote(api, id)
+      ? expansion.remoteAgencyId
+      : profile.agencyId;
   }
 
   function candidates(api: BotApi) {
@@ -403,7 +449,9 @@ export function investor(profile: InvestorProfile): Strategy {
       if (listing.offer || listing.offersMade >= limit || api.today < listing.publicDay) continue;
       const appraisal = appraise(api, listing);
       if (!appraisal || appraisal.value <= 0) continue;
-      const ratio = appraisal.value / listing.askingPrice;
+      const trouble =
+        listing.property.cityId === state.player.baseCityId ? 1 : 1 + (expansion?.premium ?? 0);
+      const ratio = appraisal.value / listing.askingPrice / trouble;
       if (ratio < profile.screenRatio) continue;
       result.push({
         listing,
@@ -528,9 +576,20 @@ export function investor(profile: InvestorProfile): Strategy {
       return;
     }
     let planned = 0;
+    let plannedFar = 0;
+    const base = state.player.baseCityId;
+    // Visits already waiting in the agenda far from home: they share the next day on site.
+    const waitingFar = state.agenda.filter(
+      (item) => item.kind === 'visit' && isRemote(api, item.listingId),
+    ).length;
     for (const candidate of found) {
-      if (planned >= profile.visitsPerDay) break;
       const { listing } = candidate;
+      const far = listing.property.cityId !== base;
+      if (far) {
+        if (!expansion || plannedFar + waitingFar >= expansion.visitsPerTrip) continue;
+      } else if (planned >= profile.visitsPerDay) {
+        continue;
+      }
       if (
         listing.visited ||
         state.agenda.some((item) => item.kind === 'visit' && item.listingId === listing.id)
@@ -540,7 +599,8 @@ export function investor(profile: InvestorProfile): Strategy {
       const price = Math.min(listing.askingPrice, candidate.estimate);
       if (!plan(api, price, listing.id, 0, candidate.works, candidate.rentAfter)) continue;
       if (!api.act({ type: 'market/visit', listingId: listing.id })) break;
-      planned += 1;
+      if (far) plannedFar += 1;
+      else planned += 1;
     }
   }
 
@@ -650,14 +710,20 @@ export function investor(profile: InvestorProfile): Strategy {
     }
   }
 
-  return { id: profile.id, daily, onEvent };
+  return {
+    id: profile.id,
+    answers: profile.smartAnswers ? 'smart' : 'default',
+    daily,
+    onEvent,
+  };
 }
 
 const BANKS_BY_RATE = ['rigueur', 'tirelire', 'zeroPapier', 'fougueux'];
 
-export const PROFILES = {
+const BASE_PROFILES = {
   prudent: {
     id: 'prudent',
+    smartAnswers: true,
     visits: true,
     visitsPerDay: 1,
     screenRatio: 1,
@@ -697,6 +763,7 @@ export const PROFILES = {
   },
   levier: {
     id: 'levier',
+    smartAnswers: true,
     visits: true,
     visitsPerDay: 1,
     screenRatio: 0.98,
@@ -775,6 +842,7 @@ export const PROFILES = {
   },
   chasseur: {
     id: 'chasseur',
+    smartAnswers: true,
     visits: true,
     visitsPerDay: 4,
     screenRatio: 1.03,
@@ -814,6 +882,7 @@ export const PROFILES = {
   },
   marchand: {
     id: 'marchand',
+    smartAnswers: true,
     visits: true,
     visitsPerDay: 3,
     screenRatio: 1.12,
@@ -853,6 +922,7 @@ export const PROFILES = {
   },
   renovateur: {
     id: 'renovateur',
+    smartAnswers: true,
     visits: true,
     visitsPerDay: 2,
     screenRatio: 1,
@@ -892,6 +962,31 @@ export const PROFILES = {
   },
 } as const satisfies Record<string, InvestorProfile>;
 
+/** The Chasseur who also looks in one city, with a local agency managing what he buys there. */
+function expandingHunter(id: string, cityId: string): InvestorProfile {
+  return {
+    ...BASE_PROFILES.chasseur,
+    id,
+    banks: [...BASE_PROFILES.chasseur.banks],
+    meetBanks: [...BASE_PROFILES.chasseur.meetBanks],
+    renovation: { ...BASE_PROFILES.chasseur.renovation },
+    expansion: {
+      cities: [cityId],
+      afterProperties: 1,
+      remoteAgencyId: 'immoZen',
+      premium: 0.02,
+      visitsPerTrip: 3,
+    },
+  };
+}
+
+export const PROFILES = {
+  ...BASE_PROFILES,
+  chasseurDijon: expandingHunter('chasseurDijon', 'dijon'),
+  chasseurBesancon: expandingHunter('chasseurBesancon', 'besancon'),
+  chasseurChalon: expandingHunter('chasseurChalon', 'chalon'),
+} satisfies Record<string, InvestorProfile>;
+
 export const inactive: Strategy = { id: 'inactif' };
 
 export type BotId = keyof typeof PROFILES | 'inactif';
@@ -902,6 +997,9 @@ export const BOT_IDS: readonly BotId[] = [
   'chasseur',
   'marchand',
   'renovateur',
+  'chasseurDijon',
+  'chasseurBesancon',
+  'chasseurChalon',
   'inactif',
 ];
 
@@ -912,17 +1010,22 @@ export const BOT_NAMES: Record<BotId, string> = {
   chasseur: 'Chasseur de bonnes affaires',
   marchand: 'Marchand de biens',
   renovateur: 'Rénovateur premium',
+  chasseurDijon: 'Chasseur à Dijon',
+  chasseurBesancon: 'Chasseur à Besançon',
+  chasseurChalon: 'Chasseur à Chalon',
   inactif: 'Inactif',
 };
 
 /** A fresh strategy (bots keep a little memory: one per game). */
 export function createStrategy(id: BotId): Strategy {
   if (id === 'inactif') return inactive;
-  const base = PROFILES[id];
+  const base: InvestorProfile = PROFILES[id];
   return investor({
     ...base,
     banks: [...base.banks],
     meetBanks: [...base.meetBanks],
     renovation: { ...base.renovation },
+    expansion: base.expansion ? { ...base.expansion, cities: [...base.expansion.cities] } : null,
+    smartAnswers: base.smartAnswers ?? false,
   });
 }

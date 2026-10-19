@@ -84,3 +84,10 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Réglages** : accélération automatique, bilan mensuel, Revenir en arrière (les points du 1er des derniers mois, avec le patrimoine net, et les retours restants), export du journal de partie.
 - **Création de partie** : choix du mode (Serein, Classique, Exigeant) avec sa description.
 - **Faillite** : une fenêtre « Nouveau départ » (Classique, Serein) ou « Fin de partie » (Exigeant), qui mène à la chronique.
+
+## Jalon 7 : villes
+
+- **Menu > Villes** : carte schématique de la région (les 4 villes, la base en vert, un point orange sur les villes où le joueur possède un bien, les durées de trajet sur les liaisons) et la fiche de la ville touchée : trajet depuis la base, prix, loyer, rendement, tendance, ventes et annonces, frais à distance, notoriété locale, biens possédés, artisans connus, coût des travaux. Trois boutons : voir la rue, voir les annonces, **déménager ici** (avec confirmation : coût, loyer, délai).
+- **La ville regardée** : la rue, la carte de la ville, les annonces et la coupe d'immeuble montrent la ville choisie (la base au départ, ou la ville du dernier bien acheté). « Changer de ville » ouvre l'écran Villes depuis le tableau de bord et la carte.
+- **Fiche d'annonce** : le bouton de visite affiche le trajet et son coût quand il n'est pas encore fait ce jour-là ; l'**agenda** montre, pour chaque jour, le trajet vers chaque ville et l'action avec le nom de sa ville.
+

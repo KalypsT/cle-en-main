@@ -74,3 +74,17 @@ Dans `content/`, en JSON, validé par des schémas (zod) au moment de la compila
 - Son prix part de la valeur réelle, ajustée par la motivation du vendeur et une erreur d'estimation.
 - Les locataires, artisans et événements sont générés de la même façon, à partir du contenu.
 - Le hasard est **à graine** : une partie peut être rejouée exactement (tests, bots, retour en arrière).
+
+## 6.6 Les villes du jalon 7
+
+`pnpm --filter @cle/data-tools build-city dijon|besancon|chalon` produit `data/cities/<ville>.json` avec la même chaîne que Dole (DVF, carte des loyers, ADEME, IRIS et cadastre de l'IGN, BD TOPO). Les téléchargements passent par le proxy de l'environnement et sont mis en cache (quelques coupures de connexion sont réessayées automatiquement).
+
+| Ville | Code INSEE | Quartiers | Population | Appartements (médiane des quartiers) |
+|---|---|---|---|---|
+| Dijon | 21231 | 8 | 161 830 | 2 250 à 3 100 €/m² |
+| Besançon | 25056 | 7 | 118 489 | 1 860 à 2 440 €/m² |
+| Chalon-sur-Saône | 71076 | 6 | 45 102 | 1 050 à 1 600 €/m² |
+
+- **Quartiers** : regroupements d'IRIS décrits dans `tools/data/cities/<ville>.ts`. Les groupes et leurs noms viennent de la connaissance générale des villes, **sans vérification sur place** (même avertissement que pour les rues). Exclus : zones industrielles et commerciales (Dijon : Z.I. Nord-Est, Le Bocage, Combe à la Serpent Le Lac ; Besançon : Tilleroyes et la forêt de Chailluz ; Chalon : les deux zones industrielles et La Thalie).
+- **Repères de la carte** : Palais des ducs et gare de Dijon, citadelle et gare de Besançon-Viotte, cathédrale Saint-Vincent et gare de Chalon (la tour du Doyenné n'est pas dans la BD TOPO ; elle n'apparaît que dans le décor de la rue).
+- Les fichiers font de 50 Ko (Dole) à 130 Ko (Dijon).

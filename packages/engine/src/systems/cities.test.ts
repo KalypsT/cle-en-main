@@ -12,6 +12,7 @@ import {
   sampleOwned,
   systemContext,
 } from '../../test/helpers.ts';
+import { toDayNumber } from '../calendar.ts';
 import { toCents } from '../money.ts';
 import { serializeGame } from '../serialization.ts';
 import { homeRent, moveHome, renownOf } from './cities.ts';
@@ -112,6 +113,30 @@ describe('trips', () => {
       const trips = day.trips.reduce((sum, trip) => sum + trip.minutes, 0);
       if (day.planned.length > 0) expect(planned + trips).toBeLessThanOrEqual(day.freeMinutes);
     }
+  });
+});
+
+describe('the day on site', () => {
+  it('puts a visit on a day that already has a trip to the same city, if one is near enough', () => {
+    // Sunday 18 October 2026: the weekdays leave too little time for a trip and a visit.
+    const state = newGame();
+    const [a, b] = [listingIn(state, 'dijon', 0), listingIn(state, 'dijon', 1)];
+    const today = toDayNumber(state.clock.date);
+    const planned = { ...state, player: { ...state.player, freeTimeMinutes: 0 } };
+    const sundayAfter = today + 7;
+    const first = {
+      ...planned,
+      agenda: [
+        { id: 'agenda-x', kind: 'visit' as const, listingId: a.id, day: sundayAfter, minutes: 80 },
+      ],
+    };
+    const result = act(first, { type: 'market/visit', listingId: b.id }).state;
+    const item = result.agenda.find((i) => i.kind === 'visit' && i.listingId === b.id);
+    // Saturday would do (today + 6), but Sunday already has the trip.
+    expect(item?.day).toBe(sundayAfter);
+    // A day with no trip yet takes it when the city is the base or the wait is too long.
+    const alone = act(planned, { type: 'market/visit', listingId: b.id }).state;
+    expect(alone.agenda[0]?.day).toBe(today + 6);
   });
 });
 

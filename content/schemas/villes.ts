@@ -43,6 +43,13 @@ export const citiesRulesSchema = z
       id,
       z.object({ buyers: z.number().positive(), tenants: z.number().positive() }).strict(),
     ),
+    /** The day on site: actions in another city are grouped on a day that already has a trip there. */
+    dayOnSite: z
+      .object({
+        /** An action joins a day with a trip to the same city if it falls within this many days. */
+        groupWithinDays: z.number().int().min(0),
+      })
+      .strict(),
     remote: z
       .object({
         /** Monthly fee for each property of another city that the owner manages himself. */

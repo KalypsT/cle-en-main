@@ -70,7 +70,7 @@ export function CitiesScreen() {
       <svg
         className="region-map"
         viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-        role="img"
+        role="group"
         aria-label={t.cities.mapLabel}
         data-testid="region-map"
       >

@@ -50,7 +50,7 @@ export interface GameMetrics {
   finalDebtRatio: number;
   /** Day the Bailleur title was earned (milestone 6: the real titles). */
   bailleurDay: number | null;
-  /** Day the Investisseur aguerri title was earned (one city until milestone 7). */
+  /** Day the Investisseur aguerri title was earned (needs properties in two cities). */
   seasonedDay: number | null;
   /** Day each title was earned. */
   titleDays: Record<string, number>;
@@ -96,6 +96,19 @@ export interface GameMetrics {
   dpeClassesGained: number;
   /** Properties classed E to G at the end. */
   finalPassoires: number;
+  /** Cities (milestone 7): trips made, their minutes and cost (euros), fees for managing from afar. */
+  trips: number;
+  tripMinutes: number;
+  tripCost: number;
+  remoteFees: number;
+  /** Deeds signed in a city other than the base, and the day of the first one. */
+  remotePurchases: number;
+  firstRemotePurchaseDay: number | null;
+  /** Cities holding at least one property at the end, and properties by city. */
+  finalCities: number;
+  finalPropertiesByCity: Record<string, number>;
+  /** Local renown at the end, by city. */
+  finalRenown: Record<string, number>;
 }
 
 const euros = (cents: number) => Math.round(cents / 100);
@@ -173,6 +186,15 @@ export class MetricsRecorder {
       hazards: 0,
       dpeClassesGained: 0,
       finalPassoires: 0,
+      trips: 0,
+      tripMinutes: 0,
+      tripCost: 0,
+      remoteFees: 0,
+      remotePurchases: 0,
+      firstRemotePurchaseDay: null,
+      finalCities: 0,
+      finalPropertiesByCity: {},
+      finalRenown: {},
     };
   }
 
@@ -271,9 +293,25 @@ export class MetricsRecorder {
             if (this.visited.has(event.listingId)) m.lostToRivals += 1;
           }
           break;
-        case 'deedSigned':
+        case 'deedSigned': {
           m.purchases += 1;
           m.firstPurchaseDay ??= this.day(state);
+          const bought = state.properties.find((owned) => owned.property.id === event.propertyId);
+          if (bought && bought.property.cityId !== state.player.baseCityId) {
+            m.remotePurchases += 1;
+            m.firstRemotePurchaseDay ??= this.day(state);
+          }
+          break;
+        }
+        case 'tripMade':
+          m.trips += 1;
+          m.tripMinutes += event.minutes;
+          m.tripCost += euros(event.cost);
+          break;
+        case 'monthlyStatement':
+          for (const line of event.lines) {
+            if (line.kind === 'remoteManagement') m.remoteFees += euros(line.amount);
+          }
           break;
         case 'propertySold':
           m.sales += 1;
@@ -313,8 +351,14 @@ export class MetricsRecorder {
   /** A new listing worth a look: well under the estimate, and affordable. */
   private interesting(state: GameState, listingId: string): boolean {
     const listing = state.listings.find((candidate) => candidate.id === listingId);
+    if (!listing) return false;
+    // Only the cities where the player lives or owns count: the others are not on his mind.
+    const present =
+      listing.property.cityId === state.player.baseCityId ||
+      state.properties.some((owned) => owned.property.cityId === listing.property.cityId);
+    if (!present) return false;
     const estimate = this.engine.estimate(state, listingId);
-    if (!listing || !estimate) return false;
+    if (!estimate) return false;
     return (
       listing.askingPrice <= estimate.estimate * (1 - INTERESTING_DISCOUNT) &&
       state.player.balance >= listing.askingPrice * INTERESTING_CASH_SHARE
@@ -360,11 +404,23 @@ export class MetricsRecorder {
       PASSOIRES.includes(owned.property.dpe),
     ).length;
     m.finalReputation = state.player.reputation;
+    for (const owned of state.properties) {
+      const { cityId } = owned.property;
+      m.finalPropertiesByCity[cityId] = (m.finalPropertiesByCity[cityId] ?? 0) + 1;
+    }
+    m.finalCities = Object.keys(m.finalPropertiesByCity).length;
+    m.finalRenown = { ...state.player.renown };
     m.finalMonthlyRent = euros(
       state.properties.reduce((sum, owned) => sum + (owned.lease?.monthlyRent ?? 0), 0),
     );
     const ratio = debtRatio(this.engine.content, state);
     m.finalDebtRatio = monthlyLoanPayments(state) === 0 ? 0 : Number.isFinite(ratio) ? ratio : 9.99;
-    return { ...m, rivalPurchases: { ...m.rivalPurchases }, titleDays: { ...m.titleDays } };
+    return {
+      ...m,
+      rivalPurchases: { ...m.rivalPurchases },
+      titleDays: { ...m.titleDays },
+      finalPropertiesByCity: { ...m.finalPropertiesByCity },
+      finalRenown: { ...m.finalRenown },
+    };
   }
 }
