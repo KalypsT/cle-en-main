@@ -203,6 +203,8 @@ export function investor(profile: InvestorProfile): Strategy {
         ? (engine.rentQuote(state, rentId, 'furnished')?.furnitureCost ?? 0)
         : 0;
     const cash = state.player.balance + deposit - furniture;
+    // The reserve only grows with the new loan's payment: short of it already, every bank fails.
+    if (cash - contribution < reserve(api, 0)) return null;
     const rent = netRent(api, rentId, rentAfter);
     const bankIds: string[] = [];
     for (const bankId of profile.banks) {

@@ -126,8 +126,11 @@ export class RenovationDesk {
     { key: unknown; month: number; plan: WorksProjectPlan | null }
   >();
   private readonly profile: RenovationProfile;
-  /** Items chosen for each listing's property (null: nothing to do). */
-  private readonly choices = new WeakMap<Property, ItemChoice[] | null>();
+  /**
+   * Items chosen for each listing's dwelling (null: nothing to do), by its frozen items: a
+   * listing copied for a price drop keeps them, and only works give a property new ones.
+   */
+  private readonly choices = new WeakMap<Property['items'], ItemChoice[] | null>();
 
   constructor(profile: RenovationProfile) {
     this.profile = profile;
@@ -163,13 +166,14 @@ export class RenovationDesk {
    * estimate (prices, rents) is recomputed.
    */
   private planListing(api: BotApi, listing: Listing): WorksProjectPlan | null {
-    if (this.profile.scope === 'profitable' || !Object.isFrozen(listing.property)) {
+    const { items } = listing.property;
+    if (this.profile.scope === 'profitable' || !Object.isFrozen(items)) {
       return chooseWorks(api, listing.id, this.profile);
     }
-    const known = this.choices.get(listing.property);
+    const known = this.choices.get(items);
     if (known === undefined) {
       const plan = chooseWorks(api, listing.id, this.profile);
-      this.choices.set(listing.property, plan?.choices ?? null);
+      this.choices.set(items, plan?.choices ?? null);
       return plan;
     }
     if (known === null) return null;
