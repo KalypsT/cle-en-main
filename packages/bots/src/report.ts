@@ -107,6 +107,22 @@ export interface BotSummary {
     /** Share of the properties held at the end that are classed E to G. */
     passoireShare: number;
   };
+  /** Depth (milestone 8): the SCI, transformations, the IFI and SCI Horizon. */
+  depth: {
+    /** Share of games creating the SCI, and the median years to it (over those games). */
+    companyShare: number;
+    companyYears: number | null;
+    /** Median properties the SCI holds at the end (over the games that created it). */
+    companyProperties: number;
+    /** Transformations per game. */
+    transformations: number;
+    /** Share of games paying the IFI at least once, and the mean paid per game (euros). */
+    wealthTaxShare: number;
+    wealthTax: number;
+    /** Share of games where SCI Horizon arrives, and the median years to it. */
+    horizonShare: number;
+    horizonYears: number | null;
+  };
 }
 
 export interface TargetCheck {
@@ -223,6 +239,26 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
           games.reduce((sum, g) => sum + g.finalProperties, 0),
         ),
     },
+    depth: depthSummary(games),
+  };
+}
+
+function depthSummary(games: GameMetrics[]): BotSummary['depth'] {
+  const yearsOf = (days: (number | null)[]) => {
+    const known = days.filter((day): day is number => day !== null);
+    return known.length > 0 ? median(known.map((day) => day / DAYS_PER_YEAR)) : null;
+  };
+  const companies = games.filter((g) => g.companyDay !== null);
+  return {
+    companyShare: share(games.map((g) => g.companyDay !== null)),
+    companyYears: yearsOf(games.map((g) => g.companyDay)),
+    companyProperties:
+      companies.length > 0 ? median(companies.map((g) => g.finalCompanyProperties)) : 0,
+    transformations: mean(games.map((g) => g.transformations)),
+    wealthTaxShare: share(games.map((g) => g.wealthTax > 0)),
+    wealthTax: mean(games.map((g) => g.wealthTax)),
+    horizonShare: share(games.map((g) => g.horizonDay !== null)),
+    horizonYears: yearsOf(games.map((g) => g.horizonDay)),
   };
 }
 
@@ -629,6 +665,10 @@ export function formatReport(report: Report, title: string): string {
   const last = years - 1;
   const name = (s: BotSummary) => BOT_NAMES[s.botId];
   const failed = report.checks.filter((check) => check.ok === false).length;
+  // Rivals present from the start, and those that arrived in at least one game (SCI Horizon).
+  const rivalsShown = gameContent.rivals.filter(
+    (r) => r.active || summaries.some((s) => (s.rivalPurchasesPerYear[r.id] ?? 0) > 0),
+  );
   const lines = [
     `# ${title}`,
     '',
@@ -795,6 +835,35 @@ export function formatReport(report: Report, title: string): string {
       ]),
     ),
     '',
+    '## Profondeur',
+    '',
+    'SCI : part des parties qui la créent, années (médiane), biens qu’elle détient à la fin (médiane, sur ces parties) ; transformations par partie ; IFI : part des parties qui le paient au moins une fois, montant moyen par partie ; arrivée de la SCI Horizon Patrimoine.',
+    '',
+    table(
+      [
+        'Bot',
+        'SCI créée',
+        'Biens de la SCI',
+        'Transformations',
+        'IFI payé',
+        'IFI (partie)',
+        'Arrivée d’Horizon',
+      ],
+      summaries.map((s) => [
+        name(s),
+        s.depth.companyYears === null
+          ? '—'
+          : `${pct(s.depth.companyShare)} · ${num(s.depth.companyYears)} ans`,
+        num(s.depth.companyProperties),
+        num(s.depth.transformations),
+        pct(s.depth.wealthTaxShare),
+        money(s.depth.wealthTax),
+        s.depth.horizonYears === null
+          ? '—'
+          : `${pct(s.depth.horizonShare)} · ${num(s.depth.horizonYears)} ans`,
+      ]),
+    ),
+    '',
     '## Rythme et progression',
     '',
     'Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×4 quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).',
@@ -860,12 +929,10 @@ export function formatReport(report: Report, title: string): string {
     '## Rivaux',
     '',
     table(
-      ['Bot', ...gameContent.rivals.filter((r) => r.active).map((r) => `${r.name} (achats/an)`)],
+      ['Bot', ...rivalsShown.map((r) => `${r.name} (achats/an)`)],
       summaries.map((s) => [
         name(s),
-        ...gameContent.rivals
-          .filter((r) => r.active)
-          .map((r) => num(s.rivalPurchasesPerYear[r.id] ?? 0)),
+        ...rivalsShown.map((r) => num(s.rivalPurchasesPerYear[r.id] ?? 0)),
       ]),
     ),
     '',
