@@ -220,6 +220,31 @@ describe('capital gains', () => {
     );
   });
 
+  it('counts this year’s works of a property never let, or let furnished', () => {
+    const ledger = (category: 'bare' | 'furnished' | null) => ({
+      category,
+      regime: 'auto' as const,
+      company: false,
+      rents: 0,
+      costs: 0,
+      works: 20_000_00,
+      energyRenovation: false,
+      interest: 0,
+      sold: false,
+    });
+    const gainWith = (category: 'bare' | 'furnished' | null) => {
+      const { state, owned } = sellerAt(2028);
+      state.tax.ledgers[owned.property.id] = ledger(category);
+      return capitalGainsTax({ content, state }, owned, 120_000_00).gain;
+    };
+    const withWorks = 120_000_00 - (80_000_00 + 6_800_00 + 20_000_00);
+    // A marchand's flat, renovated and sold without a tenant: its works count.
+    expect(gainWith(null)).toBe(withWorks);
+    expect(gainWith('furnished')).toBe(withWorks);
+    // Bare: they are deducted from the rents at the review, not from the gain.
+    expect(gainWith('bare')).toBe(120_000_00 - (80_000_00 + 6_800_00));
+  });
+
   it('exempts the income tax after 22 years and everything after 30', () => {
     const at22 = sellerAt(2048);
     const t22 = capitalGainsTax({ content, state: at22.state }, at22.owned, 200_000_00);

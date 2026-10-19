@@ -612,8 +612,11 @@ export function capitalGainsTax(
   );
   // Real works (not deducted from the rents) replace the flat allowance when they are higher.
   const ledger = state.tax.ledgers[owned.property.id];
+  // Works of a property never let, or let furnished, were not deducted from the rents.
   const pending =
-    ledger?.category && taxCategory(content, ledger.category) !== 'bare' ? ledger.works : 0;
+    ledger && (!ledger.category || taxCategory(content, ledger.category) !== 'bare')
+      ? ledger.works
+      : 0;
   const flat = years >= rules.worksFlatMinYears ? Math.round(price * rules.worksFlatShare) : 0;
   const works = Math.max(flat, owned.worksForCapitalGains + pending);
   const base = price + fees + works - owned.furnishedTax.buildingDepreciationDeducted;
