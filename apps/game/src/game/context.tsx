@@ -26,7 +26,8 @@ export type Route =
   | { name: 'monthReview' }
   | { name: 'yearReview' }
   | { name: 'rewind' }
-  | { name: 'cities' };
+  | { name: 'cities' }
+  | { name: 'bank' };
 
 /** A screen the tutorial waits for (content/textes/didacticiel.json). */
 export type TrackedScreen = 'listings' | 'listing' | 'financing';

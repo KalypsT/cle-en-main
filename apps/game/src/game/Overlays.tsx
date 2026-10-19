@@ -2,7 +2,7 @@ import { gameContent } from '@cle/content';
 import { fromDayNumber } from '@cle/engine';
 import { type ReactNode, useId } from 'react';
 import { MonthlyReviewContent, YearReviewContent } from '../screens/ReviewScreens.tsx';
-import { format, formatEuros, formatGameDate, t } from '../texts.ts';
+import { format, formatDecimal, formatEuros, formatGameDate, t } from '../texts.ts';
 import { useGame } from './context.tsx';
 
 /** What may come over the game: the reviews, a title's celebration, a fresh start, the end. */
@@ -113,7 +113,7 @@ export function OverlayView({
           <p>
             {format(t.fresh.text, {
               savings: formatEuros(state.player.balance),
-              reputation: state.player.reputation,
+              reputation: formatDecimal(state.player.reputation),
             })}
           </p>
           <button type="button" className="button primary block" onClick={onClose}>

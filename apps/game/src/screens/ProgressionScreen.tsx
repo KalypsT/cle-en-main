@@ -37,7 +37,7 @@ function Titles() {
     <>
       <Card title={t.progression.reputation} testId="reputation">
         <p className="big-number">
-          {format(t.progression.reputationValue, { value: view.reputation })}
+          {format(t.progression.reputationValue, { value: formatDecimal(view.reputation) })}
         </p>
         <span className="meter" aria-hidden="true">
           <span style={{ width: `${view.reputation}%` }} />

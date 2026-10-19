@@ -55,7 +55,7 @@ import { remoteManagementFee } from './systems/cities.ts';
 import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
-import { createCompany, setPurchaseHolder } from './systems/company.ts';
+import { companySheet, createCompany, setPurchaseHolder } from './systems/company.ts';
 import { expireCrises } from './systems/crises.ts';
 import {
   runDailyTransformations,
@@ -87,6 +87,7 @@ import {
   changeManagement,
   furnitureCost,
   letBanDay,
+  leaseOptions,
   lettingBlock,
   listForRent,
   moveIntoHome,
@@ -101,6 +102,7 @@ import {
 import {
   capitalGainsTax,
   closeTaxYear,
+  companyAccountantFees,
   estimateRegimes,
   initialTaxState,
   recordStatement,
@@ -666,6 +668,24 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? transformationQuote(content, state, owned, kind) : null;
     },
+    /** Leases an owned property may have (kind, rooms, SCI), in the order of content. */
+    leaseOptions: (state: GameState, propertyId: string): LeaseType[] => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? leaseOptions(content, owned) : [];
+    },
+    /** The SCI's sheet: what it holds, owes and may still borrow (« Banque et SCI »). */
+    companySheet: (state: GameState) =>
+      companySheet(content, state, netWorth(content, state), companyAccountantFees(content, state)),
+    /** Every transformation of an owned property: its quote and value after, or why not. */
+    transformationOptions: (state: GameState, propertyId: string) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      if (!owned) return [];
+      const kinds: TransformationKind[] = ['splitBuilding', 'division', 'attic', 'construction'];
+      return kinds.map((kind) => ({
+        kind,
+        estimate: transformationEstimate(content, state, owned.property, kind),
+      }));
+    },
     /** A transformation's quote and the estimated value of what it produces, listed or owned. */
     transformationEstimate: (state: GameState, id: string, kind: TransformationKind) => {
       const property = findAnyProperty(state, id);
@@ -703,7 +723,10 @@ export function createEngine(content: GameContent) {
       }
       const purchase = state.purchases.find((candidate) => candidate.id === id);
       return purchase
-        ? simulateFinancing(content, state, purchase.property, purchase.price, input)
+        ? simulateFinancing(content, state, purchase.property, purchase.price, input, {
+            id: purchase.id,
+            holder: purchase.holder,
+          })
         : null;
     },
     /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */

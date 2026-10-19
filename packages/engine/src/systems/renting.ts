@@ -30,6 +30,7 @@ import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { addCost, addRent, ledgerOf } from './taxes.ts';
 import { drawTenant, visibleReliability } from './tenants.ts';
+import { LEASE_TYPES } from '../content-constants.ts';
 import { spendFreeTime } from './travel.ts';
 import { homeRent } from './cities.ts';
 
@@ -289,6 +290,16 @@ function endShortTerm(ctx: SystemContext, owned: OwnedProperty): void {
     reason: 'notice',
     damages: 0,
     depositReturned: 0,
+  });
+}
+
+/** Leases the property may have: its kind, its rooms, and the SCI's rules when it holds it. */
+export function leaseOptions(content: GameContent, owned: OwnedProperty): LeaseType[] {
+  return LEASE_TYPES.filter((leaseType) => {
+    const rules = content.renting.leaseTypes[leaseType];
+    if (!rules.kinds.includes(owned.property.kind)) return false;
+    if (owned.property.rooms < rules.minRooms) return false;
+    return owned.holder !== 'company' || content.company.leaseTypes.includes(leaseType);
   });
 }
 

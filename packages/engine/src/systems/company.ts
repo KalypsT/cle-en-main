@@ -84,3 +84,51 @@ export function potentialRent(
   );
   return marketRent(content, state, { ...believed, items }, 'bare');
 }
+
+/** The SCI as the « Banque et SCI » screen shows it (read-only). */
+export interface CompanySheet {
+  createdDay: number | null;
+  creationCost: Cents;
+  /** Properties it holds, their rents and the loans' payments, per month. */
+  properties: number;
+  monthlyRent: Cents;
+  monthlyPayments: Cents;
+  debt: Cents;
+  /** Most its debts may reach (a multiple of the player's net worth), and what is left. */
+  ceiling: Cents;
+  headroom: Cents;
+  /** Yearly fees of its accountant. */
+  accountantFees: Cents;
+  /** Rules of its loans: rent share counted, contributions asked. */
+  rentCoverageShare: number;
+  feesContributionShare: number;
+  extraContributionShare: number;
+}
+
+export function companySheet(
+  content: GameContent,
+  state: GameState,
+  netWorth: Cents,
+  accountantFees: Cents,
+): CompanySheet {
+  const held = state.properties.filter((owned) => owned.holder === 'company');
+  const ids = new Set(held.map((owned) => owned.property.id));
+  const loans = state.loans.filter((loan) => loan.propertyId !== null && ids.has(loan.propertyId));
+  const debt = loans.reduce((sum, loan) => sum + loan.remaining, 0);
+  const rules = content.company.credit;
+  const ceiling = Math.round(rules.maxLeverage * Math.max(0, netWorth));
+  return {
+    createdDay: state.company?.createdDay ?? null,
+    creationCost: toCents(content.company.creationCost),
+    properties: held.length,
+    monthlyRent: held.reduce((sum, owned) => sum + (owned.lease?.monthlyRent ?? 0), 0),
+    monthlyPayments: loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0),
+    debt,
+    ceiling,
+    headroom: Math.max(0, ceiling - debt),
+    accountantFees,
+    rentCoverageShare: rules.rentCoverageShare,
+    feesContributionShare: rules.feesContributionShare,
+    extraContributionShare: rules.extraContributionShare,
+  };
+}

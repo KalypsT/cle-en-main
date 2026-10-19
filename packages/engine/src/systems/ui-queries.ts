@@ -10,7 +10,7 @@ import {
 } from '../content.ts';
 import { annuityPayment, type Cents } from '../money.ts';
 import { hashFloat } from '../random.ts';
-import type { GameState, OwnedProperty, Property } from '../state.ts';
+import type { GameState, Holder, OwnedProperty, Property } from '../state.ts';
 import {
   evaluateLoan,
   type LoanDecision,
@@ -405,13 +405,22 @@ export function simulateFinancing(
   property: Property,
   askingPrice: Cents,
   input: FinancingInput,
+  /** The listing or purchase financed, and its buyer (the SCI's bank counts its rent). */
+  target: { id: string; holder: Holder } | null = null,
 ): FinancingSimulation | null {
   const bank = findBank(content, input.bankId);
   if (!bank) return null;
   const price = input.price ?? askingPrice;
   const works = Math.max(0, input.works ?? 0);
   const fees = purchaseFees({ content }, price, true);
-  const minContribution = requiredContribution(content, price);
+  const sci = content.company.credit;
+  const minContribution =
+    target?.holder === 'company'
+      ? Math.round(
+          requiredContribution(content, price) * sci.feesContributionShare +
+            price * sci.extraContributionShare,
+        )
+      : requiredContribution(content, price);
   const total = price + works + fees.notary + fees.bank;
   const contribution =
     input.amount !== undefined
@@ -436,6 +445,7 @@ export function simulateFinancing(
     price,
     works,
     contribution,
+    ...(target ? { holder: target.holder, propertyId: target.id } : {}),
   });
   return {
     price,

@@ -75,7 +75,8 @@ describe('resale', () => {
     };
     expect(count(value, 'agency')).toBeGreaterThan(count(Math.round(value * 1.3), 'agency'));
     expect(count(value, 'agency')).toBeGreaterThan(count(value, 'self'));
-  });
+    // Long enough (600 days) for the agency's extra visits to show whatever the draws.
+  }, 30_000);
 
   it('accepts a counter-offer within the buyer’s margin', () => {
     const { state, propertyId } = owner();

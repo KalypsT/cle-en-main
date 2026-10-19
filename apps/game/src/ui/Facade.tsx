@@ -31,13 +31,16 @@ export function Facade({
   const { state } = useGame();
   const place = engine.building(state, property.id);
   const building = place?.building;
+  if (property.kind === 'land' || property.kind === 'parking') {
+    return <PlotFacade property={property} owned={owned} height={height} />;
+  }
   const spec = facadeSpec({
     id: property.id,
     cityId: property.cityId,
     kind: property.kind,
     epoch: property.epoch,
     floors: building?.floors ?? (property.kind === 'house' ? 2 : 4),
-    shop: building?.shop ?? false,
+    shop: property.kind === 'commercial' || (building?.shop ?? false),
     variant: building?.variant ?? pickIndex(property.id, 1, 1000) / 1000,
     facadeState: building?.facadeState ?? 3.5,
     newWindows: building?.newWindows ?? false,
@@ -70,10 +73,71 @@ export function Facade({
   );
 }
 
+/** A plot of land waiting for its house, or a closed parking box (milestone 8). */
+function PlotFacade({
+  property,
+  owned,
+  height,
+}: {
+  property: Property;
+  owned: boolean;
+  height: number;
+}) {
+  const viewHeight = 150;
+  const ground = viewHeight - 14;
+  const accent = owned ? 'var(--teal)' : '#8b7355';
+  return (
+    <svg
+      className="facade"
+      viewBox={`0 0 320 ${viewHeight}`}
+      style={{ maxHeight: height }}
+      aria-hidden="true"
+    >
+      <rect width="320" height={viewHeight} fill="var(--sky, #dfe9ee)" />
+      <rect y={ground} width="320" height="14" fill="var(--pavement, #cfc8b8)" />
+      {property.kind === 'land' ? (
+        <>
+          <rect x="60" y={ground - 10} width="200" height="10" fill="#9cbf7a" />
+          <circle cx="90" cy={ground - 34} r="18" fill="#b9d3b0" />
+          <rect x="88" y={ground - 20} width="4" height="12" fill="#8b7355" />
+          <rect x="200" y={ground - 48} width="4" height="40" fill={accent} />
+          <rect x="176" y={ground - 66} width="52" height="22" rx="3" fill="#f4e7c6" />
+        </>
+      ) : (
+        <>
+          <rect x="110" y={ground - 50} width="100" height="50" fill={accent} />
+          <rect x="106" y={ground - 56} width="108" height="8" fill="#6b6f76" />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <rect key={i} x="120" y={ground - 42 + i * 8} width="80" height="5" fill="#d9d4c7" />
+          ))}
+        </>
+      )}
+    </svg>
+  );
+}
+
 /** Small picture for list rows. */
 export function KindThumb({ property, owned = false }: { property: Property; owned?: boolean }) {
   const wall = owned ? '#0f6f68' : WALLS[pickIndex(property.id, 1, WALLS.length)];
   const roof = ROOFS[pickIndex(property.id, 3, ROOFS.length)];
+  if (property.kind === 'land' || property.kind === 'parking') {
+    return (
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        {property.kind === 'land' ? (
+          <>
+            <rect x="4" y="28" width="32" height="6" fill="#9cbf7a" />
+            <rect x="24" y="12" width="2" height="16" fill={wall} />
+            <rect x="18" y="8" width="14" height="7" fill="#f4e7c6" />
+          </>
+        ) : (
+          <>
+            <rect x="8" y="14" width="24" height="20" fill={wall} />
+            <rect x="11" y="18" width="18" height="16" fill="#d9d4c7" />
+          </>
+        )}
+      </svg>
+    );
+  }
   if (property.kind === 'house') {
     return (
       <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">

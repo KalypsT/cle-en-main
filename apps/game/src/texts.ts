@@ -177,7 +177,11 @@ export function propertyShortLabel(property: Property): string {
   if (property.kind === 'building') {
     return format(t.listing.lots, { count: property.lots.length });
   }
-  return `${t.listings.kindShort.house} ${format(t.common.rooms, { rooms: property.rooms })}`;
+  if (property.kind === 'house') {
+    return `${t.listings.kindShort.house} ${format(t.common.rooms, { rooms: property.rooms })}`;
+  }
+  // A shop, a parking space or a plot: its kind and its area.
+  return `${t.listings.kindShort[property.kind]} ${format(t.common.surface, { surface: property.surface })}`;
 }
 
 /** « T2 · Centre historique ». */
