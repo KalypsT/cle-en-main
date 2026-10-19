@@ -117,7 +117,7 @@
     "shops": [
       "Boulangerie",
       "Pharmacie",
-      "Café du Doubs",
+      "Café de la Place",
       "Fleuriste",
       "Librairie",
       "Primeur",
@@ -126,7 +126,7 @@
       "Boucherie",
       "Coiffure",
       "Opticien",
-      "Comtoise d'assurances"
+      "Mutuelle de proximité"
     ],
     "bubbles": {
       "forSale": "À vendre",
@@ -163,7 +163,9 @@
       "winter": "hiver"
     },
     "fallback": "L'animation de la rue n'est pas disponible sur cet appareil : voici une vue simplifiée.",
-    "fps": "{fps} img/s · {p95} ms · {renderer} · qualité {quality}"
+    "fps": "{fps} img/s · {p95} ms · {renderer} · qualité {quality}",
+    "cityChip": "{city}",
+    "subtitleIn": "{job} · à {city}"
   },
   "listings": {
     "heading": "Annonces à {city}",
@@ -252,7 +254,9 @@
       "from1989to2005": "1989-2005",
       "from2006to2012": "2006-2012",
       "after2012": "après 2012"
-    }
+    },
+    "visitTrip": "Visiter · {duration} + trajet {trip} ({cost})",
+    "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)"
   },
   "financing": {
     "heading": "Financement simulé",
@@ -429,7 +433,7 @@
       "recoverableCharges": "Charges récupérées",
       "charges": "Charges de copropriété",
       "insurance": "Assurances",
-      "managementFees": "Frais d'agence",
+      "managementFees": "Frais d'agence ou de gestion à distance",
       "coproCalls": "Appels de fonds",
       "propertyTax": "Taxe foncière (lissée)",
       "loanPayment": "Mensualité",
@@ -794,7 +798,10 @@
     "later": "Reporter d'un jour",
     "cancel": "Annuler",
     "moved": "Action reportée.",
-    "cancelled": "Action annulée."
+    "cancelled": "Action annulée.",
+    "inCity": "{label} · {city}",
+    "trip": "Trajet à {city} : {duration} (une seule fois pour la journée)",
+    "tripLabel": "Journée à {city}"
   },
   "review": {
     "monthHeading": "Bilan au {date}",
@@ -861,5 +868,47 @@
     "text": "Faillite en mode Exigeant : la partie s'arrête le {date}. Votre chronique et vos statistiques restent consultables.",
     "chronicle": "Voir la chronique",
     "quit": "Retour à l'écran titre"
+  },
+  "cities": {
+    "heading": "Villes",
+    "intro": "Toutes les villes sont ouvertes dès le départ : la distance fait le tri. Chaque déplacement coûte du temps et un peu d'argent, une seule fois par jour et par ville.",
+    "mapLabel": "Carte de la région",
+    "base": "Votre base",
+    "youAreHere": "Vous habitez ici",
+    "trip": "Trajet depuis {base}",
+    "tripValue": "{duration} aller-retour · {cost}",
+    "noTrip": "Sur place",
+    "apartmentPrice": "Appartement",
+    "housePrice": "Maison",
+    "rent": "Loyer",
+    "yield": "Rendement brut",
+    "trend": "Tendance",
+    "perM2": "{amount} / m²",
+    "perYear": "{percent} / an",
+    "sales": "Marché",
+    "salesValue": "{sales} ventes par an · {listings} annonce(s) en ligne",
+    "renown": "Notoriété locale",
+    "renownValue": "{value} / 100",
+    "renownHint": "Elle part de zéro dans chaque ville. Agents et artisans locaux la remarquent.",
+    "owned": "Vos biens",
+    "ownedValue": "{count} bien(s)",
+    "remote": "Gestion à distance",
+    "remoteValue": "{amount} / mois par bien géré sans agence",
+    "remoteNone": "Aucun frais : c'est votre ville",
+    "artisans": "Artisans connus",
+    "artisansValue": "{count}",
+    "worksIndex": "Prix des travaux",
+    "worksIndexValue": "{percent} du prix de référence",
+    "seeStreet": "Voir la rue",
+    "seeListings": "Voir les annonces",
+    "move": "Déménager ici",
+    "moveTitle": "Déménager à {city} ?",
+    "moveText": "Votre résidence principale devient un logement loué à {city} ({rent} par mois). Le déménagement coûte {cost}. Les trajets se comptent désormais depuis {city} : {previous} devient une ville éloignée. On ne déménage pas plus d'une fois tous les {months} mois.",
+    "moveConfirm": "Déménager",
+    "moveCancel": "Rester",
+    "moved": "Vous voilà à {city}.",
+    "viewing": "Vous regardez {city}",
+    "switch": "Changer de ville",
+    "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN."
   }
 }

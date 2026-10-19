@@ -42,6 +42,22 @@ describe('bots', () => {
     }
   }, 60_000);
 
+  it('the hunter who expands travels only once it owns a property, and plays deterministically', () => {
+    const years = { ...options, days: 365 * 3 };
+    const result = playGame(createStrategy('chasseurDijon'), years);
+    expect(result.bankruptDay).toBeNull();
+    expect(result.finalCities).toBe(Object.keys(result.finalPropertiesByCity).length);
+    expect(Object.values(result.finalPropertiesByCity).reduce((a, b) => a + b, 0)).toBe(
+      result.finalProperties,
+    );
+    // Trips cost time and money, and are all counted.
+    expect(result.tripCost).toBeGreaterThanOrEqual(0);
+    expect(result.trips > 0).toBe(result.tripMinutes > 0);
+    expect(playGame(createStrategy('chasseurDijon'), years)).toEqual(result);
+    // The sedentary hunter never leaves his base.
+    expect(playGame(createStrategy('chasseur'), years).trips).toBe(0);
+  }, 60_000);
+
   it('the naive bot offers without visiting', () => {
     const result = playGame(createStrategy('naif'), options);
     expect(result.visits).toBe(0);

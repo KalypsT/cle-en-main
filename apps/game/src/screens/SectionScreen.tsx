@@ -1,4 +1,3 @@
-import { gameContent } from '@cle/content';
 import type { Property, SectionRoom, SectionUnit, SpaceKind } from '@cle/engine';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -259,7 +258,7 @@ export function SectionScreen({
 }) {
   const { state } = useGame();
   const nav = useNav();
-  const cityId = gameContent.start.cityId;
+  const cityId = nav.cityId;
   const section = engine.section(state, cityId, neighbourhoodId, buildingId);
   const ambience = engine.ambience(state, cityId);
   const street = engine

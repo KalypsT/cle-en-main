@@ -1,6 +1,6 @@
 import { findBank } from '../content.ts';
 import type { Cents } from '../money.ts';
-import type { Listing, LoanApplication, Purchase } from '../state.ts';
+import type { Defect, Listing, LoanApplication, Purchase } from '../state.ts';
 import {
   evaluateLoan,
   grantLoan,
@@ -52,7 +52,7 @@ export function signCompromis(ctx: SystemContext, listing: Listing, price: Cents
   const purchase: Purchase = {
     id: `purchase-${state.nextId++}`,
     listingId: listing.id,
-    property: listing.property,
+    property: { ...listing.property },
     price,
     deposit,
     signedDay: ctx.today,
@@ -254,7 +254,9 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
   const envelope = worksEnvelope(purchase);
   state.player.balance -= purchase.price + fees.notary + fees.bank - purchase.deposit + envelope;
   const discovered = purchase.property.defects.filter((d) => !d.revealed).map((d) => d.id);
-  for (const defect of purchase.property.defects) defect.revealed = true;
+  purchase.property.defects = Object.freeze(
+    purchase.property.defects.map((defect) => Object.freeze({ ...defect, revealed: true })),
+  ) as Defect[];
   // The new owner sees every item.
   const discoveredItems = purchase.property.items.filter((item) => !item.known).map(itemId);
   purchase.property.items = purchase.property.items.map((item) =>

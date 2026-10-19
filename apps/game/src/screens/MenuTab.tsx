@@ -16,7 +16,7 @@ export function MenuTab() {
   const { save, exportGame, quit } = useGame();
   const nav = useNav();
   const entries: Entry[] = [
-    { label: t.menu.cities, icon: 'globe', later: true },
+    { label: t.menu.cities, icon: 'globe', route: { name: 'cities' } },
     { label: t.menu.agenda, icon: 'calendar', route: { name: 'agenda' } },
     { label: t.menu.statement, icon: 'euro', route: { name: 'monthReview' } },
     { label: t.menu.yearReview, icon: 'book', route: { name: 'yearReview' } },

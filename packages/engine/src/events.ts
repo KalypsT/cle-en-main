@@ -20,6 +20,8 @@ export type StatementLine =
   | { kind: 'taxRefund'; amount: Cents }
   | { kind: 'livingCosts'; amount: Cents }
   | { kind: 'loanPayment'; loanId: string; amount: Cents; interest: Cents; capital: Cents }
+  /** Monthly fee for a property of another city managed without an agency. */
+  | { kind: 'remoteManagement'; propertyId: string; amount: Cents }
   | { kind: 'overdraftInterest'; amount: Cents };
 
 /**
@@ -138,6 +140,7 @@ export type GameEvent =
   | {
       type: 'propertySold';
       propertyId: string;
+      cityId: string;
       price: Cents;
       agencyFees: Cents;
       loanRepaid: Cents;
@@ -261,6 +264,7 @@ export type GameEvent =
   | {
       type: 'forcedSale';
       propertyId: string;
+      cityId: string;
       price: Cents;
       loanRepaid: Cents;
       loanFees: Cents;
@@ -274,6 +278,11 @@ export type GameEvent =
   | { type: 'gameOver' }
   // Progression (docs/02, sections 2.8 to 2.10).
   | { type: 'reputationChanged'; delta: number; reputation: number }
+  /** Local renown of a city moved (docs/02, section 2.8). */
+  | { type: 'renownChanged'; cityId: string; delta: number; renown: number }
+  // Cities and trips (docs/03-systemes/08).
+  | { type: 'tripMade'; cityId: string; minutes: number; cost: Cents }
+  | { type: 'movedCity'; fromCityId: string; cityId: string; monthlyRent: Cents; cost: Cents }
   | { type: 'titleEarned'; titleId: string }
   | { type: 'achievementEarned'; achievementId: string }
   | { type: 'challengeOffered'; challengeId: string; deadlineDay: number }

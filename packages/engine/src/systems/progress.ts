@@ -11,6 +11,7 @@ import { netWorth } from './net-worth.ts';
 import { changeReputation } from './reputation.ts';
 import { interest } from './rivals.ts';
 import { isIndecent } from './dwelling.ts';
+import { changeRenown } from './cities.ts';
 
 const DAYS_PER_YEAR = 365;
 const PASSOIRES = new Set(['E', 'F', 'G']);
@@ -116,6 +117,9 @@ function firstTime(ctx: SystemContext, stat: Stat, kind: ChronicleKind, amount: 
   if ((ctx.state.progress.counters[stat] ?? 0) === 1) addChronicle(ctx, kind, null, amount);
 }
 
+const cityOf = (state: GameState, propertyId: string): string | undefined =>
+  state.properties.find((o) => o.property.id === propertyId)?.property.cityId;
+
 const dpeRank = (label: string) => DPE_LABELS.indexOf(label as (typeof DPE_LABELS)[number]);
 
 /**
@@ -131,8 +135,8 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
     switch (event.type) {
       case 'deedSigned': {
         bump(state, 'purchases');
-        changeReputation(ctx, gains.purchase);
         const owned = state.properties.find((o) => o.property.id === event.propertyId);
+        changeReputation(ctx, gains.purchase, owned?.property.cityId);
         if (owned) {
           const { estimate } = estimateValue(content, state, owned.property, true);
           if (event.price <= estimate * (1 - rules.bargainShare)) bump(state, 'bargainPurchases');
@@ -158,7 +162,7 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
         bump(state, 'sales');
         if (event.gain > 0) {
           bump(state, 'salesWithGain');
-          changeReputation(ctx, gains.saleWithGain);
+          changeReputation(ctx, gains.saleWithGain, event.cityId);
         }
         firstTime(ctx, 'sales', 'firstSale', event.gain);
         if (event.gain > progress.records.bestCapitalGain) {
@@ -169,7 +173,7 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
         break;
       case 'forcedSale':
         bump(state, 'forcedSales');
-        changeReputation(ctx, gains.forcedSale);
+        changeReputation(ctx, gains.forcedSale, event.cityId);
         progress.troubledYear = true;
         addChronicle(ctx, 'forcedSale', null, event.price);
         break;
@@ -183,7 +187,11 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
         if (PASSOIRES.has(event.dpeBefore) && !PASSOIRES.has(event.dpeAfter)) {
           bump(state, 'passoiresFixed');
         }
-        changeReputation(ctx, gains.worksDone + gains.dpeClassGained * gained);
+        changeReputation(
+          ctx,
+          gains.worksDone + gains.dpeClassGained * gained,
+          cityOf(state, event.propertyId),
+        );
         firstTime(ctx, 'worksDone', 'firstWorks', event.cost);
         if (event.cost > progress.records.biggestWorks) progress.records.biggestWorks = event.cost;
         break;
@@ -199,17 +207,19 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
         bump(state, 'incidentsRepaired');
         break;
       case 'tenantGaveNotice':
-        if (event.reason === 'incident') changeReputation(ctx, gains.tenantConflict);
+        if (event.reason === 'incident') {
+          changeReputation(ctx, gains.tenantConflict, cityOf(state, event.propertyId));
+        }
         break;
       case 'procedureStarted':
         bump(state, 'procedures');
-        changeReputation(ctx, gains.procedure);
+        changeReputation(ctx, gains.procedure, cityOf(state, event.propertyId));
         progress.troubledYear = true;
         break;
       case 'tenantLeft':
         if (event.reason === 'evicted') {
           bump(state, 'evictions');
-          changeReputation(ctx, gains.eviction);
+          changeReputation(ctx, gains.eviction, cityOf(state, event.propertyId));
           progress.troubledYear = true;
         }
         break;
@@ -267,15 +277,18 @@ export function runYearlyProgress(ctx: SystemContext): void {
     const lease = owned.lease;
     if (!lease) continue;
     if (isIndecent(content, owned.property)) {
-      changeReputation(ctx, gains.indecentLet);
+      changeReputation(ctx, gains.indecentLet, owned.property.cityId);
       state.progress.troubledYear = true;
     } else if (lease.satisfaction >= gains.happyTenantMin) {
-      changeReputation(ctx, gains.happyTenant);
+      changeReputation(ctx, gains.happyTenant, owned.property.cityId);
     }
   }
   if (state.properties.length > 0 && !state.progress.troubledYear) {
     bump(state, 'quietYears');
     changeReputation(ctx, gains.quietYear);
+    for (const cityId of new Set(state.properties.map((o) => o.property.cityId))) {
+      changeRenown(ctx, cityId, gains.quietYear);
+    }
   }
   state.progress.troubledYear = false;
 }

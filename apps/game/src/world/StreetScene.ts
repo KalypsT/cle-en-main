@@ -6,6 +6,7 @@ import {
   drawLamp,
   drawPlanter,
   drawSkyline,
+  landmarkOf,
   drawTerrace,
   drawTree,
   drawVan,
@@ -60,7 +61,8 @@ export interface SceneData {
   /** Shop signs and the agency panel's text (content/textes/ecrans.json). */
   shopNames: readonly string[];
   forSaleText: string;
-  /** Neighbourhood id: the historic centre shows the Collégiale's bell tower. */
+  /** City and neighbourhood: the old centre shows its landmark (the Collégiale in Dole…). */
+  cityId: string;
   neighbourhoodId: string;
   /** Stable seed of the decoration (the game's seed). */
   seed: number;
@@ -356,7 +358,7 @@ export class StreetScene {
       this.skyline,
       data.layout.width + 400,
       data.seed,
-      data.neighbourhoodId === 'centreHistorique',
+      landmarkOf(data.cityId, data.neighbourhoodId),
     );
     this.skyline.x = -200;
     this.drawSkyDecor();

@@ -1,10 +1,15 @@
 import type { GameContent } from '../content.ts';
 import type { GameState } from '../state.ts';
+import { changeRenown } from './cities.ts';
 import type { SystemContext } from './context.ts';
 
-/** Changes the global reputation, kept between 0 and 100 (docs/02, section 2.8). */
-export function changeReputation(ctx: SystemContext, delta: number): void {
+/**
+ * Changes the global reputation, kept between 0 and 100 (docs/02, section 2.8). With a
+ * `cityId`, the renown of that city moves too (what happened there is known there).
+ */
+export function changeReputation(ctx: SystemContext, delta: number, cityId?: string): void {
   if (delta === 0) return;
+  if (cityId !== undefined) changeRenown(ctx, cityId, delta);
   const { player } = ctx.state;
   const reputation = Math.max(0, Math.min(100, player.reputation + delta));
   if (reputation === player.reputation) return;

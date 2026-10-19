@@ -75,6 +75,28 @@ export interface BotSummary {
     /** Share of games earning each title, and the median years over those that do. */
     titles: Record<string, { share: number; years: number | null }>;
   };
+  /** Cities (milestone 7): trips, remote deeds and the number of cities held. */
+  cities: {
+    /** Share of games with at least one deed outside the base city. */
+    remoteBuyerShare: number;
+    /** Months to the first remote deed, over the games that had one (median). */
+    firstRemoteMonths: number | null;
+    /** Deeds outside the base city, per game. */
+    remotePurchases: number;
+    /** Per game and year: trips, hours on the road, cost and remote management fees (euros). */
+    tripsPerYear: number;
+    tripHoursPerYear: number;
+    tripCostPerYear: number;
+    remoteFeesPerYear: number;
+    /** Share of games ending with properties in two cities or more, and the median number. */
+    twoCitiesShare: number;
+    medianCities: number;
+    /** Median final local renown, by city. */
+    medianRenown: Record<string, number>;
+    /** Among the games with a remote deed: hours on the road per year, and median final net worth. */
+    buyersTripHoursPerYear: number;
+    buyersNetWorth: number | null;
+  };
   works: {
     /** Means per game. */
     projects: number;
@@ -182,6 +204,7 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
     byJob,
     renting: rentingSummary(games),
     rhythm: rhythmSummary(games),
+    cities: citiesSummary(games),
     works: {
       projects: mean(games.map((g) => g.worksProjects)),
       cost: mean(games.map((g) => g.worksCost)),
@@ -200,6 +223,35 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
           games.reduce((sum, g) => sum + g.finalProperties, 0),
         ),
     },
+  };
+}
+
+function citiesSummary(games: GameMetrics[]): BotSummary['cities'] {
+  const gameYears = (game: GameMetrics) => Math.max(1, game.days / DAYS_PER_YEAR);
+  const perYear = (pick: (game: GameMetrics) => number) =>
+    mean(games.map((game) => pick(game) / gameYears(game)));
+  const remote = games.filter((game) => game.firstRemotePurchaseDay !== null);
+  const cityIds = Object.keys(gameContent.cities);
+  return {
+    remoteBuyerShare: remote.length / Math.max(1, games.length),
+    firstRemoteMonths:
+      remote.length > 0
+        ? median(remote.map((game) => (game.firstRemotePurchaseDay ?? 0) / DAYS_PER_MONTH))
+        : null,
+    remotePurchases: mean(games.map((game) => game.remotePurchases)),
+    tripsPerYear: perYear((game) => game.trips),
+    tripHoursPerYear: perYear((game) => game.tripMinutes / 60),
+    tripCostPerYear: perYear((game) => game.tripCost),
+    remoteFeesPerYear: perYear((game) => game.remoteFees),
+    twoCitiesShare: share(games.map((game) => game.finalCities >= 2)),
+    medianCities: median(games.map((game) => game.finalCities)),
+    medianRenown: Object.fromEntries(
+      cityIds.map((cityId) => [cityId, median(games.map((game) => game.finalRenown[cityId] ?? 0))]),
+    ),
+    buyersTripHoursPerYear: mean(
+      remote.map((game) => game.tripMinutes / 60 / Math.max(1, game.days / DAYS_PER_YEAR)),
+    ),
+    buyersNetWorth: remote.length > 0 ? median(remote.map((game) => game.finalNetWorth)) : null,
   };
 }
 
@@ -295,6 +347,51 @@ const money = (value: number) => moneyFormat.format(value);
 /** The savings of a do-nothing player at the best saving rate of docs/03-systemes/01. */
 const INACTIVE_CEILING_MONTHLY_SAVINGS = 250;
 
+/**
+ * Milestone 7 (docs/09): « une expansion à Dijon est viable mais demande un vrai effort ».
+ * Viable: the Chasseur who also buys in Dijon ends about as rich as the one who stays in Dole,
+ * without more bankruptcies. Effort: it takes years to afford a first property there, and most
+ * games never get to one. Besançon and Chalon-sur-Saône are shown for comparison.
+ */
+function cityChecks(get: (id: BotId) => BotSummary | undefined, last: number): TargetCheck[] {
+  const list: TargetCheck[] = [];
+  const hunter = get('chasseur');
+  const dijon = get('chasseurDijon');
+  if (hunter && dijon) {
+    const ours = dijon.netWorth.p50[last] ?? 0;
+    const base = hunter.netWorth.p50[last] ?? 0;
+    list.push({
+      label: 'Une expansion à Dijon est viable',
+      target:
+        'médiane à 10 ans du Chasseur à Dijon d’au moins 90 % de celle du Chasseur, et pas plus de 3 points de faillites en plus',
+      measured: `${money(ours)} contre ${money(base)} (${pct(ours / Math.max(1, base))}) ; faillites ${pct(dijon.bankruptShare)} contre ${pct(hunter.bankruptShare)}`,
+      ok: ours >= 0.9 * base && dijon.bankruptShare <= hunter.bankruptShare + 0.03,
+    });
+    const months = dijon.cities.firstRemoteMonths;
+    list.push({
+      label: 'Une expansion à Dijon demande un vrai effort',
+      target:
+        'premier achat à Dijon après plus de 24 mois (médiane), et moins de la moitié des parties y achètent en 10 ans',
+      measured:
+        months === null
+          ? 'aucun achat à Dijon'
+          : `${num(months)} mois ; ${pct(dijon.cities.remoteBuyerShare)} des parties y achètent ; ${num(dijon.cities.buyersTripHoursPerYear)} h de route par an pour celles-ci`,
+      ok: months !== null && months > 24 && dijon.cities.remoteBuyerShare < 0.5,
+    });
+  }
+  for (const id of ['chasseurBesancon', 'chasseurChalon'] as const) {
+    const s = get(id);
+    if (!s || !hunter) continue;
+    list.push({
+      label: `Expansion (${BOT_NAMES[id]})`,
+      target: 'information : comparée au Chasseur',
+      measured: `médiane ${money(s.netWorth.p50[last] ?? 0)} contre ${money(hunter.netWorth.p50[last] ?? 0)} ; ${pct(s.cities.remoteBuyerShare)} des parties y achètent (premier achat ${s.cities.firstRemoteMonths === null ? '—' : `${num(s.cities.firstRemoteMonths)} mois`}) ; faillites ${pct(s.bankruptShare)}`,
+      ok: null,
+    });
+  }
+  return list;
+}
+
 function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[] {
   const list: TargetCheck[] = [];
   const get = (id: BotId) => summaries.get(id);
@@ -321,11 +418,21 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
       measured: `${num(s.bailleurYears)} ans (atteint dans ${pct(s.bailleurShare)} des parties)`,
       ok: graded ? s.bailleurYears >= 2 && s.bailleurYears <= 4 : null,
     });
+    // The title asks for properties in two cities: only an expanding bot can earn it.
     list.push({
       label: `Titre Investisseur aguerri (${BOT_NAMES[id]})`,
-      target: '6 à 10 ans (sans la condition des 2 villes)',
+      target: '6 à 10 ans (demande aussi 2 villes : jugé sur le Chasseur à Dijon)',
       measured: `${num(s.seasonedYears)} ans (atteint dans ${pct(s.seasonedShare)} des parties)`,
-      ok: graded ? s.seasonedYears >= 6 && s.seasonedYears <= 10 : null,
+      ok: null,
+    });
+  }
+  const dijonHunter = get('chasseurDijon');
+  if (dijonHunter) {
+    list.push({
+      label: 'Titre Investisseur aguerri (Chasseur à Dijon)',
+      target: '6 à 10 ans (patrimoine de 250 k€ et 2 villes)',
+      measured: `${num(dijonHunter.seasonedYears)} ans (atteint dans ${pct(dijonHunter.seasonedShare)} des parties)`,
+      ok: dijonHunter.seasonedYears >= 6 && dijonHunter.seasonedYears <= 10,
     });
   }
   // Docs/08, 8.1: one interesting decision every 30 to 60 real seconds at ×1, for every job.
@@ -342,6 +449,7 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
       ok: low >= 30 && high <= 60,
     });
   }
+  list.push(...cityChecks(get, last));
   const prudent = get('prudent');
   if (prudent) {
     list.push({
@@ -466,6 +574,14 @@ function table(header: string[], rows: string[][]): string {
   ].join('\n');
 }
 
+/** « 1000 parties », or « de 300 à 1000 parties » when the bots did not play as many. */
+function gamesLabel(summaries: readonly BotSummary[]): string {
+  const counts = summaries.map((s) => s.games);
+  const low = Math.min(...counts);
+  const high = Math.max(...counts);
+  return low === high ? `${high} parties` : `De ${low} à ${high} parties`;
+}
+
 export function formatReport(report: Report, title: string): string {
   const { summaries, years } = report;
   const last = years - 1;
@@ -474,7 +590,7 @@ export function formatReport(report: Report, title: string): string {
   const lines = [
     `# ${title}`,
     '',
-    `${report.games} parties de ${years} ans par bot, mêmes graines et mêmes métiers pour chaque bot (les 7 métiers à tour de rôle sauf mention contraire). Les repères de la section 8.1 (« joueur raisonnable ») sont jugés sur le Chasseur ; ceux du Prudent sont donnés pour information.`,
+    `${gamesLabel(summaries)} de ${years} ans par bot, mêmes graines et mêmes métiers pour chaque bot (les 7 métiers à tour de rôle sauf mention contraire). Les repères de la section 8.1 (« joueur raisonnable ») sont jugés sur le Chasseur ; ceux du Prudent sont donnés pour information.`,
     '',
     '## Cibles',
     '',
@@ -576,6 +692,39 @@ export function formatReport(report: Report, title: string): string {
         money(s.renting.capitalGainsTax),
         pct(s.renting.realRegimeShare),
         pct(s.renting.furnishedShare),
+      ]),
+    ),
+    '',
+    '## Villes',
+    '',
+    'Moyennes par partie et par an de jeu : trajets, heures de route, frais de déplacement et de gestion à distance ; achats hors de la ville de base ; part des parties qui finissent avec des biens dans au moins deux villes ; notoriété locale finale (médiane).',
+    '',
+    table(
+      [
+        'Bot',
+        'Achètent hors de la base',
+        '1er achat éloigné (mois)',
+        'Achats éloignés/partie',
+        'Trajets/an',
+        'Heures de route/an',
+        'Déplacements/an',
+        'Gestion à distance/an',
+        'Biens dans 2 villes ou plus',
+        ...Object.keys(gameContent.cities).map(
+          (cityId) => `Notoriété ${gameContent.cities[cityId]?.name ?? cityId}`,
+        ),
+      ],
+      summaries.map((s) => [
+        name(s),
+        pct(s.cities.remoteBuyerShare),
+        s.cities.firstRemoteMonths === null ? '—' : num(s.cities.firstRemoteMonths),
+        num(s.cities.remotePurchases),
+        num(s.cities.tripsPerYear),
+        num(s.cities.tripHoursPerYear),
+        money(s.cities.tripCostPerYear),
+        money(s.cities.remoteFeesPerYear),
+        pct(s.cities.twoCitiesShare),
+        ...Object.keys(gameContent.cities).map((cityId) => num(s.cities.medianRenown[cityId] ?? 0)),
       ]),
     ),
     '',

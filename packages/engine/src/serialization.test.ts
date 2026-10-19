@@ -6,6 +6,7 @@ import v4Save from '../test/fixtures/save-v4-milestone-1c.json' with { type: 'js
 import v5Save from '../test/fixtures/save-v5-milestone-2.json' with { type: 'json' };
 import v6Save from '../test/fixtures/save-v6-milestone-3.json' with { type: 'json' };
 import v7Save from '../test/fixtures/save-v7-milestone-5.json' with { type: 'json' };
+import v8Save from '../test/fixtures/save-v8-milestone-6.json' with { type: 'json' };
 import { advanceToNextMonth, content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -283,5 +284,41 @@ describe('migrations', () => {
     expect(later.progress.achievements.map((a) => a.id)).toContain('firstStone');
     // A v8 save round-trips.
     expect(engine.loadGame(serializeGame(later))).toEqual(later);
+  });
+  it('upgrades a milestone 6 save (version 8): base city, renown, trips and the new cities', () => {
+    const v8 = JSON.stringify(v8Save);
+    const original = JSON.parse(v8) as {
+      player: { balance: number };
+      properties: { property: { cityId: string } }[];
+      market: { cities: Record<string, unknown> };
+      listings: { property: { cityId: string } }[];
+    };
+    expect(Object.keys(original.market.cities)).toEqual(['dole']);
+    const migrated = engine.loadGame(v8);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    // The player stays in Dole, with no renown anywhere and no trip made today.
+    expect(migrated.player).toMatchObject({
+      baseCityId: content.start.cityId,
+      tripsToday: [],
+      lastMoveDay: null,
+      renown: {},
+      balance: original.player.balance,
+    });
+    expect(migrated.properties).toHaveLength(original.properties.length);
+    // Dole's market is kept as it was; the other cities get theirs.
+    expect(migrated.market.cities.dole).toEqual(original.market.cities.dole);
+    expect(Object.keys(migrated.market.cities).sort()).toEqual(Object.keys(content.cities).sort());
+    // They arrive with a first stock of listings, Dole's own listings untouched.
+    const inCity = (cityId: string) =>
+      migrated.listings.filter((listing) => listing.property.cityId === cityId);
+    expect(inCity('dole')).toHaveLength(original.listings.length);
+    for (const cityId of ['dijon', 'besancon', 'chalon']) {
+      expect(inCity(cityId).length).toBeGreaterThan(10);
+    }
+    // Playing on works, and the result round-trips.
+    const later = advanceToNextMonth(migrated).state;
+    expect(engine.loadGame(serializeGame(later))).toEqual(later);
+    // The migration is deterministic.
+    expect(engine.loadGame(v8)).toEqual(migrated);
   });
 });

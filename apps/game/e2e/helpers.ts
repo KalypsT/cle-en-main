@@ -95,6 +95,12 @@ export async function tab(page: Page, name: keyof typeof t.tabs) {
   await page.getByRole('navigation').getByRole('button', { name: t.tabs[name] }).click();
 }
 
+/** Opens an entry of the « Menu » tab. */
+export async function openMenuEntry(page: Page, label: string) {
+  await tab(page, 'menu');
+  await page.getByRole('button', { name: label }).click();
+}
+
 /** Closes the monthly review, the yearly review or a title's celebration if one is open. */
 export async function dismissOverlays(page: Page) {
   const overlay = page.locator('.overlay');
@@ -217,6 +223,7 @@ export function ownerGame(hours: number, until?: (state: GameState) => boolean):
     if (state.clock.hour === 18) {
       if (state.properties.length === 0 && state.purchases.length === 0) {
         const listing = [...state.listings]
+          .filter((l) => l.property.cityId === 'dole')
           .filter((l) => l.property.kind === 'apartment' && !l.offer && l.askingPrice < 70_000_00)
           .filter((l) => !engine.rentQuote(state, l.id, 'bare')?.block)
           .sort((a, b) => a.askingPrice - b.askingPrice)[0];

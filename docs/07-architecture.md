@@ -93,3 +93,9 @@ cle-en-main/
 - Code, identifiants et commentaires techniques **en anglais** ; textes affichés, contenu et documentation **en français**.
 - Tous les textes affichés viennent de `content/` (pas de texte en dur dans les composants).
 - Les détails et règles de travail pour Claude Code sont dans [`CLAUDE.md`](../CLAUDE.md).
+
+## 7.7 Jalon 7 : plusieurs villes
+
+- **Version 9 de la sauvegarde** : `player.baseCityId` (ville de la résidence principale), `player.tripsToday` (villes déjà visitées ce jour, vidées chaque matin), `player.lastMoveDay` et `player.renown` (notoriété par ville). La migration depuis la v8 place le joueur à Dole (ou dans la ville de son logement), sans notoriété, et donne aux villes ajoutées leurs niveaux de prix et un premier stock d'annonces tiré de l'état aléatoire de la sauvegarde ; le marché de Dole est laissé intact. Test : `packages/engine/test/fixtures/save-v8-milestone-6.json`.
+- **Annonces figées** : le marché compte maintenant plusieurs centaines d'annonces. Elles sont **gelées entre deux pas du moteur** (`freezeListings`) et partagées entre les copies de l'état ; un système qui doit en modifier une la copie d'abord (`editableListing`). Les lots, nuisances, aléas reportés et copropriété d'un bien sont gelés eux aussi. La valeur réelle d'une annonce gelée est mémorisée. Sans cela, dix ans de jeu prenaient 7,5 s ; ils en prennent 3,8 s (test `simulates ten years in a few seconds`).
+- `systems/travel.ts` (trajets et temps), `systems/cities.ts` (déménagement, notoriété, frais à distance), `systems/city-views.ts` (fiches de ville et devis de visite pour l'interface).

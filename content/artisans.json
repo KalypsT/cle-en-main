@@ -17,7 +17,10 @@
       "cities": ["dole"],
       "priceFactor": 0.9,
       "reliability": 0.7,
-      "queueDays": { "min": 3, "max": 10 },
+      "queueDays": {
+        "min": 3,
+        "max": 10
+      },
       "personality": "Toujours là le lundi, jamais le vendredi.",
       "unlockAfterWorks": 0
     },
@@ -28,7 +31,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.85,
-      "queueDays": { "min": 7, "max": 20 },
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
       "personality": "Sandrine Mercier rend des devis plus précis qu'un horaire de la SNCF.",
       "unlockAfterWorks": 0
     },
@@ -39,7 +45,10 @@
       "cities": ["dole"],
       "priceFactor": 1.18,
       "reliability": 0.95,
-      "queueDays": { "min": 15, "max": 35 },
+      "queueDays": {
+        "min": 15,
+        "max": 35
+      },
       "personality": "Hervé Cattin ne commence jamais avant d'avoir bu son café… chez vous.",
       "unlockAfterWorks": 2
     },
@@ -50,7 +59,10 @@
       "cities": ["dole"],
       "priceFactor": 0.88,
       "reliability": 0.68,
-      "queueDays": { "min": 2, "max": 8 },
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
       "personality": "Câble tout, n'explique rien, et part avec votre tournevis.",
       "unlockAfterWorks": 0
     },
@@ -61,7 +73,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.85,
-      "queueDays": { "min": 7, "max": 21 },
+      "queueDays": {
+        "min": 7,
+        "max": 21
+      },
       "personality": "Étiquette chaque disjoncteur, même celui du grille-pain.",
       "unlockAfterWorks": 0
     },
@@ -72,7 +87,10 @@
       "cities": ["dole"],
       "priceFactor": 1.2,
       "reliability": 0.95,
-      "queueDays": { "min": 14, "max": 40 },
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
       "personality": "Tableau électrique rangé comme une bibliothèque de chartiste.",
       "unlockAfterWorks": 2
     },
@@ -83,7 +101,10 @@
       "cities": ["dole"],
       "priceFactor": 0.9,
       "reliability": 0.7,
-      "queueDays": { "min": 5, "max": 15 },
+      "queueDays": {
+        "min": 5,
+        "max": 15
+      },
       "personality": "Annonce trois jours, en met cinq, sourit tout du long.",
       "unlockAfterWorks": 0
     },
@@ -94,7 +115,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.85,
-      "queueDays": { "min": 10, "max": 30 },
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
       "personality": "« Ça, c'est du costaud » : il le dit de tout, même du placo.",
       "unlockAfterWorks": 0
     },
@@ -105,7 +129,10 @@
       "cities": ["dole"],
       "priceFactor": 1.22,
       "reliability": 0.96,
-      "queueDays": { "min": 20, "max": 60 },
+      "queueDays": {
+        "min": 20,
+        "max": 60
+      },
       "personality": "Taillent la pierre comme au temps de Pasteur, et facturent comme aujourd'hui.",
       "unlockAfterWorks": 2
     },
@@ -116,7 +143,10 @@
       "cities": ["dole"],
       "priceFactor": 0.85,
       "reliability": 0.65,
-      "queueDays": { "min": 1, "max": 5 },
+      "queueDays": {
+        "min": 1,
+        "max": 5
+      },
       "personality": "Deux couches en une : la vitesse avant tout, les prises aussi.",
       "unlockAfterWorks": 0
     },
@@ -127,7 +157,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.85,
-      "queueDays": { "min": 5, "max": 14 },
+      "queueDays": {
+        "min": 5,
+        "max": 14
+      },
       "personality": "Bâche tout, même le chat.",
       "unlockAfterWorks": 0
     },
@@ -138,7 +171,10 @@
       "cities": ["dole"],
       "priceFactor": 1.25,
       "reliability": 0.96,
-      "queueDays": { "min": 10, "max": 30 },
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
       "personality": "Refuse de peindre en blanc « simplement blanc ».",
       "unlockAfterWorks": 2
     },
@@ -149,7 +185,10 @@
       "cities": ["dole"],
       "priceFactor": 0.88,
       "reliability": 0.7,
-      "queueDays": { "min": 2, "max": 8 },
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
       "personality": "Les joints sont droits, à condition de pencher un peu la tête.",
       "unlockAfterWorks": 0
     },
@@ -160,7 +199,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.86,
-      "queueDays": { "min": 5, "max": 18 },
+      "queueDays": {
+        "min": 5,
+        "max": 18
+      },
       "personality": "Vient avec son niveau à bulle comme d'autres avec leur chien.",
       "unlockAfterWorks": 0
     },
@@ -171,7 +213,10 @@
       "cities": ["dole"],
       "priceFactor": 1.2,
       "reliability": 0.95,
-      "queueDays": { "min": 12, "max": 35 },
+      "queueDays": {
+        "min": 12,
+        "max": 35
+      },
       "personality": "Pose chaque carreau comme s'il allait au musée.",
       "unlockAfterWorks": 2
     },
@@ -182,7 +227,10 @@
       "cities": ["dole"],
       "priceFactor": 0.9,
       "reliability": 0.72,
-      "queueDays": { "min": 4, "max": 12 },
+      "queueDays": {
+        "min": 4,
+        "max": 12
+      },
       "personality": "Mesure deux fois, coupe une fois, oublie la troisième fenêtre.",
       "unlockAfterWorks": 0
     },
@@ -193,7 +241,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.86,
-      "queueDays": { "min": 10, "max": 25 },
+      "queueDays": {
+        "min": 10,
+        "max": 25
+      },
       "personality": "Vous parle de double vitrage à la boulangerie.",
       "unlockAfterWorks": 0
     },
@@ -204,7 +255,10 @@
       "cities": ["dole"],
       "priceFactor": 1.25,
       "reliability": 0.96,
-      "queueDays": { "min": 20, "max": 50 },
+      "queueDays": {
+        "min": 20,
+        "max": 50
+      },
       "personality": "Du chêne du Jura, et un sourire en sapin.",
       "unlockAfterWorks": 2
     },
@@ -215,7 +269,10 @@
       "cities": ["dole"],
       "priceFactor": 0.88,
       "reliability": 0.7,
-      "queueDays": { "min": 2, "max": 8 },
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
       "personality": "Répare tout avec un trombone, ou presque.",
       "unlockAfterWorks": 0
     },
@@ -226,7 +283,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.85,
-      "queueDays": { "min": 7, "max": 20 },
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
       "personality": "Calcule la puissance de la chaudière au watt près, et le café au sucre près.",
       "unlockAfterWorks": 0
     },
@@ -237,7 +297,10 @@
       "cities": ["dole"],
       "priceFactor": 1.2,
       "reliability": 0.95,
-      "queueDays": { "min": 14, "max": 40 },
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
       "personality": "Installe des pompes à chaleur si silencieuses qu'on les cherche.",
       "unlockAfterWorks": 2
     },
@@ -248,7 +311,10 @@
       "cities": ["dole"],
       "priceFactor": 0.85,
       "reliability": 0.7,
-      "queueDays": { "min": 7, "max": 20 },
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
       "personality": "Des placards en kit, et une notice en suédois.",
       "unlockAfterWorks": 0
     },
@@ -259,7 +325,10 @@
       "cities": ["dole"],
       "priceFactor": 1,
       "reliability": 0.87,
-      "queueDays": { "min": 14, "max": 30 },
+      "queueDays": {
+        "min": 14,
+        "max": 30
+      },
       "personality": "Teste chaque tiroir trois fois en disant « clac ».",
       "unlockAfterWorks": 0
     },
@@ -270,8 +339,1019 @@
       "cities": ["dole"],
       "priceFactor": 1.25,
       "reliability": 0.96,
-      "queueDays": { "min": 21, "max": 50 },
+      "queueDays": {
+        "min": 21,
+        "max": 50
+      },
       "personality": "Livre un plan de travail en granit et un tablier brodé.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "dijPlomb",
+      "name": "Plomberie Moutarde & Fils",
+      "trade": "plumber",
+      "cities": ["dijon"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 3,
+        "max": 10
+      },
+      "personality": "Il promet de réparer la fuite « en moins de temps qu'il n'en faut pour dire pain d'épices ».",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "ducsEau",
+      "name": "Les Ducs de l'Eau",
+      "trade": "plumber",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Marc Perrin rend ses devis sur papier à en-tête, avec un blason.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "ouchePlomb",
+      "name": "Maison Poulet-Gaspard",
+      "trade": "plumber",
+      "cities": ["dijon"],
+      "priceFactor": 1.18,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 15,
+        "max": 35
+      },
+      "personality": "Trois générations de plombiers, une seule facture, toujours exacte.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "voltDijonnais",
+      "name": "Volt Dijonnais",
+      "trade": "electrician",
+      "cities": ["dijon"],
+      "priceFactor": 0.88,
+      "reliability": 0.68,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Le gérant branche tout, y compris parfois ce qu'il ne fallait pas.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "electriciteDuSuzon",
+      "name": "Électricité du Suzon",
+      "trade": "electrician",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 21
+      },
+      "personality": "Catherine Lambert sait où passent les gaines depuis le Moyen Âge.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "lumiereDesDucs",
+      "name": "Lumière des Ducs",
+      "trade": "electrician",
+      "cities": ["dijon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
+      "personality": "Ne se déplace que pour les installations dignes d'un palais.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "macoDijonnais",
+      "name": "Maçonnerie Pichet",
+      "trade": "mason",
+      "cities": ["dijon"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 5,
+        "max": 15
+      },
+      "personality": "Pose la première pierre le lundi, la dernière « bientôt ».",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "pierresDeBourgogne",
+      "name": "Pierres de Bourgogne",
+      "trade": "mason",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
+      "personality": "Jean-Luc Gauthey caresse le moellon comme un grand cru.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "compagnonsDuClos",
+      "name": "Compagnons du Clos",
+      "trade": "mason",
+      "cities": ["dijon"],
+      "priceFactor": 1.22,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 20,
+        "max": 60
+      },
+      "personality": "Chaque mur est signé. Chaque devis aussi.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "peintureMoutarde",
+      "name": "Peinture Pot-au-Feu",
+      "trade": "painter",
+      "cities": ["dijon"],
+      "priceFactor": 0.85,
+      "reliability": 0.65,
+      "queueDays": {
+        "min": 1,
+        "max": 5
+      },
+      "personality": "Peint vite, déborde un peu, rembourse parfois.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "couleursBourguignonnes",
+      "name": "Couleurs Bourguignonnes",
+      "trade": "painter",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 5,
+        "max": 14
+      },
+      "personality": "Chloé Mercey fait de vos murs une œuvre au pinceau fin.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierDuMuseeDesBeauxArts",
+      "name": "Atelier Rude",
+      "trade": "painter",
+      "cities": ["dijon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
+      "personality": "Se plaint des pigments modernes en vous les facturant au prix fort.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "carrelageRapide",
+      "name": "Carrelage Éclair 21",
+      "trade": "tiler",
+      "cities": ["dijon"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Le joint, c'est pour les autres.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "mosaiqueDesToits",
+      "name": "Mosaïque des Toits Vernis",
+      "trade": "tiler",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": {
+        "min": 5,
+        "max": 18
+      },
+      "personality": "Reproduit les tuiles vernissées de la ville en carrelage de salle de bains.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "sallesDeBainsDuCentre",
+      "name": "Maison Ménétrier",
+      "trade": "tiler",
+      "cities": ["dijon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 12,
+        "max": 35
+      },
+      "personality": "Pose au millimètre et vous explique le millimètre.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "menuiserieDuCentre",
+      "name": "Menuiserie Vannerie",
+      "trade": "carpenter",
+      "cities": ["dijon"],
+      "priceFactor": 0.9,
+      "reliability": 0.72,
+      "queueDays": {
+        "min": 4,
+        "max": 12
+      },
+      "personality": "Les fenêtres ferment. Presque toujours.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "boisEtFenetres",
+      "name": "Bois & Fenêtres de la Côte",
+      "trade": "carpenter",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": {
+        "min": 10,
+        "max": 25
+      },
+      "personality": "Le rendez-vous est fixé au quart d'heure près, le quart d'heure précis.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "ebenisteriePatriarche",
+      "name": "Ébénisterie Patriarche",
+      "trade": "carpenter",
+      "cities": ["dijon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 20,
+        "max": 50
+      },
+      "personality": "Vous livrera une porte en chêne centenaire, dans six mois.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "chaudDijon",
+      "name": "Chauffage Chaud-Bouillant",
+      "trade": "heatingEngineer",
+      "cities": ["dijon"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Le radiateur chauffe. L'autre aussi, mais à côté.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "thermiqueBourgogne",
+      "name": "Thermique Bourgogne",
+      "trade": "heatingEngineer",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Antoine Roussel démonte une chaudière en chantant Aznavour.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "calorieDesDucs",
+      "name": "Calories des Ducs",
+      "trade": "heatingEngineer",
+      "cities": ["dijon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
+      "personality": "Installe la chaleur comme on dresse une table de banquet.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "cuisinesDuLac",
+      "name": "Cuisines du Lac Kir",
+      "trade": "kitchenFitter",
+      "cities": ["dijon"],
+      "priceFactor": 0.85,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Livre des meubles dont vous ne vous souvenez pas avoir choisi la couleur.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierDesGourmets",
+      "name": "Atelier des Gourmets",
+      "trade": "kitchenFitter",
+      "cities": ["dijon"],
+      "priceFactor": 1,
+      "reliability": 0.87,
+      "queueDays": {
+        "min": 14,
+        "max": 30
+      },
+      "personality": "Véronique Aubry conçoit votre cuisine autour de votre coq au vin.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "cuisinesDeLaCapitale",
+      "name": "Cuisines Maître Queux",
+      "trade": "kitchenFitter",
+      "cities": ["dijon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 21,
+        "max": 50
+      },
+      "personality": "Plan de travail en granit. Délai en proportion.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "plombDoubs",
+      "name": "Plomberie du Boucle",
+      "trade": "plumber",
+      "cities": ["besancon"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 3,
+        "max": 10
+      },
+      "personality": "Passe en coup de vent, laisse des traces de pas.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "eauComtoise",
+      "name": "Eau Comtoise",
+      "trade": "plumber",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Nadia Girod prévient avant d'arriver et après être partie.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "plombierVauban",
+      "name": "Plombiers Vauban",
+      "trade": "plumber",
+      "cities": ["besancon"],
+      "priceFactor": 1.18,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 15,
+        "max": 35
+      },
+      "personality": "Fortifient vos canalisations comme une citadelle.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "etincelleComtoise",
+      "name": "Étincelle Comtoise",
+      "trade": "electrician",
+      "cities": ["besancon"],
+      "priceFactor": 0.88,
+      "reliability": 0.68,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Ça marche, mais pas le jour de la pluie.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "voltaireEtFils",
+      "name": "Électricité Pasteur",
+      "trade": "electrician",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 21
+      },
+      "personality": "Clément Besson relit la norme au lit. Et vous la lit aussi.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "horlogerElectrique",
+      "name": "Horloger Électrique",
+      "trade": "electrician",
+      "cities": ["besancon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
+      "personality": "Câble votre tableau avec la précision d'une montre suisse… de Besançon.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "maconneriePetiteSaone",
+      "name": "Maçonnerie Battant",
+      "trade": "mason",
+      "cities": ["besancon"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 5,
+        "max": 15
+      },
+      "personality": "Il y a toujours un parpaing de trop ou de moins.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "pierresDeLaCitadelle",
+      "name": "Pierres de la Citadelle",
+      "trade": "mason",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
+      "personality": "Taille la pierre sous les yeux de Vauban, en pensée.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "batisseursDeLaBoucle",
+      "name": "Bâtisseurs de la Boucle",
+      "trade": "mason",
+      "cities": ["besancon"],
+      "priceFactor": 1.22,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 20,
+        "max": 60
+      },
+      "personality": "Le crépi tient mieux que la plupart des traités de paix.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "peinturePlanoise",
+      "name": "Peinture Rapide Planoise",
+      "trade": "painter",
+      "cities": ["besancon"],
+      "priceFactor": 0.85,
+      "reliability": 0.65,
+      "queueDays": {
+        "min": 1,
+        "max": 5
+      },
+      "personality": "Peint même derrière le meuble, c'est promis, enfin presque.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "couleursDuDoubs25",
+      "name": "Couleurs du Doubs 25",
+      "trade": "painter",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 5,
+        "max": 14
+      },
+      "personality": "Julie Cuenot raconte l'histoire de chaque teinte pendant qu'elle peint.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierVictorHugo",
+      "name": "Atelier Victor Hugo",
+      "trade": "painter",
+      "cities": ["besancon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
+      "personality": "Les façades du centre ancien n'ont pas de secret pour lui, ni pour son pinceau.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "carrelagePalente",
+      "name": "Carrelage Express Palente",
+      "trade": "tiler",
+      "cities": ["besancon"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Les carreaux sont carrés, c'est déjà ça.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "faienceDeLaBoucle",
+      "name": "Faïence de la Boucle",
+      "trade": "tiler",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": {
+        "min": 5,
+        "max": 18
+      },
+      "personality": "Jérôme Vuillemin pose un carrelage qui chante sous les pas.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "mosaiqueDesQuais",
+      "name": "Mosaïques des Quais",
+      "trade": "tiler",
+      "cities": ["besancon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 12,
+        "max": 35
+      },
+      "personality": "Pour ceux qui veulent un sol digne d'une sous-préfecture.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "menuiserieCompteloise",
+      "name": "Menuiserie Comtoise",
+      "trade": "carpenter",
+      "cities": ["besancon"],
+      "priceFactor": 0.9,
+      "reliability": 0.72,
+      "queueDays": {
+        "min": 4,
+        "max": 12
+      },
+      "personality": "Les huisseries sont droites, les promesses un peu moins.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "fenetresDeMontrapon",
+      "name": "Fenêtres de Montrapon",
+      "trade": "carpenter",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": {
+        "min": 10,
+        "max": 25
+      },
+      "personality": "Un double vitrage qui ne bouge plus. Jamais.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "ebenisteDeLaCitadelle",
+      "name": "Ébéniste de la Citadelle",
+      "trade": "carpenter",
+      "cities": ["besancon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 20,
+        "max": 50
+      },
+      "personality": "Travaille le sapin du Haut-Doubs comme un bijou.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "chauffageSaintFerjeux",
+      "name": "Chauffage Saint-Ferjeux",
+      "trade": "heatingEngineer",
+      "cities": ["besancon"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "La chaudière repart toujours. Parfois avec un bruit.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "thermiqueComtoise",
+      "name": "Thermique Comtoise",
+      "trade": "heatingEngineer",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Raphaël Faivre mesure tout au dixième de degré, l'hiver comme l'été.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "chaleurVauban",
+      "name": "Chaleur Vauban",
+      "trade": "heatingEngineer",
+      "cities": ["besancon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
+      "personality": "Chaque radiateur est une redoute bien chauffée.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "cuisinesDeLaViotte",
+      "name": "Cuisines de la Viotte",
+      "trade": "kitchenFitter",
+      "cities": ["besancon"],
+      "priceFactor": 0.85,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Le plan de travail est parfois à l'inclinaison du Doubs.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierDuMetre",
+      "name": "Atelier du Mètre-Ruban",
+      "trade": "kitchenFitter",
+      "cities": ["besancon"],
+      "priceFactor": 1,
+      "reliability": 0.87,
+      "queueDays": {
+        "min": 14,
+        "max": 30
+      },
+      "personality": "Sophie Marchand mesure trois fois, pose deux, coupe jamais trop.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "grandesCuisinesComtoises",
+      "name": "Grandes Cuisines Comtoises",
+      "trade": "kitchenFitter",
+      "cities": ["besancon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 21,
+        "max": 50
+      },
+      "personality": "Même la hotte a un pedigree.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "plomberieDuPortSud",
+      "name": "Plomberie Port-Sud",
+      "trade": "plumber",
+      "cities": ["chalon"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 3,
+        "max": 10
+      },
+      "personality": "Fait sa tournée en fourgon, et la vôtre après.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "eauDeSaone",
+      "name": "Eau de Saône",
+      "trade": "plumber",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Bernard Cottin connaît chaque canalisation du centre par son prénom.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "plombiersDeLaNiepce",
+      "name": "Plombiers Niépce",
+      "trade": "plumber",
+      "cities": ["chalon"],
+      "priceFactor": 1.18,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 15,
+        "max": 35
+      },
+      "personality": "Chaque raccord est photographié avant et après.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "electriciteVerrerie",
+      "name": "Électricité Verrerie",
+      "trade": "electrician",
+      "cities": ["chalon"],
+      "priceFactor": 0.88,
+      "reliability": 0.68,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Vous fait croire que c'est normal que ça saute.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "voltChalonnais",
+      "name": "Volt Chalonnais",
+      "trade": "electrician",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 21
+      },
+      "personality": "Estelle Perrot pose un tableau comme on pose un diagnostic : sans tricher.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "lumiereDeSaoneEtLoire",
+      "name": "Lumière de Saône-et-Loire",
+      "trade": "electrician",
+      "cities": ["chalon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
+      "personality": "Il y a des disjoncteurs plus aimables que lui, mais pas plus fiables.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "maconneriePresSaintJean",
+      "name": "Maçonnerie Prés Saint-Jean",
+      "trade": "mason",
+      "cities": ["chalon"],
+      "priceFactor": 0.9,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 5,
+        "max": 15
+      },
+      "personality": "Un mur de plus ou de moins : l'important, c'est qu'il tienne.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "pierresDuDoyenne",
+      "name": "Pierres du Doyenné",
+      "trade": "mason",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
+      "personality": "Rénove le vieux Chalon pierre par pierre, devis à l'appui.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "batisseursChalonnais",
+      "name": "Bâtisseurs Chalonnais",
+      "trade": "mason",
+      "cities": ["chalon"],
+      "priceFactor": 1.22,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 20,
+        "max": 60
+      },
+      "personality": "Même les gargouilles sont pour lui des clientes.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "peintureQuaisEtCouleurs",
+      "name": "Quais & Couleurs",
+      "trade": "painter",
+      "cities": ["chalon"],
+      "priceFactor": 0.85,
+      "reliability": 0.65,
+      "queueDays": {
+        "min": 1,
+        "max": 5
+      },
+      "personality": "Rapide, un peu éclaboussant.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "peinturesDuCentre",
+      "name": "Peintures du Centre",
+      "trade": "painter",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 5,
+        "max": 14
+      },
+      "personality": "Florence Lenoir préfère le mat satiné au brillant et vous le fera savoir.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierDeLaCathedrale",
+      "name": "Atelier de la Cathédrale",
+      "trade": "painter",
+      "cities": ["chalon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 10,
+        "max": 30
+      },
+      "personality": "Voit votre salon comme une chapelle à rénover.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "carrelageStJean",
+      "name": "Carrelage Saint-Jean",
+      "trade": "tiler",
+      "cities": ["chalon"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Il en met partout, même là où il n'en fallait pas.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "sallesDeBainChalon",
+      "name": "Carreleur Chalonnais",
+      "trade": "tiler",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": {
+        "min": 5,
+        "max": 18
+      },
+      "personality": "Olivier Rey pose un joint si droit qu'il pourrait servir de règle.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "mosaiquesDuPort",
+      "name": "Mosaïques du Port",
+      "trade": "tiler",
+      "cities": ["chalon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 12,
+        "max": 35
+      },
+      "personality": "Pour les salles de bains qui impressionnent les voisins.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "menuiserieSaintCosme",
+      "name": "Menuiserie Saint-Cosme",
+      "trade": "carpenter",
+      "cities": ["chalon"],
+      "priceFactor": 0.9,
+      "reliability": 0.72,
+      "queueDays": {
+        "min": 4,
+        "max": 12
+      },
+      "personality": "Les portes claquent, les parquets crissent, mais ça tient.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "fenetresDeLaSaone",
+      "name": "Fenêtres de la Saône",
+      "trade": "carpenter",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.86,
+      "queueDays": {
+        "min": 10,
+        "max": 25
+      },
+      "personality": "Léa Martinet isole bruit, froid et belle-mère.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "ebenisterieNiepce",
+      "name": "Ébénisterie Niépce",
+      "trade": "carpenter",
+      "cities": ["chalon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 20,
+        "max": 50
+      },
+      "personality": "Révèle le bois comme d'autres révèlent des clichés.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "chauffageStadeChalon",
+      "name": "Chauffage du Stade",
+      "trade": "heatingEngineer",
+      "cities": ["chalon"],
+      "priceFactor": 0.88,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 2,
+        "max": 8
+      },
+      "personality": "Dépannage à toute heure, facture à toute heure aussi.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "thermiqueSaonoise",
+      "name": "Thermique Saônoise",
+      "trade": "heatingEngineer",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.85,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Gérard Vial a vu des chaudières qui ont vu la guerre.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "chaleurDuPort",
+      "name": "Chaleur du Port",
+      "trade": "heatingEngineer",
+      "cities": ["chalon"],
+      "priceFactor": 1.2,
+      "reliability": 0.95,
+      "queueDays": {
+        "min": 14,
+        "max": 40
+      },
+      "personality": "Une installation qui chauffe le salon et jamais le compte en banque.",
+      "unlockAfterWorks": 2
+    },
+    {
+      "id": "cuisinesDuQuai",
+      "name": "Cuisines du Quai",
+      "trade": "kitchenFitter",
+      "cities": ["chalon"],
+      "priceFactor": 0.85,
+      "reliability": 0.7,
+      "queueDays": {
+        "min": 7,
+        "max": 20
+      },
+      "personality": "Le four est livré, le plan de travail attend.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "atelierDesCuisinesChalon",
+      "name": "Atelier des Cuisines de Chalon",
+      "trade": "kitchenFitter",
+      "cities": ["chalon"],
+      "priceFactor": 1,
+      "reliability": 0.87,
+      "queueDays": {
+        "min": 14,
+        "max": 30
+      },
+      "personality": "Marie Boudot invente des rangements là où vous n'imaginiez pas de mur.",
+      "unlockAfterWorks": 0
+    },
+    {
+      "id": "cuisinesCarnaval",
+      "name": "Cuisines Carnaval",
+      "trade": "kitchenFitter",
+      "cities": ["chalon"],
+      "priceFactor": 1.25,
+      "reliability": 0.96,
+      "queueDays": {
+        "min": 21,
+        "max": 50
+      },
+      "personality": "Livre aussi la bonne humeur, en confettis.",
       "unlockAfterWorks": 2
     }
   ]

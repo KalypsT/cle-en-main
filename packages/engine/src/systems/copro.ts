@@ -6,6 +6,7 @@ import type { SystemContext } from './context.ts';
 import { clampState, dpeOf, energyNeeds, freezeItems } from './dwelling.ts';
 import { findOwned } from './renting.ts';
 import { addWorks } from './taxes.ts';
+import { spendFreeTime } from './travel.ts';
 
 /**
  * The co-ownership, simple version (docs/03-systemes/05, « La copropriété »):
@@ -69,8 +70,7 @@ export function voteResolution(
   if (!resolution) return 'copro.unknownResolution';
   if (!meeting.attended) {
     const minutes = content.works.copro.attendMinutes;
-    if (state.player.freeTimeMinutes < minutes) return 'time.notEnoughFreeTime';
-    state.player.freeTimeMinutes -= minutes;
+    if (!spendFreeTime(ctx, minutes, owned.property.cityId)) return 'time.notEnoughFreeTime';
     meeting.attended = true;
   }
   resolution.vote = vote;

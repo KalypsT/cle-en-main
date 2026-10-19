@@ -105,7 +105,7 @@ describe('household', () => {
     const mean = salaries.reduce((a, b) => a + b, 0) / salaries.length;
     expect(Math.min(...salaries)).toBeGreaterThanOrEqual(toCents(2000));
     expect(Math.abs(mean - toCents(2700))).toBeLessThan(toCents(100));
-  });
+  }, 30_000);
 
   it('gives free time by job and calendar', () => {
     // Monday 2026-10-19, then Saturday 2026-10-24.

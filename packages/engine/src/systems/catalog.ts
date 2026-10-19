@@ -12,6 +12,7 @@ import { roundRate } from './market-rate.ts';
 import { modeOf } from './modes.ts';
 import { conditionsMet } from './progress.ts';
 import { changeReputation, offMarketChancePerMonth } from './reputation.ts';
+import { localOffMarketChance, pickOfferCity } from './cities.ts';
 
 const DAYS_PER_MONTH = 30;
 /** Key of `amounts` for an event without choices. */
@@ -99,7 +100,12 @@ function drawVars(
   trade: string | undefined,
 ): CatalogEventInstance['vars'] {
   const { content, state } = ctx;
-  const cityId = owned?.property.cityId ?? content.start.cityId;
+  // An event without a property happens in any city of the game, the player's or not.
+  const cityIds = Object.keys(content.cities).sort();
+  const cityId =
+    owned?.property.cityId ??
+    cityIds[nextInt(state.rng, 0, cityIds.length - 1)] ??
+    content.start.cityId;
   const neighbourhoods = findCity(content, cityId).neighbourhoods;
   const neighbourhoodId =
     owned?.property.neighbourhoodId ??
@@ -108,7 +114,10 @@ function drawVars(
   const artisans = trade
     ? content.artisans.filter((a) => a.trade === trade && a.cities.includes(cityId))
     : [];
-  const rivals = content.rivals.filter((rival) => rival.active && rival.cities.includes(cityId));
+  // The rivals are in Dole; elsewhere, an event that names a rival names one of them all the same.
+  const active = content.rivals.filter((rival) => rival.active);
+  const local = active.filter((rival) => rival.cities.includes(cityId));
+  const rivals = local.length > 0 ? local : active;
   return {
     tenant: owned?.lease?.tenant.firstName ?? null,
     artisanId:
@@ -156,7 +165,7 @@ function applyEffects(
       case 'rentMoney':
         break; // drawn when the event fired
       case 'reputation':
-        changeReputation(ctx, effect.delta);
+        changeReputation(ctx, effect.delta, owned?.property.cityId);
         break;
       case 'satisfaction':
         if (owned?.lease) {
@@ -343,7 +352,11 @@ export function runDailyCatalog(ctx: SystemContext): void {
   if (nextFloat(state.rng) < rules.anecdoteChancePerDay) tellAnecdote(ctx);
   const offMarket = offMarketChancePerMonth(content, state);
   if (offMarket > 0 && nextFloat(state.rng) < offMarket / DAYS_PER_MONTH) {
-    offerOffMarket(ctx, content.start.cityId);
+    offerOffMarket(ctx, pickOfferCity(ctx));
+  }
+  for (const cityId of Object.keys(content.cities)) {
+    const local = localOffMarketChance(content, state, cityId);
+    if (local > 0 && nextFloat(state.rng) < local / DAYS_PER_MONTH) offerOffMarket(ctx, cityId);
   }
 }
 

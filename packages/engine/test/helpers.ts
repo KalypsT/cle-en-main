@@ -34,6 +34,11 @@ export function advanceToNextMonth(state: ReturnType<typeof newGame>) {
   }
 }
 
+/** Listings of a city (Dole by default: the tests of the first milestones play there). */
+export function cityListings(state: GameState, cityId = 'dole') {
+  return state.listings.filter((l) => l.property.cityId === cityId);
+}
+
 /** A system context on a copy of `state`, to call systems directly. */
 export function systemContext(state: GameState): SystemContext {
   return { content, state: deepClone(state), events: [], today: toDayNumber(state.clock.date) };
@@ -73,9 +78,14 @@ export function advanceUntil(
 }
 
 /** Cheapest listing whose asking price is at most `maxPrice` euros. */
-export function affordableListing(state: GameState, maxPrice = 90_000) {
+export function affordableListing(state: GameState, maxPrice = 90_000, cityId = 'dole') {
   const listing = [...state.listings]
-    .filter((l) => l.askingPrice <= maxPrice * 100 && l.property.kind !== 'building')
+    .filter(
+      (l) =>
+        l.property.cityId === cityId &&
+        l.askingPrice <= maxPrice * 100 &&
+        l.property.kind !== 'building',
+    )
     .sort((a, b) => a.askingPrice - b.askingPrice)[0];
   if (!listing) throw new Error('No affordable listing');
   return listing;

@@ -14,6 +14,7 @@ import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
 import { musicSchema } from './schemas/music.ts';
 import { worldRulesSchema } from './schemas/world.ts';
+import { citiesRulesSchema } from './schemas/villes.ts';
 import { anecdotesFileSchema, eventsFileSchema, rhythmRulesSchema } from './schemas/events.ts';
 import { calendarRulesSchema, modesFileSchema } from './schemas/modes.ts';
 import {
@@ -42,6 +43,7 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'rythme.json': rhythmRulesSchema,
   'succes.json': achievementsFileSchema,
   'titres.json': titlesFileSchema,
+  'villes.json': citiesRulesSchema,
   'banques.json': banksFileSchema,
   'credit.json': creditRulesSchema,
   'decisions.json': decisionRulesSchema,
@@ -68,5 +70,8 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
 
 /** Generated city files, by path relative to `data/`. */
 export const dataRegistry: Readonly<Record<string, z.ZodType>> = {
+  'cities/besancon.json': cityDataSchema,
+  'cities/chalon.json': cityDataSchema,
+  'cities/dijon.json': cityDataSchema,
   'cities/dole.json': cityDataSchema,
 };

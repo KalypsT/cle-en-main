@@ -11,7 +11,7 @@ import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextNormal, nextPoisson, nextRange, pickWeighted } from '../random.ts';
 import type { GameState, Listing, Property, PropertyKind } from '../state.ts';
 import type { SystemContext } from './context.ts';
-import { conditionLabel, drawDwelling } from './dwelling.ts';
+import { conditionLabel, drawDwelling, freezeDwelling, freezeNested } from './dwelling.ts';
 import { defectProbability, dwellingKindOf, realValue } from './valuation.ts';
 
 const DAYS_PER_MONTH = 30;
@@ -85,7 +85,7 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
     .map((rule) => ({ id: rule.id, revealed: false }));
   const tax = rules.ownership.propertyTaxPerM2[kind];
   const copro = content.works.copro;
-  return {
+  const property: Property = {
     id: `property-${state.nextId++}`,
     cityId,
     neighbourhoodId: neighbourhood.id,
@@ -112,6 +112,9 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
         ? toCents(Math.round(surface * rules.ownership.coOwnershipChargesPerM2))
         : 0,
   };
+  // Lots, nuisances and the like are replaced, never mutated: shared between copies of the state.
+  freezeNested(property);
+  return property;
 }
 
 function roundPrice(content: GameContent, amount: Cents, direction: 'nearest' | 'up' = 'nearest') {
@@ -184,7 +187,8 @@ export function dailyListingRate(content: GameContent, cityId: string): number {
     (sum, n) => sum + n.sales.apartment.perYear + n.sales.house.perYear,
     0,
   );
-  return (perYear * content.market.flow.listingsPerSale) / DAYS_PER_YEAR;
+  const share = content.citiesRules.listingFlowShare[cityId] ?? 1;
+  return (perYear * content.market.flow.listingsPerSale * share) / DAYS_PER_YEAR;
 }
 
 /** The market as the player finds it on the first day. */
@@ -245,9 +249,10 @@ export function otherBuyerProbability(ctx: SystemContext, listing: Listing): num
   const rules = ctx.content.market.otherBuyers;
   const bargain =
     realValue(ctx.content, ctx.state, listing.property).value / listing.askingPrice - 1;
+  const demand = ctx.content.citiesRules.demand[listing.property.cityId]?.buyers ?? 1;
   return Math.min(
     rules.maxDailyProbability,
-    rules.baseDailyProbability * Math.exp(rules.dealSensitivity * bargain),
+    rules.baseDailyProbability * demand * Math.exp(rules.dealSensitivity * bargain),
   );
 }
 
@@ -275,9 +280,12 @@ export function runDailyListings(
 ): void {
   const { content, state } = ctx;
   const rules = content.market;
-  for (const listing of [...state.listings]) {
+  for (const frozen of [...state.listings]) {
+    // Only a listing with an offer to answer or a price drop due is changed (and thawed).
+    let listing = frozen;
     const offer = listing.offer;
     if (offer && offer.counter === null && offer.responseDay <= ctx.today) {
+      listing = editableListing(ctx, frozen);
       const answer = sellerAnswer(ctx, listing, offer.amount);
       ctx.events.push({ type: 'offerAnswered', listingId: listing.id, ...answer });
       if (answer.answer === 'accepted') {
@@ -298,6 +306,7 @@ export function runDailyListings(
       continue;
     }
     if (offer?.counter && offer.counter.expiresDay <= ctx.today) {
+      listing = editableListing(ctx, frozen);
       listing.offer = null;
       ctx.events.push({ type: 'counterOfferExpired', listingId: listing.id });
     }
@@ -329,6 +338,7 @@ export function runDailyListings(
           rules.lifetime.priceDropShare.min,
           rules.lifetime.priceDropShare.max,
         );
+        listing = editableListing(ctx, frozen);
         listing.askingPrice = roundPrice(content, listing.askingPrice * (1 - share));
         listing.lastPriceDropDay = ctx.today;
         ctx.events.push({
@@ -347,6 +357,40 @@ export function runDailyListings(
       ctx.events.push({ type: 'listingPublished', listingId: listing.id });
     }
   }
+}
+
+/**
+ * Listings are frozen between two steps of the engine, so that the copies of the state share
+ * them (see clone.ts): the market holds hundreds of them and almost none changes in a day.
+ */
+export function freezeListings(state: GameState): void {
+  for (const listing of state.listings) {
+    if (Object.isFrozen(listing)) continue;
+    if (listing.offer) {
+      if (listing.offer.counter) Object.freeze(listing.offer.counter);
+      Object.freeze(listing.offer);
+    }
+    freezeDwelling(listing.property);
+    Object.freeze(listing.property);
+    Object.freeze(listing);
+  }
+}
+
+/**
+ * The listing as a draft one may change: copies a frozen listing (its property and offer too)
+ * into the state's list, or returns the listing itself if it is already a draft.
+ */
+export function editableListing(ctx: Pick<SystemContext, 'state'>, listing: Listing): Listing {
+  if (!Object.isFrozen(listing)) return listing;
+  const copy: Listing = {
+    ...listing,
+    property: { ...listing.property },
+    offer: listing.offer && { ...listing.offer },
+  };
+  const { listings } = ctx.state;
+  const index = listings.indexOf(listing);
+  if (index >= 0) listings[index] = copy;
+  return copy;
 }
 
 export function findListing(state: GameState, listingId: string): Listing | undefined {

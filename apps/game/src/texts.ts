@@ -524,7 +524,20 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       return format(events.bankMeetingPlanned, { banker: bankerName(event.bankId) });
     case 'selfRepairPlanned':
       return events.selfRepairPlanned;
+    case 'tripMade':
+      return format(events.tripMade, {
+        city: cityName(event.cityId),
+        duration: formatDuration(event.minutes),
+        cost: formatMoney(event.cost),
+      });
+    case 'movedCity':
+      return format(events.movedCity, {
+        city: cityName(event.cityId),
+        rent: formatMoney(event.monthlyRent),
+        cost: formatMoney(event.cost),
+      });
     case 'reputationChanged':
+    case 'renownChanged':
     case 'challengeAccepted':
     case 'challengeDeclined':
     case 'agendaMoved':

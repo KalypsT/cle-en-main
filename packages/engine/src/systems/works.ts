@@ -33,6 +33,9 @@ import {
 import { dailyFreeTime } from './household.ts';
 import { findOwned } from './renting.ts';
 import { addWorks, ledgerOf } from './taxes.ts';
+import { renownOf } from './cities.ts';
+import { editableListing } from './listings.ts';
+import { spendFreeTime, timeAvailableIn } from './travel.ts';
 
 /**
  * Works (docs/03-systemes/05-travaux-et-copropriete.md): quotes from the
@@ -92,13 +95,19 @@ export function artisanDiscount(content: GameContent, state: GameState, artisanI
   return Math.min(rules.maxDiscount, rules.discountPerJob * jobsWith(state, artisanId));
 }
 
-/** Share of the waiting list skipped: loyalty and reputation. */
-function queueCut(content: GameContent, state: GameState, artisanId: string): number {
+/** Share of the waiting list skipped: loyalty, reputation and local renown. */
+function queueCut(
+  content: GameContent,
+  state: GameState,
+  artisanId: string,
+  cityId: string,
+): number {
   const rules = content.works.artisans;
   return Math.min(
     rules.maxQueueCut,
     rules.queueCutPerJob * jobsWith(state, artisanId) +
-      rules.queueCutPerReputation * state.player.reputation,
+      rules.queueCutPerReputation * state.player.reputation +
+      content.citiesRules.renown.queueCutPerPoint * renownOf(state, cityId),
   );
 }
 
@@ -192,8 +201,7 @@ export function requestQuote(
     if (found.works.trade !== artisan.trade) return 'works.wrongTrade';
   }
   const minutes = content.works.quotes.minutes;
-  if (state.player.freeTimeMinutes < minutes) return 'time.notEnoughFreeTime';
-  state.player.freeTimeMinutes -= minutes;
+  if (!spendFreeTime(ctx, minutes, property.cityId)) return 'time.notEnoughFreeTime';
   const factor = artisan.priceFactor * (1 - artisanDiscount(content, state, artisan.id));
   for (const choice of choices) {
     const item = findItem(property, choice.itemId);
@@ -216,7 +224,8 @@ export function requestQuote(
     items: lines,
     total: lines.reduce((sum, line) => sum + line.price, 0),
     days: Math.max(1, Math.ceil(lines.reduce((sum, line) => sum + line.days, 0))),
-    availableDay: ctx.today + Math.round(queue * (1 - queueCut(content, state, artisan.id))),
+    availableDay:
+      ctx.today + Math.round(queue * (1 - queueCut(content, state, artisan.id, property.cityId))),
     expiresDay: ctx.today + content.works.quotes.validityDays,
   };
   owned.quotes = [...owned.quotes.filter((q) => q.expiresDay > ctx.today), quote];
@@ -621,7 +630,10 @@ function resolveHazard(
   project.hazard = null;
   property.postponedHazards = property.postponedHazards.filter((h) => h.itemId !== hazard.itemId);
   if (choice === 'postpone') {
-    property.postponedHazards.push({ hazardId: hazard.hazardId, itemId: hazard.itemId });
+    property.postponedHazards = [
+      ...property.postponedHazards,
+      { hazardId: hazard.hazardId, itemId: hazard.itemId },
+    ];
     if (task) {
       const line = task.items.find((l) => l.itemId === hazard.itemId);
       const item = findItem(property, hazard.itemId);
@@ -690,11 +702,11 @@ export function runDailyWorks(ctx: SystemContext): void {
       busy = true;
       if (task.artisanId === null) {
         const minutes = Math.min(
-          state.player.freeTimeMinutes,
+          timeAvailableIn(ctx, owned.property.cityId),
           content.works.diyDailyMaxMinutes,
           task.minutesNeeded - task.minutesDone,
         );
-        state.player.freeTimeMinutes -= minutes;
+        if (minutes > 0) spendFreeTime(ctx, minutes, owned.property.cityId);
         task.minutesDone += minutes;
         if (task.minutesDone >= task.minutesNeeded) finishTask(ctx, owned, task);
       } else if (task.endDay !== null && ctx.today >= task.endDay) {
@@ -772,14 +784,15 @@ export function runYearlyWear(ctx: SystemContext): void {
 /** A craftsman's diagnosis of a listing: the items of his trade are revealed. */
 export function diagnose(ctx: SystemContext, listingId: string, trade: Trade): WorksRefusal | null {
   const { content, state } = ctx;
-  const listing = state.listings.find((l) => l.id === listingId);
-  if (!listing) return 'listing.unknown';
-  if (knownArtisans(content, state, listing.property.cityId, trade).length === 0) {
+  const found = state.listings.find((l) => l.id === listingId);
+  if (!found) return 'listing.unknown';
+  if (knownArtisans(content, state, found.property.cityId, trade).length === 0) {
     return 'works.unknownArtisan';
   }
   const cost = toCents(content.works.diagnosis.cost);
   if (state.player.balance < cost) return 'account.insufficientFunds';
   state.player.balance -= cost;
+  const listing = editableListing(ctx, found);
   const revealed: string[] = [];
   listing.property.items = listing.property.items.map((item) => {
     if (item.known || itemRule(content, item.kind).works?.trade !== trade) return item;

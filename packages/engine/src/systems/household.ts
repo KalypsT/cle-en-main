@@ -71,4 +71,5 @@ export function runMonthlyHousehold(ctx: SystemContext, lines: StatementLine[]):
 
 export function startFreeDay(ctx: SystemContext, date: CalendarDate): void {
   ctx.state.player.freeTimeMinutes = dailyFreeTime(ctx.content, ctx.state, date);
+  ctx.state.player.tripsToday = [];
 }

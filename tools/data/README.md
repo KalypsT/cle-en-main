@@ -18,4 +18,9 @@ pnpm --filter @cle/data-tools build-city dole
 | `src/aggregate.ts` | Statistiques (quantiles, tendances, lissage des petits échantillons) |
 | `src/build-city.ts` | Assemble `data/cities/<ville>.json` et le valide avec le schéma `content/schemas/city.ts` |
 
-Ajouter une ville : écrire `cities/<ville>.ts`, la déclarer dans `CITIES` (`src/build-city.ts`) et dans `dataRegistry` (`content/registry.ts`), puis lancer le script.
+Ajouter une ville (exemples : `cities/dijon.ts`, `cities/besancon.ts`, `cities/chalon-sur-saone.ts`) :
+
+1. lister les IRIS de la commune (`loadIris`) et écrire `cities/<ville>.ts` : quartiers, IRIS exclus, repères de la carte (leur nom doit exister dans la BD TOPO) ;
+2. la déclarer dans `CITIES` (`src/build-city.ts`) et lancer le script ;
+3. déclarer le fichier produit dans `dataRegistry` (`content/registry.ts`) et l'importer dans `content/index.ts` ;
+4. écrire le contenu de la ville : trajets, position, texte, part d'annonces et demande dans `content/villes.json`, indice de coût des travaux dans `content/travaux.json`, rues de chaque quartier dans `content/monde.json`, au moins un artisan par poste dans `content/artisans.json` (`pnpm validate-content` signale ce qui manque).

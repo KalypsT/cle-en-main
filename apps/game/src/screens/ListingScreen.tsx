@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import { fromDayNumber, type Listing, toDayNumber, type Trade, visitMinutes } from '@cle/engine';
+import { fromDayNumber, type Listing, toDayNumber, type Trade, type VisitQuote } from '@cle/engine';
 import { useEffect, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -9,6 +9,7 @@ import {
   formatDuration,
   formatEuros,
   formatGameDate,
+  formatMoney,
   formatPercent,
   formatWhen,
   cityName,
@@ -79,6 +80,21 @@ function ListingBody({ listing }: { listing: Listing }) {
   const view = engine.listingView(state, listing.id);
   const catalog = engine.worksCatalog(state, listing.id) ?? [];
   const today = toDayNumber(state.clock.date);
+  const quote = engine.visitQuote(state, listing.id);
+  const visitLabel = (visit: VisitQuote | null): string => {
+    if (!visit) return '';
+    const duration = formatDuration(visit.minutes);
+    if (visit.tripMinutes > 0) {
+      return format(t.listing.visitTrip, {
+        duration,
+        trip: formatDuration(visit.tripMinutes),
+        cost: formatMoney(visit.tripCost),
+      });
+    }
+    return visit.cityId === state.player.baseCityId
+      ? format(t.listing.visitDuration, { duration })
+      : format(t.listing.visitTripDone, { duration, city: cityName(visit.cityId) });
+  };
   const planned = state.agenda.find(
     (item) => item.kind === 'visit' && item.listingId === listing.id,
   );
@@ -279,9 +295,7 @@ function ListingBody({ listing }: { listing: Listing }) {
             ? t.listing.visitDone
             : planned
               ? format(t.listing.visitPlanned, { when: formatWhen(planned.day, state.clock.date) })
-              : format(t.listing.visitDuration, {
-                  duration: formatDuration(visitMinutes({ content: gameContent })),
-                })}
+              : visitLabel(quote)}
         </button>
         <button
           type="button"

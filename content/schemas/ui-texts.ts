@@ -128,11 +128,18 @@ export const uiTextsSchema = z
         yourProperty: text,
         yourTenant: text,
         theArtisan: text,
+        tripMade: text,
+        movedCity: text,
       })
       .strict(),
     /** One text per engine refusal code (packages/engine/src/actions.ts). */
     refusals: z
       .object({
+        'city.unknown': text,
+        'move.sameCity': text,
+        'move.ownHome': text,
+        'move.tooSoon': text,
+        'move.noMoney': text,
         'bank.unknown': text,
         'bank.noMeetings': text,
         'bank.meetingTooSoon': text,

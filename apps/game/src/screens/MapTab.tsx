@@ -23,7 +23,7 @@ const MARGIN = 250;
 export function MapTab() {
   const { state } = useGame();
   const nav = useNav();
-  const cityId = gameContent.start.cityId;
+  const cityId = nav.cityId;
   const city = gameContent.cities[cityId];
   const [colorBy, setColorBy] = useState<ColorBy>('price');
   const [selected, setSelected] = useState<string | null>(null);
@@ -78,7 +78,18 @@ export function MapTab() {
 
   return (
     <div className="screen">
-      <ScreenHeader title={format(t.map.heading, { city: cityName(cityId) })} />
+      <ScreenHeader
+        title={format(t.map.heading, { city: cityName(cityId) })}
+        action={
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => nav.push({ name: 'cities' })}
+          >
+            {t.cities.switch}
+          </button>
+        }
+      />
       <Segmented<ColorBy>
         label={t.map.colorBy}
         value={colorBy}

@@ -1,4 +1,7 @@
 import banksJson from './banques.json' with { type: 'json' };
+import besanconJson from '../data/cities/besancon.json' with { type: 'json' };
+import chalonJson from '../data/cities/chalon.json' with { type: 'json' };
+import dijonJson from '../data/cities/dijon.json' with { type: 'json' };
 import doleJson from '../data/cities/dole.json' with { type: 'json' };
 import creditJson from './credit.json' with { type: 'json' };
 import decisionsJson from './decisions.json' with { type: 'json' };
@@ -26,6 +29,7 @@ import calendarJson from './calendrier.json' with { type: 'json' };
 import rhythmJson from './rythme.json' with { type: 'json' };
 import progressionJson from './progression.json' with { type: 'json' };
 import titlesJson from './titres.json' with { type: 'json' };
+import citiesRulesJson from './villes.json' with { type: 'json' };
 import achievementsJson from './succes.json' with { type: 'json' };
 import challengesJson from './defis.json' with { type: 'json' };
 import anecdotesJson from './anecdotes.json' with { type: 'json' };
@@ -52,6 +56,7 @@ import { timeSettingsSchema } from './schemas/time.ts';
 import { uiTextsSchema } from './schemas/ui-texts.ts';
 import { artisansFileSchema, worksRulesSchema, worksTextsSchema } from './schemas/works.ts';
 import { musicSchema } from './schemas/music.ts';
+import { citiesRulesSchema } from './schemas/villes.ts';
 import { worldRulesSchema } from './schemas/world.ts';
 import { anecdotesFileSchema, eventsFileSchema, rhythmRulesSchema } from './schemas/events.ts';
 import { calendarRulesSchema, modesFileSchema } from './schemas/modes.ts';
@@ -184,7 +189,13 @@ export const gameContent: GameContent = {
   ].flatMap((file) => eventsFileSchema.parse(file).events),
   anecdotes: anecdotesFileSchema.parse(anecdotesJson).anecdotes,
   yvon: yvonTextsSchema.parse(yvonJson),
-  cities: { dole: cityDataSchema.parse(doleJson) },
+  citiesRules: citiesRulesSchema.parse(citiesRulesJson),
+  cities: {
+    dole: cityDataSchema.parse(doleJson),
+    dijon: cityDataSchema.parse(dijonJson),
+    besancon: cityDataSchema.parse(besanconJson),
+    chalon: cityDataSchema.parse(chalonJson),
+  },
 };
 
 const referenceProblems = checkReferences(gameContent);

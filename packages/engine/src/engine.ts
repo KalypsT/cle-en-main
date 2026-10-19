@@ -50,8 +50,11 @@ import {
 } from './systems/reviews.ts';
 import { runDailyDistress } from './systems/distress.ts';
 import type { SystemContext } from './systems/context.ts';
+import { citySheet, citySheets, visitQuote } from './systems/city-views.ts';
+import { remoteManagementFee } from './systems/cities.ts';
+import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
-import { runDailyListings, seedListings } from './systems/listings.ts';
+import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
 import { netWorth } from './systems/net-worth.ts';
 import { answerCounter, makeOffer } from './systems/offers.ts';
@@ -204,6 +207,10 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       rentalHistoryMonths: 0,
       bankruptDay: null,
       homePropertyId: null,
+      baseCityId: content.start.cityId,
+      tripsToday: [],
+      lastMoveDay: null,
+      renown: {},
     },
     banks: initialBankRelations(content, job.bankTrust),
     market: {
@@ -237,7 +244,8 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     throw new RangeError(`Invalid avatar ${JSON.stringify(options.avatar)}`);
   }
   // The market already has listings on the first day.
-  seedListings(context(content, state, []), content.start.cityId);
+  for (const cityId of Object.keys(content.cities))
+    seedListings(context(content, state, []), cityId);
   state.history.push(monthlyPoint(content, state, 0));
   // Free time left on the first day, prorated to the hours remaining.
   const fullDay = dailyFreeTime(content, state, startDate);
@@ -332,6 +340,7 @@ export function createEngine(content: GameContent) {
       events.some((event) => event.type === 'monthStarted'),
       events.some((event) => event.type === 'yearStarted'),
     );
+    freezeListings(draft);
     return { state: draft, events };
   }
 
@@ -452,6 +461,9 @@ export function createEngine(content: GameContent) {
       case 'home/moveOut':
         refusal = moveOutOfHome(ctx);
         break;
+      case 'city/move':
+        refusal = moveHome(ctx, action.cityId);
+        break;
       case 'tax/setRegime':
         refusal = setTaxRegime(ctx, action.propertyId, action.regime);
         break;
@@ -494,6 +506,7 @@ export function createEngine(content: GameContent) {
     if (refusal) return { ok: false, state, reason: { code: refusal } };
     recordProgress(ctx, events.slice());
     checkMilestones(ctx);
+    freezeListings(draft);
     return { ok: true, state: draft, events };
   }
 
@@ -600,6 +613,9 @@ export function createEngine(content: GameContent) {
           recoverableCharges(content, property) +
           Math.round(property.annualPropertyTax / 12) +
           ownerInsurance(content, property),
+        /** Monthly fee if he manages it himself from another city (an agency avoids it). */
+        remoteManagementFee:
+          property.cityId === state.player.baseCityId ? 0 : remoteManagementFee(content),
         furnitureCost: furnitureCost(content, property),
       };
     },
@@ -657,6 +673,12 @@ export function createEngine(content: GameContent) {
     },
     /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */
     listingView: (state: GameState, listingId: string) => listingView(content, state, listingId),
+    /** Sheets of the region map: every city, the base first. */
+    citySheets: (state: GameState) => citySheets(content, state),
+    /** Minutes and trip of a visit to a listing, as of now. */
+    visitQuote: (state: GameState, listingId: string) => visitQuote(content, state, listingId),
+    /** Sheet of one city. */
+    citySheet: (state: GameState, cityId: string) => citySheet(content, state, cityId),
     /** Prices and rents of a city's neighbourhoods today (the map's colours). */
     neighbourhoodMarkets: (state: GameState, cityId: string) =>
       neighbourhoodMarkets(content, state, cityId),
