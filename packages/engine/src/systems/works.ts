@@ -194,7 +194,6 @@ export function requestQuote(
   }
   if (choices.length === 0) return 'works.empty';
   if (new Set(choices.map((c) => c.itemId)).size !== choices.length) return 'works.duplicateItem';
-  const lines: Quote['items'] = [];
   for (const choice of choices) {
     const found = renovatable(content, property, choice);
     if ('refusal' in found) return found.refusal;
@@ -202,6 +201,21 @@ export function requestQuote(
   }
   const minutes = content.works.quotes.minutes;
   if (!spendFreeTime(ctx, minutes, property.cityId)) return 'time.notEnoughFreeTime';
+  writeQuote(ctx, owned, artisan, choices);
+  return null;
+}
+
+/** The artisan's quote for these items (already checked), added to the property's quotes. */
+function writeQuote(
+  ctx: SystemContext,
+  owned: OwnedProperty,
+  artisan: Artisan,
+  choices: readonly ItemChoice[],
+): Quote {
+  const { content, state } = ctx;
+  const { property } = owned;
+  const propertyId = property.id;
+  const lines: Quote['items'] = [];
   const factor = artisan.priceFactor * (1 - artisanDiscount(content, state, artisan.id));
   for (const choice of choices) {
     const item = findItem(property, choice.itemId);
@@ -220,7 +234,7 @@ export function requestQuote(
   const queue = nextRange(state.rng, artisan.queueDays.min, artisan.queueDays.max);
   const quote: Quote = {
     id: `quote-${state.nextId++}`,
-    artisanId,
+    artisanId: artisan.id,
     items: lines,
     total: lines.reduce((sum, line) => sum + line.price, 0),
     days: Math.max(1, Math.ceil(lines.reduce((sum, line) => sum + line.days, 0))),
@@ -233,10 +247,63 @@ export function requestQuote(
     type: 'quoteReceived',
     propertyId,
     quoteId: quote.id,
-    artisanId,
+    artisanId: artisan.id,
     total: quote.total,
     availableDay: quote.availableDay,
   });
+  return quote;
+}
+
+/**
+ * Hands works to the project manager (milestone 8): he asks the most reliable artisan of each
+ * trade for a quote, signs them, and will treat the hazards; no free time, a fee on top.
+ */
+export function delegateWorks(
+  ctx: SystemContext,
+  propertyId: string,
+  choices: readonly ItemChoice[],
+): WorksRefusal | null {
+  const { content, state } = ctx;
+  const owned = findOwned(state, propertyId);
+  if (!owned) return 'property.unknown';
+  if (owned.works) return 'works.inProgress';
+  if (choices.length === 0) return 'works.empty';
+  if (new Set(choices.map((c) => c.itemId)).size !== choices.length) return 'works.duplicateItem';
+  const byTrade = new Map<Trade, ItemChoice[]>();
+  for (const choice of choices) {
+    const found = renovatable(content, owned.property, choice);
+    if ('refusal' in found) return found.refusal;
+    byTrade.set(found.works.trade, [...(byTrade.get(found.works.trade) ?? []), choice]);
+  }
+  const known = knownArtisans(content, state, owned.property.cityId);
+  const artisans = new Map<Trade, Artisan>();
+  for (const trade of byTrade.keys()) {
+    const best = known
+      .filter((artisan) => artisan.trade === trade)
+      .sort((a, b) => b.reliability - a.reliability)[0];
+    if (!best) return 'works.unknownArtisan';
+    artisans.set(trade, best);
+  }
+  const quoteIds: string[] = [];
+  for (const [trade, items] of byTrade) {
+    const artisan = artisans.get(trade);
+    if (artisan) quoteIds.push(writeQuote(ctx, owned, artisan, items).id);
+  }
+  const refusal = startWorks(ctx, propertyId, quoteIds, []);
+  if (refusal) {
+    owned.quotes = owned.quotes.filter((quote) => !quoteIds.includes(quote.id));
+    return refusal;
+  }
+  const project = owned.works as WorksProject | null;
+  if (!project) return null;
+  project.managed = true;
+  const planned = project.tasks.reduce(
+    (sum, task) => sum + task.items.reduce((s, line) => s + line.price, 0),
+    0,
+  );
+  const fee = Math.round(planned * content.works.projectManager.feeShare);
+  if (fee > 0) payWorks(ctx, owned, fee);
+  ctx.events.push({ type: 'worksDelegated', propertyId, fee });
   return null;
 }
 
@@ -415,6 +482,8 @@ export function startWorks(
     id: projectId,
     startDay: ctx.today,
     tasks,
+    managed: false,
+    transformation: null,
     hazard: null,
     dpeBefore: owned.property.dpe,
     paid: 0,
@@ -685,7 +754,12 @@ export function runDailyWorks(ctx: SystemContext): void {
     owned.quotes = owned.quotes.filter((quote) => quote.expiresDay > ctx.today);
     expireWorksFund(ctx, owned);
     const project = owned.works;
-    if (!project) continue;
+    // A transformation has no tasks: it ends on its own day (transformations.ts).
+    if (!project || project.transformation) continue;
+    // The project manager treats a hazard at once.
+    if (project.hazard && project.managed) {
+      resolveHazard(ctx, owned, project, project.hazard, 'treat');
+    }
     if (project.hazard) {
       if (ctx.today < project.hazard.deadlineDay) {
         // The works wait for the decision.

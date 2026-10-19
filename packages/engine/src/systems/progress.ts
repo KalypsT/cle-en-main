@@ -263,6 +263,9 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
       case 'anecdote':
         bump(state, 'anecdotes');
         break;
+      case 'transformationCompleted':
+        bump(state, 'transformations');
+        break;
       default:
         break;
     }

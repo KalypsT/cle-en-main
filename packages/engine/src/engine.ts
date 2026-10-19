@@ -7,7 +7,7 @@ import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
 import { deserializeGame, type MigrationRegistry, MIGRATIONS } from './serialization.ts';
-import { type Avatar, FORMAT_VERSION, type GameState } from './state.ts';
+import { type Avatar, FORMAT_VERSION, type GameState, type TransformationKind } from './state.ts';
 import { monthlyPoint, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
@@ -56,6 +56,11 @@ import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
 import { createCompany, setPurchaseHolder } from './systems/company.ts';
+import {
+  runDailyTransformations,
+  startTransformation,
+  transformationQuote,
+} from './systems/transformations.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
 import { netWorth } from './systems/net-worth.ts';
 import { answerCounter, makeOffer } from './systems/offers.ts';
@@ -106,6 +111,7 @@ import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.
 import { ambience, findBuilding, section, streets } from './systems/world.ts';
 import {
   answerHazard,
+  delegateWorks,
   artisanDiscount,
   diagnose,
   type ItemChoice,
@@ -298,6 +304,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
   runDailyWorks(ctx);
+  runDailyTransformations(ctx);
   runDailyCopro(ctx);
   runDailyPurchases(ctx);
   runDailyRivals(ctx);
@@ -481,6 +488,12 @@ export function createEngine(content: GameContent) {
       case 'works/hazard':
         refusal = answerHazard(ctx, action.propertyId, action.choice);
         break;
+      case 'works/delegate':
+        refusal = delegateWorks(ctx, action.propertyId, action.items);
+        break;
+      case 'works/transform':
+        refusal = startTransformation(ctx, action.propertyId, action.kind);
+        break;
       case 'copro/vote':
         refusal = voteResolution(ctx, action.propertyId, action.resolutionId, action.vote);
         break;
@@ -643,6 +656,11 @@ export function createEngine(content: GameContent) {
     worksCatalog: (state: GameState, id: string) => {
       const property = findAnyProperty(state, id);
       return property ? worksCatalog(content, state, property) : null;
+    },
+    /** What a transformation of an owned property would produce and cost (milestone 8). */
+    transformationQuote: (state: GameState, propertyId: string, kind: TransformationKind) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? transformationQuote(content, state, owned, kind) : null;
     },
     /** Reference cost, duration, DPE, value and rent after renovating these items. */
     worksEstimate: (state: GameState, id: string, choices: readonly ItemChoice[]) => {

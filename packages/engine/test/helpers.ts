@@ -136,7 +136,7 @@ export function buyWithLoan(state: GameState, listingId: string) {
 /** What a property is made of besides its rooms and items. */
 export type PropertyBasics = Omit<
   Property,
-  'spaces' | 'items' | 'energyFactor' | 'copro' | 'postponedHazards'
+  'spaces' | 'items' | 'energyFactor' | 'copro' | 'postponedHazards' | 'atticSurface'
 >;
 
 /**
@@ -151,6 +151,7 @@ export function dwelling(basics: PropertyBasics, state = 4): Property {
     spaces,
     items,
     energyFactor: 1,
+    atticSurface: 0,
     // No general meeting: tests ask for one explicitly.
     copro: null,
     postponedHazards: [],

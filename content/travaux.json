@@ -548,6 +548,49 @@
     "generationOffsets": { "A": 1.2, "B": 0.8, "C": 0.4, "D": 0, "E": -0.4, "F": -0.8, "G": -1.2 }
   },
   "quotes": { "minutes": 30, "validityDays": 60, "noise": 0.05, "depositShare": 0.3 },
+  "projectManager": { "feeShare": 0.1 },
+  "transformations": {
+    "rules": {
+      "division": {
+        "kind": "house",
+        "minSurface": 110,
+        "costPerM2": 850,
+        "costPerLot": 4000,
+        "costShareOfValue": 0,
+        "months": 6
+      },
+      "splitBuilding": {
+        "kind": "building",
+        "minSurface": 0,
+        "costPerM2": 0,
+        "costPerLot": 3500,
+        "costShareOfValue": 0.01,
+        "months": 3
+      },
+      "attic": {
+        "kind": "house",
+        "minSurface": 0,
+        "costPerM2": 1300,
+        "costPerLot": 0,
+        "costShareOfValue": 0,
+        "months": 4
+      },
+      "construction": {
+        "kind": "land",
+        "minSurface": 300,
+        "costPerM2": 1750,
+        "costPerLot": 0,
+        "costShareOfValue": 0,
+        "months": 10
+      }
+    },
+    "divisionLotSurface": 45,
+    "divisionLots": { "min": 2, "max": 4 },
+    "constructionSurface": { "share": 0.25, "min": 80, "max": 150 },
+    "constructionDpe": "A",
+    "overrun": { "chance": 0.35, "share": { "min": 0.05, "max": 0.2 } },
+    "attic": { "houseShare": 0.35, "surfaceShare": { "min": 0.2, "max": 0.4 } }
+  },
   "diagnosis": { "cost": 180 },
   "artisans": {
     "maxOverrun": 0.3,

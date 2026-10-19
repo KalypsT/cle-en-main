@@ -1,7 +1,8 @@
 import type { GameEvent } from './events.ts';
 import type { Cents } from './money.ts';
 import type { LeaseType, Trade } from './content.ts';
-import type { GameState, Holder, SaleMode, TaxRegimeChoice } from './state.ts';
+import type { GameState, Holder, SaleMode, TaxRegimeChoice, TransformationKind } from './state.ts';
+import type { TransformationRefusal } from './systems/transformations.ts';
 import type { CompanyRefusal } from './systems/company.ts';
 import type { AgendaRefusal, VisitRefusal } from './systems/agenda.ts';
 import type { CatalogRefusal } from './systems/catalog.ts';
@@ -72,6 +73,10 @@ export type GameAction =
   | { type: 'works/quote'; propertyId: string; artisanId: string; items: ItemChoice[] }
   | { type: 'works/start'; propertyId: string; quoteIds: string[]; diy: ItemChoice[] }
   | { type: 'works/hazard'; propertyId: string; choice: HazardChoice }
+  /** Hands these items to the project manager (milestone 8). */
+  | { type: 'works/delegate'; propertyId: string; items: ItemChoice[] }
+  /** Starts a transformation, led by the project manager (milestone 8). */
+  | { type: 'works/transform'; propertyId: string; kind: TransformationKind }
   | {
       type: 'copro/vote';
       propertyId: string;
@@ -100,6 +105,7 @@ export type RefusalCode =
   | CatalogRefusal
   | ChallengeRefusal
   | CompanyRefusal
+  | TransformationRefusal
   | 'game.over'
   | 'job.alreadyResigned'
   | 'tutorial.invalidStep';

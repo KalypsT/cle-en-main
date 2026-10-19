@@ -105,11 +105,18 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
     .map((rule) => ({ id: rule.id, revealed: false }));
   const tax = rules.ownership.propertyTaxPerM2[kind];
   const copro = content.works.copro;
+  // Some houses have an attic one could convert (milestone 8).
+  const attic = content.works.transformations.attic;
+  const atticSurface =
+    kind === 'house' && nextFloat(state.rng) < attic.houseShare
+      ? Math.round(surface * nextRange(state.rng, attic.surfaceShare.min, attic.surfaceShare.max))
+      : 0;
   const property: Property = {
     id: `property-${state.nextId++}`,
     cityId,
     neighbourhoodId: neighbourhood.id,
     kind,
+    atticSurface,
     surface,
     rooms,
     floor,
@@ -163,6 +170,7 @@ function generateOtherProperty(
     spaces: freezeSpaces([]),
     items: freezeItems([]),
     energyFactor: 1,
+    atticSurface: 0,
     copro: null,
     postponedHazards: [],
     defects: [],

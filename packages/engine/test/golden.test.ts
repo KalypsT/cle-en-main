@@ -104,6 +104,8 @@ function bestDeal(state: GameState) {
   for (const listing of state.listings) {
     // The reference game is played in Dole, the player's base.
     if (listing.property.cityId !== 'dole') continue;
+    // A home to let: shops, parking spaces and land (milestone 8) are left aside.
+    if (listing.property.kind !== 'apartment' && listing.property.kind !== 'house') continue;
     if (listing.offer || listing.askingPrice > 8_000_000) continue;
     if (engine.rentQuote(state, listing.id, 'bare')?.block) continue;
     const ratio = (engine.estimate(state, listing.id)?.estimate ?? 0) / listing.askingPrice;

@@ -183,6 +183,8 @@ describe('streets', () => {
       works: {
         id: 'w1',
         startDay: today - 5,
+        managed: false,
+        transformation: null,
         tasks: [
           {
             id: 't1',

@@ -595,6 +595,8 @@ const propertySchema = z
         .strict(),
     ),
     energyFactor: z.number().positive(),
+    // Added in version 10: houses of older saves have no convertible attic.
+    atticSurface: z.number().min(0).default(0),
     copro: z
       .object({
         lots: z.number().int().min(1),
@@ -646,6 +648,18 @@ const worksProjectSchema = z
   .object({
     id: z.string(),
     startDay: day,
+    // Added in version 10 (project manager, transformations).
+    managed: z.boolean().default(false),
+    transformation: z
+      .object({
+        kind: z.enum(['division', 'splitBuilding', 'attic', 'construction']),
+        total: cents.min(0),
+        endDay: day,
+        overrun: z.number().min(0),
+      })
+      .strict()
+      .nullable()
+      .default(null),
     tasks: z.array(
       z
         .object({

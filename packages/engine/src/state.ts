@@ -165,6 +165,8 @@ export interface Property {
   items: WorkItem[];
   /** Calibrates the energy model on the DPE drawn from the data (primary energy multiplier). */
   energyFactor: number;
+  /** Area of a house's attic that could be converted (milestone 8); 0 when there is none. */
+  atticSurface: number;
   /** Co-ownership of an apartment's building; null for houses and whole buildings. */
   copro: { lots: number; meetingMonth: number } | null;
   postponedHazards: PostponedHazard[];
@@ -408,10 +410,26 @@ export interface PendingHazard {
   deadlineDay: number;
 }
 
+export type TransformationKind = 'division' | 'splitBuilding' | 'attic' | 'construction';
+
+/** A transformation led by the project manager (milestone 8): one bill, paid at the end. */
+export interface TransformationProject {
+  kind: TransformationKind;
+  /** Quoted total, the project manager included. */
+  total: Cents;
+  endDay: number;
+  /** Hidden share added to the final bill. */
+  overrun: number;
+}
+
 export interface WorksProject {
   id: string;
   startDay: number;
   tasks: WorksTask[];
+  /** Led by the project manager: he treats the hazards himself (milestone 8). */
+  managed: boolean;
+  /** A transformation instead of tasks; null for ordinary works. */
+  transformation: TransformationProject | null;
   /** A hazard waiting for the player's decision: the works are paused. */
   hazard: PendingHazard | null;
   dpeBefore: DpeLabel;

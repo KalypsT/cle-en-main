@@ -1,7 +1,13 @@
 import type { CalendarDate, Weekday } from './calendar.ts';
 import type { Cents } from './money.ts';
 import type { DpeLabel, LeaseType, Trade } from './content.ts';
-import type { AnecdoteNote, CatalogEventInstance, Holder, SaleMode } from './state.ts';
+import type {
+  AnecdoteNote,
+  CatalogEventInstance,
+  Holder,
+  SaleMode,
+  TransformationKind,
+} from './state.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 import type { LettingBlock } from './systems/renting.ts';
 
@@ -50,6 +56,23 @@ export type GameEvent =
   | { type: 'loanRefinanced'; oldLoanId: string; newLoanId: string; fees: Cents }
   | { type: 'bankMeetingHeld'; bankId: string; trust: number }
   | { type: 'resigned' }
+  /** Works handed to the project manager (milestone 8): his fee is paid. */
+  | { type: 'worksDelegated'; propertyId: string; fee: Cents }
+  | {
+      type: 'transformationStarted';
+      propertyId: string;
+      kind: TransformationKind;
+      total: Cents;
+      endDay: number;
+    }
+  /** The transformation is done: `propertyIds` are what it produced (the flats of a division). */
+  | {
+      type: 'transformationCompleted';
+      propertyId: string;
+      kind: TransformationKind;
+      cost: Cents;
+      propertyIds: string[];
+    }
   /** A late rival (the SCI Horizon) enters the market (milestone 8). */
   | { type: 'rivalArrived'; rivalId: string }
   /** The player created his SCI (milestone 8). */

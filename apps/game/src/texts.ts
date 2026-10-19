@@ -360,6 +360,18 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':
       return events.resigned;
+    case 'worksDelegated':
+      return format(events.worksDelegated, { amount: formatMoney(event.fee) });
+    case 'transformationStarted':
+      return format(events.transformationStarted, {
+        kind: t.transformation.kinds[event.kind],
+        date: formatDayLong(event.endDay),
+      });
+    case 'transformationCompleted':
+      return format(events.transformationCompleted, {
+        kind: t.transformation.kinds[event.kind],
+        amount: formatMoney(event.cost),
+      });
     case 'companyCreated':
       return format(events.companyCreated, { amount: formatMoney(event.cost) });
     case 'purchaseHolderSet':

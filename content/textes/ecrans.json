@@ -925,5 +925,29 @@
     "viewing": "Vous regardez {city}",
     "switch": "Changer de ville",
     "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN."
+  },
+  "transformation": {
+    "heading": "Transformer le bien",
+    "intro": "Un maître d'œuvre mène le projet de bout en bout : devis, artisans, imprévus. Le bien doit être vide.",
+    "kinds": {
+      "division": "Division en appartements",
+      "splitBuilding": "Vente à la découpe",
+      "attic": "Aménagement des combles",
+      "construction": "Construction d'une maison"
+    },
+    "descriptions": {
+      "division": "La maison devient {count} appartements refaits à neuf, chacun loué ou vendu séparément.",
+      "splitBuilding": "L'immeuble est mis en copropriété : ses {count} appartements se vendent ou se louent un par un, sans la décote d'un immeuble vendu en bloc.",
+      "attic": "Les combles deviennent une chambre de plus : {surface} habitables.",
+      "construction": "Une maison neuve de {surface} sort de terre, au meilleur niveau énergétique."
+    },
+    "works": "Travaux",
+    "fee": "Honoraires du maître d'œuvre",
+    "total": "Total",
+    "duration": "Durée : {months} mois",
+    "start": "Lancer le projet",
+    "inProgress": "Projet en cours : {kind}, fin prévue le {date}.",
+    "delegate": "Confier au maître d'œuvre",
+    "delegateHint": "Il choisit les artisans les plus fiables et traite les imprévus, pour {share} du chantier."
   }
 }
