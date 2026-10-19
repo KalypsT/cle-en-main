@@ -1,7 +1,15 @@
 import type { AgendaItem, GameState } from '@cle/engine';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
-import { bankerName, format, formatDayLong, formatDuration, propertyLabel, t } from '../texts.ts';
+import {
+  bankerName,
+  cityName,
+  format,
+  formatDayLong,
+  formatDuration,
+  propertyLabel,
+  t,
+} from '../texts.ts';
 import { Badge, Card, ScreenHeader } from '../ui/components.tsx';
 
 function itemLabel(state: GameState, item: AgendaItem): string {
@@ -46,13 +54,27 @@ export function AgendaScreen() {
             <p className="small">
               {format(t.agenda.free, { duration: formatDuration(day.freeMinutes) })}
             </p>
+            {day.trips.map((trip) => (
+              <p key={trip.cityId} className="small muted">
+                {format(t.agenda.trip, {
+                  city: cityName(trip.cityId),
+                  duration: formatDuration(trip.minutes),
+                })}
+              </p>
+            ))}
             {day.planned.length === 0 ? (
               <p className="small muted">{t.agenda.nothing}</p>
             ) : (
               day.planned.map((item) => (
                 <div key={item.id} className="row between wrap">
                   <span>
-                    {itemLabel(state, item)} · {formatDuration(item.minutes)}
+                    {item.cityId === state.player.baseCityId
+                      ? itemLabel(state, item)
+                      : format(t.agenda.inCity, {
+                          label: itemLabel(state, item),
+                          city: cityName(item.cityId),
+                        })}{' '}
+                    · {formatDuration(item.minutes)}
                   </span>
                   <span className="row">
                     <button

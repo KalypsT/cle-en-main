@@ -53,10 +53,10 @@
       "name": "Investisseur aguerri",
       "step": 3,
       "branch": "landlord",
-      "description": "Un patrimoine net de 250 000 € (et des biens dans 2 villes, à partir du jalon des villes).",
+      "description": "Un patrimoine net de 250 000 € et des biens dans 2 villes.",
       "conditions": [
         { "stat": "netWorth", "min": 250000 },
-        { "stat": "cities", "min": 2, "active": false }
+        { "stat": "cities", "min": 2 }
       ],
       "requiresAny": ["landlord", "renovator"],
       "available": true,
@@ -104,11 +104,11 @@
       "name": "Baron de la pierre",
       "step": 6,
       "branch": "both",
-      "description": "5 millions d'euros nets, une réputation de 90 (et 4 villes, à partir du jalon des villes).",
+      "description": "5 millions d'euros nets, une réputation de 90 et des biens dans 4 villes.",
       "conditions": [
         { "stat": "netWorth", "min": 5000000 },
         { "stat": "reputation", "min": 90 },
-        { "stat": "cities", "min": 4, "active": false }
+        { "stat": "cities", "min": 4 }
       ],
       "requiresAny": ["magnate"],
       "available": true,

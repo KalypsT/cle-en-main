@@ -11,6 +11,7 @@ import type { PurchaseRefusal } from './systems/purchases.ts';
 import type { RentRefusal } from './systems/renting.ts';
 import type { SaleRefusal } from './systems/resale.ts';
 import type { CoproRefusal } from './systems/copro.ts';
+import type { MoveRefusal } from './systems/cities.ts';
 import type { HazardChoice, ItemChoice, WorksRefusal } from './systems/works.ts';
 
 /** Every player or bot decision goes through one of these actions. Amounts are in cents. */
@@ -59,6 +60,8 @@ export type GameAction =
   | { type: 'rent/repair'; propertyId: string; method: 'self' | 'artisan' }
   | { type: 'home/moveIn'; propertyId: string }
   | { type: 'home/moveOut' }
+  /** Moves the rented home to another city: the base changes (docs/03-systemes/08). */
+  | { type: 'city/move'; cityId: string }
   | { type: 'tax/setRegime'; propertyId: string; regime: TaxRegimeChoice }
   | { type: 'market/diagnose'; listingId: string; trade: Trade }
   | { type: 'works/quote'; propertyId: string; artisanId: string; items: ItemChoice[] }
@@ -88,6 +91,7 @@ export type RefusalCode =
   | WorksRefusal
   | CoproRefusal
   | AgendaRefusal
+  | MoveRefusal
   | CatalogRefusal
   | ChallengeRefusal
   | 'game.over'

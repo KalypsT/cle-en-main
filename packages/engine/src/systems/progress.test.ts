@@ -52,14 +52,19 @@ describe('progression (docs/02, sections 2.8 to 2.10)', () => {
     expect(ctx.state.progress.titles.map((t) => t.id)).toEqual(['ambitiousTenant']);
     ctx.state.progress.counters.purchases = 3;
     checkMilestones(ctx);
-    // Three debt-free flats also make an Investisseur aguerri (250 k€ net).
+    // Three debt-free flats in Dole are worth 250 k€ net, but Investisseur aguerri
+    // also asks for properties in two cities.
     expect(ctx.state.progress.titles.map((t) => t.id)).toEqual([
       'ambitiousTenant',
       'firstInvestor',
       'landlord',
-      'seasonedInvestor',
     ]);
-    expect(ctx.events.filter((e) => e.type === 'titleEarned')).toHaveLength(3);
+    expect(ctx.events.filter((e) => e.type === 'titleEarned')).toHaveLength(2);
+    const dijon = ctx.state.properties[2];
+    if (!dijon) throw new Error('No third property');
+    dijon.property = { ...dijon.property, cityId: 'dijon' };
+    checkMilestones(ctx);
+    expect(ctx.state.progress.titles.map((t) => t.id)).toContain('seasonedInvestor');
     expect(ctx.state.progress.achievements.map((a) => a.id)).toContain('thousandAMonth');
   });
 
@@ -71,6 +76,7 @@ describe('progression (docs/02, sections 2.8 to 2.10)', () => {
       {
         type: 'propertySold',
         propertyId: 'x',
+        cityId: 'dole',
         price: 100_000_00,
         agencyFees: 0,
         loanRepaid: 0,

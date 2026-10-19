@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { advanceDays, content, engine, newGame, systemContext } from '../../test/helpers.ts';
+import {
+  advanceDays,
+  cityListings,
+  content,
+  engine,
+  newGame,
+  systemContext,
+} from '../../test/helpers.ts';
 import { dailyListingRate, generateListing, otherBuyerProbability } from './listings.ts';
 
 describe('listings', () => {
@@ -9,13 +16,34 @@ describe('listings', () => {
     // Dole: a few hundred single-dwelling sales a year in DVF.
     expect(rate * 365).toBeGreaterThan(250);
     expect(rate * 365).toBeLessThan(500);
-    expect(state.listings.length).toBe(Math.round(rate * content.market.flow.initialStockDays));
+    expect(cityListings(state).length).toBe(
+      Math.round(rate * content.market.flow.initialStockDays),
+    );
     let published = 0;
     for (const event of advanceDays(state, 365).events) {
       if (event.type === 'listingPublished') published++;
     }
-    expect(published / 365 / rate).toBeGreaterThan(0.85);
-    expect(published / 365 / rate).toBeLessThan(1.15);
+    const total = Object.keys(content.cities).reduce(
+      (sum, id) => sum + dailyListingRate(content, id),
+      0,
+    );
+    expect(published / 365 / total).toBeGreaterThan(0.85);
+    expect(published / 365 / total).toBeLessThan(1.15);
+  });
+
+  it('shows only the share of the real sales that each city lets through', () => {
+    const state = newGame();
+    for (const [cityId, city] of Object.entries(content.cities)) {
+      const perYear = city.neighbourhoods.reduce(
+        (sum, n) => sum + n.sales.apartment.perYear + n.sales.house.perYear,
+        0,
+      );
+      const share = content.citiesRules.listingFlowShare[cityId] ?? 1;
+      expect(dailyListingRate(content, cityId) * 365).toBeCloseTo(perYear * share, 6);
+      expect(cityListings(state, cityId).length).toBe(
+        Math.round(dailyListingRate(content, cityId) * content.market.flow.initialStockDays),
+      );
+    }
   });
 
   it('draws properties within the real distributions', () => {

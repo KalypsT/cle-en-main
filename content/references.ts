@@ -9,6 +9,7 @@ import type { Rival, RivalsFile } from './schemas/rivals.ts';
 import type { LivingCosts, Start } from './schemas/start.ts';
 import type { Artisan, ArtisansFile, WorksRules, WorksTexts } from './schemas/works.ts';
 import type { WorldRules } from './schemas/world.ts';
+import type { CitiesRules } from './schemas/villes.ts';
 import type { Anecdote, CatalogEvent, RhythmRules } from './schemas/events.ts';
 import type { CalendarRules, ModesFile } from './schemas/modes.ts';
 import type {
@@ -57,6 +58,8 @@ export interface GameContent {
   anecdotes: Anecdote[];
   /** Yvon Tableur's advice at the yearly review. */
   yvon: YvonTexts;
+  /** Trips between cities, remote management, local renown, moving (milestone 7). */
+  citiesRules: CitiesRules;
   /** Generated city data, by city id. */
   cities: Record<string, CityData>;
 }
@@ -93,6 +96,31 @@ export function checkReferences(content: GameContent): string[] {
     const ids = city.neighbourhoods.map((n) => n.id);
     if (new Set(ids).size !== ids.length)
       problems.push(`data/cities/${cityId}.json : quartier en double`);
+  }
+  const cityIds = Object.keys(content.cities);
+  const trips = new Set<string>();
+  for (const trip of content.citiesRules.trips) {
+    for (const cityId of [trip.a, trip.b]) {
+      if (!content.cities[cityId]) problems.push(`villes.json : ville inconnue « ${cityId} »`);
+    }
+    trips.add([trip.a, trip.b].sort().join('/'));
+  }
+  for (const [i, a] of cityIds.entries()) {
+    if (!content.citiesRules.listingFlowShare[a]) {
+      problems.push(`villes.json : aucune part de flux d'annonces pour « ${a} »`);
+    }
+    if (!content.citiesRules.demand[a]) {
+      problems.push(`villes.json : aucune demande pour « ${a} »`);
+    }
+    if (!content.citiesRules.positions[a]) {
+      problems.push(`villes.json : aucune position sur la carte pour « ${a} »`);
+    }
+    if (!content.citiesRules.texts[a]) problems.push(`villes.json : aucun texte pour « ${a} »`);
+    for (const b of cityIds.slice(i + 1)) {
+      if (!trips.has([a, b].sort().join('/'))) {
+        problems.push(`villes.json : aucun trajet entre « ${a} » et « ${b} »`);
+      }
+    }
   }
   const { market, listingTexts } = content;
   for (const motivation of market.motivations) {

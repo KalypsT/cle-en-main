@@ -4,6 +4,7 @@ import {
   advanceDays,
   affordableListing,
   buyWithLoan,
+  cityListings,
   content,
   dwelling,
   newGame,
@@ -23,7 +24,7 @@ function rival(id: string) {
 /** The state with one listing turned into a property and price of our choosing. */
 function withBargain(changes: Partial<PropertyBasics>, priceShare: number, itemState = 4) {
   const state = newGame({ seed: 7 });
-  const base = state.listings[0];
+  const base = cityListings(state)[0];
   if (!base) throw new Error('No listing');
   const { spaces, items, energyFactor, copro, postponedHazards, ...basics } = base.property;
   void [spaces, items, energyFactor, copro, postponedHazards];

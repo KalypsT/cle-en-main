@@ -1,4 +1,3 @@
-import { gameContent } from '@cle/content';
 import { decisionKey } from '@cle/engine';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -27,10 +26,11 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
   const { state, snapshot } = useGame();
   const nav = useNav();
   const { player } = state;
-  const cityId = gameContent.start.cityId;
+  const cityId = nav.cityId;
   const summary = engine.portfolio(state);
   // The best deals by the player's own estimate.
-  const opportunities = state.listings
+  const cityListings = state.listings.filter((listing) => listing.property.cityId === cityId);
+  const opportunities = cityListings
     .filter((listing) => !listing.offer || listing.offer.counter)
     .map((listing) => ({ listing, view: engine.listingView(state, listing.id) }))
     .sort((a, b) => (b.view?.valueGap ?? -1) - (a.view?.valueGap ?? -1))
@@ -63,8 +63,18 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
         <div className="stack tight grow">
           <h1 className="h2 display">{format(t.street.hello, { name: player.name })}</h1>
           <p className="small muted">
-            {format(t.street.subtitle, { job: jobName(player.jobId), city: cityName(cityId) })}
+            {format(t.street.subtitle, {
+              job: jobName(player.jobId),
+              city: cityName(player.baseCityId),
+            })}
           </p>
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => nav.push({ name: 'cities' })}
+          >
+            {format(t.cities.viewing, { city: cityName(cityId) })} · {t.cities.switch}
+          </button>
         </div>
         {!expanded && (
           <div className="drawer-figures">
@@ -109,7 +119,7 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
                 className="link-button"
                 onClick={() => nav.push({ name: 'listings' })}
               >
-                {format(t.common.seeAll, { count: state.listings.length })}
+                {format(t.common.seeAll, { count: cityListings.length })}
               </button>
             }
           />

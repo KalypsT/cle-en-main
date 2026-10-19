@@ -8,12 +8,14 @@ import { challengeProgress, findChallenge } from './challenges.ts';
 import type { SystemContext } from './context.ts';
 import { signedLine } from './history.ts';
 import { type DayKind, dayKind, schoolHoliday } from './holidays.ts';
+import { itemCity } from './agenda.ts';
 import { dailyFreeTime } from './household.ts';
 import { modeOf, rewindsLeft } from './modes.ts';
 import { conditionsMet, currentTitleId, statValue } from './progress.ts';
 import { letBanDay } from './renting.ts';
 import { offMarketChancePerMonth, progressMarginPercent } from './reputation.ts';
 import { estimateRegimes } from './taxes.ts';
+import { tripBetween } from './travel.ts';
 import { pendingDecisions } from './ui-queries.ts';
 
 const HOURS_PER_DAY = 24;
@@ -55,6 +57,7 @@ const GROUP_OF: Record<StatementLine['kind'], ReviewGroup> = {
   propertyCharges: 'properties',
   ownerInsurance: 'properties',
   managementFees: 'properties',
+  remoteManagement: 'properties',
   legalCosts: 'properties',
   coproCall: 'properties',
   taxInstalment: 'taxes',
@@ -288,7 +291,9 @@ export interface AgendaDay {
   /** Name of the school holiday, when the day is in one. */
   holiday: string | null;
   freeMinutes: number;
-  planned: AgendaItem[];
+  planned: (AgendaItem & { cityId: string })[];
+  /** One trip for each other city with planned actions that day (the day on site). */
+  trips: { cityId: string; minutes: number; cost: Cents }[];
 }
 
 /** The coming week of the agenda: kind of day, free time and planned actions. */
@@ -298,6 +303,9 @@ export function agendaWeek(content: GameContent, state: GameState, days = 7): Ag
   return Array.from({ length: days }, (_, offset) => {
     const day = today + offset;
     const date = fromDayNumber(day);
+    const planned = state.agenda
+      .filter((item) => item.day === day)
+      .map((item) => ({ ...item, cityId: itemCity({ state }, item) }));
     return {
       day,
       date,
@@ -305,7 +313,10 @@ export function agendaWeek(content: GameContent, state: GameState, days = 7): Ag
       holiday: schoolHoliday(content, date)?.name ?? null,
       freeMinutes:
         offset === 0 ? state.player.freeTimeMinutes : dailyFreeTime(content, state, date),
-      planned: state.agenda.filter((item) => item.day === day),
+      planned,
+      trips: [...new Set(planned.map((item) => item.cityId))]
+        .map((cityId) => ({ cityId, ...tripBetween(content, state.player.baseCityId, cityId) }))
+        .filter((trip) => trip.minutes > 0),
     };
   });
 }

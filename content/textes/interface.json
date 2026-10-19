@@ -134,7 +134,9 @@
     "selfRepairPlanned": "Réparation planifiée dans l'agenda, sur votre temps libre.",
     "yourProperty": "votre bien",
     "yourTenant": "votre locataire",
-    "theArtisan": "l'artisan"
+    "theArtisan": "l'artisan",
+    "tripMade": "Trajet à {city} : {duration} de route, {cost}.",
+    "movedCity": "Vous voilà installé à {city} : loyer de {rent} par mois, déménagement {cost}."
   },
   "refusals": {
     "bank.unknown": "Cette banque n'existe pas.",
@@ -204,7 +206,12 @@
     "event.unknownChoice": "Ce choix n'existe pas.",
     "challenge.none": "Aucun défi en cours.",
     "challenge.alreadyAccepted": "Défi déjà accepté.",
-    "game.over": "La partie est terminée."
+    "game.over": "La partie est terminée.",
+    "city.unknown": "Cette ville n'est pas dans le jeu.",
+    "move.sameCity": "Vous habitez déjà ici.",
+    "move.ownHome": "Vous habitez dans un logement qui vous appartient : achetez ou louez votre nouvelle résidence ailleurs, ou quittez d'abord celui-ci.",
+    "move.tooSoon": "Vous avez déménagé il y a peu : les cartons sont à peine défaits.",
+    "move.noMoney": "Pas assez d'argent sur le compte pour payer le déménagement."
   },
   "errors": {
     "importFailed": "Ce fichier ne contient pas une partie valide.",

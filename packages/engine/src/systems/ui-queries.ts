@@ -22,6 +22,7 @@ import {
 import { believedView, conditionLabel } from './dwelling.ts';
 import { netWorth } from './net-worth.ts';
 import { dwellingKindOf, type Estimate, estimateValue } from './valuation.ts';
+import { isRemoteSelfManaged, remoteManagementFee } from './cities.ts';
 import { expectedSalary, livingCosts } from './household.ts';
 import { purchaseFees } from './purchases.ts';
 import { cashDueAtDeed } from './purchases.ts';
@@ -326,7 +327,12 @@ export function propertyCashFlow(
   const rent = lease ? lease.monthlyRent : 0;
   const due = rent + recoverable;
   const agency = lease?.agencyId ? findAgency(content, lease.agencyId) : undefined;
-  const managementFees = agency ? Math.round(due * agency.feeShare) : 0;
+  // Agency fees, or the fee for managing from afar a property of another city.
+  const managementFees = agency
+    ? Math.round(due * agency.feeShare)
+    : isRemoteSelfManaged(state, owned)
+      ? remoteManagementFee(content)
+      : 0;
   const premium = lease?.insured
     ? Math.round(due * content.renting.unpaidRentInsurance.premiumShare)
     : 0;
@@ -421,7 +427,8 @@ export function simulateFinancing(
   const ownerCosts =
     property.monthlyCharges +
     Math.round(property.annualPropertyTax / MONTHS_PER_YEAR) +
-    ownerInsurance(content, property);
+    ownerInsurance(content, property) +
+    (property.cityId === state.player.baseCityId ? 0 : remoteManagementFee(content));
   const decision = evaluateLoan(content, state, {
     bankId: bank.id,
     amount: Math.max(1, loanAmount),

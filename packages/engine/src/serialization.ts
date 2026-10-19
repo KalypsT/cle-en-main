@@ -372,6 +372,37 @@ export const MIGRATIONS: MigrationRegistry = {
       lastYearReview: null,
     };
   },
+  /**
+   * Version 8 (milestone 6) played in Dole only. The player's base is the city
+   * of his home (Dole when renting), nothing is renown yet, and the cities
+   * added since get their price levels and a first stock of listings from the
+   * save's own random state; Dole's market is left as it was.
+   */
+  8: (raw, { content }) => {
+    const player = raw.player as Record<string, unknown>;
+    const properties = (raw.properties as { property: { id: string; cityId: string } }[]) ?? [];
+    const home = properties.find((owned) => owned.property.id === player.homePropertyId);
+    const market = raw.market as { cities: Record<string, unknown> };
+    const clock = raw.clock as GameState['clock'];
+    const added = Object.entries(initialCityMarkets(content, clock.date)).filter(
+      ([cityId]) => !(cityId in market.cities),
+    );
+    const state = {
+      ...raw,
+      player: {
+        ...player,
+        baseCityId: home?.property.cityId ?? content.start.cityId,
+        tripsToday: [],
+        lastMoveDay: null,
+        renown: {},
+      },
+      market: { ...market, cities: { ...market.cities, ...Object.fromEntries(added) } },
+    } as unknown as GameState;
+    for (const [cityId] of added) {
+      seedListings({ content, state, events: [], today: toDayNumber(state.clock.date) }, cityId);
+    }
+    return state as unknown as Record<string, unknown>;
+  },
 };
 
 /** Old defects (version 5) and the item each one becomes at state 1. */
@@ -771,6 +802,7 @@ const statementLineSchema = z.discriminatedUnion('kind', [
   propertyLine('propertyCharges'),
   propertyLine('ownerInsurance'),
   propertyLine('managementFees'),
+  propertyLine('remoteManagement'),
   propertyLine('legalCosts'),
   propertyLine('coproCall'),
   amountLine('taxInstalment'),
@@ -841,6 +873,10 @@ const gameStateSchema = z
         rentalHistoryMonths: z.number().int().min(0),
         bankruptDay: day.nullable(),
         homePropertyId: z.string().nullable(),
+        baseCityId: z.string().min(1),
+        tripsToday: z.array(z.string()),
+        lastMoveDay: day.nullable(),
+        renown: z.record(z.string(), z.number().min(0).max(100)),
       })
       .strict(),
     banks: z.record(

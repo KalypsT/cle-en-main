@@ -25,13 +25,17 @@ export type Route =
   | { name: 'agenda' }
   | { name: 'monthReview' }
   | { name: 'yearReview' }
-  | { name: 'rewind' };
+  | { name: 'rewind' }
+  | { name: 'cities' };
 
 /** A screen the tutorial waits for (content/textes/didacticiel.json). */
 export type TrackedScreen = 'listings' | 'listing' | 'financing';
 
 export interface Navigation {
   tab: TabId;
+  /** City the street, the map and the listings show (the base by default). */
+  cityId: string;
+  setCityId: (cityId: string) => void;
   push: (route: Route) => void;
   pop: () => void;
   /** Switches tab; with a route, opens it on top of the tab's root. */

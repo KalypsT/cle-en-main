@@ -264,17 +264,39 @@ function impactOf(content: GameContent, defectId: string): number {
   return content.market.defects.find((rule) => rule.id === defectId)?.valueImpactShare ?? 0;
 }
 
+interface CachedValue {
+  content: GameContent;
+  priceIndex: number;
+  value: ValueBreakdown;
+}
+
+/**
+ * Real values of frozen properties (the listings, which every other buyer and rival values
+ * every day, and which the copies of the state share): a frozen property never changes, so
+ * its value only depends on the content and on the price level of its neighbourhood.
+ */
+const realValueCache = new WeakMap<Property, CachedValue>();
+
 /** Real value, hidden states and nuisances included: what the market would pay with full knowledge. */
 export function realValue(
   content: GameContent,
   state: GameState,
   property: Property,
 ): ValueBreakdown {
+  const frozen = Object.isFrozen(property);
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  if (frozen) {
+    const hit = realValueCache.get(property);
+    if (hit && hit.content === content && hit.priceIndex === priceIndex) return hit.value;
+  }
   const defects = property.defects.reduce(
     (product, d) => product * (1 - impactOf(content, d.id)),
     1,
   );
-  return valueWith(content, state, property, defects);
+  const value = valueWith(content, state, property, defects);
+  if (frozen) realValueCache.set(property, { content, priceIndex, value });
+  return value;
 }
 
 export interface Estimate {

@@ -8,6 +8,7 @@ import { moveOutOfHome } from './renting.ts';
 import { rivalAcquired } from './rivals.ts';
 import { capitalGainsTax as capitalGainsTaxOf } from './taxes.ts';
 import { realValue } from './valuation.ts';
+import { spendFreeTime } from './travel.ts';
 
 export type SaleRefusal =
   | 'property.unknown'
@@ -162,6 +163,7 @@ function closeSale(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
   ctx.events.push({
     type: 'propertySold',
     propertyId: owned.property.id,
+    cityId: owned.property.cityId,
     price,
     agencyFees,
     ...proceeds,
@@ -218,11 +220,10 @@ export function runDailyResale(ctx: SystemContext): void {
       Math.exp(-rules.priceSensitivity * overpricing);
     if (nextFloat(state.rng) >= Math.min(1, chance)) continue;
     if (sale.mode === 'self') {
-      if (state.player.freeTimeMinutes < rules.selfVisitMinutes) {
+      if (!spendFreeTime(ctx, rules.selfVisitMinutes, owned.property.cityId)) {
         ctx.events.push({ type: 'saleVisitMissed', propertyId });
         continue;
       }
-      state.player.freeTimeMinutes -= rules.selfVisitMinutes;
     }
     ctx.events.push({ type: 'saleVisit', propertyId });
     if (nextFloat(state.rng) >= rules.offerAfterVisit) continue;

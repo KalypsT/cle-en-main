@@ -20,7 +20,9 @@ import {
 } from './renting.ts';
 import { addCost, addRent } from './taxes.ts';
 import { interpolateByState, weightedState } from './dwelling.ts';
+import { spendFreeTime } from './travel.ts';
 import { knownArtisans } from './works.ts';
+import { isRemoteSelfManaged, remoteManagementFee } from './cities.ts';
 
 /** The life of a lease (docs/03-systemes/04, « La vie du bail », « Les impayés »). */
 
@@ -89,6 +91,12 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
       state.player.balance -= insurance;
       addCost(state, owned, insurance);
       lines.push({ kind: 'ownerInsurance', propertyId, amount: insurance });
+    }
+    if (isRemoteSelfManaged(state, owned)) {
+      const fee = remoteManagementFee(content);
+      state.player.balance -= fee;
+      addCost(state, owned, fee);
+      lines.push({ kind: 'remoteManagement', propertyId, amount: fee });
     }
     const lease = owned.lease;
     if (!lease) continue;
@@ -191,12 +199,9 @@ function inWinterTruce(ctx: SystemContext): boolean {
 }
 
 /** Spends the owner's free time on a task; false if there is not enough today. */
-function useFreeTime(ctx: SystemContext, lease: Lease, minutes: number): boolean {
+function useFreeTime(ctx: SystemContext, owned: OwnedProperty, lease: Lease, minutes: number) {
   if (lease.agencyId !== null) return true;
-  const { player } = ctx.state;
-  if (player.freeTimeMinutes < minutes) return false;
-  player.freeTimeMinutes -= minutes;
-  return true;
+  return spendFreeTime(ctx, minutes, owned.property.cityId);
 }
 
 /** Departures, eviction, reminders, lease terms, yearly revision and life events, incidents. */
@@ -210,7 +215,7 @@ export function runDailyLeases(ctx: SystemContext): void {
 
     // End of the notice: the exit inventory needs the owner (or the agency).
     if (lease.noticeEndDay !== null && ctx.today >= lease.noticeEndDay) {
-      if (useFreeTime(ctx, lease, rules.selfManagement.moveOutMinutes)) {
+      if (useFreeTime(ctx, owned, lease, rules.selfManagement.moveOutMinutes)) {
         moveOut(ctx, owned, 'notice');
       }
       continue;
@@ -230,7 +235,7 @@ export function runDailyLeases(ctx: SystemContext): void {
       arrears &&
       !arrears.reminderFailed &&
       ctx.today >= arrears.sinceDay + rules.unpaid.reminderAfterDays &&
-      useFreeTime(ctx, lease, rules.selfManagement.reminderMinutes)
+      useFreeTime(ctx, owned, lease, rules.selfManagement.reminderMinutes)
     ) {
       const settled =
         nextFloat(state.rng) < rules.unpaid.reminderSuccess * lease.tenant.reliability;
@@ -395,8 +400,9 @@ export function repairIncident(
   if (!kind) return 'rent.noIncident';
   if (method === 'self') {
     if (!kind.selfRepair) return 'rent.noSelfRepair';
-    if (state.player.freeTimeMinutes < kind.selfMinutes) return 'time.notEnoughFreeTime';
-    state.player.freeTimeMinutes -= kind.selfMinutes;
+    if (!spendFreeTime(ctx, kind.selfMinutes, owned.property.cityId)) {
+      return 'time.notEnoughFreeTime';
+    }
     finishRepair(ctx, owned, lease, costRange(ctx, kind.selfCost));
     return null;
   }

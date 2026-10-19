@@ -197,11 +197,86 @@ export function drawPlanter(g: Graphics, x: number, season: Season): void {
   }
 }
 
+/** A landmark of a city's old centre, drawn behind the street (docs/03-systemes/08). */
+export type Landmark = 'collegiale' | 'philippeLeBon' | 'citadelle' | 'doyenne';
+
+/** Landmark seen from the neighbourhood, or null. */
+export function landmarkOf(cityId: string, neighbourhoodId: string): Landmark | null {
+  const centre: Record<string, [string, Landmark]> = {
+    dole: ['centreHistorique', 'collegiale'],
+    dijon: ['centreHistorique', 'philippeLeBon'],
+    besancon: ['centreAncien', 'citadelle'],
+    chalon: ['centreSaintLaurent', 'doyenne'],
+  };
+  const entry = centre[cityId];
+  return entry && entry[0] === neighbourhoodId ? entry[1] : null;
+}
+
+const LANDMARK_COLOR = 0x7c7ea0;
+const LANDMARK_SHADE = 0x5f6182;
+
+function drawLandmark(g: Graphics, landmark: Landmark, width: number): void {
+  const fill = { color: LANDMARK_COLOR, alpha: 0.75 };
+  const dark = { color: LANDMARK_SHADE, alpha: 0.75 };
+  const sx = width * 0.55;
+  switch (landmark) {
+    case 'collegiale':
+      g.rect(sx, GROUND_Y - 250, 34, 250).fill(fill);
+      g.rect(sx - 4, GROUND_Y - 254, 42, 6).fill(fill);
+      g.rect(sx + 5, GROUND_Y - 290, 24, 38).fill(fill);
+      g.poly([sx + 3, GROUND_Y - 290, sx + 17, GROUND_Y - 322, sx + 31, GROUND_Y - 290]).fill(fill);
+      g.rect(sx + 13, GROUND_Y - 232, 8, 14).fill(dark);
+      break;
+    case 'philippeLeBon':
+      // A tall square tower with a gallery and a flat roof.
+      g.rect(sx, GROUND_Y - 280, 44, 280).fill(fill);
+      g.rect(sx - 5, GROUND_Y - 292, 54, 14).fill(fill);
+      g.rect(sx + 3, GROUND_Y - 306, 38, 14).fill(fill);
+      g.rect(sx + 18, GROUND_Y - 236, 8, 18).fill(dark);
+      g.rect(sx + 18, GROUND_Y - 170, 8, 18).fill(dark);
+      break;
+    case 'citadelle':
+      // Ramparts and bastions on a hill.
+      g.poly([
+        sx - 120,
+        GROUND_Y,
+        sx - 40,
+        GROUND_Y - 150,
+        sx + 170,
+        GROUND_Y - 150,
+        sx + 250,
+        GROUND_Y,
+      ]).fill({
+        color: LANDMARK_COLOR,
+        alpha: 0.5,
+      });
+      g.rect(sx - 40, GROUND_Y - 190, 210, 40).fill(fill);
+      for (let i = 0; i < 8; i++) g.rect(sx - 40 + i * 28, GROUND_Y - 200, 14, 10).fill(fill);
+      g.rect(sx - 52, GROUND_Y - 214, 30, 64).fill(fill);
+      g.rect(sx + 152, GROUND_Y - 214, 30, 64).fill(fill);
+      g.rect(sx + 52, GROUND_Y - 175, 10, 18).fill(dark);
+      g.rect(sx + 108, GROUND_Y - 175, 10, 18).fill(dark);
+      break;
+    case 'doyenne':
+      // A square tower under a pointed roof.
+      g.rect(sx, GROUND_Y - 210, 40, 210).fill(fill);
+      g.poly([sx - 4, GROUND_Y - 210, sx + 20, GROUND_Y - 262, sx + 44, GROUND_Y - 210]).fill(fill);
+      g.rect(sx + 16, GROUND_Y - 190, 8, 16).fill(dark);
+      g.rect(sx + 16, GROUND_Y - 130, 8, 16).fill(dark);
+      break;
+  }
+}
+
 /**
- * Silhouette of the town behind the street, with the Collégiale's bell tower
- * for the historic centre of Dole.
+ * Silhouette of the town behind the street, with the landmark of the city's
+ * old centre (the Collégiale's bell tower in Dole…).
  */
-export function drawSkyline(g: Graphics, width: number, seed: number, steeple: boolean): void {
+export function drawSkyline(
+  g: Graphics,
+  width: number,
+  seed: number,
+  landmark: Landmark | null,
+): void {
   const random = decorRandom(seed);
   const color = 0x8d8fae;
   let x = -40;
@@ -216,17 +291,7 @@ export function drawSkyline(g: Graphics, width: number, seed: number, steeple: b
       });
     x += w - 4;
   }
-  if (steeple) {
-    const sx = width * 0.55;
-    g.rect(sx, GROUND_Y - 250, 34, 250).fill({ color: 0x7c7ea0, alpha: 0.75 });
-    g.rect(sx - 4, GROUND_Y - 254, 42, 6).fill({ color: 0x7c7ea0, alpha: 0.75 });
-    g.rect(sx + 5, GROUND_Y - 290, 24, 38).fill({ color: 0x7c7ea0, alpha: 0.75 });
-    g.poly([sx + 3, GROUND_Y - 290, sx + 17, GROUND_Y - 322, sx + 31, GROUND_Y - 290]).fill({
-      color: 0x7c7ea0,
-      alpha: 0.75,
-    });
-    g.rect(sx + 13, GROUND_Y - 232, 8, 14).fill({ color: 0x5f6182, alpha: 0.75 });
-  }
+  if (landmark) drawLandmark(g, landmark, width);
 }
 
 export const GARLAND_COLORS = [0xf6d36b, 0xe35d6a, 0x6fc3b8, 0xf2f2f2];

@@ -28,6 +28,8 @@ import { realValue } from './valuation.ts';
 import type { SystemContext } from './context.ts';
 import { addCost, addRent, ledgerOf } from './taxes.ts';
 import { drawTenant, visibleReliability } from './tenants.ts';
+import { spendFreeTime } from './travel.ts';
+import { homeRent } from './cities.ts';
 
 /**
  * Renting (docs/03-systemes/04-location.md): the owner offers a property for
@@ -307,8 +309,7 @@ export function acceptApplication(
   if (!application) return 'rent.unknownApplication';
   if (rental.agencyId === null) {
     const minutes = content.renting.selfManagement.moveInMinutes;
-    if (state.player.freeTimeMinutes < minutes) return 'time.notEnoughFreeTime';
-    state.player.freeTimeMinutes -= minutes;
+    if (!spendFreeTime(ctx, minutes, owned.property.cityId)) return 'time.notEnoughFreeTime';
   }
   moveIn(ctx, owned, application);
   return null;
@@ -358,6 +359,7 @@ export function runDailyRentalListings(ctx: SystemContext): void {
     if (rental.applications.length < rules.maxPending && market > 0) {
       const chance =
         rules.dailyProbability *
+        (content.citiesRules.demand[owned.property.cityId]?.tenants ?? 1) *
         (agency?.applicationRate ?? 1) *
         Math.exp(-rules.rentSensitivity * (rental.monthlyRent / market - 1));
       if (nextFloat(state.rng) < Math.min(1, chance))
@@ -392,11 +394,10 @@ function receiveApplication(
   // Managing it himself, the owner shows the home to each candidate.
   if (rental.agencyId === null) {
     const minutes = content.renting.selfManagement.visitMinutes;
-    if (state.player.freeTimeMinutes < minutes) {
+    if (!spendFreeTime(ctx, minutes, owned.property.cityId)) {
       ctx.events.push({ type: 'rentalVisitMissed', propertyId });
       return;
     }
-    state.player.freeTimeMinutes -= minutes;
   }
   const agency = rental.agencyId === null ? undefined : findAgency(content, rental.agencyId);
   const { validityDays } = content.renting.applications;
@@ -479,6 +480,7 @@ export function moveIntoHome(ctx: SystemContext, propertyId: string): RentRefusa
   if (owned.sale?.agreement) return 'sale.agreed';
   owned.rental = null;
   state.player.homePropertyId = propertyId;
+  state.player.baseCityId = owned.property.cityId;
   state.player.monthlyRent = 0;
   ctx.events.push({ type: 'movedIntoHome', propertyId });
   return null;
@@ -490,7 +492,7 @@ export function moveOutOfHome(ctx: SystemContext): RentRefusal | null {
   const propertyId = state.player.homePropertyId;
   if (propertyId === null) return 'home.none';
   state.player.homePropertyId = null;
-  state.player.monthlyRent = toCents(content.start.monthlyRent);
+  state.player.monthlyRent = homeRent(content, state.player.baseCityId);
   ctx.events.push({ type: 'movedOutOfHome', propertyId });
   return null;
 }

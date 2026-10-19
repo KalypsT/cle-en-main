@@ -1,6 +1,7 @@
 import { toCents } from '../money.ts';
 import { clampTrust } from './banking.ts';
 import type { SystemContext } from './context.ts';
+import { editableListing } from './listings.ts';
 import { modeOf } from './modes.ts';
 import { addChronicle } from './progress.ts';
 import { netWorth } from './net-worth.ts';
@@ -40,7 +41,13 @@ export function runDailyDistress(ctx: SystemContext): void {
     const proceeds = transferProperty(ctx, owned, price);
     const relation = state.banks[content.start.accountBankId];
     if (relation) relation.trust = clampTrust(relation.trust + rules.forcedSaleTrust);
-    ctx.events.push({ type: 'forcedSale', propertyId: owned.property.id, price, ...proceeds });
+    ctx.events.push({
+      type: 'forcedSale',
+      propertyId: owned.property.id,
+      cityId: owned.property.cityId,
+      price,
+      ...proceeds,
+    });
   }
   if (player.balance >= 0) {
     player.overdraftDays = 0;
@@ -79,7 +86,11 @@ export function freshStart(
   player.overdraftDays = 0;
   player.overdraftInterestThisMonth = 0;
   player.employed = true;
+  player.baseCityId = content.start.cityId;
   player.monthlyRent = toCents(content.start.monthlyRent);
+  for (const cityId of Object.keys(player.renown)) {
+    player.renown[cityId] = Math.round((player.renown[cityId] ?? 0) * rules.reputationShare);
+  }
   player.homePropertyId = null;
   player.rentalHistoryMonths = 0;
   player.bankruptDay = null;
@@ -88,7 +99,9 @@ export function freshStart(
   state.purchases = [];
   state.properties = [];
   state.agenda = [];
-  for (const listing of state.listings) listing.offer = null;
+  for (const listing of state.listings) {
+    if (listing.offer) editableListing(ctx, listing).offer = null;
+  }
   for (const relation of Object.values(state.banks)) {
     relation.trust = clampTrust(relation.trust + rules.trustPenalty);
   }

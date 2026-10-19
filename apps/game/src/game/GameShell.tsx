@@ -1,4 +1,4 @@
-import { gameContent, music, type TutorialTrigger } from '@cle/content';
+import { music, type TutorialTrigger } from '@cle/content';
 import type { GameAction, GameEvent } from '@cle/engine';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
@@ -34,6 +34,7 @@ import { StreetTab } from '../screens/StreetTab.tsx';
 import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
 import { StreetWorld } from '../world/StreetWorld.tsx';
 import { AgendaScreen } from '../screens/AgendaScreen.tsx';
+import { CitiesScreen } from '../screens/CitiesScreen.tsx';
 import { ChallengeScreen } from '../screens/ChallengeScreen.tsx';
 import { EventScreen } from '../screens/EventScreen.tsx';
 import { ProgressionScreen } from '../screens/ProgressionScreen.tsx';
@@ -137,6 +138,14 @@ export function GameShell({
 }: Props) {
   const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [tab, setTab] = useState<TabId>('street');
+  const baseCityId = snapshot.state.player.baseCityId;
+  const [viewCityId, setViewCityId] = useState(baseCityId);
+  // Moving house brings the player back to his new base.
+  const [seenBaseCityId, setSeenBaseCityId] = useState(baseCityId);
+  if (seenBaseCityId !== baseCityId) {
+    setSeenBaseCityId(baseCityId);
+    setViewCityId(baseCityId);
+  }
   const [stacks, setStacks] = useState(EMPTY_STACKS);
   const [shownStep, setShownStep] = useState<string | null>(null);
 
@@ -168,7 +177,7 @@ export function GameShell({
     [session, raise],
   );
 
-  const ambience = engine.ambience(snapshot.state, gameContent.start.cityId);
+  const ambience = engine.ambience(snapshot.state, viewCityId);
   const night = ambience.moment === 'night';
   useEffect(() => onNight(night), [night, onNight]);
   const [overlays, setOverlays] = useState<Overlay[]>(() =>
@@ -230,6 +239,8 @@ export function GameShell({
   const nav = useMemo<Navigation>(
     () => ({
       tab,
+      cityId: viewCityId,
+      setCityId: setViewCityId,
       push: (next) => setStacks((all) => ({ ...all, [tab]: [...all[tab], next] })),
       pop: () => setStacks((all) => ({ ...all, [tab]: all[tab].slice(0, -1) })),
       goTab: (next, nextRoute) => {
@@ -238,7 +249,7 @@ export function GameShell({
       },
       track: (screen: TrackedScreen) => raise([`screen:${screen}`]),
     }),
-    [tab, raise],
+    [tab, viewCityId, raise],
   );
 
   const act = useCallback(
@@ -378,6 +389,8 @@ function RouteScreen({ route }: { route: Route }) {
       return <StatisticsScreen />;
     case 'agenda':
       return <AgendaScreen />;
+    case 'cities':
+      return <CitiesScreen />;
     case 'monthReview':
       return <MonthlyReviewScreen />;
     case 'yearReview':

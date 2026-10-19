@@ -525,7 +525,7 @@
     "windowsPerM2": 0.09,
     "minWindows": 2
   },
-  "cityCostIndex": { "dole": 0.95 },
+  "cityCostIndex": { "dole": 0.95, "dijon": 1.08, "besancon": 1.03, "chalon": 0.97 },
   "stateCostFactors": [1.25, 1.1, 1, 0.85, 0.8],
   "tiers": {
     "eco": { "value": -0.04, "rent": -0.02, "wear": 0.08, "diyTime": 0.8 },

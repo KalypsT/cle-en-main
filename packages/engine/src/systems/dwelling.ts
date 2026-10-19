@@ -46,10 +46,25 @@ export function freezeSpaces(spaces: Space[]): Space[] {
   return Object.freeze(spaces) as Space[];
 }
 
-/** Freezes a property's rooms and items (after loading a save). */
+/**
+ * Freezes a property's rooms and items, and its small nested data (lots, nuisances, hazards put
+ * off, co-ownership): they are replaced, never mutated, so the copies of the state share them.
+ */
 export function freezeDwelling(property: Property): void {
   property.items = freezeItems(property.items);
   property.spaces = freezeSpaces(property.spaces);
+  freezeNested(property);
+}
+
+/** Freezes the nested data of a property, not the property itself (its fields change). */
+export function freezeNested(property: Property): void {
+  for (const lot of property.lots) Object.freeze(lot);
+  Object.freeze(property.lots);
+  for (const defect of property.defects) Object.freeze(defect);
+  Object.freeze(property.defects);
+  for (const hazard of property.postponedHazards) Object.freeze(hazard);
+  Object.freeze(property.postponedHazards);
+  if (property.copro) Object.freeze(property.copro);
 }
 
 export function clampState(state: number): number {

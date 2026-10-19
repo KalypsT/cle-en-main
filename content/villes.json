@@ -1,0 +1,118 @@
+{
+  "trips": [
+    {
+      "a": "dole",
+      "b": "dijon",
+      "oneWayMinutes": 45,
+      "roundTripCostEuros": 12
+    },
+    {
+      "a": "dole",
+      "b": "besancon",
+      "oneWayMinutes": 50,
+      "roundTripCostEuros": 12
+    },
+    {
+      "a": "dole",
+      "b": "chalon",
+      "oneWayMinutes": 60,
+      "roundTripCostEuros": 15
+    },
+    {
+      "a": "dijon",
+      "b": "chalon",
+      "oneWayMinutes": 40,
+      "roundTripCostEuros": 12
+    },
+    {
+      "a": "dijon",
+      "b": "besancon",
+      "oneWayMinutes": 90,
+      "roundTripCostEuros": 25
+    },
+    {
+      "a": "chalon",
+      "b": "besancon",
+      "oneWayMinutes": 90,
+      "roundTripCostEuros": 25
+    }
+  ],
+  "fallbackTrip": {
+    "oneWayMinutes": 90,
+    "roundTripCostEuros": 25
+  },
+  "listingFlowShare": {
+    "dole": 1,
+    "dijon": 0.25,
+    "besancon": 0.3,
+    "chalon": 0.55
+  },
+  "remote": {
+    "monthlyFeePerPropertyEuros": 35
+  },
+  "renown": {
+    "share": 1,
+    "homeCityWeight": 10,
+    "maxLocalOffMarketChancePerMonth": 0.3,
+    "queueCutPerPoint": 0.004
+  },
+  "moving": {
+    "costEuros": 600,
+    "cooldownDays": 270,
+    "roundRentToEuros": 10
+  },
+  "texts": {
+    "dole": {
+      "profile": "Petite ville aux prix bas et aux annonces rares : le marché se sature vite, mais on y connaît tout le monde.",
+      "decor": "Clocher de la collégiale, canal des Tanneurs"
+    },
+    "dijon": {
+      "profile": "Capitale régionale, plus chère, forte demande, beaucoup d'étudiants : on y gagne plus, mais on s'y bat pour chaque bien.",
+      "decor": "Tour Philippe le Bon, toits en tuiles vernissées"
+    },
+    "besancon": {
+      "profile": "Ville étudiante au centre ancien dense et vallonné : des chantiers valorisants et des locataires qui changent chaque septembre.",
+      "decor": "Citadelle, boucle du Doubs"
+    },
+    "chalon": {
+      "profile": "Ville industrielle très abordable : les rendements sont élevés, la vacance aussi.",
+      "decor": "Quais de Saône, tour du Doyenné"
+    }
+  },
+  "positions": {
+    "dole": {
+      "lon": 5.4915,
+      "lat": 47.0925
+    },
+    "dijon": {
+      "lon": 5.0415,
+      "lat": 47.322
+    },
+    "besancon": {
+      "lon": 6.024,
+      "lat": 47.2378
+    },
+    "chalon": {
+      "lon": 4.8537,
+      "lat": 46.7807
+    }
+  },
+  "demand": {
+    "dole": {
+      "buyers": 1,
+      "tenants": 1
+    },
+    "dijon": {
+      "buyers": 1.4,
+      "tenants": 1.3
+    },
+    "besancon": {
+      "buyers": 1.15,
+      "tenants": 1.2
+    },
+    "chalon": {
+      "buyers": 0.85,
+      "tenants": 0.75
+    }
+  }
+}

@@ -1986,3 +1986,61 @@ select {
     display: none;
   }
 }
+
+/* Region map of the cities screen (milestone 7). */
+.region-map {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  background: var(--map-ground);
+  border: 1px solid var(--border);
+}
+.region-road {
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+.region-road.base {
+  stroke: var(--teal);
+  stroke-width: 2.5;
+}
+.region-minutes {
+  font-size: 9px;
+  fill: var(--muted);
+  text-anchor: middle;
+}
+.region-city {
+  cursor: pointer;
+  outline: none;
+}
+.region-city circle {
+  fill: var(--surface);
+  stroke: var(--text);
+  stroke-width: 2;
+}
+.region-city.base circle {
+  fill: var(--teal);
+  stroke: var(--teal-strong);
+}
+.region-city.selected circle {
+  stroke: var(--amber);
+  stroke-width: 3.5;
+}
+.region-city:focus-visible circle {
+  stroke: var(--amber);
+  stroke-width: 3.5;
+}
+.region-city text {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--text);
+}
+.region-city .owned-dot {
+  fill: var(--amber);
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+.region-city .region-hit {
+  fill: transparent;
+  stroke: none;
+}

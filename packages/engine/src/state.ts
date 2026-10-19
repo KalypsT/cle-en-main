@@ -16,7 +16,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 8;
+export const FORMAT_VERSION = 9;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -49,6 +49,14 @@ export interface PlayerState {
   bankruptDay: number | null;
   /** Owned property the player lives in (résidence principale); null while renting. */
   homePropertyId: string | null;
+  /** City of the home: trips are counted from it (docs/03-systemes/08). */
+  baseCityId: string;
+  /** Cities the player already went to today: one trip each, however many actions. */
+  tripsToday: string[];
+  /** Day number of the last move to another city. */
+  lastMoveDay: number | null;
+  /** Local renown by city, 0 … 100; a city without an entry is at 0. */
+  renown: Record<string, number>;
 }
 
 export interface BankRelation {

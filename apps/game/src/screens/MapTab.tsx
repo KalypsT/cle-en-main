@@ -23,7 +23,7 @@ const MARGIN = 250;
 export function MapTab() {
   const { state } = useGame();
   const nav = useNav();
-  const cityId = gameContent.start.cityId;
+  const cityId = nav.cityId;
   const city = gameContent.cities[cityId];
   const [colorBy, setColorBy] = useState<ColorBy>('price');
   const [selected, setSelected] = useState<string | null>(null);

@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { gameContent } from '@cle/content';
 import { toDayNumber } from '@cle/engine';
 import {
@@ -7,6 +7,7 @@ import {
   fill,
   importState,
   openGame,
+  openMenuEntry,
   ownerGame,
   pause,
   referenceGame,
@@ -29,11 +30,6 @@ function at(year: number, month: number, day: number, hour: number) {
   return (state: { clock: { date: Parameters<typeof toDayNumber>[0]; hour: number } }) =>
     toDayNumber(state.clock.date) === toDayNumber({ year, month, day }) &&
     state.clock.hour === hour;
-}
-
-async function openMenuEntry(page: Page, label: string) {
-  await tab(page, 'menu');
-  await page.getByRole('button', { name: label }).click();
 }
 
 test('shows the monthly review on the 1st, then lets the game go on', async ({ page }) => {

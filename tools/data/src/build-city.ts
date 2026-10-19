@@ -10,6 +10,9 @@ import {
   type Epoch,
   EPOCHS,
 } from '@cle/content/schemas/city.ts';
+import { besancon } from '../cities/besancon.ts';
+import { chalonSurSaone } from '../cities/chalon-sur-saone.ts';
+import { dijon } from '../cities/dijon.ts';
 import { dole } from '../cities/dole.ts';
 import {
   binCounts,
@@ -31,7 +34,12 @@ import { loadIris } from './sources/iris.ts';
 import { loadMap } from './sources/map.ts';
 import { loadRents } from './sources/rents.ts';
 
-const CITIES: Record<string, CityConfig> = { dole };
+const CITIES: Record<string, CityConfig> = {
+  dole,
+  dijon,
+  besancon,
+  chalon: chalonSurSaone,
+};
 
 /** Modelling choices of the data pipeline (not gameplay numbers): see docs/06-donnees.md. */
 const MODEL = {

@@ -62,3 +62,5 @@ export { type CatalogRefusal, NO_CHOICE } from './systems/catalog.ts';
 export { type ChallengeRefusal } from './systems/challenges.ts';
 export { type DayKind } from './systems/holidays.ts';
 export { type AgendaDay, type MonthlyReview, type ReviewGroup } from './systems/reviews.ts';
+export { type CitySheet, type VisitQuote } from './systems/city-views.ts';
+export { type MoveRefusal } from './systems/cities.ts';

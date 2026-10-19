@@ -112,7 +112,7 @@ describe('streets', () => {
     for (const neighbourhood of content.cities[CITY]?.neighbourhoods ?? []) {
       const buildings = engine.streets(state, CITY, neighbourhood.id).flatMap((s) => s.buildings);
       const listings = state.listings.filter(
-        (l) => l.property.neighbourhoodId === neighbourhood.id,
+        (l) => l.property.cityId === CITY && l.property.neighbourhoodId === neighbourhood.id,
       );
       for (const listing of listings) {
         const found = buildings.filter((b) => b.propertyId === listing.property.id);

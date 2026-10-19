@@ -1,51 +1,140 @@
 {
-  "momentStartHours": { "morning": 6, "day": 10, "evening": 18, "night": 22 },
+  "momentStartHours": {
+    "morning": 6,
+    "day": 10,
+    "evening": 18,
+    "night": 22
+  },
   "seasonStarts": {
     "spring": [3, 20],
     "summer": [6, 21],
     "autumn": [9, 22],
     "winter": [12, 21]
   },
-  "christmas": { "from": [12, 1], "to": [1, 6] },
+  "christmas": {
+    "from": [12, 1],
+    "to": [1, 6]
+  },
   "bellHours": [12],
   "weather": {
     "maxDays": 3,
     "changeChance": 0.45,
     "bySeason": {
-      "spring": { "sun": 0.38, "clouds": 0.3, "rain": 0.25, "snow": 0, "fog": 0.07 },
-      "summer": { "sun": 0.58, "clouds": 0.22, "rain": 0.18, "snow": 0, "fog": 0.02 },
-      "autumn": { "sun": 0.25, "clouds": 0.3, "rain": 0.27, "snow": 0.01, "fog": 0.17 },
-      "winter": { "sun": 0.2, "clouds": 0.32, "rain": 0.2, "snow": 0.13, "fog": 0.15 }
+      "spring": {
+        "sun": 0.38,
+        "clouds": 0.3,
+        "rain": 0.25,
+        "snow": 0,
+        "fog": 0.07
+      },
+      "summer": {
+        "sun": 0.58,
+        "clouds": 0.22,
+        "rain": 0.18,
+        "snow": 0,
+        "fog": 0.02
+      },
+      "autumn": {
+        "sun": 0.25,
+        "clouds": 0.3,
+        "rain": 0.27,
+        "snow": 0.01,
+        "fog": 0.17
+      },
+      "winter": {
+        "sun": 0.2,
+        "clouds": 0.32,
+        "rain": 0.2,
+        "snow": 0.13,
+        "fog": 0.15
+      }
     },
     "fogMoments": ["morning", "evening", "night"]
   },
   "floors": {
     "apartment": {
-      "before1948": { "min": 3, "max": 4 },
-      "from1948to1974": { "min": 4, "max": 5 },
-      "from1975to1988": { "min": 4, "max": 6 },
-      "from1989to2005": { "min": 3, "max": 4 },
-      "from2006to2012": { "min": 3, "max": 4 },
-      "after2012": { "min": 3, "max": 4 }
+      "before1948": {
+        "min": 3,
+        "max": 4
+      },
+      "from1948to1974": {
+        "min": 4,
+        "max": 5
+      },
+      "from1975to1988": {
+        "min": 4,
+        "max": 6
+      },
+      "from1989to2005": {
+        "min": 3,
+        "max": 4
+      },
+      "from2006to2012": {
+        "min": 3,
+        "max": 4
+      },
+      "after2012": {
+        "min": 3,
+        "max": 4
+      }
     },
     "house": {
-      "before1948": { "min": 2, "max": 2 },
-      "from1948to1974": { "min": 1, "max": 2 },
-      "from1975to1988": { "min": 1, "max": 2 },
-      "from1989to2005": { "min": 1, "max": 2 },
-      "from2006to2012": { "min": 1, "max": 2 },
-      "after2012": { "min": 1, "max": 2 }
+      "before1948": {
+        "min": 2,
+        "max": 2
+      },
+      "from1948to1974": {
+        "min": 1,
+        "max": 2
+      },
+      "from1975to1988": {
+        "min": 1,
+        "max": 2
+      },
+      "from1989to2005": {
+        "min": 1,
+        "max": 2
+      },
+      "from2006to2012": {
+        "min": 1,
+        "max": 2
+      },
+      "after2012": {
+        "min": 1,
+        "max": 2
+      }
     },
     "building": {
-      "before1948": { "min": 3, "max": 4 },
-      "from1948to1974": { "min": 3, "max": 4 },
-      "from1975to1988": { "min": 3, "max": 4 },
-      "from1989to2005": { "min": 3, "max": 3 },
-      "from2006to2012": { "min": 3, "max": 3 },
-      "after2012": { "min": 3, "max": 3 }
+      "before1948": {
+        "min": 3,
+        "max": 4
+      },
+      "from1948to1974": {
+        "min": 3,
+        "max": 4
+      },
+      "from1975to1988": {
+        "min": 3,
+        "max": 4
+      },
+      "from1989to2005": {
+        "min": 3,
+        "max": 3
+      },
+      "from2006to2012": {
+        "min": 3,
+        "max": 3
+      },
+      "after2012": {
+        "min": 3,
+        "max": 3
+      }
     }
   },
-  "flatsPerFloor": { "min": 2, "max": 3 },
+  "flatsPerFloor": {
+    "min": 2,
+    "max": 3
+  },
   "houseRoomFloors": {
     "entry": 0,
     "living": 0,
@@ -62,43 +151,462 @@
         "shopShare": 0.45,
         "treeShare": 0.1,
         "streets": [
-          { "id": "grandeRue", "name": "Grande Rue", "buildings": 9 },
-          { "id": "canalDesTanneurs", "name": "Canal des Tanneurs", "buildings": 8, "quay": true },
-          { "id": "rueDesArenes", "name": "Rue des Arènes", "buildings": 8 },
-          { "id": "rueDeBesancon", "name": "Rue de Besançon", "buildings": 9 }
+          {
+            "id": "grandeRue",
+            "name": "Grande Rue",
+            "buildings": 9
+          },
+          {
+            "id": "canalDesTanneurs",
+            "name": "Canal des Tanneurs",
+            "buildings": 8,
+            "quay": true
+          },
+          {
+            "id": "rueDesArenes",
+            "name": "Rue des Arènes",
+            "buildings": 8
+          },
+          {
+            "id": "rueDeBesancon",
+            "name": "Rue de Besançon",
+            "buildings": 9
+          }
         ]
       },
       "mesnilsPasteur": {
         "shopShare": 0.12,
         "treeShare": 0.35,
         "streets": [
-          { "id": "avenueDeLahr", "name": "Avenue de Lahr", "buildings": 8 },
-          { "id": "avenueDeNorthwich", "name": "Avenue de Northwich", "buildings": 8 }
+          {
+            "id": "avenueDeLahr",
+            "name": "Avenue de Lahr",
+            "buildings": 8
+          },
+          {
+            "id": "avenueDeNorthwich",
+            "name": "Avenue de Northwich",
+            "buildings": 8
+          }
         ]
       },
       "paters": {
         "shopShare": 0.1,
         "treeShare": 0.35,
         "streets": [
-          { "id": "rueDesPaters", "name": "Rue des Paters", "buildings": 9 },
-          { "id": "rueDuLandon", "name": "Rue du Landon", "buildings": 8 }
+          {
+            "id": "rueDesPaters",
+            "name": "Rue des Paters",
+            "buildings": 9
+          },
+          {
+            "id": "rueDuLandon",
+            "name": "Rue du Landon",
+            "buildings": 8
+          }
         ]
       },
       "plumontValFleuri": {
         "shopShare": 0.05,
         "treeShare": 0.45,
         "streets": [
-          { "id": "rueDePlumont", "name": "Rue de Plumont", "buildings": 8 },
-          { "id": "rueDuValFleuri", "name": "Rue du Val Fleuri", "buildings": 8 }
+          {
+            "id": "rueDePlumont",
+            "name": "Rue de Plumont",
+            "buildings": 8
+          },
+          {
+            "id": "rueDuValFleuri",
+            "name": "Rue du Val Fleuri",
+            "buildings": 8
+          }
         ]
       },
       "azans": {
         "shopShare": 0.15,
         "treeShare": 0.4,
         "streets": [
-          { "id": "rueDAzans", "name": "Rue d'Azans", "buildings": 8 },
-          { "id": "rueDuPort", "name": "Rue du Port", "buildings": 7, "quay": true },
-          { "id": "routeDeSaintYlie", "name": "Route de Saint-Ylie", "buildings": 8 }
+          {
+            "id": "rueDAzans",
+            "name": "Rue d'Azans",
+            "buildings": 8
+          },
+          {
+            "id": "rueDuPort",
+            "name": "Rue du Port",
+            "buildings": 7,
+            "quay": true
+          },
+          {
+            "id": "routeDeSaintYlie",
+            "name": "Route de Saint-Ylie",
+            "buildings": 8
+          }
+        ]
+      }
+    },
+    "dijon": {
+      "centreHistorique": {
+        "shopShare": 0.55,
+        "treeShare": 0.05,
+        "streets": [
+          {
+            "id": "rueDeLaLiberte",
+            "name": "Rue de la Liberté",
+            "buildings": 9
+          },
+          {
+            "id": "rueDesForges",
+            "name": "Rue des Forges",
+            "buildings": 8
+          },
+          {
+            "id": "rueVannerie",
+            "name": "Rue Vannerie",
+            "buildings": 8
+          }
+        ]
+      },
+      "montchapetRepublique": {
+        "shopShare": 0.2,
+        "treeShare": 0.3,
+        "streets": [
+          {
+            "id": "rueDeMontchapet",
+            "name": "Rue de Montchapet",
+            "buildings": 8
+          },
+          {
+            "id": "avenueVictorHugo",
+            "name": "Avenue Victor Hugo",
+            "buildings": 9
+          }
+        ]
+      },
+      "universiteVoltaire": {
+        "shopShare": 0.15,
+        "treeShare": 0.35,
+        "streets": [
+          {
+            "id": "boulevardVoltaire",
+            "name": "Boulevard Voltaire",
+            "buildings": 9
+          },
+          {
+            "id": "boulevardGabriel",
+            "name": "Boulevard Gabriel",
+            "buildings": 8
+          }
+        ]
+      },
+      "gareArsenal": {
+        "shopShare": 0.3,
+        "treeShare": 0.15,
+        "streets": [
+          {
+            "id": "avenueFoch",
+            "name": "Avenue Maréchal Foch",
+            "buildings": 9
+          },
+          {
+            "id": "rueDeLArquebuse",
+            "name": "Rue de l'Arquebuse",
+            "buildings": 8
+          },
+          {
+            "id": "portDuCanal",
+            "name": "Port du Canal",
+            "buildings": 7,
+            "quay": true
+          }
+        ]
+      },
+      "bourrochesLarrey": {
+        "shopShare": 0.1,
+        "treeShare": 0.4,
+        "streets": [
+          {
+            "id": "rueDeLarrey",
+            "name": "Rue de Larrey",
+            "buildings": 8
+          },
+          {
+            "id": "rueDesBourroches",
+            "name": "Rue des Bourroches",
+            "buildings": 8
+          }
+        ]
+      },
+      "lacFontaineDOuche": {
+        "shopShare": 0.08,
+        "treeShare": 0.45,
+        "streets": [
+          {
+            "id": "rueDeFontaineDOuche",
+            "name": "Rue de Fontaine d'Ouche",
+            "buildings": 8
+          },
+          {
+            "id": "boulevardDesAllobroges",
+            "name": "Boulevard des Allobroges",
+            "buildings": 8
+          }
+        ]
+      },
+      "gresillesStalingrad": {
+        "shopShare": 0.12,
+        "treeShare": 0.3,
+        "streets": [
+          {
+            "id": "rueDesGresilles",
+            "name": "Rue des Grésilles",
+            "buildings": 8
+          },
+          {
+            "id": "avenueDeStalingrad",
+            "name": "Avenue de Stalingrad",
+            "buildings": 9
+          }
+        ]
+      },
+      "toisonDOr": {
+        "shopShare": 0.1,
+        "treeShare": 0.25,
+        "streets": [
+          {
+            "id": "avenueDeLaToisonDOr",
+            "name": "Avenue de la Toison d'Or",
+            "buildings": 8
+          },
+          {
+            "id": "rueDuClosDePouilly",
+            "name": "Rue du Clos de Pouilly",
+            "buildings": 8
+          }
+        ]
+      }
+    },
+    "besancon": {
+      "centreAncien": {
+        "shopShare": 0.5,
+        "treeShare": 0.05,
+        "streets": [
+          {
+            "id": "grandeRue",
+            "name": "Grande Rue",
+            "buildings": 9
+          },
+          {
+            "id": "rueBattant",
+            "name": "Rue Battant",
+            "buildings": 8
+          },
+          {
+            "id": "quaiVauban",
+            "name": "Quai Vauban",
+            "buildings": 7,
+            "quay": true
+          }
+        ]
+      },
+      "chapraisMouillere": {
+        "shopShare": 0.25,
+        "treeShare": 0.25,
+        "streets": [
+          {
+            "id": "rueDesChaprais",
+            "name": "Rue des Chaprais",
+            "buildings": 9
+          },
+          {
+            "id": "rueDeLaMouillere",
+            "name": "Rue de la Mouillère",
+            "buildings": 8
+          }
+        ]
+      },
+      "montrapon": {
+        "shopShare": 0.12,
+        "treeShare": 0.4,
+        "streets": [
+          {
+            "id": "avenueDeMontrapon",
+            "name": "Avenue de Montrapon",
+            "buildings": 8
+          },
+          {
+            "id": "rueDeSaintFerjeux",
+            "name": "Rue de Saint-Ferjeux",
+            "buildings": 8
+          }
+        ]
+      },
+      "grettBregille": {
+        "shopShare": 0.1,
+        "treeShare": 0.45,
+        "streets": [
+          {
+            "id": "cheminDeBregille",
+            "name": "Chemin de Bregille",
+            "buildings": 7
+          },
+          {
+            "id": "rueDeVelotte",
+            "name": "Rue de Velotte",
+            "buildings": 8
+          }
+        ]
+      },
+      "viotteVesoul": {
+        "shopShare": 0.3,
+        "treeShare": 0.15,
+        "streets": [
+          {
+            "id": "rueDeVesoul",
+            "name": "Rue de Vesoul",
+            "buildings": 9
+          },
+          {
+            "id": "rueDeLaViotte",
+            "name": "Rue de la Viotte",
+            "buildings": 8
+          }
+        ]
+      },
+      "palenteSaragosse": {
+        "shopShare": 0.1,
+        "treeShare": 0.35,
+        "streets": [
+          {
+            "id": "rueDeBelfort",
+            "name": "Rue de Belfort",
+            "buildings": 8
+          },
+          {
+            "id": "rueDeSaragosse",
+            "name": "Rue de Saragosse",
+            "buildings": 8
+          }
+        ]
+      },
+      "planoise": {
+        "shopShare": 0.08,
+        "treeShare": 0.4,
+        "streets": [
+          {
+            "id": "avenueDeLIleDeFrance",
+            "name": "Avenue de l'Île-de-France",
+            "buildings": 9
+          },
+          {
+            "id": "rueReneCassin",
+            "name": "Rue René Cassin",
+            "buildings": 8
+          }
+        ]
+      }
+    },
+    "chalon": {
+      "centreSaintLaurent": {
+        "shopShare": 0.5,
+        "treeShare": 0.08,
+        "streets": [
+          {
+            "id": "rueAuxFevres",
+            "name": "Rue aux Fèvres",
+            "buildings": 9
+          },
+          {
+            "id": "quaiDesMessageries",
+            "name": "Quai des Messageries",
+            "buildings": 8,
+            "quay": true
+          },
+          {
+            "id": "rueDeStrasbourg",
+            "name": "Rue de Strasbourg",
+            "buildings": 8
+          }
+        ]
+      },
+      "saintCosmeBellevue": {
+        "shopShare": 0.15,
+        "treeShare": 0.35,
+        "streets": [
+          {
+            "id": "avenueDeParis",
+            "name": "Avenue de Paris",
+            "buildings": 8
+          },
+          {
+            "id": "rueDeBellevue",
+            "name": "Rue de Bellevue",
+            "buildings": 8
+          }
+        ]
+      },
+      "presSaintJean": {
+        "shopShare": 0.08,
+        "treeShare": 0.4,
+        "streets": [
+          {
+            "id": "rueDesPresSaintJean",
+            "name": "Rue des Prés Saint-Jean",
+            "buildings": 8
+          },
+          {
+            "id": "avenueDeLattreDeTassigny",
+            "name": "Avenue de Lattre de Tassigny",
+            "buildings": 8
+          }
+        ]
+      },
+      "saintJeanDesVignes": {
+        "shopShare": 0.1,
+        "treeShare": 0.4,
+        "streets": [
+          {
+            "id": "rueDeSaintJeanDesVignes",
+            "name": "Rue de Saint-Jean-des-Vignes",
+            "buildings": 8
+          },
+          {
+            "id": "routeDeDijon",
+            "name": "Route de Dijon",
+            "buildings": 8
+          }
+        ]
+      },
+      "stadeFontaineAuxLoups": {
+        "shopShare": 0.1,
+        "treeShare": 0.4,
+        "streets": [
+          {
+            "id": "rueDuStade",
+            "name": "Rue du Stade",
+            "buildings": 8
+          },
+          {
+            "id": "rueDeLaFontaineAuxLoups",
+            "name": "Rue de la Fontaine aux Loups",
+            "buildings": 8
+          }
+        ]
+      },
+      "champFleuriVerrerie": {
+        "shopShare": 0.1,
+        "treeShare": 0.35,
+        "streets": [
+          {
+            "id": "rueDuChampFleuri",
+            "name": "Rue du Champ Fleuri",
+            "buildings": 8
+          },
+          {
+            "id": "rueDeLaVerrerie",
+            "name": "Rue de la Verrerie",
+            "buildings": 8
+          }
         ]
       }
     }

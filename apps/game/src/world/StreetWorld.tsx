@@ -89,13 +89,19 @@ function buildingName(building: StreetBuilding): string {
 export function StreetWorld({ active }: { active: boolean }) {
   const { state, settings, audio, notify } = useGame();
   const nav = useNav();
-  const cityId = gameContent.start.cityId;
+  const cityId = nav.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
   const homeNeighbourhood =
-    state.properties[0]?.property.neighbourhoodId ?? neighbourhoods[0]?.id ?? '';
-  const [neighbourhoodId, setNeighbourhoodId] = useState(
+    state.properties.find((owned) => owned.property.cityId === cityId)?.property.neighbourhoodId ??
+    neighbourhoods[0]?.id ??
+    '';
+  const [chosenNeighbourhoodId, setNeighbourhoodId] = useState(
     memory.neighbourhoodId ?? homeNeighbourhood,
   );
+  // The remembered neighbourhood may belong to another city: start from the player's own.
+  const neighbourhoodId = neighbourhoods.some((n) => n.id === chosenNeighbourhoodId)
+    ? chosenNeighbourhoodId
+    : homeNeighbourhood;
   // Recomputed only when what the street shows changes: not at every hour of the clock.
   const { clock, listings, properties, purchases, rivals, seed } = state;
   const day = toDayNumber(clock.date);
@@ -110,6 +116,7 @@ export function StreetWorld({ active }: { active: boolean }) {
     [listings, properties, purchases, rivals, seed, day, ambience.moment, cityId, neighbourhoodId],
   );
   const layout = useMemo(() => layoutStreets(streets, cityId), [streets, cityId]);
+  const scrollKey = `${cityId}/${neighbourhoodId}`;
   const rootRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -183,12 +190,13 @@ export function StreetWorld({ active }: { active: boolean }) {
         accent: cssAccent(),
         shopNames: t.street.shops,
         forSaleText: t.street.forSaleSign,
+        cityId,
         neighbourhoodId,
         seed: state.seed,
       }),
     );
     return () => cancelAnimationFrame(frame);
-  }, [active, layout, ambience, neighbourhoodId, state.seed, settings.theme]);
+  }, [active, layout, ambience, cityId, neighbourhoodId, state.seed, settings.theme]);
 
   // A new property (just bought): show its neighbourhood and centre it.
   const ownedIds = state.properties.map((owned) => owned.property.id).join(',');
@@ -201,6 +209,7 @@ export function StreetWorld({ active }: { active: boolean }) {
     if (fresh) {
       setFocus(fresh.property.id);
       setNeighbourhoodId(fresh.property.neighbourhoodId);
+      if (fresh.property.cityId !== cityId) nav.setCityId(fresh.property.cityId);
     }
   }
 
@@ -213,20 +222,20 @@ export function StreetWorld({ active }: { active: boolean }) {
     const scroll = scrollRef.current;
     // Hidden (another tab): wait until the street shows to place it.
     if (!scroll || !active || scroll.clientWidth === 0) return;
-    if (shown.current.neighbourhoodId === neighbourhoodId && shown.current.focus === focus) return;
+    if (shown.current.neighbourhoodId === scrollKey && shown.current.focus === focus) return;
     const newFocus = focus !== shown.current.focus ? focus : null;
-    shown.current = { neighbourhoodId, focus };
+    shown.current = { neighbourhoodId: scrollKey, focus };
     memory.neighbourhoodId = neighbourhoodId;
     const buildings = layout.streets.flatMap((street) => street.buildings);
     const target = newFocus
       ? buildings.find((item) => item.building.propertyId === newFocus)
-      : memory.scroll[neighbourhoodId] === undefined
+      : memory.scroll[scrollKey] === undefined
         ? buildings.find((item) => item.building.role === 'owned')
         : undefined;
     scroll.scrollLeft = target
       ? Math.max(0, (target.x + target.spec.width / 2) * scale - size.width / 2)
-      : (memory.scroll[neighbourhoodId] ?? 0);
-  }, [neighbourhoodId, focus, layout, scale, size.width, active]);
+      : (memory.scroll[scrollKey] ?? 0);
+  }, [neighbourhoodId, scrollKey, focus, layout, scale, size.width, active]);
 
   useEffect(() => {
     if (!settings.showFps || !active) return;
@@ -237,7 +246,7 @@ export function StreetWorld({ active }: { active: boolean }) {
   const onScroll = () => {
     const scroll = scrollRef.current;
     if (!scroll) return;
-    memory.scroll[neighbourhoodId] = scroll.scrollLeft;
+    memory.scroll[scrollKey] = scroll.scrollLeft;
     setCurrent(streetAt(layout, (scroll.scrollLeft + size.width / 2) / scale));
   };
 

@@ -381,6 +381,11 @@ export function investor(profile: InvestorProfile): Strategy {
     return { value: estimate.valueAfter - works, works, rentAfter: estimate.rentAfter };
   }
 
+  /** Cities where the bot looks for properties: its base (it never travels yet). */
+  function workCities(api: BotApi): string[] {
+    return [api.state.player.baseCityId];
+  }
+
   function candidates(api: BotApi) {
     const { state } = api;
     const limit = api.engine.content.market.negotiation.maxOffersPerListing;
@@ -392,7 +397,9 @@ export function investor(profile: InvestorProfile): Strategy {
       rentAfter: number | null;
     }[] = [];
     desk.forget(new Set(state.listings.map((l) => l.id)));
+    const cities = workCities(api);
     for (const listing of state.listings) {
+      if (!cities.includes(listing.property.cityId)) continue;
       if (listing.offer || listing.offersMade >= limit || api.today < listing.publicDay) continue;
       const appraisal = appraise(api, listing);
       if (!appraisal || appraisal.value <= 0) continue;

@@ -79,7 +79,7 @@ export function ListingsScreen({
 }) {
   const { state } = useGame();
   const nav = useNav();
-  const cityId = gameContent.start.cityId;
+  const cityId = nav.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
   const [area, setArea] = useState<string | null>(neighbourhoodId ?? null);
   const [kind, setKind] = useState<PropertyKind | null>(null);
