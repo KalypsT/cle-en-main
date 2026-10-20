@@ -708,9 +708,14 @@ export function createEngine(content: GameContent) {
       return property ? transformationEstimate(content, state, property, kind) : null;
     },
     /** Reference cost, duration, DPE, value and rent after renovating these items. */
-    worksEstimate: (state: GameState, id: string, choices: readonly ItemChoice[]) => {
+    worksEstimate: (
+      state: GameState,
+      id: string,
+      choices: readonly ItemChoice[],
+      diy: readonly ItemChoice[] = [],
+    ) => {
       const property = findAnyProperty(state, id);
-      return property ? worksEstimate(content, state, property, choices) : null;
+      return property ? worksEstimate(content, state, property, choices, diy) : null;
     },
     /** Schedule of a project (the « frise »): in progress, or with these quotes. */
     worksPlan: (

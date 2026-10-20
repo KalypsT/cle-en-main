@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 13,
+    "formatVersion": 15,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -553,6 +553,32 @@
             },
             "value": 4873200,
             "debt": 4473097
+          }
+        ],
+        "log": [
+          {
+            "kind": "works",
+            "day": 20796,
+            "itemKind": "walls",
+            "spaceId": "living",
+            "tier": "eco",
+            "artisanId": null,
+            "cost": 32655
+          },
+          {
+            "kind": "works",
+            "day": 20819,
+            "itemKind": "plumbing",
+            "spaceId": null,
+            "tier": "eco",
+            "artisanId": "aquaDoloise",
+            "cost": 166042
+          },
+          {
+            "kind": "tenantIn",
+            "day": 20821,
+            "tenantName": "Lucas Arnaud",
+            "monthlyRent": 26100
           }
         ]
       }

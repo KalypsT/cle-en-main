@@ -631,6 +631,19 @@ function finishTask(ctx: SystemContext, owned: OwnedProperty, task: WorksTask): 
   const bill = Math.round(price * (1 + task.overrun));
   payWorks(ctx, owned, bill - task.deposit);
   const done = new Map(task.items.map((line) => [line.itemId, line.tier]));
+  for (const line of task.items) {
+    const item = owned.property.items.find((candidate) => itemId(candidate) === line.itemId);
+    if (!item) continue;
+    owned.log.push({
+      kind: 'works',
+      day: ctx.today,
+      itemKind: item.kind,
+      spaceId: item.spaceId,
+      tier: line.tier,
+      artisanId: task.artisanId,
+      cost: Math.round(line.price * (1 + task.overrun)),
+    });
+  }
   owned.property.items = owned.property.items.map((item) => {
     const tier = done.get(itemId(item));
     if (!tier) return item;

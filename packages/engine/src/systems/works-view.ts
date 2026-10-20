@@ -105,8 +105,14 @@ function buildCatalog(content: GameContent, state: GameState, property: Property
 }
 
 export interface WorksEstimate {
-  /** Reference cost (before the artisans' prices and hazards). */
+  /** Reference cost of the items left to artisans (before their prices and hazards). */
   cost: Cents;
+  /** Materials of the items done by the player. */
+  materials: Cents;
+  /** Free time the player spends on the items he does himself. */
+  diyMinutes: number;
+  /** `cost` plus `materials`. */
+  total: Cents;
   /** Days of works if every artisan were free now (phases one after the other). */
   days: number;
   dpeBefore: DpeLabel;
@@ -174,15 +180,25 @@ export function worksEstimate(
   state: GameState,
   property: Property,
   choices: readonly ItemChoice[],
+  diy: readonly ItemChoice[] = [],
 ): WorksEstimate {
   const view = believedView(content, property);
+  const byPlayer = new Set(diy.map((choice) => choice.itemId));
   let cost = 0;
+  let materials = 0;
+  let diyMinutes = 0;
   const phases = new Map<number, Map<Trade, number>>();
   for (const choice of choices) {
     const index = property.items.findIndex((candidate) => itemId(candidate) === choice.itemId);
     const item = property.items[index];
     const works = item ? itemRule(content, item.kind).works : null;
     if (!item || !works) continue;
+    if (byPlayer.has(choice.itemId)) {
+      const own = diyCost(content, property, item, choice.tier);
+      materials += own.materials;
+      diyMinutes += own.minutes;
+      continue;
+    }
     cost += referenceCost(
       content,
       property,
@@ -206,6 +222,9 @@ export function worksEstimate(
   const today = toDayNumber(state.clock.date);
   return {
     cost,
+    materials,
+    diyMinutes,
+    total: cost + materials,
     days,
     dpeBefore: property.dpe,
     dpeAfter: after.dpe,

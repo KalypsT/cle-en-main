@@ -7,7 +7,7 @@ import type { Checkpoint } from '../storage/saves.ts';
 
 export type TabId = 'street' | 'map' | 'decisions' | 'assets' | 'menu';
 
-export type PropertyTab = 'overview' | 'rooms' | 'rental' | 'finances';
+export type PropertyTab = 'overview' | 'rooms' | 'rental' | 'finances' | 'history';
 
 export type ListingSort = 'recent' | 'price' | 'pricePerM2' | 'yield';
 

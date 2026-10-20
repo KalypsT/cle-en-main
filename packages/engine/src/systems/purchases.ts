@@ -307,6 +307,7 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
         debt: loan?.remaining ?? 0,
       },
     ],
+    log: [],
   });
   ctx.events.push({
     type: 'deedSigned',
