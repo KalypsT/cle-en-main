@@ -605,3 +605,13 @@ export function formatRealTimestamp(timestamp: number): string {
     time: realTimeFormat.format(timestamp),
   });
 }
+
+const longDateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
+
+/** Real-world date and time of the build (« 20 octobre 2026 à 14:32 »). */
+export function formatBuildDate(timestamp: number): string {
+  return format(t.settings.buildDate, {
+    date: longDateFormat.format(timestamp),
+    time: realTimeFormat.format(timestamp),
+  });
+}

@@ -596,7 +596,7 @@
     "heading": "Réglages",
     "saves": "Sauvegardes",
     "slot": "Emplacement {number}",
-    "autosave": "Sauvegarde automatique le 1er de chaque mois.",
+    "autosave": "Sauvegarde automatique le 1er de chaque mois et dès que l'appli passe en arrière-plan.",
     "saveNow": "Sauvegarder maintenant",
     "export": "Exporter dans un fichier",
     "exportHint": "Pour changer de téléphone : importez ce fichier depuis l'écran « Continuer ».",
@@ -633,7 +633,6 @@
     "volume": "{label} : {percent} %",
     "soundHint": "Le son démarre au premier toucher de l'écran.",
     "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
-    "version": "Format de sauvegarde v{version}",
     "autoSpeed": "Accélération automatique",
     "autoSpeedHint": "Quand rien ne presse, le temps passe en ×4, puis revient en ×1 à la prochaine décision.",
     "monthlyReview": "Afficher le bilan chaque mois",
@@ -642,7 +641,18 @@
     "rewindHint": "Un point de sauvegarde le 1er de chaque mois, les 6 derniers sont gardés.",
     "journal": "Journal de partie",
     "journalHint": "Les événements et vos décisions, gardés sur ce téléphone seulement, pour comprendre ce qui a été trop facile ou trop difficile.",
-    "exportJournal": "Exporter le journal ({count} lignes)"
+    "exportJournal": "Exporter le journal ({count} lignes)",
+    "versionHeading": "Version du jeu",
+    "build": "Version {number} du {date}",
+    "buildLocal": "Version de développement du {date}",
+    "buildDetails": "Code {commit} · format de sauvegarde v{format}",
+    "updateAvailable": "Une nouvelle version est disponible. La partie est sauvegardée avant le rechargement.",
+    "update": "Mettre à jour",
+    "checkUpdate": "Rechercher une mise à jour",
+    "checking": "Recherche en cours…",
+    "upToDate": "Vous avez la dernière version.",
+    "checkFailed": "Recherche impossible pour l'instant (hors ligne ?).",
+    "buildDate": "{date} à {time}"
   },
   "avatar": {
     "label": "Avatar de {name}"

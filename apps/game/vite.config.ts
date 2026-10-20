@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -18,7 +19,26 @@ function htmlTexts(): Plugin {
   };
 }
 
+/** Short commit of the build, or null outside a git checkout. */
+function commit(): string | null {
+  try {
+    return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch {
+    return null;
+  }
+}
+
+/** What the « Réglages » show of this version: CI run number, build date, commit. */
+const BUILD = {
+  number: process.env.GITHUB_RUN_NUMBER ?? null,
+  date: new Date().toISOString(),
+  commit: commit(),
+};
+
 export default defineConfig({
+  define: { __APP_BUILD__: JSON.stringify(BUILD) },
   // GitHub Pages serves the project at https://<user>.github.io/cle-en-main/.
   base: '/cle-en-main/',
   plugins: [
