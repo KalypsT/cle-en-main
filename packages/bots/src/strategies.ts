@@ -734,7 +734,10 @@ export function investor(profile: InvestorProfile): Strategy {
         }
         // Ready once renovated (or with nothing to renovate).
         else if (!memory.renovated.has(id) && chooseWorks(api, id, profile.renovation)) continue;
-        const estimate = api.engine.estimate(api.state, id)?.estimate ?? 0;
+        // Sold with its tenant, it is priced as the buyers see it (the sale screen says so).
+        const estimate =
+          (api.engine.estimate(api.state, id)?.estimate ?? 0) *
+          (1 - api.engine.occupiedDiscount(api.state, id));
         if (estimate <= 0) continue;
         const askingPrice = Math.round((estimate * RESALE_MARKUP) / OFFER_STEP) * OFFER_STEP;
         if (

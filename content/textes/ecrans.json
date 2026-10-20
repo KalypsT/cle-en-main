@@ -487,7 +487,8 @@
       "gain": "Plus-value latente (avant frais et impôt)",
       "equity": "Votre part (valeur moins crédit)",
       "soon": "La courbe se remplit le 1er de chaque mois."
-    }
+    },
+    "leaseStart": "Début du bail"
   },
   "rent": {
     "heading": "Mise en location",

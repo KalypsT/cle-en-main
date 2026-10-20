@@ -487,7 +487,7 @@ function Rental({ owned }: { owned: OwnedProperty }) {
         <KeyValues
           rows={[
             { label: t.property.monthlyRent, value: formatEuros(lease.monthlyRent) },
-            { label: t.property.since, value: formatDayYear(lease.startDay) },
+            { label: t.property.leaseStart, value: formatDayYear(lease.startDay) },
             { label: t.property.term, value: formatDayYear(lease.termDay) },
             { label: t.property.satisfaction, value: `${Math.round(lease.satisfaction)} / 100` },
             { label: t.property.depositHeld, value: formatEuros(lease.deposit) },
