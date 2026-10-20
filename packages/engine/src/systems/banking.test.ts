@@ -257,6 +257,50 @@ describe('loans', () => {
   });
 });
 
+describe('loan sheets', () => {
+  it('tells what is repaid, the interest paid and left, and the end of a loan', () => {
+    const state = newGame();
+    const offer = acceptedOffer(state, {
+      amount: toCents(10_000),
+      price: toCents(90_000),
+      durationYears: 5,
+    });
+    let current = withLoan(state, offer);
+    const [fresh] = engine.loanSheets(current);
+    expect(fresh?.repaidShare).toBe(0);
+    expect(fresh?.interestPaid).toBe(0);
+    expect(Math.abs((fresh?.interestLeft ?? 0) - offer.totalCost)).toBeLessThan(100);
+    expect(fresh?.monthsLeft).toBe(60);
+    expect(fresh?.remainingByYear).toHaveLength(6);
+    const start = current.loans[0]?.startDate;
+    expect(fresh?.endDate).toEqual({
+      year: (start?.year ?? 0) + 5,
+      month: start?.month,
+      day: 1,
+    });
+    for (let month = 0; month < 24; month++) current = advanceToNextMonth(current).state;
+    const [later] = engine.loanSheets(current);
+    expect(later?.monthsLeft).toBe(36);
+    expect(later?.repaidShare).toBeGreaterThan(0.3);
+    expect(later?.interestPaid).toBeGreaterThan(0);
+    // Paid and left add up to the cost of the loan, to rounding.
+    expect(
+      Math.abs((later?.interestPaid ?? 0) + (later?.interestLeft ?? 0) - offer.totalCost),
+    ).toBeLessThan(200);
+  });
+
+  it('shows the cheapest bank of the day when it beats the loan rate', () => {
+    const state = newGame();
+    const offer = acceptedOffer(state, { amount: toCents(60_000) });
+    const ratePercent = offer.ratePercent + 1.5;
+    const monthlyPayment = annuityPayment(offer.amount, ratePercent, offer.durationYears * 12);
+    const [sheet] = engine.loanSheets(withLoan(state, { ...offer, ratePercent, monthlyPayment }));
+    expect(sheet?.refinance?.ratePercent).toBeLessThan(ratePercent);
+    expect(sheet?.refinance?.monthlyPayment).toBeLessThan(monthlyPayment);
+    expect(sheet?.refinance?.saving).toBeGreaterThan(0);
+  });
+});
+
 describe('overdraft', () => {
   it('charges interest daily, lowers trust and reports it', () => {
     const state = deepClone(newGame());

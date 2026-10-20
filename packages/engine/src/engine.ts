@@ -19,6 +19,7 @@ import {
   evaluateLoan,
   initialBankRelations,
   type LoanDecision,
+  loanSheets,
   type LoanRequest,
   quoteRate,
   type RateQuote,
@@ -712,6 +713,8 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? worksPlan(content, state, owned, quoteIds, diy) : null;
     },
+    /** Each loan: repaid share, interest paid and left, end, a cheaper bank (« Banque »). */
+    loanSheets: (state: GameState) => loanSheets(content, state),
     /** Free time of a whole day today (the status bar shows what is left of it). */
     dailyFreeTime: (state: GameState) => dailyFreeTime(content, state, state.clock.date),
     /** Decisions waiting for the player, the most urgent first (« Décisions »). */

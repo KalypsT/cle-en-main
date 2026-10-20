@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { capture, importState, openGame, ownerGame, t, tab } from './helpers.ts';
+import { capture, importState, openGame, openMenuEntry, ownerGame, t, tab } from './helpers.ts';
 
 const MILESTONE = 'retours-jalon-8';
 
@@ -33,4 +33,11 @@ test('lists a property for sale, then paints a room oneself', async ({ page }) =
   await page.getByRole('button', { name: t.works.start, exact: true }).click();
   await expect(page.getByTestId('works-running')).toContainText(t.works.you);
   await capture(page, '03-chantier', MILESTONE);
+
+  // The loan of the purchase, in detail.
+  await openMenuEntry(page, t.menu.bank);
+  const loan = page.getByTestId('loan').first();
+  await expect(loan).toContainText(t.bank.interestLeft);
+  await expect(loan).toContainText(t.bank.end);
+  await capture(page, '04-banque', MILESTONE);
 });
