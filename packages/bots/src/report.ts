@@ -533,7 +533,8 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
       ok: low >= 30 && high <= 60,
     });
   }
-  list.push(...cityChecks(get, last));
+  // The expansion targets are set over 10 years (milestone 7).
+  if (years <= 10) list.push(...cityChecks(get, last));
   const prudent = get('prudent');
   if (prudent) {
     list.push({
