@@ -6,7 +6,7 @@ import type { EffectName } from '../audio/effects.ts';
 import { engine } from '../engine.ts';
 import type { GameSession } from '../session/game-session.ts';
 import { saveSettings, type Settings } from '../settings.ts';
-import { t, texts } from '../texts.ts';
+import { describeEvent, t, texts } from '../texts.ts';
 import { Icon, type IconName } from '../ui/Icon.tsx';
 import {
   GameContext,
@@ -46,6 +46,7 @@ import { RewindScreen } from '../screens/RewindScreen.tsx';
 import { StatisticsScreen } from '../screens/StatisticsScreen.tsx';
 import type { Checkpoint } from '../storage/saves.ts';
 import { type Overlay, OverlayView } from './Overlays.tsx';
+import { ScrollMemory } from './scroll-memory.ts';
 
 const TABS: { id: TabId; icon: IconName }[] = [
   { id: 'street', icon: 'street' },
@@ -150,6 +151,7 @@ export function GameShell({
     setViewCityId(baseCityId);
   }
   const [stacks, setStacks] = useState(EMPTY_STACKS);
+  const [memory] = useState(() => new Map<string, unknown>());
   const [shownStep, setShownStep] = useState<string | null>(null);
 
   useEffect(() => {
@@ -195,10 +197,24 @@ export function GameShell({
   );
   useEffect(
     () =>
-      session.onEvents((events) => {
+      session.onEvents((events, state) => {
         for (const event of events) {
           const effect = effectOf(event);
           if (effect) audio.effect(effect);
+        }
+        // A refused offer is told at once, wherever the player is.
+        const bad = events.filter(
+          (event) =>
+            (event.type === 'offerAnswered' && event.answer === 'refused') ||
+            event.type === 'counterOfferExpired',
+        );
+        if (bad.length > 0) {
+          notify(
+            bad
+              .map((event) => describeEvent(event, state))
+              .filter(Boolean)
+              .join(' '),
+          );
         }
         const fresh = overlaysOf(events, settings.monthlyReview);
         if (fresh.length === 0) return;
@@ -209,7 +225,7 @@ export function GameShell({
         }
         setOverlays((queue) => [...queue, ...fresh]);
       }),
-    [session, audio, settings.monthlyReview],
+    [session, audio, notify, settings.monthlyReview],
   );
   const closeOverlay = useCallback(() => {
     setOverlays((queue) => queue.slice(1));
@@ -235,24 +251,46 @@ export function GameShell({
     .filter(Boolean)
     .join(' ');
 
+  const [scrolls] = useState(() => new ScrollMemory());
+  const depth = stack.length;
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [tab, route]);
+    window.scrollTo(0, scrolls.get(tab, depth));
+  }, [scrolls, tab, depth]);
 
   const nav = useMemo<Navigation>(
     () => ({
       tab,
       cityId: viewCityId,
+      memory,
       setCityId: setViewCityId,
-      push: (next) => setStacks((all) => ({ ...all, [tab]: [...all[tab], next] })),
-      pop: () => setStacks((all) => ({ ...all, [tab]: all[tab].slice(0, -1) })),
+      push: (next) => {
+        scrolls.save(tab, depth, window.scrollY);
+        scrolls.forget(tab, depth + 1);
+        setStacks((all) => ({ ...all, [tab]: [...all[tab], next] }));
+      },
+      pop: () => {
+        scrolls.forget(tab, depth);
+        setStacks((all) => ({ ...all, [tab]: all[tab].slice(0, -1) }));
+      },
+      replace: (next) => setStacks((all) => ({ ...all, [tab]: [...all[tab].slice(0, -1), next] })),
       goTab: (next, nextRoute) => {
+        scrolls.save(tab, depth, window.scrollY);
+        scrolls.forgetTab(next);
         setTab(next);
         setStacks((all) => ({ ...all, [next]: nextRoute ? [nextRoute] : [] }));
       },
+      selectTab: (next) => {
+        scrolls.save(tab, depth, window.scrollY);
+        if (next === tab) {
+          scrolls.forgetTab(next);
+          setStacks((all) => ({ ...all, [next]: [] }));
+        }
+        setTab(next);
+      },
       track: (screen: TrackedScreen) => raise([`screen:${screen}`]),
     }),
-    [tab, viewCityId, raise],
+    [tab, depth, scrolls, memory, viewCityId, raise],
   );
 
   // The phone's back button goes back one screen, then to the street; on the street it does
@@ -366,7 +404,7 @@ export function GameShell({
                 key={id}
                 type="button"
                 aria-current={tab === id ? 'page' : undefined}
-                onClick={() => nav.goTab(id)}
+                onClick={() => nav.selectTab(id)}
               >
                 <Icon name={icon} />
                 {t.tabs[id]}
@@ -400,7 +438,7 @@ function TabRoot({ tab, wide }: { tab: TabId; wide: boolean }) {
 function RouteScreen({ route }: { route: Route }) {
   switch (route.name) {
     case 'listings':
-      return <ListingsScreen neighbourhoodId={route.neighbourhoodId} favorites={route.favorites} />;
+      return <ListingsScreen route={route} />;
     case 'listing':
       return <ListingScreen id={route.id} />;
     case 'purchase':

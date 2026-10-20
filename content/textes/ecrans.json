@@ -195,6 +195,8 @@
     "visitPlanned": "Visite prévue",
     "offerPending": "Offre envoyée",
     "counter": "Contre-offre",
+    "offerRefused": "Offre refusée",
+    "counterExpired": "Contre-offre expirée",
     "favorite": "Favori",
     "kindShort": {
       "apartment": "Appartement",
@@ -249,6 +251,10 @@
     "noOffersLeft": "Le vendeur ne veut plus de vos offres.",
     "send": "Envoyer l'offre",
     "offerSent": "Offre de {amount} envoyée : réponse {when}.",
+    "thisListing": "cette annonce",
+    "lastReplyHeading": "Dernière réponse du vendeur",
+    "refusedText": "Votre offre de {amount} a été refusée le {date}.",
+    "counterExpiredText": "Vous n'avez pas répondu à sa contre-offre de {amount} : elle a expiré le {date}.",
     "counterHeading": "Contre-offre du vendeur",
     "counterText": "Le vendeur propose {amount}, valable jusqu'au {date}.",
     "acceptCounter": "Accepter",
@@ -539,6 +545,13 @@
     "deadline": "Échéance {when}",
     "noDeadline": "Sans échéance",
     "pauses": "Met le jeu en pause",
+    "recent": "Réponses récentes",
+    "closeNotice": "Fermer",
+    "closeAllNotices": "Tout fermer",
+    "notices": {
+      "refused": "Offre refusée : {amount}",
+      "counterExpired": "Contre-offre expirée : {amount}"
+    },
     "kinds": {
       "counterOffer": "Contre-offre du vendeur : {amount}",
       "loanNeeded": "Compromis signé : demandez votre prêt",
@@ -574,6 +587,11 @@
     "pinLabel": "{title}, {price}",
     "ownedLabel": "Mon bien : {title}",
     "close": "Fermer la fiche",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
+    "recenter": "Voir toute la ville",
+    "clusterLabel": "{count} annonces regroupées",
+    "groupTitle": "{count} annonces ici",
     "attribution": "Fond de carte : IGN (BD TOPO, IRIS), Licence Ouverte."
   },
   "menu": {

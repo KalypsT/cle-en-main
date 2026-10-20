@@ -1131,14 +1131,50 @@ select {
   background: var(--amber);
 }
 
-.map {
-  display: block;
+.map-frame {
+  position: relative;
   width: 100%;
-  height: auto;
+  height: clamp(320px, 56vh, 640px);
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--map-ground);
-  touch-action: manipulation;
+  /* Dragging and pinching move the map, not the page. */
+  touch-action: none;
+  user-select: none;
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.map-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-control {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.map-control:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .map-pin {

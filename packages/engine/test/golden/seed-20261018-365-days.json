@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 12,
+    "formatVersion": 13,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -1728,6 +1728,7 @@
       "dole": 2
     },
     "favorites": [],
+    "offerNotices": [],
     "tutorial": {
       "enabled": true,
       "step": 0

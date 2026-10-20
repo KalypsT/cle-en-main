@@ -250,6 +250,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     artisans: {},
     worksDone: {},
     favorites: [],
+    offerNotices: [],
     tutorial: { enabled: options.tutorial ?? true, step: 0 },
     history: [],
     lastStatement: null,
@@ -517,6 +518,9 @@ export function createEngine(content: GameContent) {
         break;
       case 'market/favorite':
         refusal = setFavorite(draft, action.listingId, action.favorite);
+        break;
+      case 'market/dismissOfferNotice':
+        refusal = dismissOfferNotice(draft, action.noticeId);
         break;
       case 'tutorial/set':
         refusal = null;
@@ -808,6 +812,16 @@ function setFavorite(state: GameState, listingId: string, favorite: boolean): Re
   if (!state.listings.some((listing) => listing.id === listingId)) return 'listing.unknown';
   state.favorites = state.favorites.filter((id) => id !== listingId);
   if (favorite) state.favorites.push(listingId);
+  return null;
+}
+
+function dismissOfferNotice(state: GameState, noticeId: string | null): RefusalCode | null {
+  if (noticeId !== null && !state.offerNotices.some((notice) => notice.id === noticeId)) {
+    return 'listing.unknown';
+  }
+  for (const notice of state.offerNotices) {
+    if (noticeId === null || notice.id === noticeId) notice.dismissed = true;
+  }
   return null;
 }
 

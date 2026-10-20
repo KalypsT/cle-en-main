@@ -734,12 +734,13 @@ export class StreetScene {
     this.flyers = this.dropStale(this.flyers, (bird) => bird.x < -40 || bird.x > this.width + 40);
     for (const walker of this.people) {
       walker.update(dt, still);
-      if (outOfView(walker, MARGIN)) this.respawn(walker);
+      // A stale one that left is destroyed on the next frame; it must not come back.
+      if (outOfView(walker, MARGIN) && !this.stale.has(walker)) this.respawn(walker);
     }
     for (const car of this.cars) {
       car.update(dt, still);
       car.lights.alpha = glowAlpha * 0.8;
-      if (outOfView(car, MARGIN * 2)) this.respawn(car);
+      if (outOfView(car, MARGIN * 2) && !this.stale.has(car)) this.respawn(car);
     }
     for (const bird of this.flyers) {
       bird.update(dt, still);

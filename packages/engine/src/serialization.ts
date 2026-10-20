@@ -422,6 +422,8 @@ export const MIGRATIONS: MigrationRegistry = {
       },
     };
   },
+  /** Version 12 to 13: no refused offer was ever kept. */
+  12: (raw) => ({ ...raw, offerNotices: [] }),
   /** Version 11 to 12: no tenant was ever offered an indemnity to leave. */
   11: (raw) => ({
     ...raw,
@@ -1207,6 +1209,18 @@ const gameStateSchema = z
     artisans: z.record(z.string(), z.object({ jobs: z.number().int().min(0) }).strict()),
     worksDone: z.record(z.string(), z.number().int().min(0)),
     favorites: z.array(z.string()),
+    offerNotices: z.array(
+      z
+        .object({
+          id: z.string(),
+          listingId: z.string(),
+          day,
+          amount: cents.positive(),
+          outcome: z.enum(['refused', 'counterExpired']),
+          dismissed: z.boolean(),
+        })
+        .strict(),
+    ),
     tutorial: z.object({ enabled: z.boolean(), step: z.number().int().min(0) }).strict(),
     history: z.array(
       z

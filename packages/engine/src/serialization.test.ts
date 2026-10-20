@@ -365,6 +365,8 @@ describe('migrations', () => {
       original.properties.map((o) => o.property.id),
     );
     expect(migrated.properties.every((o) => o.valueHistory.length === 0)).toBe(true);
+    // Version 13: no refused offer was ever kept.
+    expect(migrated.offerNotices).toEqual([]);
     // Version 12: no tenant was ever offered an indemnity.
     expect(migrated.properties.some((o) => o.lease !== null)).toBe(true);
     expect(

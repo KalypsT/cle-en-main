@@ -10,7 +10,14 @@ import {
 } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextNormal, nextPoisson, nextRange, pickWeighted } from '../random.ts';
-import type { GameState, Listing, OtherKind, Property, PropertyKind } from '../state.ts';
+import type {
+  GameState,
+  Listing,
+  OfferNotice,
+  OtherKind,
+  Property,
+  PropertyKind,
+} from '../state.ts';
 import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import {
@@ -312,6 +319,22 @@ export function sellerAnswer(ctx: SystemContext, listing: Listing, amount: Cents
   return { answer: 'refused' };
 }
 
+function noteOffer(
+  ctx: SystemContext,
+  listingId: string,
+  amount: Cents,
+  outcome: OfferNotice['outcome'],
+): void {
+  ctx.state.offerNotices.push({
+    id: `notice-${ctx.state.nextId++}`,
+    listingId,
+    day: ctx.today,
+    amount,
+    outcome,
+    dismissed: false,
+  });
+}
+
 /** Daily chance that another buyer takes the listing (good deals go fast). */
 export function otherBuyerProbability(ctx: SystemContext, listing: Listing): number {
   const rules = ctx.content.market.otherBuyers;
@@ -329,6 +352,7 @@ export function otherBuyerProbability(ctx: SystemContext, listing: Listing): num
 
 function removeListing(ctx: SystemContext, listingId: string): void {
   ctx.state.listings = ctx.state.listings.filter((l) => l.id !== listingId);
+  ctx.state.offerNotices = ctx.state.offerNotices.filter((n) => n.listingId !== listingId);
   if (ctx.state.favorites.includes(listingId)) {
     ctx.state.favorites = ctx.state.favorites.filter((id) => id !== listingId);
   }
@@ -358,7 +382,12 @@ export function runDailyListings(
     if (offer && offer.counter === null && offer.responseDay <= ctx.today) {
       listing = editableListing(ctx, frozen);
       const answer = sellerAnswer(ctx, listing, offer.amount);
-      ctx.events.push({ type: 'offerAnswered', listingId: listing.id, ...answer });
+      ctx.events.push({
+        type: 'offerAnswered',
+        listingId: listing.id,
+        ...(answer.answer === 'refused' ? { ...answer, amount: offer.amount } : answer),
+      });
+      if (answer.answer === 'refused') noteOffer(ctx, listing.id, offer.amount, 'refused');
       if (answer.answer === 'accepted') {
         listing.offer = null;
         onAccepted(listing, answer.price);
@@ -379,7 +408,12 @@ export function runDailyListings(
     if (offer?.counter && offer.counter.expiresDay <= ctx.today) {
       listing = editableListing(ctx, frozen);
       listing.offer = null;
-      ctx.events.push({ type: 'counterOfferExpired', listingId: listing.id });
+      ctx.events.push({
+        type: 'counterOfferExpired',
+        listingId: listing.id,
+        amount: offer.counter.amount,
+      });
+      noteOffer(ctx, listing.id, offer.counter.amount, 'counterExpired');
     }
     if (listing.offer) continue; // the seller waits for the player
     if (

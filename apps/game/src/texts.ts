@@ -333,6 +333,12 @@ export function chronicleText(entry: ChronicleEntry): string {
   return format(templates[entry.kind], values);
 }
 
+/** « T2 · Centre historique » for a listing still online, else a neutral word. */
+function listingLabel(state: GameState | undefined, listingId: string): string {
+  const listing = state?.listings.find((candidate) => candidate.id === listingId);
+  return listing ? propertyLabel(listing.property) : t.listing.thisListing;
+}
+
 /** Text for an engine event, or null when the event is not shown to the player. */
 export function describeEvent(event: GameEvent, state?: GameState): string | null {
   const { events } = texts;
@@ -397,7 +403,15 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       if (event.answer === 'counterOffer') {
         return format(events.offerCountered, { amount: formatMoney(event.amount) });
       }
-      return events.offerRefused;
+      return format(events.offerRefused, {
+        amount: formatMoney(event.amount),
+        property: listingLabel(state, event.listingId),
+      });
+    case 'counterOfferExpired':
+      return format(events.counterOfferExpired, {
+        amount: formatMoney(event.amount),
+        property: listingLabel(state, event.listingId),
+      });
     case 'compromisSigned':
       return format(events.compromisSigned, { price: formatMoney(event.price) });
     case 'loanAnswered':
@@ -584,7 +598,6 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
     case 'listingWithdrawn':
     case 'visitCancelled':
     case 'offerMade':
-    case 'counterOfferExpired':
     case 'counterOfferDeclined':
     case 'compromisImpossible':
     case 'loanRequested':

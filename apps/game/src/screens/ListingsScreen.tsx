@@ -1,13 +1,19 @@
 import { gameContent } from '@cle/content';
 import type { Listing, ListingView, PropertyKind } from '@cle/engine';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { engine } from '../engine.ts';
-import { useGame, useNav } from '../game/context.tsx';
+import {
+  type ListingFilters,
+  type ListingSort,
+  type Route,
+  useGame,
+  useNav,
+} from '../game/context.tsx';
 import { cityName, format, formatDecimal, formatEuros, propertyLabel, t } from '../texts.ts';
 import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
 import { KindThumb } from '../ui/Facade.tsx';
 
-type Sort = 'recent' | 'price' | 'pricePerM2' | 'yield';
+type Sort = ListingSort;
 const KINDS: PropertyKind[] = ['apartment', 'house', 'building', 'commercial', 'parking', 'land'];
 /** Budget filters, in euros (presentation steps, not gameplay values). */
 const BUDGETS = [60_000, 90_000, 120_000, 180_000];
@@ -20,6 +26,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
     (item) => item.kind === 'visit' && item.listingId === listing.id,
   );
   const favorite = state.favorites.includes(listing.id);
+  const reply = state.offerNotices.findLast((notice) => notice.listingId === listing.id);
   return (
     <ListRow
       thumb={<KindThumb property={property} />}
@@ -39,6 +46,10 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
             <Badge tone="amber">{t.listings.counter}</Badge>
           ) : listing.offer ? (
             <Badge tone="teal">{t.listings.offerPending}</Badge>
+          ) : reply ? (
+            <Badge tone="brick">
+              {reply.outcome === 'refused' ? t.listings.offerRefused : t.listings.counterExpired}
+            </Badge>
           ) : null}
           {listing.visited ? (
             <Badge tone="green" icon="check">
@@ -70,22 +81,27 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
   );
 }
 
-export function ListingsScreen({
-  neighbourhoodId,
-  favorites: favoritesOnly = false,
-}: {
-  neighbourhoodId?: string | undefined;
-  favorites?: boolean | undefined;
-}) {
+export function ListingsScreen({ route }: { route: Extract<Route, { name: 'listings' }> }) {
   const { state } = useGame();
   const nav = useNav();
   const cityId = nav.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
-  const [area, setArea] = useState<string | null>(neighbourhoodId ?? null);
-  const [kind, setKind] = useState<PropertyKind | null>(null);
-  const [budget, setBudget] = useState<number | null>(null);
-  const [favorites, setFavorites] = useState(favoritesOnly);
-  const [sort, setSort] = useState<Sort>('recent');
+  // The filters live in the route, so opening a listing or another tab does not lose them.
+  const filters: ListingFilters = route.filters ?? {
+    area: route.neighbourhoodId ?? null,
+    kind: null,
+    budget: null,
+    favorites: route.favorites ?? false,
+    sort: 'recent',
+  };
+  const { area, kind, budget, favorites, sort } = filters;
+  const change = (patch: Partial<ListingFilters>) =>
+    nav.replace({ ...route, filters: { ...filters, ...patch } });
+  const setArea = (value: string | null) => change({ area: value });
+  const setKind = (value: PropertyKind | null) => change({ kind: value });
+  const setBudget = (value: number | null) => change({ budget: value });
+  const setFavorites = (value: boolean) => change({ favorites: value });
+  const setSort = (value: Sort) => change({ sort: value });
 
   const rows = useMemo(() => {
     const filtered = state.listings

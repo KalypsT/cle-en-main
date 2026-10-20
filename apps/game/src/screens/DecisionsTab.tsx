@@ -1,4 +1,4 @@
-import { decisionKey, type GameState, type PendingDecision } from '@cle/engine';
+import { decisionKey, type GameState, type OfferNotice, type PendingDecision } from '@cle/engine';
 import { useGame, useNav, type Route } from '../game/context.tsx';
 import {
   findCatalogEvent,
@@ -10,7 +10,7 @@ import {
   propertyLabel,
   t,
 } from '../texts.ts';
-import { Badge, Empty, ListRow, ScreenHeader } from '../ui/components.tsx';
+import { Badge, Empty, ListRow, ScreenHeader, SectionTitle } from '../ui/components.tsx';
 import type { IconName } from '../ui/Icon.tsx';
 
 const ICONS: Record<PendingDecision['kind'], IconName> = {
@@ -149,9 +149,39 @@ export function DecisionRow({ decision }: { decision: PendingDecision }) {
   );
 }
 
+/** The seller's last word on an offer, until the player closes it. */
+function NoticeRow({ notice }: { notice: OfferNotice }) {
+  const { state, act } = useGame();
+  const nav = useNav();
+  const listing = state.listings.find((candidate) => candidate.id === notice.listingId);
+  return (
+    <ListRow
+      icon="tag"
+      title={format(t.decisions.notices[notice.outcome], { amount: formatEuros(notice.amount) })}
+      subtitle={listing ? propertyLabel(listing.property) : undefined}
+      testId={`notice-${notice.id}`}
+      extra={<Badge icon="clock">{formatWhen(notice.day, state.clock.date)}</Badge>}
+      side={
+        <button
+          type="button"
+          className="link-button"
+          onClick={(event) => {
+            event.stopPropagation();
+            act({ type: 'market/dismissOfferNotice', noticeId: notice.id });
+          }}
+        >
+          {t.decisions.closeNotice}
+        </button>
+      }
+      onClick={() => nav.push({ name: 'listing', id: notice.listingId })}
+    />
+  );
+}
+
 export function DecisionsTab() {
-  const { snapshot } = useGame();
+  const { snapshot, state, act } = useGame();
   const { decisions } = snapshot;
+  const notices = state.offerNotices.filter((notice) => !notice.dismissed);
   return (
     <div className="screen">
       <ScreenHeader title={t.decisions.heading} />
@@ -163,6 +193,27 @@ export function DecisionsTab() {
             <DecisionRow key={decisionKey(decision)} decision={decision} />
           ))}
         </div>
+      )}
+      {notices.length > 0 && (
+        <>
+          <SectionTitle
+            title={t.decisions.recent}
+            action={
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => act({ type: 'market/dismissOfferNotice', noticeId: null })}
+              >
+                {t.decisions.closeAllNotices}
+              </button>
+            }
+          />
+          <div className="list">
+            {[...notices].reverse().map((notice) => (
+              <NoticeRow key={notice.id} notice={notice} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

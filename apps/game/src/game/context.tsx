@@ -1,4 +1,4 @@
-import type { GameAction, GameEvent, GameState } from '@cle/engine';
+import type { GameAction, GameEvent, GameState, PropertyKind } from '@cle/engine';
 import { createContext, useContext } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
 import type { GameSession, SessionSnapshot } from '../session/game-session.ts';
@@ -9,9 +9,21 @@ export type TabId = 'street' | 'map' | 'decisions' | 'assets' | 'menu';
 
 export type PropertyTab = 'overview' | 'rooms' | 'rental' | 'finances';
 
+export type ListingSort = 'recent' | 'price' | 'pricePerM2' | 'yield';
+
+/** What the listings screen filters on; kept in its route so a visit to a listing keeps it. */
+export interface ListingFilters {
+  area: string | null;
+  kind: PropertyKind | null;
+  /** Maximum price, in euros. */
+  budget: number | null;
+  favorites: boolean;
+  sort: ListingSort;
+}
+
 /** Screens pushed on top of a tab. */
 export type Route =
-  | { name: 'listings'; neighbourhoodId?: string; favorites?: boolean }
+  | { name: 'listings'; neighbourhoodId?: string; favorites?: boolean; filters?: ListingFilters }
   | { name: 'listing'; id: string }
   | { name: 'purchase'; id: string }
   | { name: 'property'; id: string; tab?: PropertyTab }
@@ -38,11 +50,20 @@ export interface Navigation {
   tab: TabId;
   /** City the street, the map and the listings show (the base by default). */
   cityId: string;
+  /** What a screen keeps while another tab is shown (the map's zoom…); lost with the session. */
+  memory: Map<string, unknown>;
   setCityId: (cityId: string) => void;
   push: (route: Route) => void;
   pop: () => void;
+  /** Replaces the screen on top of the stack (its filters changed): it is not reopened. */
+  replace: (route: Route) => void;
   /** Switches tab; with a route, opens it on top of the tab's root. */
   goTab: (tab: TabId, route?: Route) => void;
+  /**
+   * The tab bar: shows the tab as it was left (its stack and its scroll kept); touching the
+   * tab already shown goes back to its root.
+   */
+  selectTab: (tab: TabId) => void;
   /** Tells the tutorial a screen was opened. */
   track: (screen: TrackedScreen) => void;
 }
