@@ -56,6 +56,16 @@ Deux types de bail dès le départ (colocation et location courte durée au jalo
 - Une candidature attend une réponse quelques jours, puis le candidat part ailleurs.
 - **Garantie loyers impayés** (option) : environ 3 % des loyers, couvre les impayés et les frais de procédure.
 
+## Départ négocié et vente d'un bien loué
+
+> **Retours après le jalon 8** (`packages/engine/src/systems/buyout.ts` ; valeurs dans `content/location.json`, `buyout` et, par bail, `buyoutMonths` et `occupiedSaleDiscounts`). Règles validées par Thibaud.
+>
+> - **Départ négocié** (action `rent/buyout`) : à tout moment sur un bail en cours, sauf la location courte durée (elle s'arrête déjà quand on veut) et un locataire déjà sur le départ. Le joueur propose une indemnité ; la rencontre prend **1 h** de temps libre (trajet compris si le bien est dans une autre ville).
+> - Le locataire attend en secret : **2 à 6 mois** de loyer hors charges en location nue, **1 à 3 mois** en meublé ou en colocation, **6 à 12 mois** pour un bail commercial, **1 à 2 mois** pour un parking. Cette attente est tirée une fois par bail (hachage stable, sans toucher au générateur de la partie) ; elle baisse de **30 %** si sa satisfaction est sous 40 et monte de **30 %** pour une famille ou un retraité.
+> - Accepté si l'offre atteint cette attente : l'indemnité est payée aussitôt, le joueur perd **2 points de réputation** (l'expulsion en coûte 5), et le locataire part **30 jours** plus tard (état des lieux et dépôt comme un préavis ordinaire). L'indemnité **n'est pas déductible** des loyers (simplification).
+> - Refusé : **−5 de satisfaction**, et pas de nouvelle offre avant **30 jours**.
+> - **Vente d'un bien loué** : les acheteurs (ménages et rivaux) jugent le bien avec une **décote** selon le temps qui reste au bail en cours : en location nue, **15 %** s'il reste au moins 2 ans, **10 %** entre 1 et 2 ans, **5 %** sous 1 an ; **5 %** en meublé ou en colocation ; rien pour la courte durée, un local ou un parking (ils se vendent sur leur loyer), ni pour un locataire qui a donné son préavis. La valeur estimée du bien (et donc le patrimoine net) n'est **pas** décotée : seules les offres le sont. L'écran Vente l'annonce.
+
 ## Gérer soi-même ou déléguer
 
 - **Soi-même** : visites, états des lieux et incidents consomment du temps libre.

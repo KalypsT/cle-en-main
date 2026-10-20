@@ -1,5 +1,15 @@
 import { expect, test } from '@playwright/test';
-import { capture, importState, openGame, openMenuEntry, ownerGame, t, tab } from './helpers.ts';
+import {
+  capture,
+  importState,
+  newGame,
+  openGame,
+  openMenuEntry,
+  ownerGame,
+  pause,
+  t,
+  tab,
+} from './helpers.ts';
 
 const MILESTONE = 'retours-jalon-8';
 
@@ -53,4 +63,45 @@ test('draws the value curve of a property owned for a few months', async ({ page
   await expect(curve).toContainText(t.property.valueCurve.equity);
   await curve.scrollIntoViewIfNeeded();
   await capture(page, '05-valeur-du-bien', MILESTONE);
+});
+
+test('shows the version of the game and looks for an update', async ({ page }) => {
+  await openGame(page);
+  await newGame(page, { tutorialOn: false });
+  await pause(page);
+  await openMenuEntry(page, t.menu.settings);
+  const version = page.getByTestId('version');
+  await expect(version).toContainText('Version');
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  await version.getByRole('button', { name: t.settings.checkUpdate }).click();
+  await expect(version.getByText(t.settings.upToDate)).toBeVisible();
+  await version.scrollIntoViewIfNeeded();
+  await capture(page, '06-version', MILESTONE);
+});
+
+test('sells a let flat at a discount, or pays the tenant to leave', async ({ page }) => {
+  await openGame(page);
+  await importState(
+    page,
+    ownerGame(24 * 120, (s) => s.properties.some((o) => o.lease !== null)),
+  );
+  await tab(page, 'assets');
+  await page.locator('[data-testid^="property-"]').first().click();
+
+  // For sale with its tenant: the buyers take a discount.
+  await page.getByRole('button', { name: t.property.sell }).click();
+  await expect(page.getByText(t.sale.tenant)).toBeVisible();
+  await expect(page.getByText(/les acheteurs en retirent/)).toBeVisible();
+  await page.getByRole('button', { name: t.common.back }).click();
+
+  // A generous indemnity: the tenant leaves in a month.
+  await page.getByRole('button', { name: t.property.tabs.rental }).click();
+  const buyout = page.getByTestId('buyout');
+  await buyout.scrollIntoViewIfNeeded();
+  await capture(page, '07-depart-negocie', MILESTONE);
+  await buyout.getByTestId('buyout-amount').fill('5000');
+  await buyout.getByRole('button', { name: /Proposer/ }).click();
+  await expect(page.getByText(/Préavis donné/)).toBeVisible();
 });

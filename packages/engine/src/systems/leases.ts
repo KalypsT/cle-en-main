@@ -42,7 +42,7 @@ export function giveNotice(
   ctx: SystemContext,
   owned: OwnedProperty,
   lease: Lease,
-  reason: 'departure' | 'lifeEvent' | 'incident',
+  reason: 'departure' | 'lifeEvent' | 'incident' | 'buyout',
   months?: number,
 ): void {
   if (lease.noticeEndDay !== null) return;

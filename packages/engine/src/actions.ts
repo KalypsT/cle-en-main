@@ -64,6 +64,8 @@ export type GameAction =
   | { type: 'rent/reject'; propertyId: string; applicationId: string }
   | { type: 'rent/manage'; propertyId: string; agencyId: string | null }
   | { type: 'rent/repair'; propertyId: string; method: 'self' | 'artisan' }
+  /** Offers the tenant `amount` to leave within a month (« départ négocié »). */
+  | { type: 'rent/buyout'; propertyId: string; amount: Cents }
   | { type: 'home/moveIn'; propertyId: string }
   | { type: 'home/moveOut' }
   /** Moves the rented home to another city: the base changes (docs/03-systemes/08). */

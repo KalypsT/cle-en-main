@@ -8,6 +8,7 @@ import { modeOf } from './modes.ts';
 import { listingFor, removeListing } from './listings.ts';
 import { netWorth } from './net-worth.ts';
 import { realValue } from './valuation.ts';
+import { occupiedDiscount } from './buyout.ts';
 import {
   conditionLabel,
   dpeOf,
@@ -191,7 +192,9 @@ function offerOnPlayerSales(
     if (sale.offers.some((offer) => offer.buyerId === rival.id)) continue;
     const weight = interest(ctx.content, rival, owned.property);
     if (weight === 0) continue;
-    const estimate = rivalEstimate(ctx, rival, owned.property);
+    const estimate = Math.round(
+      rivalEstimate(ctx, rival, owned.property) * (1 - occupiedDiscount(content, owned, ctx.today)),
+    );
     if (estimate / sale.askingPrice - 1 < rules.minBargain) continue;
     if (sale.askingPrice * (1 + rival.costShare) > rivalState.budget) continue;
     if (nextFloat(state.rng) >= Math.min(1, rules.dailyReaction * boldness * weight)) continue;

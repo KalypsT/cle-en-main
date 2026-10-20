@@ -734,7 +734,10 @@ export function investor(profile: InvestorProfile): Strategy {
         }
         // Ready once renovated (or with nothing to renovate).
         else if (!memory.renovated.has(id) && chooseWorks(api, id, profile.renovation)) continue;
-        const estimate = api.engine.estimate(api.state, id)?.estimate ?? 0;
+        const full = api.engine.estimate(api.state, id)?.estimate ?? 0;
+        negotiateDeparture(api, owned, full);
+        // Sold with its tenant, it is priced as the buyers see it (the sale screen says so).
+        const estimate = full * (1 - api.engine.occupiedDiscount(api.state, id));
         if (estimate <= 0) continue;
         const askingPrice = Math.round((estimate * RESALE_MARKUP) / OFFER_STEP) * OFFER_STEP;
         if (
@@ -770,6 +773,25 @@ export function investor(profile: InvestorProfile): Strategy {
         }
       }
     }
+  }
+
+  /**
+   * Before selling a let property, pays the tenant to leave when the discount buyers would
+   * take is worth more than the indemnity, and the cash is there: the top of the usual
+   * range, raised for a tenant attached to his home (his profile is on the lease card).
+   */
+  function negotiateDeparture(api: BotApi, owned: OwnedProperty, estimate: number): void {
+    const id = owned.property.id;
+    const lease = owned.lease;
+    const terms = api.engine.buyoutTerms(api.state, id);
+    if (!lease || !terms || (terms.retryDay !== null && api.today < terms.retryDay)) return;
+    const rules = api.engine.content.renting.buyout;
+    const attached = rules.attachedProfiles.includes(lease.tenant.profileId);
+    const months = terms.months.max * (attached ? rules.attachedFactor : 1);
+    const amount = Math.ceil((months * lease.monthlyRent) / 100_00) * 100_00;
+    const saved = api.engine.occupiedDiscount(api.state, id) * estimate;
+    if (amount >= saved || api.state.player.balance < amount) return;
+    api.act({ type: 'rent/buyout', propertyId: id, amount });
   }
 
   /** Creates the SCI once his portfolio is under way and the cash is there. */

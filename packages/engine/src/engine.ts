@@ -15,6 +15,7 @@ import {
   type TransformationKind,
 } from './state.ts';
 import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
+import { buyoutRetryDay, occupiedDiscount, offerBuyout } from './systems/buyout.ts';
 import {
   evaluateLoan,
   initialBankRelations,
@@ -460,6 +461,9 @@ export function createEngine(content: GameContent) {
       case 'rent/manage':
         refusal = changeManagement(ctx, action.propertyId, action.agencyId);
         break;
+      case 'rent/buyout':
+        refusal = offerBuyout(ctx, action.propertyId, action.amount);
+        break;
       case 'rent/repair':
         refusal =
           action.method === 'self'
@@ -716,6 +720,27 @@ export function createEngine(content: GameContent) {
     },
     /** Each loan: repaid share, interest paid and left, end, a cheaper bank (« Banque »). */
     loanSheets: (state: GameState) => loanSheets(content, state),
+    /**
+     * A negotiated departure of an owned property's tenant: the usual range of the indemnity
+     * (in months of rent) and the day a new offer is possible; null without one.
+     */
+    buyoutTerms: (state: GameState, propertyId: string) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      const lease = owned?.lease;
+      const range = lease ? content.renting.leaseTypes[lease.leaseType].buyoutMonths : null;
+      if (!lease || !range || lease.noticeEndDay !== null) return null;
+      return {
+        months: range,
+        retryDay: buyoutRetryDay(content, lease),
+        minutes: content.renting.buyout.minutes,
+        reputationPenalty: content.renting.buyout.reputationPenalty,
+      };
+    },
+    /** Share buyers take off the price of an owned property sold with its tenant today. */
+    occupiedDiscount: (state: GameState, propertyId: string) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? occupiedDiscount(content, owned, toDayNumber(state.clock.date)) : 0;
+    },
     /** Free time of a whole day today (the status bar shows what is left of it). */
     dailyFreeTime: (state: GameState) => dailyFreeTime(content, state, state.clock.date),
     /** Decisions waiting for the player, the most urgent first (« Décisions »). */

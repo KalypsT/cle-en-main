@@ -5,7 +5,9 @@ import { exportJournal } from '../storage/files.ts';
 import { type JournalEntry, readJournal, type SlotId } from '../storage/saves.ts';
 import { QUALITIES, THEMES, type Volumes } from '../settings.ts';
 import { useGame, useNav } from '../game/context.tsx';
-import { format, t } from '../texts.ts';
+import { BUILD } from '../build-info.ts';
+import { applyUpdate, checkForUpdate, useUpdates } from '../pwa-updates.ts';
+import { format, formatBuildDate, t } from '../texts.ts';
 import { Card, Chip, ScreenHeader, Segmented, Switch } from '../ui/components.tsx';
 
 const VOLUMES: readonly (keyof Volumes)[] = ['music', 'ambience', 'effects'];
@@ -147,7 +149,54 @@ export function SettingsScreen() {
           {format(t.settings.exportJournal, { count: journal?.length ?? 0 })}
         </button>
       </Card>
-      <p className="tiny muted">{format(t.settings.version, { version: FORMAT_VERSION })}</p>
+      <VersionCard onBeforeUpdate={() => save()} />
     </div>
+  );
+}
+
+/** The version of the game, and its update when the phone found a new one. */
+function VersionCard({ onBeforeUpdate }: { onBeforeUpdate: () => void }) {
+  const texts = t.settings;
+  const { available, check } = useUpdates();
+  const date = formatBuildDate(Date.parse(BUILD.date));
+  return (
+    <Card title={texts.versionHeading} testId="version">
+      <p className="small strong">
+        {BUILD.number
+          ? format(texts.build, { number: BUILD.number, date })
+          : format(texts.buildLocal, { date })}
+      </p>
+      <p className="tiny muted">
+        {format(texts.buildDetails, { commit: BUILD.commit ?? '—', format: FORMAT_VERSION })}
+      </p>
+      {available ? (
+        <>
+          <p className="small">{texts.updateAvailable}</p>
+          <button
+            type="button"
+            className="button primary block"
+            onClick={() => {
+              onBeforeUpdate();
+              applyUpdate();
+            }}
+          >
+            {texts.update}
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            type="button"
+            className="button block"
+            disabled={check === 'checking'}
+            onClick={() => void checkForUpdate()}
+          >
+            {check === 'checking' ? texts.checking : texts.checkUpdate}
+          </button>
+          {check === 'upToDate' && <p className="small muted">{texts.upToDate}</p>}
+          {check === 'failed' && <p className="small muted">{texts.checkFailed}</p>}
+        </>
+      )}
+    </Card>
   );
 }

@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import type { OwnedProperty, TaxRegimeChoice } from '@cle/engine';
+import { type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { type PropertyTab, useGame, useNav } from '../game/context.tsx';
@@ -8,6 +8,7 @@ import {
   bankName,
   format,
   formatDayLong,
+  formatDecimal,
   formatDayYear,
   formatDuration,
   formatEuros,
@@ -227,6 +228,85 @@ function ValueCurve({ owned }: { owned: OwnedProperty }) {
   );
 }
 
+const BUYOUT_STEP = 100_00;
+
+/** « Départ négocié » (feedback after milestone 8): an indemnity for the tenant to leave. */
+function BuyoutCard({ owned }: { owned: OwnedProperty }) {
+  const { state, act } = useGame();
+  const terms = engine.buyoutTerms(state, owned.property.id);
+  const rent = owned.lease?.monthlyRent ?? 0;
+  const [amount, setAmount] = useState(() =>
+    terms
+      ? Math.round((((terms.months.min + terms.months.max) / 2) * rent) / BUYOUT_STEP) * BUYOUT_STEP
+      : 0,
+  );
+  if (!terms || rent === 0) return null;
+  const texts = t.buyout;
+  const waiting = terms.retryDay !== null && toDayNumber(state.clock.date) < terms.retryDay;
+  const max = Math.round((terms.months.max * 1.5 * rent) / BUYOUT_STEP) * BUYOUT_STEP;
+  return (
+    <Card title={texts.heading} testId="buyout">
+      <p className="small">{texts.intro}</p>
+      <p className="small muted">
+        {format(texts.usual, {
+          min: formatDecimal(terms.months.min),
+          max: formatDecimal(terms.months.max),
+          low: formatEuros(terms.months.min * rent),
+          high: formatEuros(terms.months.max * rent),
+        })}
+      </p>
+      {waiting && terms.retryDay !== null ? (
+        <p className="small warning">
+          {format(texts.wait, { when: formatWhen(terms.retryDay, state.clock.date) })}
+        </p>
+      ) : (
+        <>
+          <label className="field">
+            <span className="field-label">{texts.amount}</span>
+            <input
+              className="input"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={100}
+              value={Math.round(amount / 100)}
+              data-testid="buyout-amount"
+              onChange={(e) => setAmount(Math.max(0, Math.round(Number(e.target.value) * 100)))}
+            />
+            <input
+              className="range"
+              type="range"
+              min={0}
+              max={max}
+              step={BUYOUT_STEP}
+              value={Math.min(max, amount)}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              aria-label={texts.amount}
+            />
+          </label>
+          <p className="small muted">
+            {format(texts.months, { months: formatDecimal(amount / rent) })}
+          </p>
+          <p className="tiny muted">
+            {format(texts.cost, {
+              duration: formatDuration(terms.minutes),
+              points: terms.reputationPenalty,
+            })}
+          </p>
+          <button
+            type="button"
+            className="button block"
+            disabled={amount <= 0}
+            onClick={() => act({ type: 'rent/buyout', propertyId: owned.property.id, amount })}
+          >
+            {format(texts.offer, { amount: formatEuros(amount) })}
+          </button>
+        </>
+      )}
+    </Card>
+  );
+}
+
 /** The co-ownership's general meeting (docs/03-systemes/05): one vote per resolution. */
 function CoproMeetingCard({ owned }: { owned: OwnedProperty }) {
   const { act } = useGame();
@@ -407,7 +487,7 @@ function Rental({ owned }: { owned: OwnedProperty }) {
         <KeyValues
           rows={[
             { label: t.property.monthlyRent, value: formatEuros(lease.monthlyRent) },
-            { label: t.property.since, value: formatDayYear(lease.startDay) },
+            { label: t.property.leaseStart, value: formatDayYear(lease.startDay) },
             { label: t.property.term, value: formatDayYear(lease.termDay) },
             { label: t.property.satisfaction, value: `${Math.round(lease.satisfaction)} / 100` },
             { label: t.property.depositHeld, value: formatEuros(lease.deposit) },
@@ -496,6 +576,7 @@ function Rental({ owned }: { owned: OwnedProperty }) {
           )}
         </Card>
       )}
+      <BuyoutCard owned={owned} />
       <Card title={t.property.changeManagement}>
         <select
           className="select"

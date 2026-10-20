@@ -216,6 +216,7 @@ export const MIGRATIONS: MigrationRegistry = {
           incident: null,
           arrears: null,
           missedDays: 0,
+          buyoutRefusedDay: null,
         };
         owned.lease = lease;
         state.player.balance += deposit;
@@ -421,6 +422,14 @@ export const MIGRATIONS: MigrationRegistry = {
       },
     };
   },
+  /** Version 11 to 12: no tenant was ever offered an indemnity to leave. */
+  11: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      lease: isRecord(entry.lease) ? { ...entry.lease, buyoutRefusedDay: null } : entry.lease,
+    })),
+  }),
   /** Version 10 (milestone 8) to 11: the value curve of each property starts empty. */
   10: (raw) => ({
     ...raw,
@@ -773,6 +782,7 @@ const leaseSchema = z
       .nullable(),
     // Added in version 10 (short-term lets).
     missedDays: z.number().int().min(0).default(0),
+    buyoutRefusedDay: z.number().int().nullable(),
   })
   .strict();
 

@@ -4,6 +4,7 @@ import { nextFloat, nextRange } from '../random.ts';
 import type { OwnedProperty, SaleMode } from '../state.ts';
 import { refinancingFees } from './banking.ts';
 import { crisisFactor } from './crises.ts';
+import { occupiedDiscount } from './buyout.ts';
 import type { SystemContext } from './context.ts';
 import { moveOutOfHome } from './renting.ts';
 import { rivalAcquired } from './rivals.ts';
@@ -216,7 +217,11 @@ export function runDailyResale(ctx: SystemContext): void {
       ctx.events.push({ type: 'saleOfferExpired', propertyId, offerId: offer.id });
 
     // A visit: the agency handles it, otherwise it costs the player free time.
-    const value = realValue(content, state, owned.property).value;
+    // Buyers pay less for a property that comes with its tenant.
+    const value = Math.round(
+      realValue(content, state, owned.property).value *
+        (1 - occupiedDiscount(content, owned, ctx.today)),
+    );
     const overpricing = Math.max(0, sale.askingPrice / value - 1);
     const chance =
       rules.dailyVisitProbability *

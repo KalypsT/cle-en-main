@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
+import { applyUpdate, useServiceWorker, useUpdates } from './pwa-updates.ts';
 import { texts } from './texts.ts';
 
 const OFFLINE_READY_DURATION_MS = 4000;
@@ -8,9 +8,8 @@ const OFFLINE_READY_DURATION_MS = 4000;
 export function PwaStatus() {
   const {
     offlineReady: [offlineReady, setOfflineReady],
-    needRefresh: [needRefresh],
-    updateServiceWorker,
-  } = useRegisterSW();
+  } = useServiceWorker();
+  const { available: needRefresh } = useUpdates();
 
   useEffect(() => {
     if (!offlineReady) return;
@@ -22,11 +21,7 @@ export function PwaStatus() {
     return (
       <div className="pwa-banner" role="status">
         <span>{texts.pwa.updateAvailable}</span>
-        <button
-          type="button"
-          className="button primary"
-          onClick={() => void updateServiceWorker(true)}
-        >
+        <button type="button" className="button primary" onClick={applyUpdate}>
           {texts.pwa.reload}
         </button>
       </div>

@@ -356,7 +356,7 @@ describe('migrations', () => {
     expect(engine.loadGame(v9)).toEqual(migrated);
   });
 
-  it('upgrades a milestone 8 save (version 10): the value curves start empty', () => {
+  it('upgrades a milestone 8 save (version 10): value curves empty, no indemnity offered', () => {
     const v10 = JSON.stringify(v10Save);
     const original = JSON.parse(v10) as { properties: { property: { id: string } }[] };
     const migrated = engine.loadGame(v10);
@@ -365,6 +365,11 @@ describe('migrations', () => {
       original.properties.map((o) => o.property.id),
     );
     expect(migrated.properties.every((o) => o.valueHistory.length === 0)).toBe(true);
+    // Version 12: no tenant was ever offered an indemnity.
+    expect(migrated.properties.some((o) => o.lease !== null)).toBe(true);
+    expect(
+      migrated.properties.every((o) => o.lease === null || o.lease.buyoutRefusedDay === null),
+    ).toBe(true);
     // The 1st of the next month adds a point to each curve, and the result round-trips.
     const later = advanceToNextMonth(migrated).state;
     expect(later.properties.every((o) => o.valueHistory.length === 1)).toBe(true);

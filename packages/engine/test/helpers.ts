@@ -222,6 +222,7 @@ export function sampleOwned(
             incident: null,
             arrears: null,
             missedDays: 0,
+            buyoutRefusedDay: null,
           },
     furniture: null,
     taxRegime: 'auto',
