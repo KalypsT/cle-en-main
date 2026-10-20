@@ -44,6 +44,7 @@ export function StatusBar() {
             <button
               key={value}
               type="button"
+              className={value === 0 ? 'pause' : undefined}
               aria-pressed={speed === value}
               aria-label={value === 0 ? t.status.pause : format(t.status.speed, { speed: value })}
               onClick={() => session.setSpeed(value)}

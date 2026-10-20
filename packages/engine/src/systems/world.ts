@@ -535,8 +535,8 @@ function ordinaryBuilding(
 /**
  * The streets of a neighbourhood with their buildings, left to right. The
  * ordinary buildings never move; the player's properties, the listings, the
- * purchases and the rivals' renovations are inserted at a place drawn from
- * their id, so a building keeps its place while it stays in the street.
+ * purchases and the rivals' renovations take the place of an ordinary building
+ * drawn from their id, so a building keeps its place while it stays in the street.
  */
 export function streets(
   content: GameContent,
@@ -550,45 +550,52 @@ export function streets(
   const weather = weatherOn(content, state.seed, cityId, toDayNumber(state.clock.date));
   const placed = placedProperties(state, cityId, neighbourhoodId);
   return world.streets.map((street, streetIndex) => {
-    const ordinary = Array.from({ length: street.buildings }, (_, index) =>
-      ordinaryBuilding(
-        content,
-        state,
-        cityId,
-        neighbourhoodId,
-        `${street.id}.${index}`,
-        world.shopShare,
-        world.treeShare,
-      ),
+    const ordinary = Array.from(
+      { length: street.buildings * content.world.placesPerBuilding },
+      (_, index) =>
+        ordinaryBuilding(
+          content,
+          state,
+          cityId,
+          neighbourhoodId,
+          `${street.id}.${index}`,
+          world.shopShare,
+          world.treeShare,
+        ),
     );
-    const mine = placed
-      .filter(
-        (entry) =>
-          Math.floor(hashFloat(0, `street#${entry.property.id}`) * world.streets.length) ===
-          streetIndex,
-      )
-      .map((entry) => ({
-        entry,
-        position: hashFloat(0, `position#${entry.property.id}`) * (street.buildings + 1),
-      }))
-      .sort(
-        (a, b) => a.position - b.position || a.entry.property.id.localeCompare(b.entry.property.id),
-      );
-    const buildings: StreetBuilding[] = [];
-    let next = 0;
-    for (let index = 0; index <= ordinary.length; index++) {
-      while (next < mine.length && (mine[next]?.position ?? 0) < index + 1) {
-        const item = mine[next];
-        if (item) {
-          const shop = hashFloat(state.seed, `shop#${item.entry.property.id}`) < world.shopShare;
-          const tree = hashFloat(state.seed, `tree#${item.entry.property.id}`) < world.treeShare;
-          buildings.push(placedBuilding(content, state, item.entry, shop, tree));
+    // Each placed building takes one of the street's places, drawn from its id, from an
+    // ordinary building: nothing moves along when a listing comes or goes. The player's
+    // properties choose first, so a listing never pushes them; a taken place goes to the next
+    // free one, and the rare ones left without a place go to the end of the street.
+    const slots: (Placed | null)[] = ordinary.map(() => null);
+    const extra: Placed[] = [];
+    for (const entry of placed) {
+      const id = entry.property.id;
+      if (Math.floor(hashFloat(0, `street#${id}`) * world.streets.length) !== streetIndex) continue;
+      const wanted = Math.floor(hashFloat(0, `position#${id}`) * slots.length);
+      let slot = -1;
+      for (let step = 0; step < slots.length; step++) {
+        const candidate = (wanted + step) % slots.length;
+        if (slots[candidate] === null) {
+          slot = candidate;
+          break;
         }
-        next++;
       }
-      const building = ordinary[index];
-      if (building) buildings.push(building);
+      if (slot >= 0) slots[slot] = entry;
+      else extra.push(entry);
     }
+    const place = (entry: Placed) => {
+      const shop = hashFloat(state.seed, `shop#${entry.property.id}`) < world.shopShare;
+      const tree = hashFloat(state.seed, `tree#${entry.property.id}`) < world.treeShare;
+      return placedBuilding(content, state, entry, shop, tree);
+    };
+    const buildings: StreetBuilding[] = [
+      ...ordinary.map((building, index) => {
+        const entry = slots[index];
+        return entry ? place(entry) : building;
+      }),
+      ...extra.map(place),
+    ];
     return {
       id: street.id,
       name: street.name,

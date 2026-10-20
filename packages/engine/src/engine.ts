@@ -7,12 +7,19 @@ import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
 import { deserializeGame, type MigrationRegistry, MIGRATIONS } from './serialization.ts';
-import { type Avatar, FORMAT_VERSION, type GameState, type TransformationKind } from './state.ts';
-import { monthlyPoint, statementNet } from './systems/history.ts';
+import {
+  type Avatar,
+  FORMAT_VERSION,
+  type GameState,
+  type SaleMode,
+  type TransformationKind,
+} from './state.ts';
+import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
   initialBankRelations,
   type LoanDecision,
+  loanSheets,
   type LoanRequest,
   quoteRate,
   type RateQuote,
@@ -329,6 +336,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     // The wealth curve, once the first day of the month has run.
     const net = statementNet(ctx.state.lastStatement?.lines ?? []);
     ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
+    recordPropertyValues(ctx.content, ctx.state);
   }
   if (yearStarted) ctx.state.lastYearReview = buildYearReview(ctx, regime);
 }
@@ -613,10 +621,10 @@ export function createEngine(content: GameContent) {
       const purchase = state.purchases.find((candidate) => candidate.id === purchaseId);
       return purchase ? cashDueAtDeed({ content }, purchase) : null;
     },
-    /** Net proceeds if an owned property sold today at `price`. */
-    saleProceeds: (state: GameState, propertyId: string, price: Cents) => {
+    /** Net proceeds if an owned property sold today at `price` (by `mode`, else as listed). */
+    saleProceeds: (state: GameState, propertyId: string, price: Cents, mode?: SaleMode) => {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
-      return owned ? saleProceeds(context(content, state, []), owned, price) : null;
+      return owned ? saleProceeds(context(content, state, []), owned, price, mode) : null;
     },
     /**
      * Rents the player may ask today for a listing, a purchase under compromis
@@ -706,6 +714,8 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? worksPlan(content, state, owned, quoteIds, diy) : null;
     },
+    /** Each loan: repaid share, interest paid and left, end, a cheaper bank (« Banque »). */
+    loanSheets: (state: GameState) => loanSheets(content, state),
     /** Free time of a whole day today (the status bar shows what is left of it). */
     dailyFreeTime: (state: GameState) => dailyFreeTime(content, state, state.clock.date),
     /** Decisions waiting for the player, the most urgent first (« Décisions »). */

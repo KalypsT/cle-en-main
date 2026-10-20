@@ -16,7 +16,9 @@ import {
   type Checkpoint,
   dropCheckpointsFrom,
   type JournalEntry,
+  lastSlot,
   loadFromSlot,
+  rememberSlot,
   saveToSlot,
   type SlotId,
 } from './storage/saves.ts';
@@ -24,6 +26,8 @@ import { t, texts } from './texts.ts';
 import { useTheme } from './theme.ts';
 
 type Screen =
+  /** At launch, while the last game played is reopened. */
+  | { name: 'resuming'; slot: SlotId }
   | { name: 'title' }
   | { name: 'slots'; mode: 'new' | 'continue' }
   | { name: 'create'; slot: SlotId }
@@ -44,7 +48,10 @@ const JOURNAL_BATCH = 200;
  * End-to-end tests open the game with `?e2e`: a fixed seed and start date, a
  * faster clock, and time paused on start. It changes nothing else.
  */
-const E2E = new URLSearchParams(window.location.search).has('e2e');
+const PARAMS = new URLSearchParams(window.location.search);
+const E2E = PARAMS.has('e2e');
+/** The tests open the title screen, unless they check the reopening (`?e2e&resume`). */
+const RESUME = !E2E || PARAMS.has('resume');
 const E2E_SEED = 20261018;
 const E2E_START = { year: 2026, month: 10, day: 18 };
 const E2E_SECONDS_PER_DAY = 1;
@@ -63,7 +70,10 @@ function randomSeed(): number {
 }
 
 export function App() {
-  const [screen, setScreen] = useState<Screen>({ name: 'title' });
+  const [screen, setScreen] = useState<Screen>(() => {
+    const slot = RESUME ? lastSlot() : null;
+    return slot === null ? { name: 'title' } : { name: 'resuming', slot };
+  });
   const [notice, setNotice] = useState<string | null>(null);
   const [settings, setSettings] = useState<Settings>(loadSettings);
   // Night in the running game, for the « Automatique » theme.
@@ -140,10 +150,46 @@ export function App() {
         onAction: (action, current) => log(current, 'action', action),
         ...(E2E ? { realSecondsPerGameDay: E2E_SECONDS_PER_DAY, initialSpeed: 0 } : {}),
       });
+      rememberSlot(slot);
       setScreen({ name: 'game', slot, session });
     },
     [save, autoPause, autoSpeed],
   );
+
+  // At launch, the last game played opens straight away (a reload costs nothing).
+  useEffect(() => {
+    if (screen.name !== 'resuming') return;
+    const { slot } = screen;
+    loadFromSlot(slot)
+      .then((state) => {
+        if (state) play(slot, state);
+        else setScreen({ name: 'title' });
+      })
+      .catch(() => setScreen({ name: 'title' }));
+  }, [screen, play]);
+
+  // Saved whenever the app goes to the background or the page is left: closing the app,
+  // switching to another one or reloading loses nothing.
+  useEffect(() => {
+    if (screen.name !== 'game') return;
+    const { slot, session } = screen;
+    const store = () => void save(slot, session.getSnapshot().state, true);
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') store();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', store);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', store);
+    };
+  }, [screen, save]);
+
+  const quit = (slot: SlotId, state: GameState) => {
+    void save(slot, state, true);
+    rememberSlot(null);
+    setScreen({ name: 'title' });
+  };
 
   /** Goes back to a monthly point (docs/02, section 2.7); later points are dropped. */
   const rewind = async (slot: SlotId, current: GameState, checkpoint: Checkpoint) => {
@@ -223,7 +269,7 @@ export function App() {
           onRewind={(checkpoint) =>
             void rewind(screen.slot, screen.session.getSnapshot().state, checkpoint)
           }
-          onQuit={() => setScreen({ name: 'title' })}
+          onQuit={() => quit(screen.slot, screen.session.getSnapshot().state)}
           notify={notify}
           settings={settings}
           onSettings={setSettings}

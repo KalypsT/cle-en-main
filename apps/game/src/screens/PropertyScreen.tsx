@@ -7,10 +7,13 @@ import {
   agencyName,
   bankName,
   format,
+  formatDayLong,
   formatDayYear,
+  formatDuration,
   formatEuros,
   formatGameDate,
   formatPercent,
+  formatShortDate,
   formatSigned,
   formatWhen,
   propertyLabel,
@@ -21,6 +24,7 @@ import {
   Amount,
   Badge,
   Card,
+  Chip,
   Empty,
   KeyValues,
   ScreenHeader,
@@ -29,6 +33,7 @@ import {
 import { DpeCard } from '../ui/DpeCard.tsx';
 import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
+import { LineChart } from '../ui/LineChart.tsx';
 
 /** « Fiche d'un bien » (docs/04): overview, rooms, letting, finances. */
 export function PropertyScreen({
@@ -106,6 +111,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
           )}
         </Card>
       )}
+      <CoproMeetingCard owned={owned} />
       <DpeCard property={property} id={property.id} />
       <Transformations owned={owned} />
       <Card title={t.property.actions}>
@@ -119,6 +125,26 @@ function Overview({ owned }: { owned: OwnedProperty }) {
               {owned.rental
                 ? format(t.property.seeCandidates, { count: owned.rental.applications.length })
                 : t.property.rent}
+            </button>
+          )}
+          {!owned.works?.transformation && (
+            <button
+              type="button"
+              className="button block"
+              onClick={() => nav.push({ name: 'works', id: property.id })}
+            >
+              {owned.works ? t.property.worksInProgress : t.property.works}
+            </button>
+          )}
+          {!owned.works && (
+            <button
+              type="button"
+              className="button block"
+              onClick={() => nav.push({ name: 'sale', id: property.id })}
+            >
+              {owned.sale
+                ? format(t.property.saleInProgress, { count: owned.sale.offers.length })
+                : t.property.sell}
             </button>
           )}
           {isHome ? (
@@ -150,6 +176,111 @@ function Overview({ owned }: { owned: OwnedProperty }) {
         </div>
       </Card>
     </>
+  );
+}
+
+/** The value curve (feedback after milestone 8): value, purchase price and debt month by month. */
+function ValueCurve({ owned }: { owned: OwnedProperty }) {
+  const { state } = useGame();
+  const texts = t.property.valueCurve;
+  const history = owned.valueHistory;
+  const value = engine.estimate(state, owned.property.id)?.estimate ?? owned.purchasePrice;
+  const debt = state.loans
+    .filter((loan) => loan.propertyId === owned.property.id)
+    .reduce((sum, loan) => sum + loan.remaining, 0);
+  const first = history[0];
+  const last = history.at(-1);
+  return (
+    <Card title={texts.heading} testId="value-curve">
+      <KeyValues
+        rows={[
+          { label: texts.value, value: formatEuros(value) },
+          { label: texts.price, value: formatEuros(owned.purchasePrice) },
+          {
+            label: texts.gain,
+            value: formatSigned(value - owned.purchasePrice),
+            className: tone(value - owned.purchasePrice),
+          },
+          { label: texts.debt, value: formatEuros(debt) },
+          { label: texts.equity, value: formatEuros(value - debt), total: true },
+        ]}
+      />
+      {first && last && history.length >= 2 ? (
+        <LineChart
+          title={texts.chart}
+          xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
+          series={[
+            { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
+            {
+              label: texts.price,
+              color: '#8a7f6a',
+              values: history.map(() => owned.purchasePrice),
+              dashed: true,
+            },
+            { label: texts.debt, color: '#a33a2a', values: history.map((p) => p.debt) },
+          ]}
+        />
+      ) : (
+        <p className="small muted">{texts.soon}</p>
+      )}
+    </Card>
+  );
+}
+
+/** The co-ownership's general meeting (docs/03-systemes/05): one vote per resolution. */
+function CoproMeetingCard({ owned }: { owned: OwnedProperty }) {
+  const { act } = useGame();
+  const meeting = owned.coproMeeting;
+  if (!meeting) return null;
+  const texts = t.coproMeeting;
+  const rules = gameContent.works.copro;
+  const propertyId = owned.property.id;
+  return (
+    <Card title={texts.heading} testId="copro-meeting">
+      <p className="small">
+        {format(texts.when, {
+          date: formatDayLong(meeting.voteDay),
+          lots: owned.property.copro?.lots ?? 1,
+        })}
+      </p>
+      <p className="small muted">
+        {meeting.attended
+          ? texts.attended
+          : format(texts.attend, { duration: formatDuration(rules.attendMinutes) })}
+      </p>
+      <ul className="stack tight">
+        {meeting.resolutions.map((resolution) => {
+          const rule = rules.resolutions.find((r) => r.id === resolution.id);
+          return (
+            <li key={resolution.id} className="stack tight">
+              <span className="strong">
+                {gameContent.worksTexts.resolutions[resolution.id] ?? resolution.id}
+              </span>
+              <span className="small muted">
+                {format(texts.share, {
+                  amount: formatEuros(resolution.cost),
+                  months: rule?.months ?? 0,
+                })}
+              </span>
+              <div className="row wrap">
+                {(['for', 'against'] as const).map((vote) => (
+                  <Chip
+                    key={vote}
+                    pressed={resolution.vote === vote}
+                    onClick={() =>
+                      act({ type: 'copro/vote', propertyId, resolutionId: resolution.id, vote })
+                    }
+                  >
+                    {texts[vote]}
+                  </Chip>
+                ))}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {!meeting.attended && <p className="small muted">{texts.absent}</p>}
+    </Card>
   );
 }
 
@@ -419,6 +550,7 @@ function Finances({ owned }: { owned: OwnedProperty }) {
           />
         </Card>
       )}
+      <ValueCurve owned={owned} />
       <Card title={t.property.loan}>
         {loans.length === 0 && <p className="small muted">{t.property.noLoan}</p>}
         {loans.map((loan) => (

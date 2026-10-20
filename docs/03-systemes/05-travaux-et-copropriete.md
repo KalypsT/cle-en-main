@@ -118,7 +118,7 @@ C'est le cœur ludique de la gestion. Pas de mini-jeux : la richesse vient des c
 - **Aucune aide à la rénovation** (prime, crédit d'impôt) : le jeu reste simple.
 - Au **jalon 8** : un **maître d'œuvre** pour déléguer les gros chantiers, la **division** d'une maison en appartements, l'**aménagement des combles**.
 
-> **Jalon 8, le maître d'œuvre** (`content/travaux.json`, `projectManager`) : on lui confie des postes (action `works/delegate`) ; il demande les devis aux artisans les plus fiables du carnet, les signe, traite les imprévus aussitôt (« traiter ») et ne prend aucun temps libre ; ses honoraires valent **10 %** du chantier. L'interface n'a pas encore d'écran de chantier : le bouton viendra avec lui.
+> **Jalon 8, le maître d'œuvre** (`content/travaux.json`, `projectManager`) : on lui confie des postes (action `works/delegate`) ; il demande les devis aux artisans les plus fiables du carnet, les signe, traite les imprévus aussitôt (« traiter ») et ne prend aucun temps libre ; ses honoraires valent **10 %** du chantier. L'écran de chantier (ajouté après le jalon 8) propose de lui confier les postes choisis.
 >
 > **Jalon 8, les transformations** (`packages/engine/src/systems/transformations.ts`, décision validée : un projet de transformation qui produit des lots à partir d'un bien), toujours menées par le maître d'œuvre, sur un bien vide et hors vente (action `works/transform`) :
 >

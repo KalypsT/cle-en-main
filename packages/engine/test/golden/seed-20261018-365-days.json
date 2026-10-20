@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 10,
+    "formatVersion": 11,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -451,6 +451,107 @@
           {
             "monthly": 7108,
             "monthsLeft": 9
+          }
+        ],
+        "valueHistory": [
+          {
+            "date": {
+              "year": 2026,
+              "month": 12,
+              "day": 3
+            },
+            "value": 4523800,
+            "debt": 4600000
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 1,
+              "day": 1
+            },
+            "value": 4722900,
+            "debt": 4587500
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 2,
+              "day": 1
+            },
+            "value": 4716300,
+            "debt": 4574958
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 3,
+              "day": 1
+            },
+            "value": 4688900,
+            "debt": 4562374
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 4,
+              "day": 1
+            },
+            "value": 4705800,
+            "debt": 4549748
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 5,
+              "day": 1
+            },
+            "value": 4694300,
+            "debt": 4537080
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 6,
+              "day": 1
+            },
+            "value": 4667300,
+            "debt": 4524369
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 7,
+              "day": 1
+            },
+            "value": 4664800,
+            "debt": 4511615
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 8,
+              "day": 1
+            },
+            "value": 4828100,
+            "debt": 4498819
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 9,
+              "day": 1
+            },
+            "value": 4851200,
+            "debt": 4485980
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 10,
+              "day": 1
+            },
+            "value": 4873200,
+            "debt": 4473097
           }
         ]
       }

@@ -1,3 +1,4 @@
+import type { CalendarDate } from '../calendar.ts';
 import { type Bank, findBank, findJob, type GameContent } from '../content.ts';
 import type { StatementLine } from '../events.ts';
 import {
@@ -627,4 +628,108 @@ export function refinanceLoan(
 export function recordRefusedApplication(ctx: SystemContext, bankId: string): void {
   const relation = relationOf(ctx.state, bankId);
   relation.trust = clampTrust(relation.trust + ctx.content.credit.trust.refusedApplication);
+}
+
+/** The « Banque » sheet of a loan: where it stands, what it costs, a cheaper bank if any. */
+export interface LoanSheet {
+  loanId: string;
+  bankId: string;
+  propertyId: string | null;
+  principal: Cents;
+  remaining: Cents;
+  ratePercent: number;
+  monthlyPayment: Cents;
+  /** Share of the principal repaid, 0 … 1. */
+  repaidShare: number;
+  paymentsMade: number;
+  monthsLeft: number;
+  /** Month of the last payment. */
+  endDate: CalendarDate;
+  /** Interest of the payments made, on the loan's original schedule. */
+  interestPaid: Cents;
+  /** Interest of the payments left, at the current payment. */
+  interestLeft: Cents;
+  /** Remaining capital at each coming anniversary of the loan, starting now (the curve). */
+  remainingByYear: Cents[];
+  /** The bank with the lowest rate today, when it beats this loan's rate. */
+  refinance: {
+    bankId: string;
+    ratePercent: number;
+    monthlyPayment: Cents;
+    fees: Cents;
+    /** Interest saved over the months left, fees deducted (may be negative). */
+    saving: Cents;
+    /** Why the bank would refuse to take it over today; null if it would. */
+    refusal: LoanRefusalCode | null;
+  } | null;
+}
+
+/** Interest and capital left after paying `payment` each month from `remaining`. */
+function amortize(remaining: Cents, ratePercent: number, payment: Cents, months: number) {
+  let left = remaining;
+  let interest = 0;
+  const byYear: Cents[] = [left];
+  for (let month = 1; month <= months && left > 0; month++) {
+    const split = splitPayment(
+      left,
+      ratePercent,
+      Math.min(payment, left + splitPayment(left, ratePercent, 0).interest),
+    );
+    interest += split.interest;
+    left -= split.capital;
+    if (month % MONTHS_PER_YEAR === 0) byYear.push(Math.max(0, left));
+  }
+  return { interest, left: Math.max(0, left), byYear };
+}
+
+export function loanSheets(content: GameContent, state: GameState): LoanSheet[] {
+  return state.loans.map((loan) => {
+    const monthsLeft = remainingMonths(loan);
+    const original = annuityPayment(loan.principal, loan.ratePercent, loan.durationMonths);
+    const past = amortize(loan.principal, loan.ratePercent, original, loan.paymentsMade);
+    const future = amortize(loan.remaining, loan.ratePercent, loan.monthlyPayment, monthsLeft);
+    const end =
+      loan.startDate.year * MONTHS_PER_YEAR + loan.startDate.month - 1 + loan.durationMonths;
+    let refinance: LoanSheet['refinance'] = null;
+    if (monthsLeft > 0 && loan.remaining > 0) {
+      const years = remainingYears(content, loan);
+      for (const bank of content.banks) {
+        const ratePercent = quoteRate(content, state, bank, years).ratePercent;
+        if (ratePercent >= loan.ratePercent) continue;
+        if (refinance && ratePercent >= refinance.ratePercent) continue;
+        const monthlyPayment = annuityPayment(loan.remaining, ratePercent, monthsLeft);
+        const fees = refinancingFees(content, loan);
+        const interest = amortize(loan.remaining, ratePercent, monthlyPayment, monthsLeft).interest;
+        refinance = {
+          bankId: bank.id,
+          ratePercent,
+          monthlyPayment,
+          fees,
+          saving: future.interest - interest - fees,
+          refusal: checkBorrower(content, state, bank),
+        };
+      }
+    }
+    return {
+      loanId: loan.id,
+      bankId: loan.bankId,
+      propertyId: loan.propertyId,
+      principal: loan.principal,
+      remaining: loan.remaining,
+      ratePercent: loan.ratePercent,
+      monthlyPayment: loan.monthlyPayment,
+      repaidShare: loan.principal > 0 ? 1 - loan.remaining / loan.principal : 1,
+      paymentsMade: loan.paymentsMade,
+      monthsLeft,
+      endDate: {
+        year: Math.floor(end / MONTHS_PER_YEAR),
+        month: (end % MONTHS_PER_YEAR) + 1,
+        day: 1,
+      },
+      interestPaid: past.interest,
+      interestLeft: future.interest,
+      remainingByYear: future.byYear,
+      refinance,
+    };
+  });
 }

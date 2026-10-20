@@ -14,6 +14,7 @@ export {
   type LoanOffer,
   type LoanRefusalCode,
   type LoanRequest,
+  type LoanSheet,
   monthlyLoanPayments,
   type RateQuote,
   notaryFees,

@@ -296,6 +296,7 @@ function shareOwnership(
     worksForCapitalGains: share(owned.worksForCapitalGains, flat),
     coproMeeting: null,
     coproCalls: [],
+    valueHistory: [],
   }));
   return { flats: result, firstId: flats[0]?.id ?? owned.property.id };
 }

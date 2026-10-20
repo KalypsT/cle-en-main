@@ -101,6 +101,11 @@
   box-sizing: border-box;
 }
 
+/* No pull-to-refresh in the installed app: a reload never interrupts a game. */
+html {
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;
@@ -759,6 +764,12 @@ select {
 
 .speed button[aria-pressed='true'] {
   background: var(--teal);
+  color: var(--on-teal);
+}
+
+/* A paused clock is seen at a glance (the pause icon still says it). */
+.speed button.pause[aria-pressed='true'] {
+  background: var(--brick);
   color: var(--on-teal);
 }
 
@@ -2043,4 +2054,11 @@ select {
 .region-city .region-hit {
   fill: transparent;
   stroke: none;
+}
+
+/* An item picked for works: its tier and the « do it myself » switch, set off to the right. */
+.works-pick {
+  margin: 2px 0 8px 10px;
+  padding-left: 12px;
+  border-left: 3px solid var(--teal);
 }

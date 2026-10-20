@@ -19,7 +19,7 @@
 
 Toujours visible en haut de l'écran :
 - date et heure du jeu ;
-- vitesse (pause, ×1, ×2, ×4) ;
+- vitesse (pause, ×1, ×2, ×4) ; la pause choisie est en rouge brique ;
 - trésorerie ;
 - temps libre restant aujourd'hui ;
 - badge du nombre de décisions en attente.
@@ -70,11 +70,16 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **3 emplacements** de partie.
 - **Export et import** d'une partie en fichier (changement de téléphone).
 - Points de retour en arrière (voir [02-boucle-et-progression.md](02-boucle-et-progression.md#27-le-retour-en-arrière)).
+- **Retours de jeu après le jalon 8** : la partie est aussi sauvegardée dès que l'appli passe en arrière-plan ou que la page est quittée, et le jeu rouvre directement la dernière partie jouée (l'écran titre revient après « Retour à l'écran titre »). Une actualisation ne coûte donc rien ; le « tirer pour actualiser » est désactivé.
+- **Chantier et vente** (retours après le jalon 8 : ces écrans manquaient) : « Faire des travaux » dans la fiche du bien ouvre le **chantier** : choisir les postes pièce par pièce et leur gamme, voir le coût de référence, la durée, le DPE, la valeur et le loyer après ; cocher « Je le fais moi-même » quand c'est permis ; demander un devis aux artisans du carnet pour chaque métier ; lancer le chantier avec les devis retenus, ou le confier au maître d'œuvre. Pendant le chantier : la frise des interventions et l'imprévu à trancher (traiter, reporter, passer en Éco). « Vendre » ouvre la **vente** : prix (avec l'estimation), agence ou soi-même, ce qui reste après les frais, le crédit, les indemnités et l'impôt ; puis les offres (accepter, refuser, contre-proposer). Un bien loué se vend avec son locataire.
+- **Banque, détail des crédits** (retours après le jalon 8) : pour tous les crédits, la mensualité totale, le capital restant dû, les intérêts restants et la courbe du capital restant dû année par année ; puis une carte par crédit : le bien financé, la part remboursée, l'emprunt, le restant dû, la mensualité, le taux, les intérêts payés et à payer, la dernière mensualité, et la banque la moins chère du jour si elle fait mieux (économie nette des frais, bouton de rachat). Les intérêts déjà payés suivent le tableau d'amortissement d'origine (requête `loanSheets`).
+- **Valeur d'un bien** (onglet Finances de la fiche, retours après le jalon 8) : valeur estimée, prix d'achat, plus-value latente, crédit restant dû et part possédée ; une courbe mois par mois de la valeur, du prix d'achat et du crédit restant (estimation du jour de l'acte, puis du 1er de chaque mois).
+- **Bouton retour du téléphone** : il remonte d'un écran, puis revient à la Rue ; sur la Rue, il ne fait rien (on ne quitte jamais la partie par erreur).
 
 ## 4.9 La Rue (jalon 5)
 
 - **La rue vivante** remplit l'onglet Rue : les rues du quartier sont posées bout à bout et l'on glisse du doigt de l'une à l'autre (les flèches autour du nom de la rue font de même). Le quartier se choisit en haut à gauche. Les rues de chaque quartier sont décrites dans `content/monde.json` (noms réels de Dole, à vérifier sur place et modifiables sans toucher au code).
-- **Les bâtiments** : des immeubles et maisons ordinaires (tirés des époques et du mélange appartements/maisons du quartier), plus les biens du joueur, les annonces, les biens sous compromis et les chantiers des rivaux, glissés entre eux à une place stable.
+- **Les bâtiments** : des immeubles et maisons ordinaires (tirés des époques et du mélange appartements/maisons du quartier), plus les biens du joueur, les annonces, les biens sous compromis et les chantiers des rivaux, qui prennent chacun la place d'un immeuble ordinaire, tirée de leur identifiant. Chaque rue a un nombre fixe de places (`placesPerBuilding` fois ses immeubles ordinaires, `content/monde.json`) : elle garde sa longueur, et les biens du joueur, placés en premier, ne bougent plus quand une annonce arrive ou part (retours après le jalon 8).
 - **Les bulles** ouvrent les fiches existantes : « À vendre » (annonce), « Compromis », « Panne », « Impayé », « Imprévu », « Travaux 25 % », « 2 offre(s) », « 3 candidat(s) », « Assemblée », « Vendu », « À louer ». Deux au plus par bâtiment, les plus urgentes d'abord.
 - **Toucher un bâtiment** ouvre sa **coupe** : les logements étage par étage, le logement du joueur (ou l'annonce) cerclé de sa couleur avec ses pièces, leur usure et les artisans au travail ; toucher le logement ouvre sa fiche. La liste des pièces et de leur état suit le dessin.
 - **Le tableau de bord du jalon 4 n'est pas perdu** : il devient un **tiroir** sous la rue. Fermé, il montre le bonjour, le patrimoine net et le solde du mois ; ouvert (toucher la poignée), les opportunités, les décisions et les nouvelles. Sur grand écran, il reste ouvert dans la colonne de droite, la rue à gauche.

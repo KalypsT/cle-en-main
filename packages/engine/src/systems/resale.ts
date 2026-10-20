@@ -112,11 +112,14 @@ function agree(
 }
 
 /** Net proceeds of a sale: agency fees and the property's loans (with their fees) deducted. */
-export function saleProceeds(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
+export function saleProceeds(
+  ctx: SystemContext,
+  owned: OwnedProperty,
+  price: Cents,
+  mode: SaleMode | null = owned.sale?.mode ?? null,
+) {
   const agencyFees =
-    owned.sale?.mode === 'agency'
-      ? Math.round(price * ctx.content.market.resale.agencyFeeShare)
-      : 0;
+    mode === 'agency' ? Math.round(price * ctx.content.market.resale.agencyFeeShare) : 0;
   return { agencyFees, ...settlement(ctx, owned, price - agencyFees) };
 }
 

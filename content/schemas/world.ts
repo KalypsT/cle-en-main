@@ -28,7 +28,7 @@ const streetSchema = z
   .object({
     id,
     name: text,
-    /** Ordinary buildings drawn along the street (the player's and the listings come on top). */
+    /** Ordinary buildings of the street; it has `placesPerBuilding` times as many places. */
     buildings: z.number().int().min(1).max(30),
     /** The street runs along water (the canal, the Doubs): a quay, and fog in the morning. */
     quay: z.boolean().default(false),
@@ -85,6 +85,12 @@ export const worldRulesSchema = z
     houseRoomFloors: z.record(z.string(), z.number().int().min(0)),
     /** Bubbles shown at most above one building. */
     maxBubbles: z.number().int().min(1),
+    /**
+     * Places of a street per ordinary building of content: the player's properties, the
+     * listings and the rivals take some of them, ordinary buildings fill the others, so a
+     * street keeps its length and nothing moves along when a listing comes or goes.
+     */
+    placesPerBuilding: z.number().int().min(1),
     cities: z.record(z.string(), z.record(z.string(), neighbourhoodWorldSchema)),
   })
   .strict();
