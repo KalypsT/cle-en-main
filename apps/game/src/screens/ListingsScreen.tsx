@@ -26,6 +26,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
     (item) => item.kind === 'visit' && item.listingId === listing.id,
   );
   const favorite = state.favorites.includes(listing.id);
+  const reply = state.offerNotices.findLast((notice) => notice.listingId === listing.id);
   return (
     <ListRow
       thumb={<KindThumb property={property} />}
@@ -45,6 +46,10 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
             <Badge tone="amber">{t.listings.counter}</Badge>
           ) : listing.offer ? (
             <Badge tone="teal">{t.listings.offerPending}</Badge>
+          ) : reply ? (
+            <Badge tone="brick">
+              {reply.outcome === 'refused' ? t.listings.offerRefused : t.listings.counterExpired}
+            </Badge>
           ) : null}
           {listing.visited ? (
             <Badge tone="green" icon="check">

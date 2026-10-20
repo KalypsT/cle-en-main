@@ -103,6 +103,7 @@ function ListingBody({ listing }: { listing: Listing }) {
   const rules = gameContent.market.negotiation;
   const offersLeft = rules.maxOffersPerListing - listing.offersMade;
   const offer = listing.offer;
+  const reply = state.offerNotices.findLast((notice) => notice.listingId === listing.id);
 
   const details = format(t.listing.details, {
     city: cityName(property.cityId),
@@ -211,6 +212,19 @@ function ListingBody({ listing }: { listing: Listing }) {
               {t.listing.acceptCounter}
             </button>
           </div>
+        </Card>
+      )}
+      {!offer && reply && (
+        <Card title={t.listing.lastReplyHeading} tint="amber" testId="last-reply">
+          <p>
+            {format(
+              reply.outcome === 'refused' ? t.listing.refusedText : t.listing.counterExpiredText,
+              {
+                amount: formatEuros(reply.amount),
+                date: formatGameDate(fromDayNumber(reply.day)),
+              },
+            )}
+          </p>
         </Card>
       )}
       {offer && !offer.counter && (

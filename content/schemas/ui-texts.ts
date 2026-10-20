@@ -79,6 +79,7 @@ export const uiTextsSchema = z
         offerAccepted: text,
         offerCountered: text,
         offerRefused: text,
+        counterOfferExpired: text,
         compromisSigned: text,
         loanAnswered: text,
         purchaseCancelled: text,

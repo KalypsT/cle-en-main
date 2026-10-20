@@ -94,6 +94,7 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 ## 4.10 Rythme et progression (jalon 6)
 
 - **Barre d'état** : quand l'accélération automatique joue, l'horloge passe à ×4 sans changer le bouton choisi (×1), et l'heure porte la mention « accéléré ».
+- **Réponses récentes** (onglet Décisions, sous les décisions) : les offres refusées et les contre-offres expirées, avec le bien et le montant ; un toucher ouvre l'annonce, « Fermer » ou « Tout fermer » les retire de la liste (l'annonce garde son encadré). Une notification s'affiche aussi au moment de la réponse.
 - **Décisions** : les événements du catalogue (« Événement : à vous de décider », avec le bien ou la famille) et les défis proposés y apparaissent. L'écran d'un événement montre son texte, ses choix avec leur montant et le temps libre qu'ils demandent, et le choix appliqué sans réponse.
 - **Rue** : une bulle « Événement » sur le bien concerné ; une bulle « … » pour une anecdote récente, qui s'affiche au toucher.
 - **Bilans** : le bilan du mois s'ouvre par-dessus le jeu le 1er de chaque mois (réglage), le bilan annuel avec Yvon Tableur le 1er janvier ; tous deux arrêtent l'horloge et se retrouvent dans le Menu.

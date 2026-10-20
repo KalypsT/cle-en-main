@@ -6,7 +6,7 @@ import type { EffectName } from '../audio/effects.ts';
 import { engine } from '../engine.ts';
 import type { GameSession } from '../session/game-session.ts';
 import { saveSettings, type Settings } from '../settings.ts';
-import { t, texts } from '../texts.ts';
+import { describeEvent, t, texts } from '../texts.ts';
 import { Icon, type IconName } from '../ui/Icon.tsx';
 import {
   GameContext,
@@ -196,10 +196,24 @@ export function GameShell({
   );
   useEffect(
     () =>
-      session.onEvents((events) => {
+      session.onEvents((events, state) => {
         for (const event of events) {
           const effect = effectOf(event);
           if (effect) audio.effect(effect);
+        }
+        // A refused offer is told at once, wherever the player is.
+        const bad = events.filter(
+          (event) =>
+            (event.type === 'offerAnswered' && event.answer === 'refused') ||
+            event.type === 'counterOfferExpired',
+        );
+        if (bad.length > 0) {
+          notify(
+            bad
+              .map((event) => describeEvent(event, state))
+              .filter(Boolean)
+              .join(' '),
+          );
         }
         const fresh = overlaysOf(events, settings.monthlyReview);
         if (fresh.length === 0) return;
@@ -210,7 +224,7 @@ export function GameShell({
         }
         setOverlays((queue) => [...queue, ...fresh]);
       }),
-    [session, audio, settings.monthlyReview],
+    [session, audio, notify, settings.monthlyReview],
   );
   const closeOverlay = useCallback(() => {
     setOverlays((queue) => queue.slice(1));
