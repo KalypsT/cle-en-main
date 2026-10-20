@@ -365,6 +365,12 @@ function moveIn(ctx: SystemContext, owned: OwnedProperty, application: RentalApp
   };
   state.player.balance += deposit;
   owned.lease = lease;
+  owned.log.push({
+    kind: 'tenantIn',
+    day: ctx.today,
+    tenantName: `${lease.tenant.firstName} ${lease.tenant.lastName}`,
+    monthlyRent: lease.monthlyRent,
+  });
   owned.rental = null;
   ledgerOf(state, owned).category = lease.leaseType;
   ctx.events.push({
@@ -528,6 +534,12 @@ export function moveOut(
   addCost(state, owned, damages - keptForDamages);
   addRent(state, owned, keptForRent);
   owned.lease = null;
+  owned.log.push({
+    kind: 'tenantOut',
+    day: ctx.today,
+    tenantName: `${tenant.firstName} ${tenant.lastName}`,
+    reason,
+  });
   const propertyId = owned.property.id;
   ctx.events.push({ type: 'tenantLeft', propertyId, reason, damages, depositReturned: returned });
   if (state.player.homePropertyId === propertyId || owned.sale?.agreement) return;

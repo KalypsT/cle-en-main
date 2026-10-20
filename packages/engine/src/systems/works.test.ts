@@ -316,6 +316,18 @@ describe('works', () => {
     );
     expect(walls?.state).toBeGreaterThanOrEqual(3);
     expect(walls?.tier).toBe('eco');
+    // The property remembers the job: who did it, in which range, for how much.
+    expect(done.state.properties[0]?.log).toEqual([
+      {
+        kind: 'works',
+        day: expect.any(Number),
+        itemKind: 'walls',
+        spaceId: 'living',
+        tier: 'eco',
+        artisanId: null,
+        cost: catalog?.diy?.tiers.eco.materials,
+      },
+    ]);
 
     const electrician = { ...state, player: { ...state.player, jobId: 'electrician' } };
     expect(
@@ -326,6 +338,25 @@ describe('works', () => {
         diy: [{ itemId: 'electricity', tier: 'standard' }],
       }).ok,
     ).toBe(true);
+  });
+
+  it('keeps the player\'s own items out of the reference cost, and counts their materials and time', () => {
+    const engine = createEngine(steadyContent());
+    const state = withOwned(flat(2));
+    const id = 'property-flat';
+    const choices = [
+      { itemId: 'living.walls', tier: 'eco' as const },
+      { itemId: 'windows', tier: 'standard' as const },
+    ];
+    const all = engine.worksEstimate(state, id, choices);
+    const mixed = engine.worksEstimate(state, id, choices, [choices[0] as (typeof choices)[0]]);
+    const walls = engine.worksCatalog(state, id)?.find((item) => item.id === 'living.walls');
+    expect(mixed?.materials).toBe(walls?.diy?.tiers.eco.materials);
+    expect(mixed?.diyMinutes).toBe(walls?.diy?.tiers.eco.minutes);
+    expect(mixed?.cost).toBe((all?.cost ?? 0) - (walls?.tiers.eco.cost ?? 0));
+    expect(mixed?.total).toBe((mixed?.cost ?? 0) + (mixed?.materials ?? 0));
+    expect(mixed?.total).toBeLessThan(all?.total ?? 0);
+    expect(all?.materials).toBe(0);
   });
 
   it('wears renovated items over the years, faster in the Éco range', () => {

@@ -17,7 +17,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 13;
+export const FORMAT_VERSION = 14;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -501,7 +501,31 @@ export interface OwnedProperty {
    * month (the value curve).
    */
   valueHistory: { date: CalendarDate; value: Cents; debt: Cents }[];
+  /** What happened to the property, oldest first (works, tenants, incidents). */
+  log: PropertyLogEntry[];
 }
+
+/** One line of a property's history. */
+export type PropertyLogEntry =
+  | {
+      kind: 'works';
+      day: number;
+      itemKind: ItemKind;
+      spaceId: string | null;
+      tier: Tier;
+      /** Null: done by the player. */
+      artisanId: string | null;
+      /** What the item cost (the bill, or the materials). */
+      cost: Cents;
+    }
+  | { kind: 'tenantIn'; day: number; tenantName: string; monthlyRent: Cents }
+  | {
+      kind: 'tenantOut';
+      day: number;
+      tenantName: string;
+      reason: 'notice' | 'evicted' | 'endOfTerm' | 'dpe';
+    }
+  | { kind: 'incident'; day: number; kindId: string; cost: Cents };
 
 /** A property a marchand de biens renovates before selling it again. */
 export interface RivalProject {

@@ -134,6 +134,7 @@ function setup(): GameState {
     coproMeeting: null,
     coproCalls: [],
     valueHistory: [],
+    log: [],
   };
   state.properties = [owned];
   state.loans = [

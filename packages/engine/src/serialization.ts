@@ -422,6 +422,14 @@ export const MIGRATIONS: MigrationRegistry = {
       },
     };
   },
+  /** Version 13 to 14: the history of each property starts empty. */
+  13: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      log: [],
+    })),
+  }),
   /** Version 12 to 13: no refused offer was ever kept. */
   12: (raw) => ({ ...raw, offerNotices: [] }),
   /** Version 11 to 12: no tenant was ever offered an indemnity to leave. */
@@ -560,6 +568,24 @@ const cents = z.number().int();
 const day = z.number().int();
 
 const tierSchema = z.enum(TIERS);
+const itemKindSchema = z.enum([
+  'floors',
+  'walls',
+  'joinery',
+  'kitchen',
+  'bathroom',
+  'wcUnit',
+  'garden',
+  'electricity',
+  'plumbing',
+  'heating',
+  'insulation',
+  'windows',
+  'ventilation',
+  'roof',
+  'facade',
+  'commonParts',
+]);
 
 const propertySchema = z
   .object({
@@ -588,24 +614,7 @@ const propertySchema = z
     items: z.array(
       z
         .object({
-          kind: z.enum([
-            'floors',
-            'walls',
-            'joinery',
-            'kitchen',
-            'bathroom',
-            'wcUnit',
-            'garden',
-            'electricity',
-            'plumbing',
-            'heating',
-            'insulation',
-            'windows',
-            'ventilation',
-            'roof',
-            'facade',
-            'commonParts',
-          ]),
+          kind: itemKindSchema,
           spaceId: z.string().nullable(),
           state: z.number().int().min(1).max(5),
           tier: tierSchema,
@@ -1132,6 +1141,38 @@ const gameStateSchema = z
           ),
           valueHistory: z.array(
             z.object({ date: calendarDateSchema, value: cents, debt: cents }).strict(),
+          ),
+          log: z.array(
+            z.discriminatedUnion('kind', [
+              z
+                .object({
+                  kind: z.literal('works'),
+                  day,
+                  itemKind: itemKindSchema,
+                  spaceId: z.string().nullable(),
+                  tier: tierSchema,
+                  artisanId: z.string().nullable(),
+                  cost: cents,
+                })
+                .strict(),
+              z
+                .object({
+                  kind: z.literal('tenantIn'),
+                  day,
+                  tenantName: z.string(),
+                  monthlyRent: cents,
+                })
+                .strict(),
+              z
+                .object({
+                  kind: z.literal('tenantOut'),
+                  day,
+                  tenantName: z.string(),
+                  reason: z.enum(['notice', 'evicted', 'endOfTerm', 'dpe']),
+                })
+                .strict(),
+              z.object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents }).strict(),
+            ]),
           ),
         })
         .strict(),

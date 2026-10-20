@@ -239,6 +239,7 @@ export function sampleOwned(
     coproMeeting: null,
     coproCalls: [],
     valueHistory: [],
+    log: [],
   };
 }
 

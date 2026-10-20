@@ -398,6 +398,7 @@ function finishRepair(ctx: SystemContext, owned: OwnedProperty, lease: Lease, co
   ctx.state.player.balance -= cost;
   addCost(ctx.state, owned, cost);
   lease.incident = null;
+  owned.log.push({ kind: 'incident', day: ctx.today, kindId: incident.kindId, cost });
   ctx.events.push({
     type: 'incidentRepaired',
     propertyId: owned.property.id,

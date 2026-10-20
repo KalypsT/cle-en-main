@@ -297,6 +297,7 @@ function shareOwnership(
     coproMeeting: null,
     coproCalls: [],
     valueHistory: [],
+    log: [],
   }));
   return { flats: result, firstId: flats[0]?.id ?? owned.property.id };
 }
