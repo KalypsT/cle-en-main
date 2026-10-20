@@ -6,6 +6,7 @@ import {
   type Listing,
   type OwnedProperty,
   type PropertyKind,
+  debtRatio,
   requiredContribution,
   visibleReliability,
 } from '@cle/engine';
@@ -51,6 +52,11 @@ export interface PromoterProfile {
 export interface CompanyProfile {
   /** Creates the SCI once he owns this many properties. */
   afterProperties: number;
+  /**
+   * ... and once his own debt ratio reaches this (his own credit nearly spent: before, the
+   * SCI only costs its accountant); null: whatever his debt ratio.
+   */
+  minDebtRatio: number | null;
   /** Share of the fees he brings himself, whatever the bank lends (prudence). */
   feesShare: number;
 }
@@ -771,6 +777,8 @@ export function investor(profile: InvestorProfile): Strategy {
     const company = profile.company;
     if (!company || api.state.company) return;
     if (api.state.properties.length < company.afterProperties) return;
+    const { minDebtRatio } = company;
+    if (minDebtRatio !== null && debtRatio(api.engine.content, api.state) < minDebtRatio) return;
     const cost = api.engine.content.company.creationCost * 100;
     if (api.state.player.balance - cost < reserve(api, 0)) return;
     api.act({ type: 'company/create' });
@@ -1128,7 +1136,7 @@ const BASE_PROFILES = {
   },
   chasseur: {
     id: 'chasseur',
-    company: { afterProperties: 2, feesShare: 1 },
+    company: { afterProperties: 2, minDebtRatio: 0.3, feesShare: 1 },
     smartAnswers: true,
     visits: true,
     visitsPerDay: 4,
@@ -1278,7 +1286,7 @@ function developer(): InvestorProfile {
     banks: [...BASE_PROFILES.chasseur.banks],
     meetBanks: [...BASE_PROFILES.chasseur.meetBanks],
     renovation: { ...BASE_PROFILES.chasseur.renovation },
-    company: { afterProperties: 1, feesShare: 0 },
+    company: { afterProperties: 1, minDebtRatio: null, feesShare: 0 },
     // His SCI loans pay for themselves: a thinner reserve than the Chasseur's.
     reserveMonths: 2,
     // Buildings to sell flat by flat are many in the big cities: he looks there too.
