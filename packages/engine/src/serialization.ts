@@ -1171,7 +1171,9 @@ const gameStateSchema = z
                   reason: z.enum(['notice', 'evicted', 'endOfTerm', 'dpe']),
                 })
                 .strict(),
-              z.object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents }).strict(),
+              z
+                .object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents })
+                .strict(),
             ]),
           ),
         })

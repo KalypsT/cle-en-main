@@ -340,7 +340,7 @@ describe('works', () => {
     ).toBe(true);
   });
 
-  it('keeps the player\'s own items out of the reference cost, and counts their materials and time', () => {
+  it("keeps the player's own items out of the reference cost, and counts their materials and time", () => {
     const engine = createEngine(steadyContent());
     const state = withOwned(flat(2));
     const id = 'property-flat';

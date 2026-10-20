@@ -410,7 +410,25 @@
       "overview": "Vue d'ensemble",
       "rooms": "Pièces",
       "rental": "Location",
-      "finances": "Finances"
+      "finances": "Finances",
+      "history": "Historique"
+    },
+    "history": {
+      "heading": "Historique du bien",
+      "empty": "Rien à signaler pour l'instant : les travaux, locataires et incidents s'afficheront ici.",
+      "works": "{item} refait, gamme {tier}",
+      "worksBy": "Par {who} · {cost}",
+      "byYou": "vous-même (matériaux)",
+      "tenantIn": "Entrée de {name}, loyer {rent} / mois",
+      "tenantOut": "Départ de {name} ({reason})",
+      "tenantReasons": {
+        "notice": "congé",
+        "evicted": "expulsion",
+        "endOfTerm": "fin de bail",
+        "dpe": "logement devenu non louable"
+      },
+      "incident": "Incident réparé : {text} · {cost}",
+      "total": "Travaux enregistrés : {amount}"
     },
     "bought": "Acheté {price} le {date}",
     "value": "Valeur estimée",
@@ -1072,8 +1090,13 @@
     "coproOnly": "Copropriété",
     "nothing": "Aucun poste ne se rénove ici.",
     "summary": "Si vous faites ces travaux",
-    "cost": "Coût de référence",
-    "days": "Durée sans attente",
+    "cost": "Artisans (prix de référence)",
+    "materials": "Matériaux (vous)",
+    "diyTime": "Temps libre à donner",
+    "total": "Total estimé",
+    "referenceDiy": "{amount} de matériaux · {duration} de votre temps",
+    "referenceDiyArtisan": "Artisan : {amount}",
+    "days": "Durée des artisans, sans attente",
     "daysValue": "{days} jour(s)",
     "dpe": "DPE",
     "dpeValue": "{before} → {after}",

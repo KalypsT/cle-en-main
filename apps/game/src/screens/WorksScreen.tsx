@@ -93,7 +93,8 @@ function Planner({ owned }: { owned: OwnedProperty }) {
   const diy = [...picks]
     .filter(([, pick]) => pick.diy)
     .map(([itemId, pick]) => ({ itemId, tier: pick.tier }));
-  const estimate = choices.length > 0 ? engine.worksEstimate(state, propertyId, choices) : null;
+  const estimate =
+    choices.length > 0 ? engine.worksEstimate(state, propertyId, choices, diy) : null;
 
   return (
     <>
@@ -106,10 +107,21 @@ function Planner({ owned }: { owned: OwnedProperty }) {
           <KeyValues
             rows={[
               { label: t.works.cost, value: formatEuros(estimate.cost) },
-              {
-                label: t.works.days,
-                value: format(t.works.daysValue, { days: estimate.days }),
-              },
+              ...(diy.length > 0
+                ? [
+                    { label: t.works.materials, value: formatEuros(estimate.materials) },
+                    { label: t.works.diyTime, value: formatDuration(estimate.diyMinutes) },
+                  ]
+                : []),
+              { label: t.works.total, value: formatEuros(estimate.total) },
+              ...(estimate.cost > 0
+                ? [
+                    {
+                      label: t.works.days,
+                      value: format(t.works.daysValue, { days: estimate.days }),
+                    },
+                  ]
+                : []),
               {
                 label: t.works.dpe,
                 value: format(t.works.dpeValue, {
@@ -209,10 +221,24 @@ function ItemPicker({
                       onChange={(value) => onPick(item.id, { ...pick, tier: value })}
                     />
                     <span className="tiny muted">
-                      {format(t.works.reference, {
-                        amount: formatEuros(reference.cost),
-                        days: reference.days,
-                      })}
+                      {pick.diy && diy ? (
+                        <>
+                          {format(t.works.referenceDiy, {
+                            amount: formatEuros(diy.materials),
+                            duration: formatDuration(diy.minutes),
+                          })}{' '}
+                          <s>
+                            {format(t.works.referenceDiyArtisan, {
+                              amount: formatEuros(reference.cost),
+                            })}
+                          </s>
+                        </>
+                      ) : (
+                        format(t.works.reference, {
+                          amount: formatEuros(reference.cost),
+                          days: reference.days,
+                        })
+                      )}
                       {owned.lease && !item.occupied ? ` · ${t.works.needsVacant}` : ''}
                     </span>
                     {diy && (
