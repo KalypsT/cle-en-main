@@ -52,7 +52,7 @@ Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : 
 
 ## 5.6 Les animations
 
-Passants, voitures, oiseaux, fumée des cheminées, échafaudages et poussière de chantier, camion de l'artisan qui se gare, panneau « À vendre » qui apparaît, fenêtres qui s'allument, et une **scène de célébration** à chaque nouveau titre.
+Passants (certains s'arrêtent quelques secondes ; jamais les cyclistes), voitures (une voie par sens, distance gardée entre elles), oiseaux, fumée des cheminées, échafaudages et poussière de chantier, camion de l'artisan qui se gare, panneau « À vendre » qui apparaît, fenêtres qui s'allument, et une **scène de célébration** à chaque nouveau titre.
 
 L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-equilibrage.md](08-equilibrage.md) et [09-feuille-de-route.md](09-feuille-de-route.md)).
 
