@@ -19,7 +19,7 @@
 
 Toujours visible en haut de l'écran :
 - date et heure du jeu ;
-- vitesse (pause, ×1, ×2, ×4) ;
+- vitesse (pause, ×1, ×2, ×4) ; la pause choisie est en rouge brique ;
 - trésorerie ;
 - temps libre restant aujourd'hui ;
 - badge du nombre de décisions en attente.
@@ -70,6 +70,8 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **3 emplacements** de partie.
 - **Export et import** d'une partie en fichier (changement de téléphone).
 - Points de retour en arrière (voir [02-boucle-et-progression.md](02-boucle-et-progression.md#27-le-retour-en-arrière)).
+- **Retours de jeu après le jalon 8** : la partie est aussi sauvegardée dès que l'appli passe en arrière-plan ou que la page est quittée, et le jeu rouvre directement la dernière partie jouée (l'écran titre revient après « Retour à l'écran titre »). Une actualisation ne coûte donc rien ; le « tirer pour actualiser » est désactivé.
+- **Bouton retour du téléphone** : il remonte d'un écran, puis revient à la Rue ; sur la Rue, il ne fait rien (on ne quitte jamais la partie par erreur).
 
 ## 4.9 La Rue (jalon 5)
 

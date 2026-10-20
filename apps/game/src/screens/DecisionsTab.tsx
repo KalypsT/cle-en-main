@@ -112,7 +112,7 @@ export function decisionRoute(decision: PendingDecision): Route | null {
       return { name: 'challenge' };
     case 'renegotiation':
     case 'cashAlert':
-      return null;
+      return { name: 'bank' };
   }
 }
 

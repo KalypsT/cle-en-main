@@ -82,3 +82,30 @@ test('works offline once the service worker is installed', async ({ page, contex
   await newGame(page);
   await expect(page.getByTestId('game-date')).toBeVisible();
 });
+
+test('reopens the last game at launch and keeps it on the back button', async ({ page }) => {
+  await page.goto('./?e2e&resume');
+  await newGame(page, { name: 'Thibaud', tutorialOn: false });
+  await pause(page);
+  const date = await page.getByTestId('game-date').textContent();
+
+  // The back button goes back one screen, then to the street, then does nothing.
+  await tab(page, 'menu');
+  await page.getByRole('button', { name: t.menu.statistics }).click();
+  await page.goBack();
+  await expect(page.getByRole('button', { name: t.menu.quit })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByText(fill(t.street.hello, { name: 'Thibaud' }))).toBeVisible();
+  await page.goBack();
+  await expect(page.getByTestId('game-date')).toHaveText(date ?? '');
+
+  // A reload opens the game again, saved as the page was left.
+  await page.reload();
+  await expect(page.getByTestId('game-date')).toHaveText(date ?? '');
+
+  // After « Quitter », the title screen opens.
+  await tab(page, 'menu');
+  await page.getByRole('button', { name: t.menu.quit }).click();
+  await page.reload();
+  await expect(page.getByRole('heading', { name: ui.app.name })).toBeVisible();
+});

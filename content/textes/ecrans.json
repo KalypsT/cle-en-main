@@ -987,5 +987,15 @@
     "accountant": "Comptable de la SCI par an",
     "rules": "Ses banques comptent {coverage} du loyer du bien, qui doit couvrir la mensualité ; elles demandent {fees} des frais et {extra} du prix en apport.",
     "buyHint": "Pour acheter via la SCI, choisissez-la sur l'écran du compromis, avant de solliciter les banques."
+  },
+  "coproMeeting": {
+    "heading": "Assemblée générale de copropriété",
+    "when": "Le {date}, {lots} lots dans l'immeuble : votre voix pèse pour 1 lot.",
+    "attend": "Y aller prend {duration} de temps libre, une seule fois, au premier vote.",
+    "attended": "Vous y allez : vous pouvez changer vos votes jusqu'au jour de l'assemblée.",
+    "share": "Votre part : {amount}, en appels de fonds sur {months} mois",
+    "for": "Pour",
+    "against": "Contre",
+    "absent": "Sans votre vote, les autres copropriétaires décident pour vous."
   }
 }

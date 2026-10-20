@@ -77,9 +77,10 @@ export async function saveToSlot(
   state: GameState,
   options: { checkpoint?: boolean; fresh?: boolean } = {},
 ): Promise<SlotRecord> {
+  // Serialized before any wait: a save made as the page hides must catch this state.
+  const game = serializeGame(state);
   const database = await db();
   const previous = options.fresh ? undefined : await database.get('slots', slot);
-  const game = serializeGame(state);
   let checkpoints = checkpointsOf(previous);
   if (options.checkpoint) {
     checkpoints = [
@@ -131,4 +132,25 @@ export async function appendJournal(slot: SlotId, entries: JournalEntry[]): Prom
   const previous = (await database.get('journal', slot))?.entries ?? [];
   const kept = [...previous, ...entries].slice(-gameContent.rhythm.journalEntries);
   await database.put('journal', { slot, entries: kept });
+}
+
+const LAST_SLOT_KEY = 'cle-en-main.lastSlot';
+
+/** The slot played last on this device, reopened at launch; null after « Quitter ». */
+export function lastSlot(): SlotId | null {
+  try {
+    const value = Number(localStorage.getItem(LAST_SLOT_KEY));
+    return SLOT_IDS.find((slot) => slot === value) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function rememberSlot(slot: SlotId | null): void {
+  try {
+    if (slot === null) localStorage.removeItem(LAST_SLOT_KEY);
+    else localStorage.setItem(LAST_SLOT_KEY, String(slot));
+  } catch {
+    // Storage unavailable: the game opens on the title screen.
+  }
 }

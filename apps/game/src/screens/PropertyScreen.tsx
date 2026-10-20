@@ -7,7 +7,9 @@ import {
   agencyName,
   bankName,
   format,
+  formatDayLong,
   formatDayYear,
+  formatDuration,
   formatEuros,
   formatGameDate,
   formatPercent,
@@ -21,6 +23,7 @@ import {
   Amount,
   Badge,
   Card,
+  Chip,
   Empty,
   KeyValues,
   ScreenHeader,
@@ -106,6 +109,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
           )}
         </Card>
       )}
+      <CoproMeetingCard owned={owned} />
       <DpeCard property={property} id={property.id} />
       <Transformations owned={owned} />
       <Card title={t.property.actions}>
@@ -150,6 +154,63 @@ function Overview({ owned }: { owned: OwnedProperty }) {
         </div>
       </Card>
     </>
+  );
+}
+
+/** The co-ownership's general meeting (docs/03-systemes/05): one vote per resolution. */
+function CoproMeetingCard({ owned }: { owned: OwnedProperty }) {
+  const { act } = useGame();
+  const meeting = owned.coproMeeting;
+  if (!meeting) return null;
+  const texts = t.coproMeeting;
+  const rules = gameContent.works.copro;
+  const propertyId = owned.property.id;
+  return (
+    <Card title={texts.heading} testId="copro-meeting">
+      <p className="small">
+        {format(texts.when, {
+          date: formatDayLong(meeting.voteDay),
+          lots: owned.property.copro?.lots ?? 1,
+        })}
+      </p>
+      <p className="small muted">
+        {meeting.attended
+          ? texts.attended
+          : format(texts.attend, { duration: formatDuration(rules.attendMinutes) })}
+      </p>
+      <ul className="stack tight">
+        {meeting.resolutions.map((resolution) => {
+          const rule = rules.resolutions.find((r) => r.id === resolution.id);
+          return (
+            <li key={resolution.id} className="stack tight">
+              <span className="strong">
+                {gameContent.worksTexts.resolutions[resolution.id] ?? resolution.id}
+              </span>
+              <span className="small muted">
+                {format(texts.share, {
+                  amount: formatEuros(resolution.cost),
+                  months: rule?.months ?? 0,
+                })}
+              </span>
+              <div className="row wrap">
+                {(['for', 'against'] as const).map((vote) => (
+                  <Chip
+                    key={vote}
+                    pressed={resolution.vote === vote}
+                    onClick={() =>
+                      act({ type: 'copro/vote', propertyId, resolutionId: resolution.id, vote })
+                    }
+                  >
+                    {texts[vote]}
+                  </Chip>
+                ))}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {!meeting.attended && <p className="small muted">{texts.absent}</p>}
+    </Card>
   );
 }
 

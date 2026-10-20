@@ -253,6 +253,35 @@ export function GameShell({
     [tab, viewCityId, raise],
   );
 
+  // The phone's back button goes back one screen, then to the street; on the street it does
+  // nothing, so the game is never left by mistake. A history entry is kept above the page's
+  // own, put back after each press (and at each touch, which Chrome needs to honour it).
+  const backRef = useRef({ tab, depth: stack.length, nav });
+  useEffect(() => {
+    backRef.current = { tab, depth: stack.length, nav };
+  }, [tab, stack.length, nav]);
+  useEffect(() => {
+    const MARK = 'cle-en-main.back';
+    const arm = () => {
+      if ((history.state as { mark?: string } | null)?.mark !== MARK) {
+        history.pushState({ mark: MARK }, '');
+      }
+    };
+    const onBack = () => {
+      const { tab: current, depth, nav: navigation } = backRef.current;
+      if (depth > 0) navigation.pop();
+      else if (current !== 'street') navigation.goTab('street');
+      arm();
+    };
+    arm();
+    window.addEventListener('popstate', onBack);
+    window.addEventListener('pointerdown', arm);
+    return () => {
+      window.removeEventListener('popstate', onBack);
+      window.removeEventListener('pointerdown', arm);
+    };
+  }, []);
+
   const act = useCallback(
     (action: GameAction, success?: string) => {
       const result = session.dispatch(action);
