@@ -21,6 +21,8 @@ export const creditRulesSchema = z
     /** Share of rents the banks count as income. */
     retainedRentShare: share,
     notaryFeesShare: share,
+    /** Notary fees are never below this (euros): fixed costs and minimum fees on a small sale. */
+    notaryFeesMinimum: z.number().min(0),
     bankFeesShare: share,
     /** Borrower insurance, included in the displayed rate. */
     insurancePercent: percent,
@@ -85,6 +87,8 @@ export const bankSchema = z
     counterOffers: z.boolean(),
     /** Whether the banker takes meetings (a chatbot does not). */
     meetings: z.boolean(),
+    /** Whether the bank lends to an SCI (milestone 8). */
+    lendsToCompanies: z.boolean(),
   })
   .strict();
 

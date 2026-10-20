@@ -5,6 +5,38 @@ import { euros, id, share } from './common.ts';
 /** Market and listing rules (docs/03-systemes/03-marche-et-annonces.md). */
 
 export const CONDITIONS = ['ruin', 'toRenovate', 'toRefresh', 'good', 'renovated'] as const;
+/** Every kind of property; the last three arrive with the depth (milestone 8). */
+export const PROPERTY_KINDS = [
+  'apartment',
+  'house',
+  'building',
+  'commercial',
+  'parking',
+  'land',
+] as const;
+export const propertyKindSchema = z.enum(PROPERTY_KINDS);
+/** Kinds without rooms nor items, generated from hand-written ratios (DVF tells them apart badly). */
+export const OTHER_KINDS = ['commercial', 'parking', 'land'] as const;
+
+const otherKindSchema = z
+  .object({
+    /** Share of the new listings. */
+    share: share,
+    surface: z
+      .object({ min: z.number().positive(), max: z.number().positive() })
+      .strict()
+      .refine((r) => r.max >= r.min, { message: 'max doit être supérieur ou égal à min.' }),
+    /** Price per m² relative to the neighbourhood's median for apartments. */
+    priceRatio: z.number().positive(),
+    /** Rent per m² relative to the neighbourhood's rent for large apartments (0: not let). */
+    rentRatio: z.number().min(0),
+    propertyTaxPerM2: euros,
+    /** Monthly charges per m² (co-ownership of a shopping arcade, a car park). */
+    chargesPerM2: euros,
+    /** Multiplier on the landlord insurance. */
+    insuranceFactor: z.number().min(0),
+  })
+  .strict();
 export const conditionSchema = z.enum(CONDITIONS);
 
 const positive = z.number().positive();
@@ -57,6 +89,8 @@ export const marketRulesSchema = z
         buildingShare: share,
       })
       .strict(),
+    /** Shops, parking spaces and building land (milestone 8). */
+    otherKinds: z.record(z.enum(OTHER_KINDS), otherKindSchema),
     apartment: z
       .object({
         maxFloor: z.number().int().min(0),
@@ -198,7 +232,7 @@ export const marketRulesSchema = z
 /** Humorous texts: listing titles and seller motivations (docs/06, section 6.4). */
 export const listingTextsSchema = z
   .object({
-    kinds: z.record(z.enum(['apartment', 'house', 'building']), z.string().min(1)),
+    kinds: z.record(propertyKindSchema, z.string().min(1)),
     conditions: z.record(conditionSchema, z.string().min(1)),
     titles: z
       .array(
@@ -208,6 +242,8 @@ export const listingTextsSchema = z
             text: z.string().min(1),
             /** Only for these conditions (all when absent). */
             conditions: z.array(conditionSchema).min(1).optional(),
+            /** Only for these kinds; absent: dwellings (apartments, houses, buildings). */
+            kinds: z.array(propertyKindSchema).min(1).optional(),
           })
           .strict(),
       )

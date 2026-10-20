@@ -58,7 +58,12 @@ function RentalForm({ owned }: { owned: OwnedProperty }) {
   const { state, act } = useGame();
   const nav = useNav();
   const current = owned.rental;
-  const [leaseType, setLeaseType] = useState<LeaseType>(current?.leaseType ?? 'bare');
+  const options = engine.leaseOptions(state, owned.property.id);
+  const [leaseType, setLeaseType] = useState<LeaseType>(current?.leaseType ?? options[0] ?? 'bare');
+  const leaseRules = gameContent.renting.leaseTypes[leaseType];
+  const agencies = gameContent.renting.agencies.filter((agency) =>
+    agency.leaseTypes.includes(leaseType),
+  );
   const [agencyId, setAgencyId] = useState<string | null>(current?.agencyId ?? null);
   const [insured, setInsured] = useState(current?.insured ?? false);
   const [rent, setRent] = useState<number | null>(current?.monthlyRent ?? null);
@@ -102,13 +107,19 @@ function RentalForm({ owned }: { owned: OwnedProperty }) {
           onChange={(value) => {
             setLeaseType(value);
             setRent(null);
+            setAgencyId(null);
           }}
-          options={[
-            { value: 'bare', label: t.rent.bare },
-            { value: 'furnished', label: t.rent.furnished },
-          ]}
+          options={options.map((value) => ({ value, label: t.property.leaseType[value] }))}
         />
-        {leaseType === 'furnished' && !owned.furniture && (
+        {leaseRules.shortTerm && (
+          <span className="small muted">
+            {format(t.rent.shortTermHint, { minutes: leaseRules.shortTerm.selfMinutesPerDay })}
+          </span>
+        )}
+        {leaseType === 'shared' && <span className="small muted">{t.rent.sharedHint}</span>}
+        {leaseType === 'commercial' && <span className="small muted">{t.rent.commercialHint}</span>}
+        {leaseType === 'parking' && <span className="small muted">{t.rent.parkingHint}</span>}
+        {leaseRules.furnished && !owned.furniture && (
           <span className="small muted">
             {format(t.rent.furnitureCost, { amount: formatEuros(quote.furnitureCost) })}
           </span>
@@ -148,7 +159,7 @@ function RentalForm({ owned }: { owned: OwnedProperty }) {
           <span className="strong">{t.rent.self}</span>
           <span className="small muted">{t.rent.selfHint}</span>
         </button>
-        {gameContent.renting.agencies.map((agency) => (
+        {agencies.map((agency) => (
           <button
             key={agency.id}
             type="button"

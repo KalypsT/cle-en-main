@@ -94,6 +94,67 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > Le Chasseur qui reste à Dole perd environ 10 % de patrimoine par rapport au jalon 6 sur 100 parties (non significatif, 1,6 écart-type) ; sur 1 000 parties sa médiane est de 87 k€.
 
+> **Jalon 8, profondeur** : un bot s'ajoute, le **Promoteur**, et le Chasseur se sert de la SCI.
+>
+> | Bot | Réglages principaux |
+> |---|---|
+> | Chasseur | crée la SCI quand son taux d'endettement personnel atteint 30 % (et qu'il a au moins 2 biens) ; y achète quand son propre crédit est épuisé, en apportant lui-même les frais (par prudence : à 110 %, 4 parties sur 8 finissaient en faillite lors des essais) ; loue nu |
+> | Promoteur | un Chasseur qui n'achète que ce qu'il peut transformer : immeuble vendu à la découpe, maison divisée, combles, construction sur un terrain. Il juge une annonce sur la valeur de ce que la transformation produit, son coût (+20 %) et 8 % de marge déduits ; écarte ce qui ne serait pas louable tout de suite ou interdit avant 5 ans ; crée la SCI dès son 1er bien et y fait prêter les frais ; réserve de 2 mensualités, plus les mois de chantier à venir ; cherche aussi à Dijon et à Besançon dès son 1er bien (Immo Zen) ; garde et loue nu les lots produits |
+> | Autres bots | ne regardent que les appartements, maisons et immeubles, comme avant le jalon 8 : seul le Promoteur regarde aussi les locaux, parkings et terrains |
+>
+> **Cibles du jalon** (séries de 25 ans, seulement pour le Promoteur et le Chasseur ; révisées après la première mesure, voir plus bas) :
+>
+> | Repère | Cible d'origine | Cible révisée |
+> |---|---|---|
+> | Magnat | 25 à 50 % des parties en 25 ans, en 15 à 25 ans (médiane) | **10 à 25 %** des parties en 25 ans, en 15 à 25 ans (médiane) |
+> | Baron de la pierre | moins de 5 % des parties en 25 ans | inchangée |
+> | Promoteur | plus de 50 % des parties du bot Promoteur en 10 ans | plus de 50 % des parties du bot Promoteur **en 25 ans**, en **10 à 15 ans** (médiane) : c'est l'étape 4 sur 6 |
+>
+> **Première mesure** (300 parties de 25 ans, avec Magnat à 1,3 M€ après Promoteur et l'érosion de 2 points) : Baron 0 % ; Magnat 14,3 % pour le Promoteur, 0 % pour le Chasseur (il ne transforme jamais) ; Promoteur 13,3 % des parties en 10 ans, 60 % en 25 ans (13,4 ans) ; réputation finale médiane de 95,5 pour le Chasseur. D'où trois décisions : **Magnat à 1 M€**, après Investisseur aguerri, Marchand de biens **ou** Promoteur ; **érosion de 5 points par an** au-dessus de 80 ; cibles révisées ci-dessus.
+>
+> **Mesure finale du jalon 8** (`packages/bots/rapports/jalon-8.md` : 300 parties de 25 ans pour le Promoteur et le Chasseur, 150 pour le Chasseur à Dijon donné pour information) :
+>
+> | Repère | Résultat |
+> |---|---|
+> | Promoteur (bot Promoteur) | 59 % des parties en 25 ans, en 13,4 ans (médiane) : **atteint** (12,7 % en 10 ans) |
+> | Baron de la pierre | 0 % pour tous les bots : **atteint** (5 M€ nets, 4 villes, réputation de 90) |
+> | Magnat (Promoteur) | 25,7 % des parties, en 21,1 ans : **manqué de peu** (0,7 point au-dessus de la cible) |
+> | Magnat (Chasseur) | **manqué** : 0,3 % (une partie sur 300). Il reste à Dole et n'est donc jamais Investisseur aguerri (2 villes) ; seule la voie Marchand de biens lui est ouverte (6,3 % des parties) |
+> | Magnat (Chasseur à Dijon, information) | 4 % des parties, en 24 ans : Investisseur aguerri dans 74 % des parties (16,2 ans), mais 1 M€ net reste rare |
+> | Patrimoine à 25 ans | Chasseur 370 k€ (D1 80 k€, D9 819 k€) ; Chasseur à Dijon 309 k€ ; Promoteur 226 k€ (D9 1,44 M€), très dispersé selon le métier |
+> | Faillites en 25 ans | Chasseur 3,3 %, Chasseur à Dijon 4,7 %, Promoteur 8 % |
+> | Bailleur (Chasseur) | 81 % des parties en 25 ans, en 9,3 ans (médiane) : toujours hors de la cible de 2 à 4 ans |
+> | Densité de décisions | Chasseur 37,1 s : dans la cible ; Promoteur 16,5 s, trop dense en apparence : le bot compte toutes les annonces qu'il pourrait financer (160 par an, avec ses prêts à 110 %), ce qui ne correspond pas à ce que vit un joueur ; pas de changement |
+> | Réputation finale (médiane) | Chasseur 91,4, Chasseur à Dijon 92,2, Promoteur 86,4 (95,5 et 91,7 avec l'érosion de 2 points) : plus basse, mais encore au-dessus des 90 du Baron pour les Chasseurs |
+> | SCI | créée dans 81 % des parties du Chasseur (en 8,9 ans) et 93 % de celles du Promoteur (en 3,1 ans, 19 biens à la fin) |
+> | SCI Horizon | arrive dans environ la moitié des parties, vers 18 à 21 ans, et achète 0,9 à 1,4 bien par an |
+> | IFI | payé dans 12 % des parties du Promoteur, très rarement par le Chasseur |
+>
+> **Pourquoi le Promoteur obtient son titre tard** : il part avec 15 000 € et n'achète que ce qu'il peut transformer, des biens chers (immeubles, grandes maisons) dont les frais doivent être apportés tant qu'il n'a pas de SCI. Son premier achat arrive au 40e mois en médiane (21 parties sur 300 n'achètent jamais), sa première transformation vers 13 ans. Les métiers les mieux payés (développeur, commercial, agent immobilier) l'obtiennent dans 76 à 88 % des parties ; un fonctionnaire ou un électricien dans 37 à 42 %. Trois réglages du bot ont été essayés sur 42 parties de 25 ans (mêmes graines ; la série retenue y donne 21 % de Promoteur en 10 ans, 26 % de Magnat, 2 % de faillites) et **refusés** :
+> - acheter aussi les bonnes affaires ordinaires, au prix du Chasseur ou avec 10 % de marge en plus : 90 à 98 % de faillites (les prêts de la SCI à 110 % sur des biens à cash-flow nul) ;
+> - les mêmes, mais en apportant les frais des achats ordinaires : 29 % de faillites, 12 % de Promoteur en 10 ans, 14 % de Magnat ;
+> - créer la SCI et chercher à Dijon et à Besançon dès le départ : 5 % de Promoteur en 10 ans, 7 % de Magnat, 10 % de faillites (la SCI coûte 1 500 € sur 15 000).
+>
+> Le constat de fond : une location nue financée à crédit a un cash-flow à peu près nul. Le patrimoine ne grandit vite que par la création de valeur (transformations) et par le levier de la SCI, et c'est la trésorerie de départ qui freine. D'où le choix de réviser la cible du titre Promoteur (étape 4 sur 6) plutôt que de rendre les transformations moins chères. **Reste ouvert** (point ouvert n° 5) : Magnat est hors de portée d'un joueur qui reste dans une seule ville sans revendre (voie Bailleur), car Investisseur aguerri demande 2 villes.
+
+> **Jalon 8, série de contrôle** (`packages/bots/rapports/jalon-8-controle-10-ans.md` : 100 parties de 10 ans pour chaque bot, avec les règles finales ; plus 1 000 parties du Chasseur avant le changement de Magnat et de l'érosion, sans effet à 10 ans) : les repères des jalons 1 à 7 sont revenus au niveau du jalon 7 après trois corrections faites pendant la mesure :
+> - les bots achetaient des parkings par dizaines (valeur connue exactement, donc toute annonce sous la valeur est une affaire sûre) : **frais de notaire minimaux de 1 500 €** et bots d'avant le jalon 8 limités aux logements et immeubles ;
+> - les travaux d'un bien jamais loué n'étaient plus déduits de la plus-value (erreur du jalon 8) : l'impôt du Marchand de biens avait doublé ;
+> - le Chasseur créait sa SCI dès son 2e bien et payait son comptable pendant des années pour presque rien (62,9 k€ à 10 ans sur 1 000 parties, 6,2 % de faillites) : il attend désormais 30 % d'endettement.
+>
+> | Repère (10 ans) | Jalon 7 | Jalon 8 |
+> |---|---|---|
+> | Chasseur, médiane (1 000 parties) | 87,2 k€, faillites 2,5 % | 85,5 k€, faillites 3,3 % |
+> | Chasseur, Bailleur en 10 ans (1 000 parties) | 40,6 % | 43,7 % |
+> | Chasseur à Dijon (100 parties) | 96 % de la médiane du Chasseur, faillites 3 % | 98 %, faillites 2 % contre 1 % : viable, avec un vrai effort (1er achat au 66e mois, 43 % y achètent) |
+> | Prudent | 75,8 k€, 1er achat au 31e mois | 71,0 k€, au 36e mois |
+> | Marchand de biens | 33,2 k€, 12,1 k€ d'impôt sur les plus-values | 37,2 k€, 13,4 k€ |
+> | Rénovateur premium | 30,2 k€ | 27,8 k€ |
+> | Levier maximal | 74 % de faillites | 77 % |
+> | Chasseur à Chalon (information) | 80,2 k€, faillites 4 % | 63,3 k€, faillites 8 % (100 parties) |
+>
+> Les cibles atteintes et manquées sont les mêmes qu'au jalon 7 (Bailleur, Investisseur aguerri et Levier toujours manqués) ; le seuil d'Investisseur aguerri abaissé à 150 k€ ne suffit pas (5 % des parties du Chasseur à Dijon en 10 ans, 74 % en 25 ans).
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :

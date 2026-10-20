@@ -73,7 +73,7 @@ export interface BotSummary {
     medianAchievements: number;
     medianReputation: number;
     /** Share of games earning each title, and the median years over those that do. */
-    titles: Record<string, { share: number; years: number | null }>;
+    titles: Record<string, { share: number; years: number | null; within10: number }>;
   };
   /** Cities (milestone 7): trips, remote deeds and the number of cities held. */
   cities: {
@@ -106,6 +106,22 @@ export interface BotSummary {
     sales: number;
     /** Share of the properties held at the end that are classed E to G. */
     passoireShare: number;
+  };
+  /** Depth (milestone 8): the SCI, transformations, the IFI and SCI Horizon. */
+  depth: {
+    /** Share of games creating the SCI, and the median years to it (over those games). */
+    companyShare: number;
+    companyYears: number | null;
+    /** Median properties the SCI holds at the end (over the games that created it). */
+    companyProperties: number;
+    /** Transformations per game. */
+    transformations: number;
+    /** Share of games paying the IFI at least once, and the mean paid per game (euros). */
+    wealthTaxShare: number;
+    wealthTax: number;
+    /** Share of games where SCI Horizon arrives, and the median years to it. */
+    horizonShare: number;
+    horizonYears: number | null;
   };
 }
 
@@ -223,6 +239,26 @@ function summarize(botId: BotId, games: GameMetrics[], years: number): BotSummar
           games.reduce((sum, g) => sum + g.finalProperties, 0),
         ),
     },
+    depth: depthSummary(games),
+  };
+}
+
+function depthSummary(games: GameMetrics[]): BotSummary['depth'] {
+  const yearsOf = (days: (number | null)[]) => {
+    const known = days.filter((day): day is number => day !== null);
+    return known.length > 0 ? median(known.map((day) => day / DAYS_PER_YEAR)) : null;
+  };
+  const companies = games.filter((g) => g.companyDay !== null);
+  return {
+    companyShare: share(games.map((g) => g.companyDay !== null)),
+    companyYears: yearsOf(games.map((g) => g.companyDay)),
+    companyProperties:
+      companies.length > 0 ? median(companies.map((g) => g.finalCompanyProperties)) : 0,
+    transformations: mean(games.map((g) => g.transformations)),
+    wealthTaxShare: share(games.map((g) => g.wealthTax > 0)),
+    wealthTax: mean(games.map((g) => g.wealthTax)),
+    horizonShare: share(games.map((g) => g.horizonDay !== null)),
+    horizonYears: yearsOf(games.map((g) => g.horizonDay)),
   };
 }
 
@@ -279,6 +315,7 @@ function rhythmSummary(games: GameMetrics[]): BotSummary['rhythm'] {
     titles[title.id] = {
       share: days.length / Math.max(1, games.length),
       years: days.length > 0 ? median(days) / DAYS_PER_YEAR : null,
+      within10: days.filter((day) => day <= 10 * DAYS_PER_YEAR).length / Math.max(1, games.length),
     };
   }
   return {
@@ -392,10 +429,57 @@ function cityChecks(get: (id: BotId) => BotSummary | undefined, last: number): T
   return list;
 }
 
+/**
+ * The depth (milestone 8), over games of 20 years or more: Magnat in 10 to 25 % of the games
+ * (15 to 25 years), Baron rare, the Promoteur title in most games of the Promoteur bot (10 to
+ * 15 years; docs/08).
+ */
+function depthChecks(get: (id: BotId) => BotSummary | undefined, years: number): TargetCheck[] {
+  const list: TargetCheck[] = [];
+  const promoter = get('promoteur');
+  if (promoter) {
+    const title = promoter.rhythm.titles.developer;
+    const share = title?.share ?? 0;
+    const at = title?.years ?? null;
+    list.push({
+      label: 'Titre Promoteur (Promoteur)',
+      target:
+        years >= 20
+          ? `plus de 50 % des parties en ${years} ans, de 10 à 15 ans en médiane`
+          : `information (cible jugée sur 20 ans ou plus)`,
+      measured: `${pct(share)} en ${years} ans (${num(at ?? 0)} ans en médiane) ; ${pct(title?.within10 ?? 0)} en 10 ans`,
+      ok: years >= 20 ? share > 0.5 && at !== null && at >= 10 && at <= 15 : null,
+    });
+  }
+  if (years < 20) return list;
+  for (const id of ['chasseur', 'promoteur'] as const) {
+    const s = get(id);
+    if (!s) continue;
+    const magnate = s.rhythm.titles.magnate;
+    const share = magnate?.share ?? 0;
+    const at = magnate?.years ?? null;
+    list.push({
+      label: `Titre Magnat (${BOT_NAMES[id]})`,
+      target: `10 à 25 % des parties en ${years} ans, de 15 à 25 ans en médiane`,
+      measured: `${pct(share)} des parties${at === null ? '' : `, en ${num(at)} ans (médiane)`}`,
+      ok: share >= 0.1 && share <= 0.25 && at !== null && at >= 15 && at <= 25,
+    });
+    const baron = s.rhythm.titles.baron;
+    list.push({
+      label: `Titre Baron de la pierre (${BOT_NAMES[id]})`,
+      target: `moins de 5 % des parties en ${years} ans`,
+      measured: `${pct(baron?.share ?? 0)} des parties`,
+      ok: (baron?.share ?? 0) < 0.05,
+    });
+  }
+  return list;
+}
+
 function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[] {
   const list: TargetCheck[] = [];
   const get = (id: BotId) => summaries.get(id);
   const last = years - 1;
+  list.push(...depthChecks(get, years));
   // Section 8.1 is for « un joueur raisonnable »: the hunter, who visits, negotiates and
   // keeps a moderate debt. The Prudent bot is shown for information.
   for (const id of ['chasseur', 'prudent'] as const) {
@@ -430,7 +514,7 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
   if (dijonHunter) {
     list.push({
       label: 'Titre Investisseur aguerri (Chasseur à Dijon)',
-      target: '6 à 10 ans (patrimoine de 250 k€ et 2 villes)',
+      target: '6 à 10 ans (patrimoine de 150 k€ et 2 villes)',
       measured: `${num(dijonHunter.seasonedYears)} ans (atteint dans ${pct(dijonHunter.seasonedShare)} des parties)`,
       ok: dijonHunter.seasonedYears >= 6 && dijonHunter.seasonedYears <= 10,
     });
@@ -449,7 +533,8 @@ function checks(summaries: Map<BotId, BotSummary>, years: number): TargetCheck[]
       ok: low >= 30 && high <= 60,
     });
   }
-  list.push(...cityChecks(get, last));
+  // The expansion targets are set over 10 years (milestone 7).
+  if (years <= 10) list.push(...cityChecks(get, last));
   const prudent = get('prudent');
   if (prudent) {
     list.push({
@@ -587,6 +672,10 @@ export function formatReport(report: Report, title: string): string {
   const last = years - 1;
   const name = (s: BotSummary) => BOT_NAMES[s.botId];
   const failed = report.checks.filter((check) => check.ok === false).length;
+  // Rivals present from the start, and those that arrived in at least one game (SCI Horizon).
+  const rivalsShown = gameContent.rivals.filter(
+    (r) => r.active || summaries.some((s) => (s.rivalPurchasesPerYear[r.id] ?? 0) > 0),
+  );
   const lines = [
     `# ${title}`,
     '',
@@ -753,6 +842,35 @@ export function formatReport(report: Report, title: string): string {
       ]),
     ),
     '',
+    '## Profondeur',
+    '',
+    'SCI : part des parties qui la créent, années (médiane), biens qu’elle détient à la fin (médiane, sur ces parties) ; transformations par partie ; IFI : part des parties qui le paient au moins une fois, montant moyen par partie ; arrivée de la SCI Horizon Patrimoine.',
+    '',
+    table(
+      [
+        'Bot',
+        'SCI créée',
+        'Biens de la SCI',
+        'Transformations',
+        'IFI payé',
+        'IFI (partie)',
+        'Arrivée d’Horizon',
+      ],
+      summaries.map((s) => [
+        name(s),
+        s.depth.companyYears === null
+          ? '—'
+          : `${pct(s.depth.companyShare)} · ${num(s.depth.companyYears)} ans`,
+        num(s.depth.companyProperties),
+        num(s.depth.transformations),
+        pct(s.depth.wealthTaxShare),
+        money(s.depth.wealthTax),
+        s.depth.horizonYears === null
+          ? '—'
+          : `${pct(s.depth.horizonShare)} · ${num(s.depth.horizonYears)} ans`,
+      ]),
+    ),
+    '',
     '## Rythme et progression',
     '',
     'Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×4 quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).',
@@ -818,12 +936,10 @@ export function formatReport(report: Report, title: string): string {
     '## Rivaux',
     '',
     table(
-      ['Bot', ...gameContent.rivals.filter((r) => r.active).map((r) => `${r.name} (achats/an)`)],
+      ['Bot', ...rivalsShown.map((r) => `${r.name} (achats/an)`)],
       summaries.map((s) => [
         name(s),
-        ...gameContent.rivals
-          .filter((r) => r.active)
-          .map((r) => num(s.rivalPurchasesPerYear[r.id] ?? 0)),
+        ...rivalsShown.map((r) => num(s.rivalPurchasesPerYear[r.id] ?? 0)),
       ]),
     ),
     '',

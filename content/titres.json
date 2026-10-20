@@ -53,9 +53,9 @@
       "name": "Investisseur aguerri",
       "step": 3,
       "branch": "landlord",
-      "description": "Un patrimoine net de 250 000 € et des biens dans 2 villes.",
+      "description": "Un patrimoine net de 150 000 € et des biens dans 2 villes.",
       "conditions": [
-        { "stat": "netWorth", "min": 250000 },
+        { "stat": "netWorth", "min": 150000 },
         { "stat": "cities", "min": 2 }
       ],
       "requiresAny": ["landlord", "renovator"],
@@ -80,10 +80,10 @@
       "name": "Promoteur",
       "step": 4,
       "branch": "both",
-      "description": "Diviser ou transformer un bien (arrive avec la profondeur, jalon 8).",
-      "conditions": [{ "stat": "netWorth", "min": 0, "active": false }],
+      "description": "Mener à bien une transformation : diviser une maison, aménager des combles ou construire sur un terrain.",
+      "conditions": [{ "stat": "transformations", "min": 1 }],
       "requiresAny": ["seasonedInvestor", "propertyDealer"],
-      "available": false,
+      "available": true,
       "perks": { "bankMarginPercent": -0.05 },
       "perkText": "Encore 0,05 point de marge en moins."
     },
@@ -92,9 +92,9 @@
       "name": "Magnat",
       "step": 5,
       "branch": "both",
-      "description": "Un patrimoine net de 1,3 million d'euros. L'IFI vous guette.",
-      "conditions": [{ "stat": "netWorth", "min": 1300000 }],
-      "requiresAny": ["developer", "seasonedInvestor", "propertyDealer"],
+      "description": "Un patrimoine net d'un million d'euros. L'IFI n'est plus très loin.",
+      "conditions": [{ "stat": "netWorth", "min": 1000000 }],
+      "requiresAny": ["seasonedInvestor", "propertyDealer", "developer"],
       "available": true,
       "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.1 },
       "perkText": "Encore 0,05 point de marge en moins, et les plus beaux biens vous sont proposés en premier."

@@ -245,6 +245,93 @@
           "percent": -1
         }
       ]
+    },
+    {
+      "id": "recession",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "pause": true,
+      "major": true,
+      "chancePerMonth": 0.002,
+      "cooldownDays": 3650,
+      "texts": [
+        "Récession : le chômage grimpe, des locataires peinent à payer et les candidats se font rares pendant un an."
+      ],
+      "effects": [
+        {
+          "type": "crisis",
+          "modifier": "unpaidRents",
+          "factor": 1.8,
+          "months": 12
+        },
+        {
+          "type": "crisis",
+          "modifier": "tenantDemand",
+          "factor": 0.8,
+          "months": 12
+        },
+        {
+          "type": "priceTrend",
+          "scope": "france",
+          "percent": -1
+        }
+      ]
+    },
+    {
+      "id": "constructionCrisis",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "pause": true,
+      "major": true,
+      "chancePerMonth": 0.002,
+      "cooldownDays": 3650,
+      "texts": [
+        "Crise des matériaux : bois, cuivre et isolants s'envolent, les artisans revoient leurs devis de 15 % pendant deux ans."
+      ],
+      "effects": [
+        {
+          "type": "crisis",
+          "modifier": "worksCosts",
+          "factor": 1.15,
+          "months": 24
+        }
+      ]
+    },
+    {
+      "id": "creditCrunch",
+      "family": "france",
+      "target": "none",
+      "kind": "neutral",
+      "conditions": {},
+      "pause": true,
+      "major": true,
+      "chancePerMonth": 0.002,
+      "cooldownDays": 3650,
+      "texts": [
+        "Resserrement du crédit : les banques durcissent leurs critères et les acheteurs se raréfient pendant 18 mois."
+      ],
+      "effects": [
+        {
+          "type": "crisis",
+          "modifier": "credit",
+          "factor": 0.9,
+          "months": 18
+        },
+        {
+          "type": "crisis",
+          "modifier": "buyerDemand",
+          "factor": 0.75,
+          "months": 18
+        },
+        {
+          "type": "marketRate",
+          "delta": 0.6
+        }
+      ]
     }
   ]
 }

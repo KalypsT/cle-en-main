@@ -11,6 +11,7 @@ import {
   evaluateLoan,
   grantLoan,
   type LoanOffer,
+  notaryFees,
   type LoanRequest,
   quoteRate,
   requiredContribution,
@@ -91,6 +92,17 @@ describe('evaluateLoan', () => {
     if (decision.decision !== 'accepted') return;
     expect(decision.offer.debtRatioAfter).toBeLessThanOrEqual(content.credit.maxDebtRatio);
     expect(decision.offer.totalCost).toBeGreaterThan(0);
+  });
+
+  it('never charges notary fees below their minimum', () => {
+    const minimum = toCents(content.credit.notaryFeesMinimum);
+    const flat = toCents(100_000);
+    expect(notaryFees(content, flat)).toBe(Math.round(flat * content.credit.notaryFeesShare));
+    // A parking: the fixed costs weigh far more than the share of its price.
+    expect(notaryFees(content, toCents(9_000))).toBe(minimum);
+    expect(requiredContribution(content, toCents(9_000))).toBe(
+      minimum + Math.round(toCents(9_000) * content.credit.bankFeesShare),
+    );
   });
 
   it('requires the contribution to cover the fees', () => {

@@ -12,7 +12,13 @@ import {
   systemContext,
 } from '../../test/helpers.ts';
 import type { GameState, Listing, Property } from '../state.ts';
-import { aggressiveness, rivalEstimate, runDailyRivals } from './rivals.ts';
+import {
+  aggressiveness,
+  isRivalActive,
+  rivalEstimate,
+  runDailyRivals,
+  runMonthlyRivals,
+} from './rivals.ts';
 import { realValue } from './valuation.ts';
 
 function rival(id: string) {
@@ -115,7 +121,10 @@ describe('rivals', () => {
     const bargain: GameState = {
       ...state,
       properties: [{ ...owned, property: flat }],
-      rivals: { ...state.rivals, delaporte: { budget: 300_000_00, purchases: 0, projects: [] } },
+      rivals: {
+        ...state.rivals,
+        delaporte: { arrivedDay: null, budget: 300_000_00, purchases: 0, projects: [] },
+      },
     };
     const value = realValue(content, bargain, flat).value;
     let current = act(bargain, {
@@ -146,5 +155,28 @@ describe('rivals', () => {
     expect(aggressiveness(content, state)).toBeCloseTo(1.015, 3);
     const rich = { ...state, player: { ...state.player, balance: 100_000_000 } };
     expect(aggressiveness(content, rich)).toBe(content.rivalRules.max);
+  });
+
+  it('lets the SCI Horizon arrive late, once the player is rich enough', () => {
+    const horizon = rival('horizon');
+    const arrival = horizon.arrival;
+    if (!arrival) throw new Error('Horizon arrives later');
+    const state = newGame();
+    expect(isRivalActive(state, horizon)).toBe(false);
+    // Rich, but too early.
+    const early = systemContext(state);
+    early.state.player.balance += (arrival.minPlayerNetWorth + 1) * 100;
+    runMonthlyRivals(early);
+    expect(isRivalActive(early.state, horizon)).toBe(false);
+    // Late enough, but too poor.
+    const days = Math.ceil((arrival.fromYear - 1) * 365);
+    const poor = { ...systemContext(state), today: early.today + days };
+    runMonthlyRivals(poor);
+    expect(isRivalActive(poor.state, horizon)).toBe(false);
+    // Both: it arrives, and says so.
+    const due = { ...early, today: early.today + days, events: [] };
+    runMonthlyRivals(due);
+    expect(isRivalActive(due.state, horizon)).toBe(true);
+    expect(due.events).toContainEqual({ type: 'rivalArrived', rivalId: 'horizon' });
   });
 });

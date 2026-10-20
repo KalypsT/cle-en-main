@@ -1,8 +1,15 @@
 import type { CalendarDate, Weekday } from './calendar.ts';
 import type { Cents } from './money.ts';
 import type { DpeLabel, LeaseType, Trade } from './content.ts';
-import type { AnecdoteNote, CatalogEventInstance, SaleMode } from './state.ts';
+import type {
+  AnecdoteNote,
+  CatalogEventInstance,
+  Holder,
+  SaleMode,
+  TransformationKind,
+} from './state.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
+import type { LettingBlock } from './systems/renting.ts';
 
 export type StatementLine =
   | { kind: 'salary'; amount: Cents }
@@ -49,6 +56,28 @@ export type GameEvent =
   | { type: 'loanRefinanced'; oldLoanId: string; newLoanId: string; fees: Cents }
   | { type: 'bankMeetingHeld'; bankId: string; trust: number }
   | { type: 'resigned' }
+  /** Works handed to the project manager (milestone 8): his fee is paid. */
+  | { type: 'worksDelegated'; propertyId: string; fee: Cents }
+  | {
+      type: 'transformationStarted';
+      propertyId: string;
+      kind: TransformationKind;
+      total: Cents;
+      endDay: number;
+    }
+  /** The transformation is done: `propertyIds` are what it produced (the flats of a division). */
+  | {
+      type: 'transformationCompleted';
+      propertyId: string;
+      kind: TransformationKind;
+      cost: Cents;
+      propertyIds: string[];
+    }
+  /** A late rival (the SCI Horizon) enters the market (milestone 8). */
+  | { type: 'rivalArrived'; rivalId: string }
+  /** The player created his SCI (milestone 8). */
+  | { type: 'companyCreated'; cost: Cents }
+  | { type: 'purchaseHolderSet'; purchaseId: string; holder: Holder }
   // Market (docs/03-systemes/03).
   | { type: 'propertyPricesUpdated' }
   | { type: 'listingPublished'; listingId: string }
@@ -161,7 +190,7 @@ export type GameEvent =
       insured: boolean;
     }
   | { type: 'rentalWithdrawn'; propertyId: string }
-  | { type: 'rentalBlocked'; propertyId: string; reason: 'rent.indecent' | 'rent.dpeBanned' }
+  | { type: 'rentalBlocked'; propertyId: string; reason: LettingBlock }
   | { type: 'furnitureBought'; propertyId: string; cost: Cents }
   | { type: 'applicationReceived'; propertyId: string; applicationId: string }
   | { type: 'applicationExpired'; propertyId: string; applicationId: string }
@@ -259,7 +288,14 @@ export type GameEvent =
     }
   // Taxes (docs/03-systemes/06).
   | { type: 'propertyTaxCharged'; amount: Cents }
-  | { type: 'taxAssessed'; year: number; total: Cents; accountantFees: Cents }
+  | {
+      type: 'taxAssessed';
+      year: number;
+      /** Income tax, social contributions and IFI, paid in instalments this year. */
+      total: Cents;
+      accountantFees: Cents;
+      wealthTax: Cents;
+    }
   // Descent towards bankruptcy (docs/02, section 2.6).
   | {
       type: 'forcedSale';

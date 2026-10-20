@@ -4,8 +4,19 @@
   "dataRentsIncludeCharges": true,
   "stateRentFactors": [0.8, 0.87, 0.94, 1, 1.05],
   "indecentBelowState": 1.8,
-  "dpeFactors": { "A": 1.03, "B": 1.02, "C": 1.01, "D": 1, "E": 0.98, "F": 0.96, "G": 0.94 },
-  "rentRange": { "min": 0.8, "max": 1.3 },
+  "dpeFactors": {
+    "A": 1.03,
+    "B": 1.02,
+    "C": 1.01,
+    "D": 1,
+    "E": 0.98,
+    "F": 0.96,
+    "G": 0.94
+  },
+  "rentRange": {
+    "min": 0.8,
+    "max": 1.3
+  },
   "leaseTypes": {
     "bare": {
       "rentFactor": 1,
@@ -13,7 +24,16 @@
       "studentTermMonths": null,
       "depositMonths": 1,
       "noticeMonths": 3,
-      "monthlyDepartureProbability": 0.014
+      "monthlyDepartureProbability": 0.014,
+      "furnished": false,
+      "minRooms": 0,
+      "taxCategory": "bare",
+      "microBic": null,
+      "applicationRate": 1,
+      "shortTerm": null,
+      "recoverableCharges": true,
+      "kinds": ["apartment", "house", "building"],
+      "incidents": true
     },
     "furnished": {
       "rentFactor": 1.15,
@@ -21,23 +41,125 @@
       "studentTermMonths": 9,
       "depositMonths": 2,
       "noticeMonths": 1,
-      "monthlyDepartureProbability": 0.03
+      "monthlyDepartureProbability": 0.03,
+      "furnished": true,
+      "minRooms": 0,
+      "taxCategory": "furnished",
+      "microBic": null,
+      "applicationRate": 1,
+      "shortTerm": null,
+      "recoverableCharges": true,
+      "kinds": ["apartment", "house", "building"],
+      "incidents": true
+    },
+    "shared": {
+      "rentFactor": 1.3,
+      "termMonths": 12,
+      "studentTermMonths": 9,
+      "depositMonths": 2,
+      "noticeMonths": 1,
+      "monthlyDepartureProbability": 0.05,
+      "furnished": true,
+      "minRooms": 4,
+      "taxCategory": "furnished",
+      "microBic": null,
+      "applicationRate": 0.8,
+      "shortTerm": null,
+      "recoverableCharges": true,
+      "kinds": ["apartment", "house"],
+      "incidents": true
+    },
+    "shortTerm": {
+      "rentFactor": 1.3,
+      "termMonths": 12,
+      "studentTermMonths": null,
+      "depositMonths": 0,
+      "noticeMonths": 1,
+      "monthlyDepartureProbability": 0,
+      "furnished": true,
+      "minRooms": 0,
+      "taxCategory": "furnished",
+      "microBic": {
+        "allowanceShare": 0.3,
+        "receiptsCeiling": 15000
+      },
+      "applicationRate": 0,
+      "shortTerm": {
+        "seasonality": [0.6, 0.65, 0.8, 0.95, 1.05, 1.2, 1.5, 1.55, 1.1, 0.95, 0.8, 0.85],
+        "selfMinutesPerDay": 20,
+        "guestProfileId": "guests"
+      },
+      "recoverableCharges": false,
+      "kinds": ["apartment", "house"],
+      "incidents": true
+    },
+    "commercial": {
+      "rentFactor": 1,
+      "termMonths": 108,
+      "studentTermMonths": null,
+      "depositMonths": 3,
+      "noticeMonths": 6,
+      "monthlyDepartureProbability": 0.006,
+      "kinds": ["commercial"],
+      "incidents": false,
+      "furnished": false,
+      "minRooms": 0,
+      "taxCategory": "bare",
+      "microBic": null,
+      "applicationRate": 0.3,
+      "recoverableCharges": true,
+      "shortTerm": null
+    },
+    "parking": {
+      "rentFactor": 1,
+      "termMonths": 12,
+      "studentTermMonths": null,
+      "depositMonths": 1,
+      "noticeMonths": 1,
+      "monthlyDepartureProbability": 0.02,
+      "kinds": ["parking"],
+      "incidents": false,
+      "furnished": false,
+      "minRooms": 0,
+      "taxCategory": "bare",
+      "microBic": null,
+      "applicationRate": 1.5,
+      "recoverableCharges": true,
+      "shortTerm": null
     }
   },
   "recoverableChargesShare": 0.7,
-  "furniture": { "perM2": 90, "minimum": 3000, "maximum": 8000 },
-  "ownerInsurance": { "base": 80, "perM2": 1.5 },
-  "unpaidRentInsurance": { "premiumShare": 0.03 },
+  "furniture": {
+    "perM2": 90,
+    "minimum": 3000,
+    "maximum": 8000
+  },
+  "ownerInsurance": {
+    "base": 80,
+    "perM2": 1.5
+  },
+  "unpaidRentInsurance": {
+    "premiumShare": 0.03
+  },
   "applications": {
     "dailyProbability": 0.2,
     "rentSensitivity": 5,
     "maxPending": 5,
-    "validityDays": { "min": 3, "max": 7 },
+    "validityDays": {
+      "min": 3,
+      "max": 7
+    },
     "fragility": 0.5,
     "referenceIncomeRatio": 3,
     "incomeReliability": 0.04,
-    "incomeEffect": { "min": -0.12, "max": 0.08 },
-    "reliabilityBounds": { "min": 0.05, "max": 0.99 },
+    "incomeEffect": {
+      "min": -0.12,
+      "max": 0.08
+    },
+    "reliabilityBounds": {
+      "min": 0.05,
+      "max": 0.99
+    },
     "guarantorReliability": 0.08,
     "hiddenNoise": 0.08
   },
@@ -51,77 +173,273 @@
     {
       "id": "employee",
       "contract": "permanent",
-      "weights": { "bare": 40, "furnished": 25 },
-      "incomeToRent": { "min": 2.8, "max": 5 },
+      "weights": {
+        "bare": 40,
+        "furnished": 25,
+        "shared": 10,
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 30
+      },
+      "incomeToRent": {
+        "min": 2.8,
+        "max": 5
+      },
       "guarantorChance": 0.25,
-      "reliability": { "min": 0.72, "max": 0.94 },
+      "reliability": {
+        "min": 0.72,
+        "max": 0.94
+      },
       "mobility": 0.9,
-      "desiredYears": { "min": 2, "max": 6 }
+      "desiredYears": {
+        "min": 2,
+        "max": 6
+      }
     },
     {
       "id": "family",
       "contract": "permanent",
-      "weights": { "bare": 15, "furnished": 3 },
-      "incomeToRent": { "min": 2.8, "max": 4.5 },
+      "weights": {
+        "bare": 15,
+        "furnished": 3,
+        "shared": 0,
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 20
+      },
+      "incomeToRent": {
+        "min": 2.8,
+        "max": 4.5
+      },
       "guarantorChance": 0.15,
-      "reliability": { "min": 0.75, "max": 0.95 },
+      "reliability": {
+        "min": 0.75,
+        "max": 0.95
+      },
       "mobility": 0.7,
-      "desiredYears": { "min": 4, "max": 10 }
+      "desiredYears": {
+        "min": 4,
+        "max": 10
+      }
     },
     {
       "id": "youngWorker",
       "contract": "fixedTerm",
-      "weights": { "bare": 15, "furnished": 25 },
-      "incomeToRent": { "min": 2.2, "max": 3.8 },
+      "weights": {
+        "bare": 15,
+        "furnished": 25,
+        "shared": 30,
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 25
+      },
+      "incomeToRent": {
+        "min": 2.2,
+        "max": 3.8
+      },
       "guarantorChance": 0.6,
-      "reliability": { "min": 0.6, "max": 0.9 },
+      "reliability": {
+        "min": 0.6,
+        "max": 0.9
+      },
       "mobility": 1.4,
-      "desiredYears": { "min": 1, "max": 3 }
+      "desiredYears": {
+        "min": 1,
+        "max": 3
+      }
     },
     {
       "id": "student",
       "contract": "student",
-      "weights": { "bare": 3, "furnished": 30 },
-      "incomeToRent": { "min": 1, "max": 2 },
+      "weights": {
+        "bare": 3,
+        "furnished": 30,
+        "shared": 50,
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 5
+      },
+      "incomeToRent": {
+        "min": 1,
+        "max": 2
+      },
       "guarantorChance": 0.9,
-      "reliability": { "min": 0.65, "max": 0.9 },
+      "reliability": {
+        "min": 0.65,
+        "max": 0.9
+      },
       "mobility": 1.5,
-      "desiredYears": { "min": 1, "max": 2 }
+      "desiredYears": {
+        "min": 1,
+        "max": 2
+      }
     },
     {
       "id": "retiree",
       "contract": "retired",
-      "weights": { "bare": 15, "furnished": 5 },
-      "incomeToRent": { "min": 2.5, "max": 4.5 },
+      "weights": {
+        "bare": 15,
+        "furnished": 5,
+        "shared": 0,
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 15
+      },
+      "incomeToRent": {
+        "min": 2.5,
+        "max": 4.5
+      },
       "guarantorChance": 0.05,
-      "reliability": { "min": 0.8, "max": 0.97 },
+      "reliability": {
+        "min": 0.8,
+        "max": 0.97
+      },
       "mobility": 0.4,
-      "desiredYears": { "min": 5, "max": 12 }
+      "desiredYears": {
+        "min": 5,
+        "max": 12
+      }
     },
     {
       "id": "freelancer",
       "contract": "selfEmployed",
-      "weights": { "bare": 10, "furnished": 12 },
-      "incomeToRent": { "min": 2, "max": 6 },
+      "weights": {
+        "bare": 10,
+        "furnished": 12,
+        "shared": 10,
+        "shortTerm": 0,
+        "commercial": 0,
+        "parking": 5
+      },
+      "incomeToRent": {
+        "min": 2,
+        "max": 6
+      },
       "guarantorChance": 0.3,
-      "reliability": { "min": 0.55, "max": 0.9 },
+      "reliability": {
+        "min": 0.55,
+        "max": 0.9
+      },
       "mobility": 1,
-      "desiredYears": { "min": 1, "max": 5 }
+      "desiredYears": {
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "id": "guests",
+      "contract": "fixedTerm",
+      "weights": {
+        "bare": 0,
+        "furnished": 0,
+        "shared": 0,
+        "shortTerm": 1,
+        "commercial": 0,
+        "parking": 0
+      },
+      "incomeToRent": {
+        "min": 3,
+        "max": 3
+      },
+      "guarantorChance": 0,
+      "reliability": {
+        "min": 0.99,
+        "max": 0.99
+      },
+      "mobility": 0,
+      "desiredYears": {
+        "min": 0,
+        "max": 0
+      }
+    },
+    {
+      "id": "shopkeeper",
+      "contract": "selfEmployed",
+      "weights": {
+        "bare": 0,
+        "furnished": 0,
+        "shared": 0,
+        "shortTerm": 0,
+        "commercial": 1,
+        "parking": 0
+      },
+      "incomeToRent": {
+        "min": 3,
+        "max": 8
+      },
+      "guarantorChance": 0.4,
+      "reliability": {
+        "min": 0.6,
+        "max": 0.92
+      },
+      "mobility": 1,
+      "desiredYears": {
+        "min": 6,
+        "max": 12
+      }
     }
   ],
   "traits": [
-    { "id": "jazzDrummer", "weight": 1, "reliability": 0 },
-    { "id": "plantLover", "weight": 1, "reliability": 0.02 },
-    { "id": "nightOwl", "weight": 1, "reliability": -0.02 },
-    { "id": "diyFan", "weight": 1, "reliability": 0.01 },
-    { "id": "catPerson", "weight": 1, "reliability": 0 },
-    { "id": "marathonRunner", "weight": 1, "reliability": 0.02 },
-    { "id": "boardGamer", "weight": 1, "reliability": 0 },
-    { "id": "amateurChef", "weight": 1, "reliability": 0 },
-    { "id": "tidyPerson", "weight": 1, "reliability": 0.03 },
-    { "id": "partyAnimal", "weight": 1, "reliability": -0.04 },
-    { "id": "cyclist", "weight": 1, "reliability": 0.01 },
-    { "id": "collector", "weight": 1, "reliability": 0 }
+    {
+      "id": "jazzDrummer",
+      "weight": 1,
+      "reliability": 0
+    },
+    {
+      "id": "plantLover",
+      "weight": 1,
+      "reliability": 0.02
+    },
+    {
+      "id": "nightOwl",
+      "weight": 1,
+      "reliability": -0.02
+    },
+    {
+      "id": "diyFan",
+      "weight": 1,
+      "reliability": 0.01
+    },
+    {
+      "id": "catPerson",
+      "weight": 1,
+      "reliability": 0
+    },
+    {
+      "id": "marathonRunner",
+      "weight": 1,
+      "reliability": 0.02
+    },
+    {
+      "id": "boardGamer",
+      "weight": 1,
+      "reliability": 0
+    },
+    {
+      "id": "amateurChef",
+      "weight": 1,
+      "reliability": 0
+    },
+    {
+      "id": "tidyPerson",
+      "weight": 1,
+      "reliability": 0.03
+    },
+    {
+      "id": "partyAnimal",
+      "weight": 1,
+      "reliability": -0.04
+    },
+    {
+      "id": "cyclist",
+      "weight": 1,
+      "reliability": 0.01
+    },
+    {
+      "id": "collector",
+      "weight": 1,
+      "reliability": 0
+    }
   ],
   "agencies": [
     {
@@ -132,7 +450,11 @@
       "reliabilityShift": 0.05,
       "judgementNoise": 0.03,
       "selectionDays": 6,
-      "incidentDays": { "min": 1, "max": 2 }
+      "incidentDays": {
+        "min": 1,
+        "max": 2
+      },
+      "leaseTypes": ["bare", "furnished", "shared", "commercial", "parking"]
     },
     {
       "id": "bonnePioche",
@@ -142,7 +464,11 @@
       "reliabilityShift": -0.08,
       "judgementNoise": 0.1,
       "selectionDays": 2,
-      "incidentDays": { "min": 2, "max": 5 }
+      "incidentDays": {
+        "min": 2,
+        "max": 5
+      },
+      "leaseTypes": ["bare", "furnished", "shared", "commercial", "parking"]
     },
     {
       "id": "plusOuMoins",
@@ -152,7 +478,25 @@
       "reliabilityShift": 0,
       "judgementNoise": 0.2,
       "selectionDays": 4,
-      "incidentDays": { "min": 1, "max": 10 }
+      "incidentDays": {
+        "min": 1,
+        "max": 10
+      },
+      "leaseTypes": ["bare", "furnished", "shared", "commercial", "parking"]
+    },
+    {
+      "id": "conciergerie",
+      "name": "Clés & Valises",
+      "feeShare": 0.2,
+      "applicationRate": 1,
+      "reliabilityShift": 0,
+      "judgementNoise": 0,
+      "selectionDays": 0,
+      "incidentDays": {
+        "min": 1,
+        "max": 2
+      },
+      "leaseTypes": ["shortTerm"]
     }
   ],
   "satisfaction": {
@@ -171,9 +515,18 @@
       "item": "plumbing",
       "selfRepair": false,
       "selfMinutes": 0,
-      "selfCost": { "min": 0, "max": 0 },
-      "artisanCost": { "min": 600, "max": 1100 },
-      "artisanDays": { "min": 1, "max": 3 },
+      "selfCost": {
+        "min": 0,
+        "max": 0
+      },
+      "artisanCost": {
+        "min": 600,
+        "max": 1100
+      },
+      "artisanDays": {
+        "min": 1,
+        "max": 3
+      },
       "satisfactionHit": 10,
       "dailySatisfactionLoss": 3
     },
@@ -183,9 +536,18 @@
       "item": "plumbing",
       "selfRepair": true,
       "selfMinutes": 90,
-      "selfCost": { "min": 20, "max": 60 },
-      "artisanCost": { "min": 150, "max": 400 },
-      "artisanDays": { "min": 1, "max": 3 },
+      "selfCost": {
+        "min": 20,
+        "max": 60
+      },
+      "artisanCost": {
+        "min": 150,
+        "max": 400
+      },
+      "artisanDays": {
+        "min": 1,
+        "max": 3
+      },
       "satisfactionHit": 8,
       "dailySatisfactionLoss": 2
     },
@@ -195,9 +557,18 @@
       "item": "heating",
       "selfRepair": false,
       "selfMinutes": 0,
-      "selfCost": { "min": 0, "max": 0 },
-      "artisanCost": { "min": 200, "max": 700 },
-      "artisanDays": { "min": 1, "max": 4 },
+      "selfCost": {
+        "min": 0,
+        "max": 0
+      },
+      "artisanCost": {
+        "min": 200,
+        "max": 700
+      },
+      "artisanDays": {
+        "min": 1,
+        "max": 4
+      },
       "satisfactionHit": 10,
       "dailySatisfactionLoss": 4
     },
@@ -207,9 +578,18 @@
       "item": "joinery",
       "selfRepair": true,
       "selfMinutes": 60,
-      "selfCost": { "min": 40, "max": 90 },
-      "artisanCost": { "min": 120, "max": 250 },
-      "artisanDays": { "min": 0, "max": 1 },
+      "selfCost": {
+        "min": 40,
+        "max": 90
+      },
+      "artisanCost": {
+        "min": 120,
+        "max": 250
+      },
+      "artisanDays": {
+        "min": 0,
+        "max": 1
+      },
       "satisfactionHit": 6,
       "dailySatisfactionLoss": 3
     },
@@ -219,9 +599,18 @@
       "item": "ventilation",
       "selfRepair": true,
       "selfMinutes": 180,
-      "selfCost": { "min": 50, "max": 150 },
-      "artisanCost": { "min": 300, "max": 900 },
-      "artisanDays": { "min": 2, "max": 7 },
+      "selfCost": {
+        "min": 50,
+        "max": 150
+      },
+      "artisanCost": {
+        "min": 300,
+        "max": 900
+      },
+      "artisanDays": {
+        "min": 2,
+        "max": 7
+      },
       "satisfactionHit": 5,
       "dailySatisfactionLoss": 1
     }
@@ -233,12 +622,27 @@
     "reminderAfterDays": 10,
     "reminderSuccess": 0.9,
     "procedureAfterMonths": 2,
-    "procedureCost": { "min": 1500, "max": 3000 },
-    "procedureMonths": { "min": 12, "max": 20 },
-    "winterTruce": { "fromMonth": 11, "toMonth": 3 },
+    "procedureCost": {
+      "min": 1500,
+      "max": 3000
+    },
+    "procedureMonths": {
+      "min": 12,
+      "max": 20
+    },
+    "winterTruce": {
+      "fromMonth": 11,
+      "toMonth": 3
+    },
     "reputationPenalty": 5
   },
-  "damages": { "probability": 0.5, "perM2": { "min": 10, "max": 40 } },
+  "damages": {
+    "probability": 0.5,
+    "perM2": {
+      "min": 10,
+      "max": 40
+    }
+  },
   "lifeEvents": {
     "yearlyProbability": 0.15,
     "events": [
@@ -268,7 +672,10 @@
         "noticeMonths": null,
         "mobilityFactor": 0.5,
         "satisfaction": 5,
-        "requestCost": { "min": 80, "max": 250 }
+        "requestCost": {
+          "min": 80,
+          "max": 250
+        }
       },
       {
         "id": "transfer",
@@ -289,9 +696,15 @@
       }
     ]
   },
-  "rentRevision": { "maxYearlyPercent": 3.5 },
+  "rentRevision": {
+    "maxYearlyPercent": 3.5
+  },
   "dpe": {
-    "letBanFrom": { "G": "2025-01-01", "F": "2028-01-01", "E": "2034-01-01" },
+    "letBanFrom": {
+      "G": "2025-01-01",
+      "F": "2028-01-01",
+      "E": "2034-01-01"
+    },
     "warningMonths": 24
   }
 }

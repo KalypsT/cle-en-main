@@ -20,6 +20,7 @@ import {
   Empty,
   KeyValues,
   ScreenHeader,
+  Segmented,
   Why,
 } from '../ui/components.tsx';
 import { RateWhy } from '../ui/explain.tsx';
@@ -97,6 +98,29 @@ export function PurchaseScreen({ id }: { id: string }) {
               : t.purchase.cashOk}
           </p>
         )}
+      </Card>
+
+      <Card title={t.purchase.buyer} testId="purchase-buyer">
+        {state.company ? (
+          <Segmented
+            label={t.purchase.buyer}
+            options={(['player', 'company'] as const).map((holder) => ({
+              value: holder,
+              label: t.purchase.buyers[holder],
+            }))}
+            value={purchase.holder}
+            onChange={(holder) =>
+              act({ type: 'purchase/setHolder', purchaseId: purchase.id, holder })
+            }
+          />
+        ) : (
+          <p className="small muted">{t.purchase.noCompany}</p>
+        )}
+        <p className="small muted">
+          {purchase.applications.length > 0 || chosen
+            ? t.purchase.buyerLocked
+            : t.purchase.buyerHint}
+        </p>
       </Card>
 
       <Card

@@ -9,7 +9,9 @@ import {
   incomeTax,
   type TaxInput,
   type TaxRegime,
+  wealthTax,
 } from './taxes.ts';
+import { realValue } from './valuation.ts';
 
 const SALARY = 24_000_00; // 2 000 € a month: 21 600 € taxable, 11 % marginal rate.
 
@@ -218,6 +220,31 @@ describe('capital gains', () => {
     );
   });
 
+  it('counts this year’s works of a property never let, or let furnished', () => {
+    const ledger = (category: 'bare' | 'furnished' | null) => ({
+      category,
+      regime: 'auto' as const,
+      company: false,
+      rents: 0,
+      costs: 0,
+      works: 20_000_00,
+      energyRenovation: false,
+      interest: 0,
+      sold: false,
+    });
+    const gainWith = (category: 'bare' | 'furnished' | null) => {
+      const { state, owned } = sellerAt(2028);
+      state.tax.ledgers[owned.property.id] = ledger(category);
+      return capitalGainsTax({ content, state }, owned, 120_000_00).gain;
+    };
+    const withWorks = 120_000_00 - (80_000_00 + 6_800_00 + 20_000_00);
+    // A marchand's flat, renovated and sold without a tenant: its works count.
+    expect(gainWith(null)).toBe(withWorks);
+    expect(gainWith('furnished')).toBe(withWorks);
+    // Bare: they are deducted from the rents at the review, not from the gain.
+    expect(gainWith('bare')).toBe(120_000_00 - (80_000_00 + 6_800_00));
+  });
+
   it('exempts the income tax after 22 years and everything after 30', () => {
     const at22 = sellerAt(2048);
     const t22 = capitalGainsTax({ content, state: at22.state }, at22.owned, 200_000_00);
@@ -239,4 +266,49 @@ describe('capital gains', () => {
       100_000_00 - (80_000_00 + 6_800_00) + 5_000_00,
     );
   });
+
+  it('charges the IFI on the net real-estate wealth from 1.3 M€, with its discount', () => {
+    const state = newGame();
+    const today = toDayNumber(state.clock.date);
+    const owned = sampleOwned(today);
+    state.properties = [owned];
+    const market = state.market.cities.dole?.[owned.property.neighbourhoodId];
+    if (!market) throw new Error('no market');
+    const value = () => realValue(content, state, owned.property).value;
+    // Under the threshold: nothing, whatever the scale says.
+    expect(wealthTax(content, state).tax).toBe(0);
+    // 2 M€ of net wealth: 0,5 % from 800 k€ to 1,3 M€, then 0,7 %.
+    market.priceIndex *= 2_000_000_00 / value();
+    const base = value();
+    const expected = Math.round(500_000_00 * 0.005 + (base - 1_300_000_00) * 0.007);
+    expect(wealthTax(content, state)).toEqual({ base, tax: expected });
+    // Loans are deducted; the main residence has a 30 % allowance.
+    state.loans = [{ ...loanOn(owned.property.id), remaining: 500_000_00 }];
+    expect(wealthTax(content, state).base).toBe(base - 500_000_00);
+    state.loans = [];
+    state.player.homePropertyId = owned.property.id;
+    expect(wealthTax(content, state).base).toBe(Math.round(base * 0.7));
+    // Just over the threshold, the discount lowers the tax.
+    state.player.homePropertyId = null;
+    market.priceIndex *= 1_350_000_00 / value();
+    const small = value();
+    const scale = 500_000_00 * 0.005 + (small - 1_300_000_00) * 0.007;
+    expect(wealthTax(content, state).tax).toBe(Math.round(scale - (17_500_00 - small * 0.0125)));
+  });
 });
+
+function loanOn(propertyId: string): GameState['loans'][number] {
+  return {
+    id: 'loan-ifi',
+    bankId: 'tirelire',
+    principal: 0,
+    ratePercent: 4,
+    durationMonths: 240,
+    monthlyPayment: 0,
+    remaining: 0,
+    paymentsMade: 0,
+    startDate: { year: 2027, month: 1, day: 1 },
+    renegotiationSuggested: false,
+    propertyId,
+  };
+}

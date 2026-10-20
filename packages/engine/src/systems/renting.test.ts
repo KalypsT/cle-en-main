@@ -273,3 +273,78 @@ describe('main residence', () => {
     expect(engine.capitalGainsTax(state, PROPERTY, 150_000_00)?.tax).toBeGreaterThan(0);
   });
 });
+
+describe('flat-shares and short-term lets (milestone 8)', () => {
+  it('lets a flat-share only with enough rooms, furnished, at a higher rent', () => {
+    const small = owner();
+    const refused = engine.dispatch(small, {
+      type: 'rent/list',
+      propertyId: PROPERTY,
+      leaseType: 'shared',
+      monthlyRent: 600_00,
+      agencyId: null,
+      insured: false,
+    });
+    expect(refused.ok ? null : refused.reason.code).toBe('rent.notEnoughRooms');
+    const big = owner({ property: { rooms: 4, surface: 85 } });
+    const ctx = systemContext(big);
+    const owned = ctx.state.properties[0];
+    if (!owned) throw new Error('no property');
+    const shared = rentRange(content, ctx.state, owned.property, 'shared').market;
+    const bare = rentRange(content, ctx.state, owned.property, 'bare').market;
+    expect(shared / bare).toBeCloseTo(content.renting.leaseTypes.shared.rentFactor, 1);
+    const listed = act(big, {
+      type: 'rent/list',
+      propertyId: PROPERTY,
+      leaseType: 'shared',
+      monthlyRent: shared,
+      agencyId: null,
+      insured: false,
+    });
+    expect(listed.events.map((e) => e.type)).toContain('furnitureBought');
+  });
+
+  it('starts a short-term let at once, earns with the seasons and the owner’s time', () => {
+    const state = owner();
+    const ctx = systemContext(state);
+    const owned = ctx.state.properties[0];
+    if (!owned) throw new Error('no property');
+    const rent = rentRange(content, ctx.state, owned.property, 'shortTerm').market;
+    // A classic agency does not do short-term lets.
+    const agency = engine.dispatch(state, {
+      type: 'rent/list',
+      propertyId: PROPERTY,
+      leaseType: 'shortTerm',
+      monthlyRent: rent,
+      agencyId: 'immoZen',
+      insured: false,
+    });
+    expect(agency.ok ? null : agency.reason.code).toBe('agency.leaseType');
+    const listed = act(state, {
+      type: 'rent/list',
+      propertyId: PROPERTY,
+      leaseType: 'shortTerm',
+      monthlyRent: rent,
+      agencyId: 'conciergerie',
+      insured: false,
+    }).state;
+    const lease = listed.properties[0]?.lease;
+    expect(lease?.leaseType).toBe('shortTerm');
+    expect(lease?.tenant.profileId).toBe('guests');
+    expect(lease?.deposit).toBe(0);
+    // The first month's income follows the season of the month paid.
+    const month = advanceUntil(listed, (e) => e.type === 'monthlyStatement', 40);
+    const line = month.events
+      .flatMap((e) => (e.type === 'monthlyStatement' ? e.lines : []))
+      .find((l) => l.kind === 'rentalIncome');
+    const season =
+      content.renting.leaseTypes.shortTerm.shortTerm?.seasonality[
+        month.state.clock.date.month - 1
+      ] ?? 1;
+    expect(line?.amount).toBe(Math.round(rent * season));
+    // Stopping it frees the property.
+    const stopped = act(month.state, { type: 'rent/withdraw', propertyId: PROPERTY }).state;
+    expect(stopped.properties[0]?.lease).toBeNull();
+    expect(stopped.properties[0]?.rental).toBeNull();
+  });
+});

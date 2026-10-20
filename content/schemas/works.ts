@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DPE_LABELS, EPOCHS } from './city.ts';
+import { DPE_LABELS, dpeLabelSchema, EPOCHS } from './city.ts';
 import { euros, id, share } from './common.ts';
 
 /** Works and co-ownership (docs/03-systemes/05-travaux-et-copropriete.md). */
@@ -168,9 +168,66 @@ const resolutionSchema = z
   })
   .strict();
 
+export const TRANSFORMATION_KINDS = ['division', 'splitBuilding', 'attic', 'construction'] as const;
+export const transformationKindSchema = z.enum(TRANSFORMATION_KINDS);
+
+const transformationSchema = z
+  .object({
+    /** Kind of property it applies to. */
+    kind: z.enum(['house', 'building', 'land']),
+    /** Smallest living area (or plot) it applies to, in m². */
+    minSurface: z.number().min(0),
+    /** Cost before the project manager: per m² of the result, per lot, and as a share of the value. */
+    costPerM2: euros,
+    costPerLot: euros,
+    costShareOfValue: share,
+    months: z.number().int().min(1),
+  })
+  .strict();
+
 export const worksRulesSchema = z
   .object({
     items: z.record(itemKindSchema, itemSchema),
+    /**
+     * The project manager (maître d'œuvre, milestone 8): he asks the quotes of the most
+     * reliable artisans, treats the hazards and takes no free time, for a share of the works.
+     */
+    projectManager: z.object({ feeShare: share }).strict(),
+    /**
+     * Transformations (milestone 8), always led by the project manager: dividing a house into
+     * flats, selling a building flat by flat, converting an attic, building a house on land.
+     */
+    transformations: z
+      .object({
+        rules: z.record(transformationKindSchema, transformationSchema),
+        /** Target area of a flat cut out of a house, and bounds of their number. */
+        divisionLotSurface: positive,
+        divisionLots: z
+          .object({ min: z.number().int().min(2), max: z.number().int().min(2) })
+          .strict(),
+        /** A new house covers this share of its plot, within bounds (m²). */
+        constructionSurface: z.object({ share, min: positive, max: positive }).strict(),
+        /** Energy class a new house is built to. */
+        constructionDpe: dpeLabelSchema,
+        /**
+         * Share of a transformation's margin the seller already asks for (the developer's
+         * « compte à rebours »): building land is worth this share of the margin of the house it
+         * can hold, and a convertible attic adds this share of its own margin to a house.
+         */
+        residualShare: share,
+        /** Chance and size of a final overrun of the bill. */
+        overrun: z
+          .object({ chance: share, share: z.object({ min: share, max: share }).strict() })
+          .strict(),
+        /** Houses with a convertible attic, and its area as a share of the living area. */
+        attic: z
+          .object({
+            houseShare: share,
+            surfaceShare: z.object({ min: share, max: share }).strict(),
+          })
+          .strict(),
+      })
+      .strict(),
     /** Rooms of a dwelling: the items of each kind of room. */
     spaces: z.record(z.enum(SPACE_KINDS), z.array(itemKindSchema).min(1)),
     /** How a living area is split into rooms (share of the area, bounds in m²). */

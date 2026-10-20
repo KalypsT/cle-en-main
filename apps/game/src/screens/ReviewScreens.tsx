@@ -5,6 +5,7 @@ import { useGame, useNav } from '../game/context.tsx';
 import {
   achievementName,
   format,
+  formatDecimal,
   formatEuros,
   formatGameDate,
   formatPercent,
@@ -57,8 +58,8 @@ export function MonthlyReviewContent() {
         )}
         <p className="small">
           {format(t.review.reputation, {
-            value: review.reputation,
-            change: `${reputationChange >= 0 ? t.common.plus : t.common.minus}${Math.abs(reputationChange)}`,
+            value: formatDecimal(review.reputation),
+            change: `${reputationChange >= 0 ? t.common.plus : t.common.minus}${formatDecimal(Math.abs(reputationChange))}`,
           })}
         </p>
         {review.positiveStreak > 1 && (
@@ -104,6 +105,8 @@ export function YearReviewContent() {
   const { state } = useGame();
   const review = state.lastYearReview;
   if (!review) return <Empty icon="calendar">{t.review.noYearReview}</Empty>;
+  const assessment = state.tax.lastAssessment;
+  const wealthTax = assessment?.year === review.year ? assessment.wealthTax : 0;
   const { yvon } = gameContent;
   const pick = (list: readonly string[]) => list[review.year % list.length] ?? list[0] ?? '';
   return (
@@ -138,12 +141,15 @@ export function YearReviewContent() {
               value: review.rentTax === null ? t.review.yearNoTax : formatSigned(-review.rentTax),
             },
             { label: t.review.yearAccountant, value: formatEuros(review.accountantFees) },
+            ...(wealthTax > 0
+              ? [{ label: t.review.yearWealthTax, value: formatSigned(-wealthTax) }]
+              : []),
           ]}
         />
         <p className="small">
           {format(t.review.yearReputation, {
-            start: review.reputationStart,
-            end: review.reputationEnd,
+            start: formatDecimal(review.reputationStart),
+            end: formatDecimal(review.reputationEnd),
           })}
         </p>
       </Card>

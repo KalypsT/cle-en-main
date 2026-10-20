@@ -4,14 +4,25 @@ import {
   type Epoch,
   findCity,
   findJob,
+  findNeighbourhood,
   type GameContent,
   type Motivation,
 } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextNormal, nextPoisson, nextRange, pickWeighted } from '../random.ts';
-import type { GameState, Listing, Property, PropertyKind } from '../state.ts';
+import type { GameState, Listing, OtherKind, Property, PropertyKind } from '../state.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
-import { conditionLabel, drawDwelling, freezeDwelling, freezeNested } from './dwelling.ts';
+import {
+  conditionLabel,
+  drawDwelling,
+  freezeDwelling,
+  freezeItems,
+  freezeNested,
+  freezeSpaces,
+  isDwelling,
+  OTHER_KIND_DPE,
+} from './dwelling.ts';
 import { defectProbability, dwellingKindOf, realValue } from './valuation.ts';
 
 const DAYS_PER_MONTH = 30;
@@ -42,6 +53,16 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
   );
   const neighbourhood = city.neighbourhoods.find((n) => n.id === neighbourhoodId);
   if (!neighbourhood) throw new RangeError(`City ${cityId} has no neighbourhood`);
+  // Shops, parking spaces and building land first (milestone 8): hand-written shares.
+  const others = Object.entries(rules.otherKinds) as [OtherKind, { share: number }][];
+  const othersShare = others.reduce((sum, [, other]) => sum + other.share, 0);
+  if (othersShare > 0 && nextFloat(state.rng) < othersShare) {
+    const other = pickWeighted(
+      state.rng,
+      Object.fromEntries(others.map(([id, rule]) => [id, rule.share])) as Record<OtherKind, number>,
+    );
+    return generateOtherProperty(ctx, cityId, neighbourhood.id, other);
+  }
   let kind: PropertyKind;
   if (nextFloat(state.rng) < rules.flow.buildingShare) kind = 'building';
   else {
@@ -85,11 +106,18 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
     .map((rule) => ({ id: rule.id, revealed: false }));
   const tax = rules.ownership.propertyTaxPerM2[kind];
   const copro = content.works.copro;
+  // Some houses have an attic one could convert (milestone 8).
+  const attic = content.works.transformations.attic;
+  const atticSurface =
+    kind === 'house' && nextFloat(state.rng) < attic.houseShare
+      ? Math.round(surface * nextRange(state.rng, attic.surfaceShare.min, attic.surfaceShare.max))
+      : 0;
   const property: Property = {
     id: `property-${state.nextId++}`,
     cityId,
     neighbourhoodId: neighbourhood.id,
     kind,
+    atticSurface,
     surface,
     rooms,
     floor,
@@ -113,6 +141,43 @@ export function generateProperty(ctx: SystemContext, cityId: string): Property {
         : 0,
   };
   // Lots, nuisances and the like are replaced, never mutated: shared between copies of the state.
+  freezeNested(property);
+  return property;
+}
+
+/** A shop, a parking space or a plot of land: no rooms, no items, no energy class to speak of. */
+function generateOtherProperty(
+  ctx: SystemContext,
+  cityId: string,
+  neighbourhoodId: string,
+  kind: OtherKind,
+): Property {
+  const { content, state } = ctx;
+  const rule = content.market.otherKinds[kind];
+  const neighbourhood = findNeighbourhood(content, cityId, neighbourhoodId);
+  const surface = Math.round(nextRange(state.rng, rule.surface.min, rule.surface.max));
+  const epoch = pickWeighted<Epoch>(state.rng, neighbourhood.epochShares.apartment);
+  const property: Property = {
+    id: `property-${state.nextId++}`,
+    cityId,
+    neighbourhoodId,
+    kind,
+    surface,
+    rooms: 0,
+    floor: null,
+    lots: [],
+    epoch,
+    dpe: OTHER_KIND_DPE,
+    spaces: freezeSpaces([]),
+    items: freezeItems([]),
+    energyFactor: 1,
+    atticSurface: 0,
+    copro: null,
+    postponedHazards: [],
+    defects: [],
+    annualPropertyTax: toCents(Math.round(surface * rule.propertyTaxPerM2)),
+    monthlyCharges: toCents(Math.round(surface * rule.chargesPerM2)),
+  };
   freezeNested(property);
   return property;
 }
@@ -155,8 +220,11 @@ export function listingFor(
   const value = realValue(content, state, property).value;
   const askingPrice = roundPrice(content, value * factor * (1 + error));
   const condition = conditionLabel(content, property);
-  const titles = content.listingTexts.titles.filter(
-    (title) => !title.conditions || title.conditions.includes(condition),
+  const dwelling = isDwelling(property.kind);
+  const titles = content.listingTexts.titles.filter((title) =>
+    title.kinds
+      ? title.kinds.includes(property.kind)
+      : dwelling && (!title.conditions || title.conditions.includes(condition)),
   );
   const title = titles[nextInt(state.rng, 0, titles.length - 1)] ?? content.listingTexts.titles[0];
   const published = ctx.today - ageDays;
@@ -252,7 +320,10 @@ export function otherBuyerProbability(ctx: SystemContext, listing: Listing): num
   const demand = ctx.content.citiesRules.demand[listing.property.cityId]?.buyers ?? 1;
   return Math.min(
     rules.maxDailyProbability,
-    rules.baseDailyProbability * demand * Math.exp(rules.dealSensitivity * bargain),
+    rules.baseDailyProbability *
+      demand *
+      crisisFactor(ctx.state, 'buyerDemand') *
+      Math.exp(rules.dealSensitivity * bargain),
   );
 }
 

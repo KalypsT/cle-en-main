@@ -3,8 +3,8 @@ import type { DpeLabel, GameContent, ItemKind, Tier, Trade } from '../content.ts
 import { TIERS } from '../content-constants.ts';
 import type { Cents } from '../money.ts';
 import type { GameState, OwnedProperty, Property, WorkItem } from '../state.ts';
-import { believedView, dpeOf, energyNeeds, itemId, itemRule } from './dwelling.ts';
-import { lettingBlock, marketRent } from './renting.ts';
+import { believedView, dpeOf, energyNeeds, freezeItems, itemId, itemRule } from './dwelling.ts';
+import { type LettingBlock, lettingBlock, marketRent } from './renting.ts';
 import { estimateValue } from './valuation.ts';
 import {
   buildTasks,
@@ -38,11 +38,35 @@ export interface CatalogItem {
   diy: { allowed: boolean; tiers: Record<Tier, { minutes: number; materials: Cents }> } | null;
 }
 
+/**
+ * Catalogues of frozen properties (the listings, which the bots read every day): a frozen
+ * property never changes, so its catalogue only depends on the content and on whether the
+ * player may do some items himself.
+ */
+const catalogCache = new WeakMap<
+  Property,
+  { content: GameContent; diyKey: string; catalog: readonly CatalogItem[] }
+>();
+
 export function worksCatalog(
   content: GameContent,
   state: GameState,
   property: Property,
 ): CatalogItem[] {
+  if (!Object.isFrozen(property)) return buildCatalog(content, state, property);
+  const diyKey = `${state.player.employed}/${state.player.jobId}`;
+  const cached = catalogCache.get(property);
+  if (cached?.content === content && cached.diyKey === diyKey) {
+    return cached.catalog as CatalogItem[];
+  }
+  const catalog = buildCatalog(content, state, property);
+  for (const item of catalog) Object.freeze(item);
+  Object.freeze(catalog);
+  catalogCache.set(property, { content, diyKey, catalog });
+  return catalog;
+}
+
+function buildCatalog(content: GameContent, state: GameState, property: Property): CatalogItem[] {
   const believed = believedView(content, property).items;
   return property.items.map((item, i) => {
     const rule = itemRule(content, item.kind);
@@ -95,7 +119,7 @@ export interface WorksEstimate {
   rentBefore: Cents;
   rentAfter: Cents;
   /** Why a new lease would still be impossible after the works. */
-  blockAfter: 'rent.indecent' | 'rent.dpeBanned' | null;
+  blockAfter: LettingBlock | null;
 }
 
 /** Items after renovation at the chosen tiers (state 5), the others as the player believes them. */
@@ -115,6 +139,34 @@ function renovatedView(
   });
   const view = { ...property, items };
   return { ...view, dpe: dpeOf(content, energyNeeds(content, view)) };
+}
+
+/**
+ * Views of frozen properties after some works, by content and choices: frozen in turn, they
+ * keep their derived values (weighted state, value at a price level) in the caches.
+ */
+const viewCache = new WeakMap<Property, { content: GameContent; views: Map<string, Property> }>();
+
+function cachedView(
+  content: GameContent,
+  property: Property,
+  choices: readonly ItemChoice[],
+): Property {
+  if (!Object.isFrozen(property)) return renovatedView(content, property, choices);
+  let entry = viewCache.get(property);
+  if (entry?.content !== content) {
+    entry = { content, views: new Map() };
+    viewCache.set(property, entry);
+  }
+  const key = choices.map((choice) => `${choice.itemId}:${choice.tier}`).join(',');
+  let view = entry.views.get(key);
+  if (!view) {
+    view = renovatedView(content, property, choices);
+    view.items = freezeItems(view.items);
+    Object.freeze(view);
+    entry.views.set(key, view);
+  }
+  return view;
 }
 
 export function worksEstimate(
@@ -149,8 +201,8 @@ export function worksEstimate(
     (sum, byTrade) => sum + Math.ceil(Math.max(0, ...byTrade.values())),
     0,
   );
-  const before = renovatedView(content, property, []);
-  const after = renovatedView(content, property, choices);
+  const before = cachedView(content, property, []);
+  const after = cachedView(content, property, choices);
   const today = toDayNumber(state.clock.date);
   return {
     cost,

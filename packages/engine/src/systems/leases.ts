@@ -3,6 +3,7 @@ import type { StatementLine } from '../events.ts';
 import { type Cents, toCents } from '../money.ts';
 import { nextFloat, nextInt, nextRange, pickWeighted } from '../random.ts';
 import type { Lease, OwnedProperty } from '../state.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { modeOf } from './modes.ts';
 import {
@@ -100,14 +101,30 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
     }
     const lease = owned.lease;
     if (!lease) continue;
-    const recoverable = recoverableCharges(content, owned.property);
-    const due = lease.monthlyRent + recoverable;
+    const leaseRules = rules.leaseTypes[lease.leaseType];
+    const recoverable = leaseRules.recoverableCharges
+      ? recoverableCharges(content, owned.property)
+      : 0;
+    // A short-term let earns with the season, less the days the owner could not see to.
+    const shortTerm = leaseRules.shortTerm;
+    const rent = shortTerm
+      ? Math.round(
+          lease.monthlyRent *
+            (shortTerm.seasonality[state.clock.date.month - 1] ?? 1) *
+            Math.max(0, 1 - lease.missedDays / DAYS_PER_MONTH),
+        )
+      : lease.monthlyRent;
+    lease.missedDays = 0;
+    const due = rent + recoverable;
     const arrears = lease.arrears;
     const stopped =
       arrears !== null && (arrears.reminderFailed || arrears.procedureEndDay !== null);
     const pays =
       !stopped &&
-      nextFloat(state.rng) >= rules.unpaid.monthlyProbability * (1 - lease.tenant.reliability);
+      nextFloat(state.rng) >=
+        rules.unpaid.monthlyProbability *
+          crisisFactor(state, 'unpaidRents') *
+          (1 - lease.tenant.reliability);
     if (!pays) {
       lease.arrears = arrears ?? {
         amount: 0,
@@ -124,7 +141,7 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
     // The unpaid-rent insurance pays in the tenant's place.
     if (pays || lease.insured) {
       state.player.balance += due;
-      addRent(state, owned, lease.monthlyRent);
+      addRent(state, owned, rent);
       addCost(state, owned, -recoverable);
       lines.push({ kind: 'rentalIncome', propertyId, amount: due });
       collected = true;
@@ -257,6 +274,11 @@ export function runDailyLeases(ctx: SystemContext): void {
     if (ctx.today >= lease.termDay) renewOrEnd(ctx, owned, lease);
     if (!owned.lease) continue;
     if (ctx.today >= lease.anniversaryDay) anniversary(ctx, owned, lease);
+    // Short-term let managed by the owner: check-ins and cleaning every day.
+    const shortTerm = rules.leaseTypes[lease.leaseType].shortTerm;
+    if (shortTerm && !useFreeTime(ctx, owned, lease, shortTerm.selfMinutesPerDay)) {
+      lease.missedDays += 1;
+    }
     dailyIncident(ctx, owned, lease);
   }
 }
@@ -324,6 +346,8 @@ function anniversary(ctx: SystemContext, owned: OwnedProperty, lease: Lease): vo
 function dailyIncident(ctx: SystemContext, owned: OwnedProperty, lease: Lease): void {
   const { content, state } = ctx;
   const rules = content.renting;
+  // A shop's tenant sees to his own repairs; a parking space has none.
+  if (!rules.leaseTypes[lease.leaseType].incidents) return;
   const propertyId = owned.property.id;
   const incident = lease.incident;
   if (incident) {

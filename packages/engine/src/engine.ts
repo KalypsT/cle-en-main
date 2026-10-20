@@ -7,7 +7,7 @@ import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
 import { deserializeGame, type MigrationRegistry, MIGRATIONS } from './serialization.ts';
-import { type Avatar, FORMAT_VERSION, type GameState } from './state.ts';
+import { type Avatar, FORMAT_VERSION, type GameState, type TransformationKind } from './state.ts';
 import { monthlyPoint, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
@@ -55,6 +55,14 @@ import { remoteManagementFee } from './systems/cities.ts';
 import { moveHome } from './systems/cities.ts';
 import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
+import { companySheet, createCompany, setPurchaseHolder } from './systems/company.ts';
+import { expireCrises } from './systems/crises.ts';
+import {
+  runDailyTransformations,
+  startTransformation,
+  transformationEstimate,
+  transformationQuote,
+} from './systems/transformations.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
 import { netWorth } from './systems/net-worth.ts';
 import { answerCounter, makeOffer } from './systems/offers.ts';
@@ -79,6 +87,7 @@ import {
   changeManagement,
   furnitureCost,
   letBanDay,
+  leaseOptions,
   lettingBlock,
   listForRent,
   moveIntoHome,
@@ -93,6 +102,7 @@ import {
 import {
   capitalGainsTax,
   closeTaxYear,
+  companyAccountantFees,
   estimateRegimes,
   initialTaxState,
   recordStatement,
@@ -105,6 +115,7 @@ import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.
 import { ambience, findBuilding, section, streets } from './systems/world.ts';
 import {
   answerHazard,
+  delegateWorks,
   artisanDiscount,
   diagnose,
   type ItemChoice,
@@ -193,6 +204,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     startDate: { ...startDate },
     clock: createClock(startDate, startHour),
     nextId: 1,
+    company: null,
     player: {
       name: playerName(content, options.name),
       avatar: { ...(options.avatar ?? { face: 0, hair: 0, skin: 0, outfit: 0 }) },
@@ -218,6 +230,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       cyclePhase: nextFloat(rng),
       laggedRatePercent: startRate,
       cities: initialCityMarkets(content, startDate),
+      crises: [],
     },
     loans: [],
     listings: [],
@@ -273,6 +286,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   if (monthStarted) {
     runMonthlyMarketRate(ctx);
     runMonthlyPrices(ctx);
+    expireCrises(ctx);
     const lines: StatementLine[] = [];
     runMonthlyRivals(ctx);
     runMonthlyHousehold(ctx, lines);
@@ -296,6 +310,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
   runDailyWorks(ctx);
+  runDailyTransformations(ctx);
   runDailyCopro(ctx);
   runDailyPurchases(ctx);
   runDailyRivals(ctx);
@@ -479,6 +494,12 @@ export function createEngine(content: GameContent) {
       case 'works/hazard':
         refusal = answerHazard(ctx, action.propertyId, action.choice);
         break;
+      case 'works/delegate':
+        refusal = delegateWorks(ctx, action.propertyId, action.items);
+        break;
+      case 'works/transform':
+        refusal = startTransformation(ctx, action.propertyId, action.kind);
+        break;
       case 'copro/vote':
         refusal = voteResolution(ctx, action.propertyId, action.resolutionId, action.vote);
         break;
@@ -492,6 +513,12 @@ export function createEngine(content: GameContent) {
           if (!Number.isInteger(action.step) || action.step < 0) refusal = 'tutorial.invalidStep';
           else draft.tutorial.step = action.step;
         }
+        break;
+      case 'company/create':
+        refusal = createCompany(ctx);
+        break;
+      case 'purchase/setHolder':
+        refusal = setPurchaseHolder(ctx, action.purchaseId, action.holder);
         break;
       case 'job/resign':
         if (!draft.player.employed) {
@@ -636,6 +663,34 @@ export function createEngine(content: GameContent) {
       const property = findAnyProperty(state, id);
       return property ? worksCatalog(content, state, property) : null;
     },
+    /** What a transformation of an owned property would produce and cost (milestone 8). */
+    transformationQuote: (state: GameState, propertyId: string, kind: TransformationKind) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? transformationQuote(content, state, owned, kind) : null;
+    },
+    /** Leases an owned property may have (kind, rooms, SCI), in the order of content. */
+    leaseOptions: (state: GameState, propertyId: string): LeaseType[] => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? leaseOptions(content, owned) : [];
+    },
+    /** The SCI's sheet: what it holds, owes and may still borrow (« Banque et SCI »). */
+    companySheet: (state: GameState) =>
+      companySheet(content, state, netWorth(content, state), companyAccountantFees(content, state)),
+    /** Every transformation of an owned property: its quote and value after, or why not. */
+    transformationOptions: (state: GameState, propertyId: string) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      if (!owned) return [];
+      const kinds: TransformationKind[] = ['splitBuilding', 'division', 'attic', 'construction'];
+      return kinds.map((kind) => ({
+        kind,
+        estimate: transformationEstimate(content, state, owned.property, kind),
+      }));
+    },
+    /** A transformation's quote and the estimated value of what it produces, listed or owned. */
+    transformationEstimate: (state: GameState, id: string, kind: TransformationKind) => {
+      const property = findAnyProperty(state, id);
+      return property ? transformationEstimate(content, state, property, kind) : null;
+    },
     /** Reference cost, duration, DPE, value and rent after renovating these items. */
     worksEstimate: (state: GameState, id: string, choices: readonly ItemChoice[]) => {
       const property = findAnyProperty(state, id);
@@ -668,7 +723,10 @@ export function createEngine(content: GameContent) {
       }
       const purchase = state.purchases.find((candidate) => candidate.id === id);
       return purchase
-        ? simulateFinancing(content, state, purchase.property, purchase.price, input)
+        ? simulateFinancing(content, state, purchase.property, purchase.price, input, {
+            id: purchase.id,
+            holder: purchase.holder,
+          })
         : null;
     },
     /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */

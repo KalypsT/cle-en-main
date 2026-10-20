@@ -13,7 +13,7 @@ import {
 import { EPOCHS, MOMENTS, SEASONS, WEATHERS } from '../content-constants.ts';
 import { hashFloat } from '../random.ts';
 import type { AnecdoteNote, GameState, OwnedProperty, Property, PropertyKind } from '../state.ts';
-import { believedView, weightedState } from './dwelling.ts';
+import { believedView, isDwelling, weightedState } from './dwelling.ts';
 import { worksPlan } from './works-view.ts';
 
 /*
@@ -284,7 +284,9 @@ function pickEpoch(shares: Record<Epoch, number>, value: number): Epoch {
 }
 
 function floorsOf(content: GameContent, kind: PropertyKind, epoch: Epoch, value: number): number {
-  const range = content.world.floors[kind][epoch];
+  // A shop sits under flats; a parking space or a plot of land is drawn low, like a house.
+  const facade = isDwelling(kind) ? kind : kind === 'commercial' ? 'apartment' : 'house';
+  const range = content.world.floors[facade][epoch];
   return pickInt(value, range.min, range.max);
 }
 

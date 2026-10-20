@@ -35,12 +35,19 @@ Une jauge de 0 à 100 par banque.
 - **Taux d'endettement maximal : 35 %** (mensualités totales / revenus), sauf dérogation.
 - **Durée maximale : 25 ans**, 27 ans si le projet comprend de gros travaux.
 - **Revenus retenus** : salaire, plus **70 % des loyers** (comme le font les banques).
-- **Apport minimal** : les frais de notaire (environ 7,5 % dans l'ancien) plus environ 1,5 % de frais de dossier et de garantie.
+- **Apport minimal** : les frais de notaire (environ 7,5 % dans l'ancien, **jamais moins de 1 500 €** depuis le jalon 8 : émoluments minimums et formalités pèsent lourd sur un parking à 10 000 €) plus environ 1,5 % de frais de dossier et de garantie.
 - **Le taux proposé** = taux de marché du moment + marge de la banque, ajustée selon la durée, le profil (métier, ancienneté, réputation) et la confiance.
 - **Le taux de marché** évolue lentement par simulation, avec des cycles et de rares chocs (voir [07-evenements.md](07-evenements.md)). Valeur de départ : **3,65 % sur 20 ans hors assurance** (taux réels d'octobre 2026), plus **0,30 point d'assurance** dans le taux affiché.
 - Un crédit peut financer **l'achat et les travaux** ensemble.
 
 > **Jalon 3** : la demande de prêt d'un achat indique la part de travaux (`works`). Si elle fait au moins 10 % du projet, la durée peut aller jusqu'à 27 ans. À l'acte, cette part du prêt est mise de côté sur le bien (**enveloppe travaux**) et paie d'abord ses factures de travaux ; ce qui reste au bout de 24 mois rembourse le prêt par anticipation (la mensualité baisse, la durée reste). À la revente, le reste de l'enveloppe revient au joueur. Pas de prêt travaux seul pour un bien déjà possédé.
+
+> **Jalon 8, le crédit de la SCI « au différentiel »** (`packages/engine/src/systems/banking.ts`, règles dans `content/sci.json`) : un prêt pour un achat via la SCI n'est pas jugé sur le taux d'endettement du joueur. Ses mensualités et ses loyers n'entrent pas dans ce taux, qui ne compte plus que les prêts et les loyers en nom propre. La banque vérifie :
+> - les contrôles habituels de l'emprunteur (métier, confiance, compte non débiteur) ; la banque doit prêter aux sociétés (le chatbot ZéroPapier ne le fait pas) ;
+> - l'apport : une part des frais de notaire et de dossier (`feesContributionShare`) et une part du prix (`extraContributionShare`) ; **valeurs retenues après mesure : 0 et 0**, la banque finance les frais (« prêt à 110 % ») quand le bien s'autofinance ;
+> - la couverture : le loyer de marché du bien, tel que le joueur le connaît (ou, si le prêt finance des travaux, comme refait à l'état 4), multiplié par 80 %, doit couvrir la mensualité ; sinon une durée plus longue, puis un accord partiel ;
+> - le plafond : les dettes de la SCI après le prêt ne dépassent pas 6 fois le patrimoine net du joueur.
+> - Un resserrement du crédit (crise nationale, chapitre 3.7) baisse pour un temps le taux d'endettement maximal et la part du loyer comptée.
 
 ## La demande de prêt
 

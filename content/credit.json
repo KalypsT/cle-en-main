@@ -8,6 +8,7 @@
   "partialAgreementMinShare": 0.5,
   "retainedRentShare": 0.7,
   "notaryFeesShare": 0.075,
+  "notaryFeesMinimum": 1500,
   "bankFeesShare": 0.015,
   "insurancePercent": 0.3,
   "durationSpreadPercent": {

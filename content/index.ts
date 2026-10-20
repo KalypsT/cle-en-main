@@ -4,6 +4,7 @@ import chalonJson from '../data/cities/chalon.json' with { type: 'json' };
 import dijonJson from '../data/cities/dijon.json' with { type: 'json' };
 import doleJson from '../data/cities/dole.json' with { type: 'json' };
 import creditJson from './credit.json' with { type: 'json' };
+import companyJson from './sci.json' with { type: 'json' };
 import decisionsJson from './decisions.json' with { type: 'json' };
 import taxesJson from './fiscalite.json' with { type: 'json' };
 import marketJson from './marche.json' with { type: 'json' };
@@ -45,6 +46,7 @@ import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
 import { decisionRulesSchema } from './schemas/decisions.ts';
 import { banksFileSchema, creditRulesSchema, marketRateSchema } from './schemas/credit.ts';
+import { companyRulesSchema } from './schemas/company.ts';
 import { jobsFileSchema } from './schemas/jobs.ts';
 import { listingTextsSchema, marketRulesSchema } from './schemas/market.ts';
 import { rentingRulesSchema, tenantTextsSchema } from './schemas/renting.ts';
@@ -70,6 +72,7 @@ import {
 
 export type { GameContent } from './references.ts';
 export type { Bank, CreditRules, MarketRate } from './schemas/credit.ts';
+export type { CompanyRules } from './schemas/company.ts';
 export type { CityData, DpeLabel, DwellingKind, Epoch, NeighbourhoodData } from './schemas/city.ts';
 export { DPE_LABELS, EPOCHS } from './schemas/city.ts';
 export type { Job, JobsFile } from './schemas/jobs.ts';
@@ -128,7 +131,13 @@ export type {
   EventTarget,
   RhythmRules,
 } from './schemas/events.ts';
-export { ANECDOTE_SPEAKERS, EVENT_FAMILIES, EVENT_TARGETS } from './schemas/events.ts';
+export {
+  ANECDOTE_SPEAKERS,
+  CRISIS_MODIFIERS,
+  EVENT_FAMILIES,
+  EVENT_TARGETS,
+} from './schemas/events.ts';
+export type { CrisisModifier } from './schemas/events.ts';
 export type { CalendarRules, Mode, ModesFile } from './schemas/modes.ts';
 export type {
   Achievement,
@@ -157,6 +166,7 @@ export const gameContent: GameContent = {
   unemployedFreeTimeMinutes: jobsFile.unemployedFreeTimeMinutes,
   credit: creditRulesSchema.parse(creditJson),
   banks: banksFileSchema.parse(banksJson).banks,
+  company: companyRulesSchema.parse(companyJson),
   marketRate: marketRateSchema.parse(marketRateJson),
   market: marketRulesSchema.parse(marketJson),
   listingTexts: listingTextsSchema.parse(listingTextsJson),

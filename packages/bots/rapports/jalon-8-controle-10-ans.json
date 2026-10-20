@@ -1,0 +1,2199 @@
+{
+  "games": 100,
+  "years": 10,
+  "summaries": [
+    {
+      "botId": "prudent",
+      "games": 100,
+      "bankruptShare": 0,
+      "forcedSaleShare": 0,
+      "boughtShare": 0.84,
+      "firstPurchaseMonths": 35.50684931506849,
+      "firstPurchaseInWindowShare": 0.05,
+      "bailleurYears": null,
+      "bailleurShare": 0,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          16425.4,
+          17967.5,
+          19667.6,
+          21071.5,
+          22719.4,
+          24716.5,
+          26433.7,
+          28050.8,
+          30393.5,
+          32099.5
+        ],
+        "p50": [
+          16892,
+          18667,
+          22058,
+          27788.5,
+          36237.5,
+          43907.5,
+          50383,
+          57396.5,
+          62284.5,
+          70986.5
+        ],
+        "p90": [
+          18812.100000000006,
+          33422.6,
+          40660.700000000004,
+          52008.700000000004,
+          60108.70000000004,
+          70894.8,
+          80356.40000000001,
+          88428.90000000004,
+          100377.40000000001,
+          109137.10000000002
+        ]
+      },
+      "maxFinalNetWorth": 150668,
+      "medianProperties": 1,
+      "medianMonthlyRent": 750.5,
+      "medianDebtRatio": 0.19595621351411022,
+      "medianVisits": 2,
+      "medianOffers": 1,
+      "meanLostToRivals": 0.38,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.2469999999999994,
+        "martinot": 15.513000000000002
+      },
+      "byJob": {
+        "civilServant": 65658,
+        "teacher": 63101,
+        "nurse": 70879,
+        "developer": 106937,
+        "electrician": 52186,
+        "salesperson": 84165,
+        "realEstateAgent": 73735.5
+      },
+      "renting": {
+        "occupancy": 0.9749380737286901,
+        "rentMissed": 0.258778959638642,
+        "incidents": 0.7518577881392977,
+        "departures": 0.35144980329302056,
+        "evictionShare": 0.05,
+        "rentTaxPerYear": 577.189,
+        "propertyTaxPerYear": 495.227,
+        "accountantPerYear": 143.7,
+        "capitalGainsTax": 59.48,
+        "realRegimeShare": 0.9357277882797732,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 33.05298392314967,
+        "intervalByJob": {
+          "civilServant": 34.10994477559607,
+          "teacher": 31.791935099021714,
+          "nurse": 34.798181736954966,
+          "developer": 34.630195891065455,
+          "electrician": 32.884701159678855,
+          "salesperson": 31.256333582523464,
+          "realEstateAgent": 32.2928465626906
+        },
+        "decisionsPerYear": 80.364,
+        "catalogPerYear": 18.556,
+        "interestingPerYear": 64.633,
+        "challengesPerYear": 1.326,
+        "challengesWonPerYear": 0.043,
+        "anecdotesPerYear": 109.23,
+        "calmShare": 0.9949808219178082,
+        "realHoursPerYear": 0.7378527777777778,
+        "medianAchievements": 14,
+        "medianReputation": 82.20000000000002,
+        "titles": {
+          "firstInvestor": {
+            "share": 0.84,
+            "years": 2.958904109589041,
+            "within10": 0.84
+          },
+          "landlord": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "renovator": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 31,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 0.55,
+        "cost": 7315.48,
+        "hazardsPerProject": 0.41818181818181815,
+        "dpeClassesGained": 0.82,
+        "sales": 0.01,
+        "passoireShare": 0.011235955056179775
+      },
+      "depth": {
+        "companyShare": 0,
+        "companyYears": null,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "levier",
+      "games": 100,
+      "bankruptShare": 0.77,
+      "forcedSaleShare": 0.99,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.0520547945205478,
+      "firstPurchaseInWindowShare": 1,
+      "bailleurYears": null,
+      "bailleurShare": 0.18,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          7371.4000000000015,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000
+        ],
+        "p50": [
+          20340.5,
+          8697,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000
+        ],
+        "p90": [
+          42878.100000000064,
+          39925.700000000004,
+          38275.90000000001,
+          35384.50000000001,
+          37434.900000000016,
+          41530.700000000004,
+          36229.6000000001,
+          25223.500000000004,
+          30855.000000000004,
+          29853.700000000008
+        ]
+      },
+      "maxFinalNetWorth": 136855,
+      "medianProperties": 0,
+      "medianMonthlyRent": 0,
+      "medianDebtRatio": 0,
+      "medianVisits": 3,
+      "medianOffers": 2,
+      "meanLostToRivals": 0.34,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.782969723558131,
+        "martinot": 12.046591544733435
+      },
+      "byJob": {
+        "civilServant": 5000,
+        "teacher": 5000,
+        "nurse": 5000,
+        "developer": 5000,
+        "electrician": 5000,
+        "salesperson": 5000,
+        "realEstateAgent": 5000
+      },
+      "renting": {
+        "occupancy": 0.9502888620180034,
+        "rentMissed": 0.3079403466344216,
+        "incidents": 0.6416767432486901,
+        "departures": 0.6594115276098348,
+        "evictionShare": 0.02,
+        "rentTaxPerYear": 12.23184718262137,
+        "propertyTaxPerYear": 642.4426551252382,
+        "accountantPerYear": 435.3016199767296,
+        "capitalGainsTax": 4483.33,
+        "realRegimeShare": 0.7627388535031847,
+        "furnishedShare": 0.785031847133758
+      },
+      "rhythm": {
+        "interval": 63.71949409669547,
+        "intervalByJob": {
+          "civilServant": 67.43177136972194,
+          "teacher": 60.5732044198895,
+          "nurse": 72.15563774490204,
+          "developer": 60.04853273137697,
+          "electrician": 59.15031285551763,
+          "salesperson": 59.88148863148863,
+          "realEstateAgent": 65.34121320249777
+        },
+        "decisionsPerYear": 35.377152830164555,
+        "catalogPerYear": 31.30298167776911,
+        "interestingPerYear": 5.068212911227321,
+        "challengesPerYear": 1.7757412640165704,
+        "challengesWonPerYear": 0.20534195957090434,
+        "anecdotesPerYear": 109.93028474255539,
+        "calmShare": 0.990269910882101,
+        "realHoursPerYear": 0.6261706335887678,
+        "medianAchievements": 13,
+        "medianReputation": 11.5,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.08767123287671233,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.18,
+            "years": 4.372602739726028,
+            "within10": 0.18
+          },
+          "renovator": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 0,
+        "medianRenown": {
+          "dole": 0,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 1.24,
+        "cost": 21308.89,
+        "hazardsPerProject": 1.0887096774193548,
+        "dpeClassesGained": 1.73,
+        "sales": 0,
+        "passoireShare": 0
+      },
+      "depth": {
+        "companyShare": 0,
+        "companyYears": null,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "naif",
+      "games": 100,
+      "bankruptShare": 1,
+      "forcedSaleShare": 0.99,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.0191780821917809,
+      "firstPurchaseInWindowShare": 1,
+      "bailleurYears": null,
+      "bailleurShare": 0.23,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          -10196.6,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000
+        ],
+        "p50": [
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000
+        ],
+        "p90": [
+          14801.900000000007,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          5000
+        ]
+      },
+      "maxFinalNetWorth": 5000,
+      "medianProperties": 0,
+      "medianMonthlyRent": 0,
+      "medianDebtRatio": 0,
+      "medianVisits": 0,
+      "medianOffers": 2,
+      "meanLostToRivals": 0,
+      "meanRivalOffers": 0.04,
+      "rivalPurchasesPerYear": {
+        "delaporte": 4.328035810547124,
+        "martinot": 9.063249735184309
+      },
+      "byJob": {
+        "civilServant": 5000,
+        "teacher": 5000,
+        "nurse": 5000,
+        "developer": 5000,
+        "electrician": 5000,
+        "salesperson": 5000,
+        "realEstateAgent": 5000
+      },
+      "renting": {
+        "occupancy": 0.8427590715920236,
+        "rentMissed": 0.08630271330500164,
+        "incidents": 0.5217391304347826,
+        "departures": 0.2589081399150049,
+        "evictionShare": 0,
+        "rentTaxPerYear": 1252.7740012656416,
+        "propertyTaxPerYear": 859.3113479086286,
+        "accountantPerYear": 16.541123155122783,
+        "capitalGainsTax": 82.47,
+        "realRegimeShare": 0.08717948717948718,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 51.738562904027845,
+        "intervalByJob": {
+          "civilServant": 50.228509249183894,
+          "teacher": 50.16353811149033,
+          "nurse": 52.639377934272304,
+          "developer": 57.348428143712574,
+          "electrician": 50.601773648648646,
+          "salesperson": 49.53470515970516,
+          "realEstateAgent": 53.68723849372385
+        },
+        "decisionsPerYear": 44.951619817502596,
+        "catalogPerYear": 32.873619531712485,
+        "interestingPerYear": 4.835670688141751,
+        "challengesPerYear": 2.108620654459346,
+        "challengesWonPerYear": 0.31294016779962025,
+        "anecdotesPerYear": 109.3651376895911,
+        "calmShare": 0.9957335619654193,
+        "realHoursPerYear": 0.6460367248793897,
+        "medianAchievements": 6,
+        "medianReputation": 0,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.08493150684931507,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.23,
+            "years": 0.4657534246575342,
+            "within10": 0.23
+          },
+          "renovator": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 0,
+        "medianRenown": {
+          "dole": 0,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 0,
+        "cost": 0,
+        "hazardsPerProject": 0,
+        "dpeClassesGained": 0,
+        "sales": 0.35,
+        "passoireShare": 0
+      },
+      "depth": {
+        "companyShare": 0,
+        "companyYears": null,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "chasseur",
+      "games": 100,
+      "bankruptShare": 0.01,
+      "forcedSaleShare": 0.37,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.3972602739726026,
+      "firstPurchaseInWindowShare": 0.96,
+      "bailleurYears": 9.865753424657534,
+      "bailleurShare": 0.53,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          22872.1,
+          25945.5,
+          28605.2,
+          29110.4,
+          33335.8,
+          36806.3,
+          35613,
+          38464,
+          44191.6,
+          42182.2
+        ],
+        "p50": [
+          28888,
+          37643.5,
+          44406.5,
+          52857.5,
+          57774,
+          62129.5,
+          67153.5,
+          74539,
+          78563,
+          88112
+        ],
+        "p90": [
+          39750,
+          52555.4,
+          68001.9,
+          78163.00000000001,
+          89462.50000000003,
+          100317.20000000003,
+          106805.1,
+          119057.8,
+          127875.30000000005,
+          143100.1
+        ]
+      },
+      "maxFinalNetWorth": 259570,
+      "medianProperties": 2,
+      "medianMonthlyRent": 1017.5,
+      "medianDebtRatio": 0.2497102534631011,
+      "medianVisits": 21,
+      "medianOffers": 6.5,
+      "meanLostToRivals": 3.45,
+      "meanRivalOffers": 0.06,
+      "rivalPurchasesPerYear": {
+        "martinot": 15.689980903304031,
+        "delaporte": 3.1601918763261585
+      },
+      "byJob": {
+        "civilServant": 80264,
+        "teacher": 93713,
+        "nurse": 80248,
+        "developer": 116609.5,
+        "electrician": 67756.5,
+        "salesperson": 110875,
+        "realEstateAgent": 89238.5
+      },
+      "renting": {
+        "occupancy": 0.976707530647986,
+        "rentMissed": 0.18283712784588443,
+        "incidents": 0.7245183887915937,
+        "departures": 0.3099824868651489,
+        "evictionShare": 0.07,
+        "rentTaxPerYear": 433.6159841381712,
+        "propertyTaxPerYear": 1040.8208990015055,
+        "accountantPerYear": 521.9018837292849,
+        "capitalGainsTax": 5084.39,
+        "realRegimeShare": 0.9697612732095491,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 47.38221869516355,
+        "intervalByJob": {
+          "civilServant": 50.671773612112474,
+          "teacher": 46.10703245749614,
+          "nurse": 53.42017317332523,
+          "developer": 44.52827087442472,
+          "electrician": 52.61354303547963,
+          "salesperson": 43.126573910853686,
+          "realEstateAgent": 43.66444501409895
+        },
+        "decisionsPerYear": 50.76782056169083,
+        "catalogPerYear": 32.49424789317947,
+        "interestingPerYear": 18.771051065545223,
+        "challengesPerYear": 1.6896248172900514,
+        "challengesWonPerYear": 0.15014438542269415,
+        "anecdotesPerYear": 109.10091622354648,
+        "calmShare": 0.9899986013947659,
+        "realHoursPerYear": 0.6681922157030155,
+        "medianAchievements": 19,
+        "medianReputation": 91,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.11643835616438356,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.53,
+            "years": 6.4301369863013695,
+            "within10": 0.53
+          },
+          "renovator": {
+            "share": 0.03,
+            "years": 8.53972602739726,
+            "within10": 0.03
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 92,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 1.59,
+        "cost": 15577.57,
+        "hazardsPerProject": 0.3333333333333333,
+        "dpeClassesGained": 3.02,
+        "sales": 0.89,
+        "passoireShare": 0
+      },
+      "depth": {
+        "companyShare": 0.47,
+        "companyYears": 5.956164383561644,
+        "companyProperties": 1,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "marchand",
+      "games": 100,
+      "bankruptShare": 0.03,
+      "forcedSaleShare": 0.01,
+      "boughtShare": 0.85,
+      "firstPurchaseMonths": 43.92328767123288,
+      "firstPurchaseInWindowShare": 0.07,
+      "bailleurYears": null,
+      "bailleurShare": 0,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          15756.7,
+          17360,
+          18340.6,
+          20090.1,
+          21506.5,
+          22628.7,
+          23223.7,
+          24482.1,
+          25229,
+          26182.300000000003
+        ],
+        "p50": [
+          16751,
+          18372,
+          20246.5,
+          22172.5,
+          24597,
+          27143.5,
+          30037,
+          32881,
+          35250,
+          37157.5
+        ],
+        "p90": [
+          19059.5,
+          23564.800000000007,
+          37366.00000000003,
+          33990.700000000004,
+          41028.60000000003,
+          47030.200000000004,
+          50262.200000000004,
+          53692.500000000015,
+          59850.200000000004,
+          65163.200000000026
+        ]
+      },
+      "maxFinalNetWorth": 142073,
+      "medianProperties": 0,
+      "medianMonthlyRent": 0,
+      "medianDebtRatio": 0,
+      "medianVisits": 41,
+      "medianOffers": 6.5,
+      "meanLostToRivals": 8.55,
+      "meanRivalOffers": 0.03,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.265609340579883,
+        "martinot": 15.29679057116866
+      },
+      "byJob": {
+        "civilServant": 29919,
+        "teacher": 35974,
+        "nurse": 34379.5,
+        "developer": 62788.5,
+        "electrician": 30969,
+        "salesperson": 46866.5,
+        "realEstateAgent": 40064
+      },
+      "renting": {
+        "occupancy": 0,
+        "rentMissed": 0,
+        "incidents": 0,
+        "departures": 0,
+        "evictionShare": 0,
+        "rentTaxPerYear": 0,
+        "propertyTaxPerYear": 80.11458095232786,
+        "accountantPerYear": 0,
+        "capitalGainsTax": 13398.87,
+        "realRegimeShare": 0,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 28.551783816686786,
+        "intervalByJob": {
+          "civilServant": 29.50748909701866,
+          "teacher": 28.38538138463623,
+          "nurse": 30.63736820762368,
+          "developer": 26.51540210874509,
+          "electrician": 29.469554721030043,
+          "salesperson": 27.42914595415631,
+          "realEstateAgent": 28.349601593625497
+        },
+        "decisionsPerYear": 98.61782283646743,
+        "catalogPerYear": 13.730410712991509,
+        "interestingPerYear": 86.93654492643738,
+        "challengesPerYear": 1.0276187343550518,
+        "challengesWonPerYear": 0.10683165060126776,
+        "anecdotesPerYear": 109.28979600938835,
+        "calmShare": 0.9948849033567299,
+        "realHoursPerYear": 0.7821429883608708,
+        "medianAchievements": 15,
+        "medianReputation": 81.60000000000002,
+        "titles": {
+          "firstInvestor": {
+            "share": 0.85,
+            "years": 3.66027397260274,
+            "within10": 0.85
+          },
+          "landlord": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "renovator": {
+            "share": 0.33,
+            "years": 7.306849315068493,
+            "within10": 0.33
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0.08,
+            "years": 8.464383561643835,
+            "within10": 0.08
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 0,
+        "medianRenown": {
+          "dole": 24.5,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 2.89,
+        "cost": 79524.37,
+        "hazardsPerProject": 1.820069204152249,
+        "dpeClassesGained": 5.31,
+        "sales": 1.98,
+        "passoireShare": 0.4166666666666667
+      },
+      "depth": {
+        "companyShare": 0,
+        "companyYears": null,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "renovateur",
+      "games": 100,
+      "bankruptShare": 0.05,
+      "forcedSaleShare": 0.05,
+      "boughtShare": 0.75,
+      "firstPurchaseMonths": 40.07671232876712,
+      "firstPurchaseInWindowShare": 0.01,
+      "bailleurYears": null,
+      "bailleurShare": 0.01,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          16105.9,
+          12029.1,
+          10673.4,
+          8448,
+          7922.5,
+          9865,
+          8543.9,
+          6835.7,
+          8076.2,
+          9907.7
+        ],
+        "p50": [
+          16800,
+          18319.5,
+          19850.5,
+          21723,
+          23044,
+          24513.5,
+          24523.5,
+          24240.5,
+          26795.5,
+          27804
+        ],
+        "p90": [
+          18042.7,
+          20464.5,
+          23135.6,
+          25959.600000000002,
+          28565.200000000004,
+          31172.5,
+          33343.600000000006,
+          36633,
+          40509.90000000001,
+          42479.200000000004
+        ]
+      },
+      "maxFinalNetWorth": 92393,
+      "medianProperties": 1,
+      "medianMonthlyRent": 150,
+      "medianDebtRatio": 0.07298749692802176,
+      "medianVisits": 9,
+      "medianOffers": 1,
+      "meanLostToRivals": 0.9,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.2395322753838736,
+        "martinot": 15.447557534597468
+      },
+      "byJob": {
+        "civilServant": 16679,
+        "teacher": 30885,
+        "nurse": 21974,
+        "developer": 33468.5,
+        "electrician": 24318.5,
+        "salesperson": 38569.5,
+        "realEstateAgent": 31938.5
+      },
+      "renting": {
+        "occupancy": 0.9668101901686401,
+        "rentMissed": 0.11194833153928956,
+        "incidents": 0.2884822389666308,
+        "departures": 0.32292787944025836,
+        "evictionShare": 0,
+        "rentTaxPerYear": -125.15488414331796,
+        "propertyTaxPerYear": 160.8487846051847,
+        "accountantPerYear": 109.14067157318831,
+        "capitalGainsTax": 94.82,
+        "realRegimeShare": 0.873015873015873,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 35.05168786491598,
+        "intervalByJob": {
+          "civilServant": 39.2496459309293,
+          "teacher": 33.195784170183444,
+          "nurse": 40.517270194986075,
+          "developer": 36.69450765411668,
+          "electrician": 35.234107160348714,
+          "salesperson": 31.318992150968604,
+          "realEstateAgent": 31.606686354019747
+        },
+        "decisionsPerYear": 74.18596682805074,
+        "catalogPerYear": 18.151474463616154,
+        "interestingPerYear": 59.189546434600445,
+        "challengesPerYear": 1.2119962783234626,
+        "challengesWonPerYear": 0.0965936631214169,
+        "anecdotesPerYear": 109.5168784716612,
+        "calmShare": 0.994021917777691,
+        "realHoursPerYear": 0.7223175981149571,
+        "medianAchievements": 15,
+        "medianReputation": 85.39999999999999,
+        "titles": {
+          "firstInvestor": {
+            "share": 0.75,
+            "years": 3.33972602739726,
+            "within10": 0.75
+          },
+          "landlord": {
+            "share": 0.01,
+            "years": 7.816438356164384,
+            "within10": 0.01
+          },
+          "renovator": {
+            "share": 0.01,
+            "years": 4.843835616438356,
+            "within10": 0.01
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 43.5,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 4.09,
+        "cost": 14395.02,
+        "hazardsPerProject": 0.034229828850855744,
+        "dpeClassesGained": 0.66,
+        "sales": 0.14,
+        "passoireShare": 0
+      },
+      "depth": {
+        "companyShare": 0,
+        "companyYears": null,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "chasseurDijon",
+      "games": 100,
+      "bankruptShare": 0.02,
+      "forcedSaleShare": 0.47,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.3972602739726026,
+      "firstPurchaseInWindowShare": 0.96,
+      "bailleurYears": 9.556164383561644,
+      "bailleurShare": 0.54,
+      "seasonedYears": null,
+      "seasonedShare": 0.05,
+      "netWorth": {
+        "p10": [
+          22907.2,
+          26188.1,
+          28112.9,
+          28317.1,
+          23412.100000000002,
+          32283.600000000002,
+          33037.5,
+          29666.3,
+          31455,
+          31660.100000000002
+        ],
+        "p50": [
+          29785.5,
+          38458.5,
+          44526,
+          51568.5,
+          59053,
+          63802,
+          69094.5,
+          75848,
+          77734.5,
+          86504.5
+        ],
+        "p90": [
+          40171.30000000003,
+          52940.30000000002,
+          66118.70000000001,
+          78163.00000000001,
+          88453.80000000002,
+          95796.6,
+          105480.70000000001,
+          117974.20000000001,
+          129127.70000000004,
+          141805.50000000006
+        ]
+      },
+      "maxFinalNetWorth": 239643,
+      "medianProperties": 2,
+      "medianMonthlyRent": 1042,
+      "medianDebtRatio": 0.24477262902395472,
+      "medianVisits": 21,
+      "medianOffers": 7,
+      "meanLostToRivals": 2.99,
+      "meanRivalOffers": 0.1,
+      "rivalPurchasesPerYear": {
+        "martinot": 15.673038799107449,
+        "delaporte": 3.1676240755692735
+      },
+      "byJob": {
+        "civilServant": 42027,
+        "teacher": 83397,
+        "nurse": 73750.5,
+        "developer": 109821,
+        "electrician": 70381,
+        "salesperson": 109185,
+        "realEstateAgent": 82584
+      },
+      "renting": {
+        "occupancy": 0.9743215389900378,
+        "rentMissed": 0.17365166609412572,
+        "incidents": 0.7523187907935417,
+        "departures": 0.3230848505668155,
+        "evictionShare": 0.06,
+        "rentTaxPerYear": 404.5299192659127,
+        "propertyTaxPerYear": 1055.281987488156,
+        "accountantPerYear": 495.77739113088677,
+        "capitalGainsTax": 5893.47,
+        "realRegimeShare": 0.9595015576323987,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 42.62249964968822,
+        "intervalByJob": {
+          "civilServant": 46.45908243441204,
+          "teacher": 38.98054301018801,
+          "nurse": 53.44211447708936,
+          "developer": 37.64388681260011,
+          "electrician": 50.48392108124903,
+          "salesperson": 37.11218583793931,
+          "realEstateAgent": 40.604634658109106
+        },
+        "decisionsPerYear": 57.73451396084646,
+        "catalogPerYear": 32.72620228404879,
+        "interestingPerYear": 25.287417783663678,
+        "challengesPerYear": 1.6827266732790673,
+        "challengesWonPerYear": 0.14764308551607203,
+        "anecdotesPerYear": 109.73016141276342,
+        "calmShare": 0.9894386293490849,
+        "realHoursPerYear": 0.6835525836308606,
+        "medianAchievements": 19,
+        "medianReputation": 90.40000000000003,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.11643835616438356,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.54,
+            "years": 5.586301369863014,
+            "within10": 0.54
+          },
+          "renovator": {
+            "share": 0.07,
+            "years": 8.838356164383562,
+            "within10": 0.07
+          },
+          "seasonedInvestor": {
+            "share": 0.05,
+            "years": 9.169863013698631,
+            "within10": 0.05
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0.43,
+        "firstRemoteMonths": 65.58904109589041,
+        "remotePurchases": 0.56,
+        "tripsPerYear": 0.26735058721183136,
+        "tripHoursPerYear": 0.4010258808177467,
+        "tripCostPerYear": 3.2082070465419736,
+        "remoteFeesPerYear": 0.805,
+        "twoCitiesShare": 0.3,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 82.5,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0.6988973972505739,
+        "buyersNetWorth": 78937
+      },
+      "works": {
+        "projects": 1.82,
+        "cost": 19062.62,
+        "hazardsPerProject": 0.32967032967032966,
+        "dpeClassesGained": 3.7,
+        "sales": 0.96,
+        "passoireShare": 0.0038022813688212928
+      },
+      "depth": {
+        "companyShare": 0.44,
+        "companyYears": 5.617808219178082,
+        "companyProperties": 1,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "chasseurBesancon",
+      "games": 100,
+      "bankruptShare": 0.02,
+      "forcedSaleShare": 0.44,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.3972602739726026,
+      "firstPurchaseInWindowShare": 0.96,
+      "bailleurYears": 9.104109589041094,
+      "bailleurShare": 0.54,
+      "seasonedYears": null,
+      "seasonedShare": 0.07,
+      "netWorth": {
+        "p10": [
+          22957.2,
+          25491.9,
+          27564.9,
+          19172.7,
+          21151.3,
+          21270,
+          23146.1,
+          22234.7,
+          23944.2,
+          26202.2
+        ],
+        "p50": [
+          28888,
+          38028.5,
+          44377.5,
+          50208,
+          53812.5,
+          56608.5,
+          61588.5,
+          65067.5,
+          71654.5,
+          78545.5
+        ],
+        "p90": [
+          38891.200000000004,
+          52056.50000000001,
+          66504.70000000001,
+          77019.10000000002,
+          84895.30000000003,
+          98985.20000000001,
+          114323.5,
+          126198.40000000004,
+          132675.70000000004,
+          138953.80000000013
+        ]
+      },
+      "maxFinalNetWorth": 258660,
+      "medianProperties": 2,
+      "medianMonthlyRent": 961,
+      "medianDebtRatio": 0.23853960173940725,
+      "medianVisits": 24.5,
+      "medianOffers": 7,
+      "meanLostToRivals": 2.99,
+      "meanRivalOffers": 0.02,
+      "rivalPurchasesPerYear": {
+        "martinot": 15.495012680625187,
+        "delaporte": 3.176892400186452
+      },
+      "byJob": {
+        "civilServant": 52844,
+        "teacher": 82025,
+        "nurse": 70394.5,
+        "developer": 121053.5,
+        "electrician": 35492,
+        "salesperson": 102636,
+        "realEstateAgent": 81487
+      },
+      "renting": {
+        "occupancy": 0.9767411642411642,
+        "rentMissed": 0.21985446985446985,
+        "incidents": 0.7188149688149689,
+        "departures": 0.3264033264033264,
+        "evictionShare": 0.07,
+        "rentTaxPerYear": 372.4068707068423,
+        "propertyTaxPerYear": 1021.7354904712926,
+        "accountantPerYear": 464.46182312534984,
+        "capitalGainsTax": 5136.05,
+        "realRegimeShare": 0.9716932578486875,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 43.88729001641977,
+        "intervalByJob": {
+          "civilServant": 45.337067610062896,
+          "teacher": 44.526976859299594,
+          "nurse": 51.71795059201871,
+          "developer": 36.94848736874935,
+          "electrician": 48.49224720752498,
+          "salesperson": 38.732334106216186,
+          "realEstateAgent": 45.55198321375389
+        },
+        "decisionsPerYear": 55.78151670660515,
+        "catalogPerYear": 32.43059940823018,
+        "interestingPerYear": 23.711246108410243,
+        "challengesPerYear": 1.6879089788523636,
+        "challengesWonPerYear": 0.15298876850659468,
+        "anecdotesPerYear": 109.34469626986468,
+        "calmShare": 0.9890084132792486,
+        "realHoursPerYear": 0.6800276670162624,
+        "medianAchievements": 19,
+        "medianReputation": 90.15,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.11643835616438356,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.54,
+            "years": 5.810958904109589,
+            "within10": 0.54
+          },
+          "renovator": {
+            "share": 0.05,
+            "years": 7.394520547945206,
+            "within10": 0.05
+          },
+          "seasonedInvestor": {
+            "share": 0.07,
+            "years": 7.501369863013698,
+            "within10": 0.07
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0.64,
+        "firstRemoteMonths": 65.2931506849315,
+        "remotePurchases": 0.97,
+        "tripsPerYear": 0.6432443279649166,
+        "tripHoursPerYear": 1.0720738799415277,
+        "tripCostPerYear": 7.718931935578999,
+        "remoteFeesPerYear": 0.91,
+        "twoCitiesShare": 0.46,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 76.5,
+          "dijon": 0,
+          "besancon": 9.5,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 1.3027196040753037,
+        "buyersNetWorth": 62084.5
+      },
+      "works": {
+        "projects": 1.64,
+        "cost": 16618.91,
+        "hazardsPerProject": 0.3780487804878049,
+        "dpeClassesGained": 3.12,
+        "sales": 1.08,
+        "passoireShare": 0.011811023622047244
+      },
+      "depth": {
+        "companyShare": 0.43,
+        "companyYears": 7.189041095890411,
+        "companyProperties": 1,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "chasseurChalon",
+      "games": 100,
+      "bankruptShare": 0.08,
+      "forcedSaleShare": 0.67,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.3972602739726026,
+      "firstPurchaseInWindowShare": 0.96,
+      "bailleurYears": 6.2904109589041095,
+      "bailleurShare": 0.69,
+      "seasonedYears": null,
+      "seasonedShare": 0.03,
+      "netWorth": {
+        "p10": [
+          20917.5,
+          24990.6,
+          23435.800000000003,
+          21273.100000000002,
+          18323.4,
+          17897.2,
+          17088.3,
+          13428.6,
+          9810.8,
+          6894.6
+        ],
+        "p50": [
+          30203,
+          37213,
+          43796.5,
+          50379,
+          53074.5,
+          54312,
+          58969.5,
+          60724.5,
+          62348,
+          63340.5
+        ],
+        "p90": [
+          39655.4,
+          48987.90000000001,
+          59287.7,
+          72524.90000000001,
+          77917.3,
+          86959.1,
+          95741.30000000002,
+          106815.70000000004,
+          117497.60000000002,
+          136075.70000000004
+        ]
+      },
+      "maxFinalNetWorth": 164509,
+      "medianProperties": 2.5,
+      "medianMonthlyRent": 1055,
+      "medianDebtRatio": 0.22633534234763042,
+      "medianVisits": 40.5,
+      "medianOffers": 9,
+      "meanLostToRivals": 2.36,
+      "meanRivalOffers": 0.09,
+      "rivalPurchasesPerYear": {
+        "martinot": 15.353486551476474,
+        "delaporte": 3.229920823439287
+      },
+      "byJob": {
+        "civilServant": 66936,
+        "teacher": 75944,
+        "nurse": 36808,
+        "developer": 95378.5,
+        "electrician": 65197.5,
+        "salesperson": 61704,
+        "realEstateAgent": 61904
+      },
+      "renting": {
+        "occupancy": 0.9761234283901162,
+        "rentMissed": 0.2270257406893269,
+        "incidents": 0.7324792765636774,
+        "departures": 0.30984016182128266,
+        "evictionShare": 0.08,
+        "rentTaxPerYear": 328.13037241160333,
+        "propertyTaxPerYear": 1132.4325542627748,
+        "accountantPerYear": 537.21210110907,
+        "capitalGainsTax": 5836.39,
+        "realRegimeShare": 0.9549218031278749,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 40.73615947366659,
+        "intervalByJob": {
+          "civilServant": 42.27222031571723,
+          "teacher": 42.62012490440989,
+          "nurse": 45.762444653159804,
+          "developer": 37.919137894513874,
+          "electrician": 43.16862694962925,
+          "salesperson": 37.66567702258509,
+          "realEstateAgent": 37.49749944432096
+        },
+        "decisionsPerYear": 61.812246263409776,
+        "catalogPerYear": 33.6752256696378,
+        "interestingPerYear": 28.38019663876982,
+        "challengesPerYear": 1.7167193985167044,
+        "challengesWonPerYear": 0.18729729423238306,
+        "anecdotesPerYear": 109.67136150234744,
+        "calmShare": 0.9856064729763445,
+        "realHoursPerYear": 0.699442644781059,
+        "medianAchievements": 20,
+        "medianReputation": 90.9,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.11643835616438356,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.69,
+            "years": 3.4684931506849317,
+            "within10": 0.69
+          },
+          "renovator": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "seasonedInvestor": {
+            "share": 0.03,
+            "years": 8.753424657534246,
+            "within10": 0.03
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0.93,
+        "firstRemoteMonths": 11.473972602739726,
+        "remotePurchases": 2.29,
+        "tripsPerYear": 2.3613343061240615,
+        "tripHoursPerYear": 4.722668612248123,
+        "tripCostPerYear": 35.42001459186092,
+        "remoteFeesPerYear": 1.2696446384039901,
+        "twoCitiesShare": 0.61,
+        "medianCities": 2,
+        "medianRenown": {
+          "dole": 58.5,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 42.5
+        },
+        "buyersTripHoursPerYear": 4.894298086914728,
+        "buyersNetWorth": 64684
+      },
+      "works": {
+        "projects": 1.71,
+        "cost": 15658.55,
+        "hazardsPerProject": 0.38011695906432746,
+        "dpeClassesGained": 3.34,
+        "sales": 1.29,
+        "passoireShare": 0.0038910505836575876
+      },
+      "depth": {
+        "companyShare": 0.5,
+        "companyYears": 6.4,
+        "companyProperties": 1,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "promoteur",
+      "games": 100,
+      "bankruptShare": 0.05,
+      "forcedSaleShare": 0.5,
+      "boughtShare": 0.85,
+      "firstPurchaseMonths": 33.961643835616435,
+      "firstPurchaseInWindowShare": 0.07,
+      "bailleurYears": 8.835616438356166,
+      "bailleurShare": 0.55,
+      "seasonedYears": null,
+      "seasonedShare": 0.15,
+      "netWorth": {
+        "p10": [
+          16056,
+          17950,
+          19327.6,
+          18453.2,
+          18933.6,
+          19497.300000000003,
+          16659.300000000003,
+          17219.3,
+          13555.1,
+          11808.1
+        ],
+        "p50": [
+          16844,
+          18657.5,
+          21775.5,
+          24586.5,
+          26870.5,
+          29860,
+          32694.5,
+          36458,
+          45884.5,
+          44767.5
+        ],
+        "p90": [
+          18628.5,
+          34191.80000000001,
+          39123.100000000006,
+          50445.800000000025,
+          64349.50000000005,
+          85858.70000000003,
+          95634.90000000004,
+          111829.50000000006,
+          138279.70000000024,
+          165477.2000000001
+        ]
+      },
+      "maxFinalNetWorth": 690341,
+      "medianProperties": 3,
+      "medianMonthlyRent": 1372.5,
+      "medianDebtRatio": 0.1940621515016644,
+      "medianVisits": 3,
+      "medianOffers": 3,
+      "meanLostToRivals": 0.04,
+      "meanRivalOffers": 0.06,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.281938217578699,
+        "martinot": 15.32908171154542,
+        "horizon": 0.036000000000000004
+      },
+      "byJob": {
+        "civilServant": 30097,
+        "teacher": 32988,
+        "nurse": 35925.5,
+        "developer": 90602,
+        "electrician": 31292,
+        "salesperson": 67192.5,
+        "realEstateAgent": 81126.5
+      },
+      "renting": {
+        "occupancy": 0.9349850443027259,
+        "rentMissed": 0.13273886788193465,
+        "incidents": 0.7239686212540212,
+        "departures": 0.2634460183983295,
+        "evictionShare": 0.05,
+        "rentTaxPerYear": 117.37885009398894,
+        "propertyTaxPerYear": 974.2543309594199,
+        "accountantPerYear": 813.4678958033306,
+        "capitalGainsTax": 3473.63,
+        "realRegimeShare": 0.909288824383164,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 25.295329483849365,
+        "intervalByJob": {
+          "civilServant": 28.987807114044738,
+          "teacher": 25.34791548942048,
+          "nurse": 26.937516216917487,
+          "developer": 20.878407921810698,
+          "electrician": 28.101476157353737,
+          "salesperson": 24.167904903417533,
+          "realEstateAgent": 24.80631859709363
+        },
+        "decisionsPerYear": 113.65817055539429,
+        "catalogPerYear": 23.845472044280484,
+        "interestingPerYear": 90.44841317930609,
+        "challengesPerYear": 1.1531329175461984,
+        "challengesWonPerYear": 0.057605212651728015,
+        "anecdotesPerYear": 109.43447407060866,
+        "calmShare": 0.9911281208694892,
+        "realHoursPerYear": 0.7986169090917347,
+        "medianAchievements": 17,
+        "medianReputation": 86.34999999999998,
+        "titles": {
+          "firstInvestor": {
+            "share": 0.85,
+            "years": 2.83013698630137,
+            "within10": 0.85
+          },
+          "landlord": {
+            "share": 0.55,
+            "years": 6.2164383561643834,
+            "within10": 0.55
+          },
+          "renovator": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "seasonedInvestor": {
+            "share": 0.15,
+            "years": 8.208219178082192,
+            "within10": 0.15
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0.15,
+            "years": 8.208219178082192,
+            "within10": 0.15
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0.46,
+        "firstRemoteMonths": 81.64931506849314,
+        "remotePurchases": 1.01,
+        "tripsPerYear": 0.12999999999999995,
+        "tripHoursPerYear": 0.2119999999999999,
+        "tripCostPerYear": 1.56,
+        "remoteFeesPerYear": 9.625,
+        "twoCitiesShare": 0.44,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 40,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0.43260869565217375,
+        "buyersNetWorth": 98563.5
+      },
+      "works": {
+        "projects": 0.14,
+        "cost": 1187.36,
+        "hazardsPerProject": 0.35714285714285715,
+        "dpeClassesGained": 0.06,
+        "sales": 0.81,
+        "passoireShare": 0
+      },
+      "depth": {
+        "companyShare": 0.85,
+        "companyYears": 2.83013698630137,
+        "companyProperties": 2,
+        "transformations": 2.43,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0.02,
+        "horizonYears": 8.712328767123289
+      }
+    },
+    {
+      "botId": "inactif",
+      "games": 100,
+      "bankruptShare": 0,
+      "forcedSaleShare": 0,
+      "boughtShare": 0,
+      "firstPurchaseMonths": null,
+      "firstPurchaseInWindowShare": 0,
+      "bailleurYears": null,
+      "bailleurShare": 0,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          16312,
+          17711.6,
+          19213,
+          20771.2,
+          22410.2,
+          23947.9,
+          25243.2,
+          26730,
+          28276.8,
+          29663.1
+        ],
+        "p50": [
+          16734.5,
+          18404.5,
+          20185.5,
+          21996.5,
+          23738.5,
+          25537.5,
+          27334,
+          29237.5,
+          31001,
+          32815
+        ],
+        "p90": [
+          17902.1,
+          20543,
+          23379.9,
+          26259.9,
+          29127.5,
+          31956.6,
+          34800,
+          37481.5,
+          40148.4,
+          42786.2
+        ]
+      },
+      "maxFinalNetWorth": 46991,
+      "medianProperties": 0,
+      "medianMonthlyRent": 0,
+      "medianDebtRatio": 0,
+      "medianVisits": 0,
+      "medianOffers": 0,
+      "meanLostToRivals": 0,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.271000000000001,
+        "martinot": 15.446
+      },
+      "byJob": {
+        "civilServant": 29439,
+        "teacher": 31753,
+        "nurse": 33134,
+        "developer": 42799,
+        "electrician": 30845,
+        "salesperson": 39813.5,
+        "realEstateAgent": 37984.5
+      },
+      "renting": {
+        "occupancy": 0,
+        "rentMissed": 0,
+        "incidents": 0,
+        "departures": 0,
+        "evictionShare": 0,
+        "rentTaxPerYear": 0,
+        "propertyTaxPerYear": 0,
+        "accountantPerYear": 0,
+        "capitalGainsTax": 0,
+        "realRegimeShare": 0,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 29.455476588628763,
+        "intervalByJob": {
+          "civilServant": 30.155957092272445,
+          "teacher": 29.692543740675436,
+          "nurse": 29.411411249820635,
+          "developer": 28.680718728403594,
+          "electrician": 30.082913362484252,
+          "salesperson": 28.831331418966244,
+          "realEstateAgent": 29.36119081779053
+        },
+        "decisionsPerYear": 99.268,
+        "catalogPerYear": 8.265,
+        "interestingPerYear": 89.307,
+        "challengesPerYear": 4.962,
+        "challengesWonPerYear": 0,
+        "anecdotesPerYear": 109.266,
+        "calmShare": 0.9729452054794521,
+        "realHoursPerYear": 0.8122184027777778,
+        "medianAchievements": 4,
+        "medianReputation": 10,
+        "titles": {
+          "firstInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "landlord": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "renovator": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 0,
+        "medianRenown": {
+          "dole": 0,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 0,
+        "cost": 0,
+        "hazardsPerProject": 0,
+        "dpeClassesGained": 0,
+        "sales": 0,
+        "passoireShare": 0
+      },
+      "depth": {
+        "companyShare": 0,
+        "companyYears": null,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    }
+  ],
+  "checks": [
+    {
+      "label": "Titre Promoteur (Promoteur)",
+      "target": "information (cible jugée sur 20 ans ou plus)",
+      "measured": "15 % en 10 ans (8,2 ans en médiane) ; 15 % en 10 ans",
+      "ok": null
+    },
+    {
+      "label": "Premier achat (Chasseur de bonnes affaires)",
+      "target": "entre le 2e et le 6e mois (médiane)",
+      "measured": "1,4 mois (96 % des parties dans la fenêtre, 100 % achètent)",
+      "ok": true
+    },
+    {
+      "label": "Titre Bailleur (Chasseur de bonnes affaires)",
+      "target": "2 à 4 ans",
+      "measured": "9,9 ans (atteint dans 53 % des parties)",
+      "ok": false
+    },
+    {
+      "label": "Titre Investisseur aguerri (Chasseur de bonnes affaires)",
+      "target": "6 à 10 ans (demande aussi 2 villes : jugé sur le Chasseur à Dijon)",
+      "measured": "> 10 ans (atteint dans 0 % des parties)",
+      "ok": null
+    },
+    {
+      "label": "Premier achat (Prudent)",
+      "target": "entre le 2e et le 6e mois (médiane)",
+      "measured": "35,5 mois (5 % des parties dans la fenêtre, 84 % achètent)",
+      "ok": null
+    },
+    {
+      "label": "Titre Bailleur (Prudent)",
+      "target": "2 à 4 ans",
+      "measured": "> 10 ans (atteint dans 0 % des parties)",
+      "ok": null
+    },
+    {
+      "label": "Titre Investisseur aguerri (Prudent)",
+      "target": "6 à 10 ans (demande aussi 2 villes : jugé sur le Chasseur à Dijon)",
+      "measured": "> 10 ans (atteint dans 0 % des parties)",
+      "ok": null
+    },
+    {
+      "label": "Titre Investisseur aguerri (Chasseur à Dijon)",
+      "target": "6 à 10 ans (patrimoine de 150 k€ et 2 villes)",
+      "measured": "> 10 ans (atteint dans 5 % des parties)",
+      "ok": false
+    },
+    {
+      "label": "Densité de décisions (Chasseur de bonnes affaires)",
+      "target": "une décision toutes les 30 à 60 s réelles à ×1, pour chaque métier",
+      "measured": "47,4 s en moyenne (de 43,1 à 53,4 s selon le métier)",
+      "ok": true
+    },
+    {
+      "label": "Densité de décisions (Prudent)",
+      "target": "une décision toutes les 30 à 60 s réelles à ×1, pour chaque métier",
+      "measured": "33,1 s en moyenne (de 31,3 à 34,8 s selon le métier)",
+      "ok": true
+    },
+    {
+      "label": "Une expansion à Dijon est viable",
+      "target": "médiane à 10 ans du Chasseur à Dijon d’au moins 90 % de celle du Chasseur, et pas plus de 3 points de faillites en plus",
+      "measured": "86 505 € contre 88 112 € (98,2 %) ; faillites 2 % contre 1 %",
+      "ok": true
+    },
+    {
+      "label": "Une expansion à Dijon demande un vrai effort",
+      "target": "premier achat à Dijon après plus de 24 mois (médiane), et moins de la moitié des parties y achètent en 10 ans",
+      "measured": "65,6 mois ; 43 % des parties y achètent ; 0,7 h de route par an pour celles-ci",
+      "ok": true
+    },
+    {
+      "label": "Expansion (Chasseur à Besançon)",
+      "target": "information : comparée au Chasseur",
+      "measured": "médiane 78 546 € contre 88 112 € ; 64 % des parties y achètent (premier achat 65,3 mois) ; faillites 2 %",
+      "ok": null
+    },
+    {
+      "label": "Expansion (Chasseur à Chalon)",
+      "target": "information : comparée au Chasseur",
+      "measured": "médiane 63 341 € contre 88 112 € ; 93 % des parties y achètent (premier achat 11,5 mois) ; faillites 8 %",
+      "ok": null
+    },
+    {
+      "label": "Faillites du Prudent",
+      "target": "moins de 5 %",
+      "measured": "0 %",
+      "ok": true
+    },
+    {
+      "label": "Faillites du Levier maximal",
+      "target": "plus de 40 %",
+      "measured": "77 %",
+      "ok": true
+    },
+    {
+      "label": "Le Levier maximal peut progresser vite",
+      "target": "son 9e décile dépasse la médiane du Prudent",
+      "measured": "29 854 € contre 70 987 €",
+      "ok": false
+    },
+    {
+      "label": "Le Naïf stagne ou perd",
+      "target": "médiane à 10 ans ≤ celle de l’Inactif",
+      "measured": "5 000 € contre 32 815 €",
+      "ok": true
+    },
+    {
+      "label": "L’Inactif ne s’enrichit jamais",
+      "target": "médiane de chaque métier ≤ apport + 250 €/mois d’épargne (45 000 €)",
+      "measured": "métier le plus favorable 42 799 € (maximum d’une partie 46 991 €)",
+      "ok": true
+    },
+    {
+      "label": "Le Chasseur a un bon rendement",
+      "target": "médiane à 10 ans au-dessus de celle du Prudent",
+      "measured": "88 112 € contre 70 987 €",
+      "ok": true
+    },
+    {
+      "label": "Le Chasseur est limité par le temps libre",
+      "target": "information : visites médianes, patrimoine selon le métier",
+      "measured": "21 visites ; civilServant 80 264 €, teacher 93 713 €, nurse 80 248 €, developer 116 610 €, electrician 67 757 €, salesperson 110 875 €, realEstateAgent 89 239 €",
+      "ok": null
+    },
+    {
+      "label": "Le Marchand de biens fait des plus-values",
+      "target": "médiane à 10 ans au-dessus de celle de l’Inactif ; information : reventes",
+      "measured": "37 158 € contre 32 815 € ; 2 reventes par partie, 13 399 € d’impôt sur les plus-values",
+      "ok": true
+    },
+    {
+      "label": "Le Rénovateur premium n’écrase pas les autres",
+      "target": "médiane à 10 ans sous 1,1 × la meilleure médiane des autres investisseurs",
+      "measured": "27 804 € contre 88 112 € (Chasseur de bonnes affaires)",
+      "ok": true
+    },
+    {
+      "label": "Aucune stratégie ne domine",
+      "target": "information (une seule ville et un seul mode au jalon 1)",
+      "measured": "meilleure médiane : Chasseur de bonnes affaires (88 112 €)",
+      "ok": null
+    }
+  ]
+}

@@ -215,6 +215,7 @@ export const MIGRATIONS: MigrationRegistry = {
           noticeEndDay: null,
           incident: null,
           arrears: null,
+          missedDays: 0,
         };
         owned.lease = lease;
         state.player.balance += deposit;
@@ -403,6 +404,23 @@ export const MIGRATIONS: MigrationRegistry = {
     }
     return state as unknown as Record<string, unknown>;
   },
+  /** Version 9 (milestone 7) to 10 (milestone 8): IFI in the assessment, the SCI and who holds each property. */
+  9: (raw) => {
+    const tax = raw.tax as Record<string, unknown>;
+    const last = tax.lastAssessment as Record<string, unknown> | null;
+    const owned = (raw.properties as Record<string, unknown>[]) ?? [];
+    const purchases = (raw.purchases as Record<string, unknown>[]) ?? [];
+    return {
+      ...raw,
+      company: null,
+      properties: owned.map((entry) => ({ ...entry, holder: 'player' })),
+      purchases: purchases.map((entry) => ({ ...entry, holder: 'player' })),
+      tax: {
+        ...tax,
+        lastAssessment: last && { ...last, wealthTax: 0, taxableWealth: 0 },
+      },
+    };
+  },
 };
 
 /** Old defects (version 5) and the item each one becomes at state 1. */
@@ -529,9 +547,10 @@ const propertySchema = z
     id: z.string(),
     cityId: z.string(),
     neighbourhoodId: z.string(),
-    kind: z.enum(['apartment', 'house', 'building']),
+    kind: z.enum(['apartment', 'house', 'building', 'commercial', 'parking', 'land']),
     surface: z.number().positive(),
-    rooms: z.number().int().min(1),
+    // No rooms for a shop, a parking space or land (version 10).
+    rooms: z.number().int().min(0),
     floor: z.number().int().min(0).nullable(),
     lots: z.array(
       z.object({ surface: z.number().positive(), rooms: z.number().int().min(1) }).strict(),
@@ -576,6 +595,8 @@ const propertySchema = z
         .strict(),
     ),
     energyFactor: z.number().positive(),
+    // Added in version 10: houses of older saves have no convertible attic.
+    atticSurface: z.number().min(0).default(0),
     copro: z
       .object({
         lots: z.number().int().min(1),
@@ -627,6 +648,18 @@ const worksProjectSchema = z
   .object({
     id: z.string(),
     startDay: day,
+    // Added in version 10 (project manager, transformations).
+    managed: z.boolean().default(false),
+    transformation: z
+      .object({
+        kind: z.enum(['division', 'splitBuilding', 'attic', 'construction']),
+        total: cents.min(0),
+        endDay: day,
+        overrun: z.number().min(0),
+      })
+      .strict()
+      .nullable()
+      .default(null),
     tasks: z.array(
       z
         .object({
@@ -665,6 +698,7 @@ const worksProjectSchema = z
   })
   .strict();
 const taxRegimeSchema = z.enum(['auto', 'micro', 'real']);
+const holderSchema = z.enum(['player', 'company']);
 
 const tenantSchema = z
   .object({
@@ -729,6 +763,8 @@ const leaseSchema = z
       })
       .strict()
       .nullable(),
+    // Added in version 10 (short-term lets).
+    missedDays: z.number().int().min(0).default(0),
   })
   .strict();
 
@@ -756,6 +792,8 @@ const loanOfferSchema = z
     monthlyPayment: cents.min(0),
     totalCost: cents,
     debtRatioAfter: z.number(),
+    // Added in version 10 (the SCI): older offers were all personal.
+    rentCoverage: z.number().min(0).nullable().default(null),
   })
   .strict();
 
@@ -784,6 +822,10 @@ const loanDecisionSchema = z.discriminatedUnion('decision', [
         'insufficientContribution',
         'overFinancing',
         'debtRatio',
+        'noCompany',
+        'companyNotServed',
+        'rentCoverage',
+        'leverage',
       ]),
       debtRatioAfter: z.number().optional(),
     })
@@ -879,6 +921,7 @@ const gameStateSchema = z
         renown: z.record(z.string(), z.number().min(0).max(100)),
       })
       .strict(),
+    company: z.object({ createdDay: day }).strict().nullable(),
     banks: z.record(
       z.string(),
       z
@@ -901,6 +944,24 @@ const gameStateSchema = z
             z.object({ priceIndex: z.number().positive(), trendPercent: z.number() }).strict(),
           ),
         ),
+        // Added in version 10 (lasting national crises).
+        crises: z
+          .array(
+            z
+              .object({
+                modifier: z.enum([
+                  'unpaidRents',
+                  'worksCosts',
+                  'tenantDemand',
+                  'buyerDemand',
+                  'credit',
+                ]),
+                factor: z.number().positive(),
+                untilDay: day,
+              })
+              .strict(),
+          )
+          .default([]),
       })
       .strict(),
     loans: z.array(
@@ -949,6 +1010,7 @@ const gameStateSchema = z
       z
         .object({
           id: z.string(),
+          holder: holderSchema,
           listingId: z.string(),
           property: propertySchema,
           price: cents.positive(),
@@ -978,6 +1040,7 @@ const gameStateSchema = z
       z
         .object({
           property: propertySchema,
+          holder: holderSchema,
           purchasePrice: cents.positive(),
           acquisitionCost: cents.positive(),
           purchaseDate: calendarDateSchema,
@@ -1061,6 +1124,8 @@ const gameStateSchema = z
       z.string(),
       z
         .object({
+          // Added in version 10 (the SCI Horizon arrives).
+          arrivedDay: day.nullable().default(null),
           budget: cents,
           purchases: z.number().int().min(0),
           projects: z.array(z.object({ property: propertySchema, resaleDay: day }).strict()),
@@ -1077,6 +1142,8 @@ const gameStateSchema = z
             .object({
               category: leaseTypeSchema.nullable(),
               regime: taxRegimeSchema,
+              // Added in version 10 (the SCI).
+              company: z.boolean().default(false),
               rents: cents,
               costs: cents,
               works: cents,
@@ -1099,6 +1166,8 @@ const gameStateSchema = z
             socialContributions: cents,
             accountantFees: cents.min(0),
             deficitOnSalary: cents.min(0),
+            wealthTax: cents.min(0),
+            taxableWealth: cents.min(0),
             properties: z.array(
               z
                 .object({

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { GameAction, GameEvent, GameState } from '../src/index.ts';
+import { type GameAction, type GameEvent, type GameState, itemId } from '../src/index.ts';
 import { engine } from './helpers.ts';
 
 const GOLDEN_SEED = 20261018;
@@ -65,6 +65,15 @@ function playReferenceGame() {
         }
         if (!owned.lease && !owned.rental) {
           const quote = engine.rentQuote(state, owned.property.id, 'bare');
+          // Indecent once bought: the project manager redoes the dead critical items (milestone 8).
+          if (quote?.block === 'rent.indecent' && !owned.works) {
+            const items = owned.property.items
+              .filter((item) => item.state < 1.5 && engine.content.works.items[item.kind].critical)
+              .map((item) => ({ itemId: itemId(item), tier: 'eco' as const }));
+            if (items.length > 0) {
+              tryAction({ type: 'works/delegate', propertyId: owned.property.id, items });
+            }
+          }
           if (quote && !quote.block) {
             tryAction({
               type: 'rent/list',
@@ -104,6 +113,8 @@ function bestDeal(state: GameState) {
   for (const listing of state.listings) {
     // The reference game is played in Dole, the player's base.
     if (listing.property.cityId !== 'dole') continue;
+    // A home to let: shops, parking spaces and land (milestone 8) are left aside.
+    if (listing.property.kind !== 'apartment' && listing.property.kind !== 'house') continue;
     if (listing.offer || listing.askingPrice > 8_000_000) continue;
     if (engine.rentQuote(state, listing.id, 'bare')?.block) continue;
     const ratio = (engine.estimate(state, listing.id)?.estimate ?? 0) / listing.askingPrice;
@@ -146,6 +157,8 @@ describe('golden seed', () => {
     expect(result.state.properties).toHaveLength(1);
     expect(result.eventCounts.tenantMovedIn).toBeGreaterThanOrEqual(1);
     expect(result.eventCounts.taxAssessed).toBe(1);
-    expect(result.eventCounts.worksCompleted).toBe(1);
+    // The painting done oneself, and the dead items redone by the project manager.
+    expect(result.eventCounts.worksCompleted).toBe(2);
+    expect(result.eventCounts.worksDelegated).toBe(1);
   });
 });

@@ -17,6 +17,19 @@ Chaque ville est découpée en **quartiers réels** (5 pour Dole : Centre histor
 Types disponibles dès le départ : **appartements** (studio à T5), **maisons**, **immeubles de rapport**.
 Au jalon 8 : locaux commerciaux, parkings, terrains à bâtir.
 
+> **Jalon 8, les nouveaux types de biens** (`content/marche.json`, `otherKinds` ; décision validée : des ratios écrits à la main, les données DVF les repérant mal) :
+>
+> | Type | Part du flux d'annonces | Surface | Prix au m² | Loyer au m² |
+> |---|---|---|---|---|
+> | Local commercial | 3 % | 30 à 150 m² | 75 % du prix médian des appartements du quartier | 95 % du loyer des grands appartements |
+> | Parking | 4 % | 12 à 15 m² | 45 % | 50 % |
+> | Terrain à bâtir | 2 % | 300 à 900 m² | 5 % au moins (voir plus bas) | ne se loue pas |
+>
+> - Ni pièces, ni postes, ni travaux ordinaires ; les règles de décence et du DPE des logements ne s'appliquent pas. Taxe foncière, charges et assurance propriétaire ont leurs propres valeurs (assurance ×1,5 pour un local, ×0,2 pour un parking).
+> - Rendement brut : environ 8 % pour un local, 7 % pour un parking, contre 7 % pour un appartement à Dole.
+> - **Compte à rebours** : un terrain vaut le plus grand de son prix plancher et de **75 % de la marge** de la maison qu'on peut y construire (valeur d'une maison neuve du quartier moins le coût de construction et du maître d'œuvre). De même, une maison qui a des **combles aménageables** (35 % des maisons, 20 à 40 % de leur surface) vaut 75 % de la marge de leur aménagement en plus. Sans cela, construire ou aménager était de l'argent gratuit dans les villes chères (le modèle valorise un bien neuf environ 1,6 fois la médiane du quartier).
+> - Un titre « Bailleur » ne compte que les logements loués : un parking ne fait pas un bailleur.
+
 Chaque bien a :
 - un type, une surface, un étage, un nombre de pièces ;
 - une **époque** de construction (qui détermine le style de façade et les risques de chantier) ;
@@ -99,6 +112,8 @@ Contenu dans `content/rivaux.json`, système `packages/engine/src/systems/rivals
 - **Monique Delaporte** : appartements de 50 m² au plus, en bon état ou à rafraîchir, au Centre historique (la gare de Dole-Ville y est) et, un peu moins, aux Paters ; seuil de 4 %, très vive.
 - **Les frères Martinot** : tout bien en ruine ou à rénover, dans toute la ville, sous un seuil de 8 %. Ils le « rénovent » pendant 4 à 9 mois, puis le remettent en vente, rénové et sans défaut, comme une nouvelle annonce (motivation « Rénové par les frères Martinot »). Leur budget récupère le prix affiché (la revente n'est pas simulée). Les enchères, où ils font grimper les prix, arriveront avec les enchères judiciaires.
 - **SCI Horizon Patrimoine** : décrite, mais inactive jusqu'au jalon 8.
+
+> **Jalon 8, l'arrivée de la SCI Horizon** (décision validée ; `content/rivaux.json`, champ `arrival`) : elle entre sur le marché au plus tôt la **8e année de jeu**, une fois que le patrimoine net du joueur dépasse **400 000 €** (vérifié chaque mois ; un événement et une ligne de chronique l'annoncent). Elle cherche à Dijon, Besançon et Dole des **immeubles et des locaux commerciaux**, en bon état ou à rafraîchir, avec un seuil de bonne affaire de 3 %, une vivacité moyenne (0,3) et un budget de 2 M€ (plus 100 000 € par mois, 5 M€ au plus). Elle fait aussi des offres, de 95 à 100 % du prix, sur les immeubles que le joueur met en vente. Son agressivité suit la règle commune (+0,1 par 100 000 € de patrimoine du joueur, plafonnée à 1,6).
 - **Offres sur les biens du joueur** : un rival qui voit dans un bien en vente une bonne affaire (selon ses préférences et son seuil) fait une offre de 90 à 100 % du prix demandé, valable 3 jours. Il accepte une contre-proposition tant que le prix reste une bonne affaire à ses yeux. Il paie comptant : il ne se désiste pas avant l'acte. Les Martinot rénovent et remettent en vente ce qu'ils achètent au joueur.
 - **Agressivité** : 1 au départ, +0,1 par tranche de 100 000 € de patrimoine net du joueur, plafonnée à 1,6. Le coefficient du mode de partie arrivera avec les modes (jalon 6), comme les « affaires pas toujours honnêtes » (événements).
 - Les **acheteurs anonymes** (ménages) restent : ils emportent les annonces au prix du marché, les rivaux les bonnes affaires.

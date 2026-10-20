@@ -10,6 +10,7 @@ import type {
   TaxRegimeChoice,
 } from '../state.ts';
 import type { SystemContext } from './context.ts';
+import { realValue } from './valuation.ts';
 
 /**
  * Taxes (docs/03-systemes/06-fiscalite.md): what each property earns and
@@ -30,6 +31,7 @@ function emptyLedger(owned: OwnedProperty | null): PropertyLedger {
   return {
     category: owned?.lease?.leaseType ?? owned?.rental?.leaseType ?? null,
     regime: owned?.taxRegime ?? 'auto',
+    company: owned?.holder === 'company',
     rents: 0,
     costs: 0,
     works: 0,
@@ -123,6 +125,8 @@ export interface TaxInput {
   propertyId: string;
   category: LeaseType;
   choice: TaxRegimeChoice;
+  /** Held by the SCI: always at the real regime (milestone 8). */
+  company?: boolean;
   rents: Cents;
   costs: Cents;
   /** Works paid this year: deducted in a bare let at the real regime. */
@@ -150,7 +154,16 @@ export interface TaxComputation {
   >;
 }
 
-function accountantFees(content: GameContent, category: LeaseType, count: number): Cents {
+/** Tax family of a lease type's rents: revenus fonciers or BIC (content/location.json). */
+export function taxCategory(content: GameContent, leaseType: LeaseType): 'bare' | 'furnished' {
+  return content.renting.leaseTypes[leaseType].taxCategory;
+}
+
+function accountantFees(
+  content: GameContent,
+  category: 'bare' | 'furnished',
+  count: number,
+): Cents {
   if (count === 0) return 0;
   const fees = content.taxes.accountantFees[category];
   return toCents(fees.first + fees.perExtraProperty * (count - 1));
@@ -167,11 +180,13 @@ export function computeTax(
 ): TaxComputation {
   const rules = content.taxes;
   const regimeOf = (input: TaxInput) => regimes.get(input.propertyId) ?? 'micro';
-  const bare = inputs.filter((i) => i.category === 'bare');
-  const furnished = inputs.filter((i) => i.category === 'furnished');
+  const bare = inputs.filter((i) => taxCategory(content, i.category) === 'bare');
+  const furnished = inputs.filter((i) => taxCategory(content, i.category) === 'furnished');
   const realBare = bare.filter((i) => regimeOf(i) === 'real');
+  // The SCI's own accountant does its properties (closeTaxYear charges him).
+  const personalRealBare = realBare.filter((i) => !i.company);
   const realFurnished = furnished.filter((i) => regimeOf(i) === 'real');
-  const bareFees = accountantFees(content, 'bare', realBare.length);
+  const bareFees = accountantFees(content, 'bare', personalRealBare.length);
   const furnishedFees = accountantFees(content, 'furnished', realFurnished.length);
   const properties: TaxAssessment['properties'] = [];
 
@@ -186,7 +201,7 @@ export function computeTax(
       incomeBeforeInterest += taxable;
       properties.push({ ...propertyKey(input), regime: 'micro', taxable });
     } else {
-      const fees = Math.round(bareFees / realBare.length);
+      const fees = input.company ? 0 : Math.round(bareFees / personalRealBare.length);
       const taxable = input.rents - input.costs - input.works - input.interest - fees;
       foncier += taxable;
       incomeBeforeInterest += input.rents;
@@ -229,8 +244,12 @@ export function computeTax(
   const furnishedState: TaxComputation['furnished'] = {};
   for (const input of furnished) {
     if (regimeOf(input) === 'micro') {
+      // Furnished tourist lets have their own, smaller allowance.
+      const share =
+        content.renting.leaseTypes[input.category].microBic?.allowanceShare ??
+        rules.microBic.allowanceShare;
       const allowance = Math.max(
-        Math.round(input.rents * rules.microBic.allowanceShare),
+        Math.round(input.rents * share),
         Math.min(input.rents, toCents(rules.microBic.minimumAllowance)),
       );
       const taxable = input.rents - allowance;
@@ -277,6 +296,8 @@ export function computeTax(
       socialContributions: social,
       accountantFees: fees,
       deficitOnSalary,
+      wealthTax: 0,
+      taxableWealth: 0,
       properties,
     },
     total: tax + social,
@@ -292,14 +313,25 @@ function propertyKey(input: TaxInput) {
 
 /** Regimes allowed for each property: a micro regime has a ceiling on the receipts. */
 function allowedRegimes(content: GameContent, inputs: readonly TaxInput[]) {
-  const receipts = (category: LeaseType) =>
-    inputs.filter((i) => i.category === category).reduce((sum, i) => sum + i.rents, 0);
-  const microAllowed: Record<LeaseType, boolean> = {
-    bare: receipts('bare') <= toCents(content.taxes.microFoncier.receiptsCeiling),
-    furnished: receipts('furnished') <= toCents(content.taxes.microBic.receiptsCeiling),
+  const receipts = (keep: (input: TaxInput) => boolean) =>
+    inputs.filter(keep).reduce((sum, i) => sum + i.rents, 0);
+  const ceilings = {
+    bare: toCents(content.taxes.microFoncier.receiptsCeiling),
+    furnished: toCents(content.taxes.microBic.receiptsCeiling),
+  };
+  const familyReceipts = {
+    bare: receipts((i) => taxCategory(content, i.category) === 'bare'),
+    furnished: receipts((i) => taxCategory(content, i.category) === 'furnished'),
+  };
+  const microAllowed = (input: TaxInput) => {
+    const family = taxCategory(content, input.category);
+    if (familyReceipts[family] > ceilings[family]) return false;
+    // A lease type with its own ceiling (furnished tourist lets) must stay under it too.
+    const own = content.renting.leaseTypes[input.category].microBic;
+    return !own || receipts((i) => i.category === input.category) <= toCents(own.receiptsCeiling);
   };
   return inputs.map((input): TaxRegime[] => {
-    if (!microAllowed[input.category] || input.choice === 'real') return ['real'];
+    if (!microAllowed(input) || input.choice === 'real' || input.company) return ['real'];
     if (input.choice === 'micro') return ['micro'];
     return ['micro', 'real'];
   });
@@ -366,7 +398,7 @@ export function taxInputs(content: GameContent, state: GameState, yearEndDay: nu
       : state.properties.find((o) => o.property.id === propertyId);
     let buildingDepreciation = 0;
     let depreciation = 0;
-    if (owned && ledger.category === 'furnished') {
+    if (owned && taxCategory(content, ledger.category) === 'furnished') {
       const purchaseDay = toDayNumber(owned.purchaseDate);
       buildingDepreciation = Math.round(
         ((owned.acquisitionCost * rules.buildingShare) / rules.buildingYears) *
@@ -392,6 +424,7 @@ export function taxInputs(content: GameContent, state: GameState, yearEndDay: nu
       propertyId,
       category: ledger.category,
       choice: owned?.taxRegime ?? ledger.regime,
+      company: ledger.company,
       rents: ledger.rents,
       costs: ledger.costs,
       works: ledger.works,
@@ -422,26 +455,35 @@ export function closeTaxYear(ctx: SystemContext): void {
     const ledger = tax.ledgers[owned.property.id];
     if (!ledger || ledger.works === 0) continue;
     const assessed = result.assessment.properties.find((p) => p.propertyId === owned.property.id);
-    if (assessed?.regime === 'real' && assessed.category === 'bare') continue;
+    if (assessed?.regime === 'real' && taxCategory(content, assessed.category) === 'bare') continue;
     // Not deducted from the rents: depreciated if let furnished, and counted in the capital gain.
     if (assessed?.regime === 'real') {
       owned.furnishedTax.works.push({ amount: ledger.works, year: tax.year });
     }
     owned.worksForCapitalGains += ledger.works;
   }
-  const fees = result.assessment.accountantFees;
+  const fees = result.assessment.accountantFees + companyAccountantFees(content, state);
   state.player.balance -= fees;
   tax.landlordDeficits = result.landlordDeficits;
+  // The IFI of 1 January is paid with the income tax, in the same instalments.
+  const wealth = wealthTax(content, state);
+  const total = result.total + wealth.tax;
   tax.installments = {
-    monthly: Math.round(result.total / MONTHS_PER_YEAR),
-    remaining: result.total === 0 ? 0 : MONTHS_PER_YEAR,
+    monthly: Math.round(total / MONTHS_PER_YEAR),
+    remaining: total === 0 ? 0 : MONTHS_PER_YEAR,
   };
-  tax.lastAssessment = result.assessment;
+  tax.lastAssessment = {
+    ...result.assessment,
+    accountantFees: fees,
+    wealthTax: wealth.tax,
+    taxableWealth: wealth.base,
+  };
   ctx.events.push({
     type: 'taxAssessed',
     year: tax.year,
-    total: result.total,
+    total,
     accountantFees: fees,
+    wealthTax: wealth.tax,
   });
   tax.year = state.clock.date.year;
   tax.salary = 0;
@@ -449,6 +491,46 @@ export function closeTaxYear(ctx: SystemContext): void {
   for (const owned of state.properties) {
     if (!isHome(state, owned)) ledgerOf(state, owned);
   }
+}
+
+/** Yearly fees of the SCI's accountant, from its creation, by property it holds. */
+export function companyAccountantFees(content: GameContent, state: GameState): Cents {
+  if (!state.company) return 0;
+  const count = state.properties.filter((owned) => owned.holder === 'company').length;
+  const rules = content.company.accountantFees;
+  return toCents(rules.first + rules.perExtraProperty * Math.max(0, count - 1));
+}
+
+/**
+ * Impôt sur la fortune immobilière (milestone 8): every property at its value (the main
+ * residence with an allowance), minus the loans still due; nothing below the threshold.
+ */
+export function wealthTax(content: GameContent, state: GameState): { base: Cents; tax: Cents } {
+  const rules = content.taxes.wealthTax;
+  let gross = 0;
+  for (const owned of state.properties) {
+    const value = realValue(content, state, owned.property).value;
+    const home = state.player.homePropertyId === owned.property.id;
+    gross += home ? Math.round(value * (1 - rules.homeAllowanceShare)) : value;
+  }
+  const debts = state.loans.reduce((sum, loan) => sum + loan.remaining, 0);
+  const base = Math.max(0, gross - debts);
+  if (base < toCents(rules.threshold)) return { base, tax: 0 };
+  let tax = 0;
+  const { brackets } = rules;
+  for (let i = 0; i < brackets.length; i++) {
+    const bracket = brackets[i];
+    if (!bracket) continue;
+    const from = toCents(bracket.from);
+    const next = brackets[i + 1];
+    const to = next ? toCents(next.from) : Infinity;
+    if (base <= from) break;
+    tax += (Math.min(base, to) - from) * bracket.rate;
+  }
+  if (base < toCents(rules.decote.until)) {
+    tax -= Math.max(0, toCents(rules.decote.base) - base * rules.decote.rate);
+  }
+  return { base, tax: Math.max(0, Math.round(tax)) };
 }
 
 /** Monthly instalment of last year's tax (a refund when the deficit lowered it). */
@@ -530,7 +612,11 @@ export function capitalGainsTax(
   );
   // Real works (not deducted from the rents) replace the flat allowance when they are higher.
   const ledger = state.tax.ledgers[owned.property.id];
-  const pending = ledger && ledger.category !== 'bare' ? ledger.works : 0;
+  // Works of a property never let, or let furnished, were not deducted from the rents.
+  const pending =
+    ledger && (!ledger.category || taxCategory(content, ledger.category) !== 'bare')
+      ? ledger.works
+      : 0;
   const flat = years >= rules.worksFlatMinYears ? Math.round(price * rules.worksFlatShare) : 0;
   const works = Math.max(flat, owned.worksForCapitalGains + pending);
   const base = price + fees + works - owned.furnishedTax.buildingDepreciationDeducted;

@@ -43,6 +43,15 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 | **Progression** | Titres et réputation · Succès · Défis · Chronique · Statistiques |
 | **Réglages** | Accélération et pauses automatiques · Thème · Volumes (musique, ambiances, effets) · Sauvegardes (export, import) · Revenir en arrière · Didacticiel |
 
+> **Jalon 8** (emplacements validés) :
+> - **Banque et SCI** (Menu) : les crédits en cours, le taux d'endettement personnel (sans la SCI), et la SCI : la créer, ce qu'elle détient, doit et peut encore emprunter, son comptable, les règles de ses banques.
+> - **Compromis** : le choix « En nom propre » ou « Via la SCI », avant toute demande de prêt.
+> - **Annonces** : filtres Local, Parking, Terrain ; façades simples pour un terrain et un parking, vitrine pour un local.
+> - **Location** : seulement les baux possibles pour le bien (colocation, courte durée, bail commercial, parking), les agences de ce bail ; une location courte durée s'arrête depuis la fiche du bien.
+> - **Fiche d'un bien** : « Transformer le bien » donne les devis du maître d'œuvre (travaux, honoraires, total, valeur estimée après, durée) et lance le projet ; le projet en cours y est suivi.
+> - **Bilan annuel** : la ligne de l'IFI.
+> - À faire avec l'écran de chantier (plus tard) : confier des postes au maître d'œuvre.
+
 ## 4.6 Interactions clés
 
 - **Rue** : toucher une bulle (« À vendre », « Panne », « Travaux 25 % ») ouvre la fiche concernée ; toucher un bâtiment ouvre sa coupe.

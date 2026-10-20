@@ -96,7 +96,9 @@
     "youngWorker": "Jeune actif",
     "student": "Étudiant",
     "retiree": "Retraité",
-    "freelancer": "Indépendant"
+    "freelancer": "Indépendant",
+    "guests": "Voyageurs de passage",
+    "shopkeeper": "Commerçant"
   },
   "traits": {
     "jazzDrummer": "Batteur de jazz, promet de jouer doucement.",

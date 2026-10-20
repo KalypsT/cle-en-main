@@ -4,6 +4,7 @@ import type { Defect, Listing, LoanApplication, Purchase } from '../state.ts';
 import {
   evaluateLoan,
   grantLoan,
+  notaryFees,
   type LoanOffer,
   type LoanRequest,
   recordRefusedApplication,
@@ -32,7 +33,7 @@ export function purchaseFees(
 ): { notary: Cents; bank: Cents } {
   const rules = ctx.content.credit;
   return {
-    notary: Math.round(price * rules.notaryFeesShare),
+    notary: notaryFees(ctx.content, price),
     bank: withLoan ? Math.round(price * rules.bankFeesShare) : 0,
   };
 }
@@ -51,6 +52,7 @@ export function signCompromis(ctx: SystemContext, listing: Listing, price: Cents
   state.player.balance -= deposit;
   const purchase: Purchase = {
     id: `purchase-${state.nextId++}`,
+    holder: 'player',
     listingId: listing.id,
     property: { ...listing.property },
     price,
@@ -93,6 +95,8 @@ export function loanRequestFor(
     price: purchase.price,
     works,
     contribution: Math.min(cash, needed),
+    holder: purchase.holder,
+    propertyId: purchase.id,
   };
 }
 
@@ -266,6 +270,7 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
   state.purchases = state.purchases.filter((p) => p.id !== purchase.id);
   state.properties.push({
     property: purchase.property,
+    holder: purchase.holder,
     purchasePrice: purchase.price,
     acquisitionCost: purchase.price + fees.notary + fees.bank,
     purchaseDate: { ...state.clock.date },

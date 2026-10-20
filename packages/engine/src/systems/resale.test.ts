@@ -62,7 +62,7 @@ describe('resale', () => {
     const count = (askingPrice: number, mode: 'agency' | 'self') => {
       let current = act(state, { type: 'sale/list', propertyId, askingPrice, mode }).state;
       let visits = 0;
-      for (let day = 0; day < 300; day++) {
+      for (let day = 0; day < 600; day++) {
         const result = engine.advanceHours(current, 24);
         current = result.state;
         visits += result.events.filter((e) => e.type === 'saleVisit').length;
@@ -75,7 +75,8 @@ describe('resale', () => {
     };
     expect(count(value, 'agency')).toBeGreaterThan(count(Math.round(value * 1.3), 'agency'));
     expect(count(value, 'agency')).toBeGreaterThan(count(value, 'self'));
-  });
+    // Long enough (600 days) for the agency's extra visits to show whatever the draws.
+  }, 30_000);
 
   it('accepts a counter-offer within the buyer’s margin', () => {
     const { state, propertyId } = owner();

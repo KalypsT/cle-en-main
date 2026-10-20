@@ -34,6 +34,7 @@ import { StreetTab } from '../screens/StreetTab.tsx';
 import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
 import { StreetWorld } from '../world/StreetWorld.tsx';
 import { AgendaScreen } from '../screens/AgendaScreen.tsx';
+import { BankScreen } from '../screens/BankScreen.tsx';
 import { CitiesScreen } from '../screens/CitiesScreen.tsx';
 import { ChallengeScreen } from '../screens/ChallengeScreen.tsx';
 import { EventScreen } from '../screens/EventScreen.tsx';
@@ -391,6 +392,8 @@ function RouteScreen({ route }: { route: Route }) {
       return <AgendaScreen />;
     case 'cities':
       return <CitiesScreen />;
+    case 'bank':
+      return <BankScreen />;
     case 'monthReview':
       return <MonthlyReviewScreen />;
     case 'yearReview':

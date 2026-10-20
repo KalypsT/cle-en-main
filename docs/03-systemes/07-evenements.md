@@ -21,6 +21,13 @@ Les événements font vivre la simulation et maintiennent un **flux régulier de
 
 - Les événements courants dépendent de l'état du patrimoine (plus de biens, plus d'événements).
 - **Les grands événements nationaux** sont **rares mais marquants** : environ une fois tous les 5 à 10 ans de jeu (crise de type 2008, choc de taux, réforme importante).
+
+> **Jalon 8, les crises qui durent** : l'effet `crisis` pose pour quelques mois un facteur national sur les impayés, les prix des artisans (devis et transformations), les candidats locataires, les acheteurs (annonces et reventes) ou les limites des banques (taux d'endettement, part du loyer comptée pour la SCI). Plusieurs crises du même genre se multiplient. Trois grands événements rares (0,2 % par mois chacun, au plus une fois en 10 ans) l'utilisent :
+> - **Récession** : impayés ×1,8 et candidats ×0,8 pendant 12 mois, tendance des prix −1 point ;
+> - **Crise des matériaux** : prix des artisans +15 % pendant 24 mois ;
+> - **Resserrement du crédit** : limites des banques ×0,9 et acheteurs ×0,75 pendant 18 mois, taux +0,6 point.
+>
+> Ils s'ajoutent aux huit grands événements nationaux du jalon 6 (crise financière, chocs de taux, inflation, envolée des prix, choc énergétique, lois).
 - **Les anecdotes** n'ont aucun enjeu : elles apparaissent en bulles dans la rue ou dans un fil d'actualité, pour la vie et l'humour.
 - **Les défis** (voir [02-boucle-et-progression.md](../02-boucle-et-progression.md#210-succès-défis-chronique-et-statistiques)) : 2 ou 3 par an de jeu, jamais deux en même temps.
 

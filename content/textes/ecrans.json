@@ -105,6 +105,9 @@
       "apartment": "Immeuble",
       "house": "Maison",
       "building": "Immeuble de rapport",
+      "commercial": "Local commercial",
+      "parking": "Parking",
+      "land": "Terrain",
       "owned": "Mon bien",
       "home": "Chez moi",
       "listing": "Bien en vente",
@@ -194,7 +197,10 @@
     "kindShort": {
       "apartment": "Appartement",
       "house": "Maison",
-      "building": "Immeuble"
+      "building": "Immeuble",
+      "commercial": "Local",
+      "parking": "Parking",
+      "land": "Terrain"
     }
   },
   "listing": {
@@ -298,7 +304,11 @@
       "invalidDuration": "durée impossible pour ce projet.",
       "insufficientContribution": "l'apport doit couvrir au moins les frais.",
       "overFinancing": "le prêt dépasse le coût du projet.",
-      "debtRatio": "taux d'endettement trop élevé ({ratio})."
+      "debtRatio": "taux d'endettement trop élevé ({ratio}).",
+      "noCompany": "il faut d'abord créer votre SCI.",
+      "companyNotServed": "cette banque ne prête pas aux sociétés.",
+      "rentCoverage": "le loyer du bien ne couvre pas la mensualité.",
+      "leverage": "votre SCI doit déjà trop par rapport à votre patrimoine."
     }
   },
   "value": {
@@ -349,7 +359,15 @@
     "withdraw": "Se retirer de l'achat",
     "withdrawConfirm": "Se retirer de l'achat ? Le dépôt de garantie vous est rendu.",
     "withdrawn": "Vous vous êtes retiré : dépôt rendu.",
-    "bound": "Le compromis vous engage désormais."
+    "bound": "Le compromis vous engage désormais.",
+    "buyer": "Acheteur",
+    "buyers": {
+      "player": "En nom propre",
+      "company": "Via la SCI"
+    },
+    "buyerHint": "Via la SCI, la banque juge le prêt sur le loyer du bien ; à décider avant toute demande de prêt.",
+    "buyerLocked": "Les banques sont déjà sollicitées : l'acheteur ne change plus.",
+    "noCompany": "Pas encore de SCI : créez-la depuis Menu, Banque et SCI."
   },
   "assets": {
     "heading": "Patrimoine",
@@ -405,7 +423,11 @@
     "tenant": "Locataire",
     "leaseType": {
       "bare": "Location nue",
-      "furnished": "Location meublée"
+      "furnished": "Location meublée",
+      "shared": "Colocation",
+      "shortTerm": "Location courte durée",
+      "commercial": "Bail commercial",
+      "parking": "Location de parking"
     },
     "monthlyRent": "Loyer hors charges",
     "since": "Depuis le {date}",
@@ -490,7 +512,11 @@
     "reject": "Écarter",
     "accepted": "{name} emménage !",
     "agencySelects": "L'agence choisit pour vous le meilleur dossier.",
-    "reliabilityValue": "{value} %"
+    "reliabilityValue": "{value} %",
+    "shortTermHint": "Pas de locataire à choisir : les voyageurs arrivent dès la mise en ligne. Les revenus suivent les saisons ; gérée vous-même, elle demande {minutes} min par jour (un jour manqué est un jour perdu), ou confiez-la à une conciergerie.",
+    "sharedHint": "Plusieurs colocataires, un seul bail meublé : loyer plus élevé, départs plus fréquents.",
+    "commercialHint": "Bail commercial de 9 ans : candidats rares, mais un commerçant reste longtemps et fait ses petites réparations.",
+    "parkingHint": "Un parking se loue simplement, sans incident à gérer."
   },
   "decisions": {
     "heading": "Décisions",
@@ -537,7 +563,7 @@
   },
   "menu": {
     "heading": "Menu",
-    "bank": "Banque",
+    "bank": "Banque et SCI",
     "statement": "Bilan du mois",
     "taxes": "Impôts",
     "agenda": "Agenda",
@@ -714,6 +740,7 @@
     "leasesSigned": "Baux signés",
     "incidentsRepaired": "Incidents réparés",
     "diyTasks": "Travaux faits soi-même",
+    "transformations": "Transformations menées à bien",
     "bankMeetings": "Rendez-vous bancaires",
     "refinances": "Crédits rachetés",
     "loansRepaid": "Crédits remboursés",
@@ -836,7 +863,8 @@
     "yearTitles": "Titres de l'année",
     "yearAchievements": "Succès de l'année",
     "noYearReview": "Le premier bilan annuel arrive le 1er janvier.",
-    "noMonthReview": "Le premier bilan arrive le 1er du mois prochain."
+    "noMonthReview": "Le premier bilan arrive le 1er du mois prochain.",
+    "yearWealthTax": "Impôt sur la fortune immobilière"
   },
   "celebration": {
     "title": "Nouveau titre !",
@@ -910,5 +938,54 @@
     "viewing": "Vous regardez {city}",
     "switch": "Changer de ville",
     "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN."
+  },
+  "transformation": {
+    "heading": "Transformer le bien",
+    "intro": "Un maître d'œuvre mène le projet de bout en bout : devis, artisans, imprévus. Le bien doit être vide.",
+    "kinds": {
+      "division": "Division en appartements",
+      "splitBuilding": "Vente à la découpe",
+      "attic": "Aménagement des combles",
+      "construction": "Construction d'une maison"
+    },
+    "descriptions": {
+      "division": "La maison devient {count} appartements refaits à neuf, chacun loué ou vendu séparément.",
+      "splitBuilding": "L'immeuble est mis en copropriété : ses {count} appartements se vendent ou se louent un par un, sans la décote d'un immeuble vendu en bloc.",
+      "attic": "Les combles deviennent une chambre de plus : {surface} habitables.",
+      "construction": "Une maison neuve de {surface} sort de terre, au meilleur niveau énergétique."
+    },
+    "works": "Travaux",
+    "fee": "Honoraires du maître d'œuvre",
+    "total": "Total",
+    "duration": "Durée : {months} mois",
+    "start": "Lancer le projet",
+    "inProgress": "Projet en cours : {kind}, fin prévue le {date}.",
+    "delegate": "Confier au maître d'œuvre",
+    "delegateHint": "Il choisit les artisans les plus fiables et traite les imprévus, pour {share} du chantier.",
+    "valueAfter": "Valeur estimée après",
+    "notPossible": "Aucune transformation possible pour ce bien.",
+    "stopShortTerm": "Arrêter la location courte durée"
+  },
+  "bank": {
+    "heading": "Banque et SCI",
+    "loans": "Vos crédits",
+    "noLoans": "Aucun crédit en cours.",
+    "loan": "{bank} : {remaining} restant dus, {payment} par mois à {rate}",
+    "companyLoan": "(SCI)",
+    "debtRatio": "Taux d'endettement personnel",
+    "debtRatioHint": "Les prêts de votre SCI n'y entrent pas : ils sont jugés sur les loyers de chaque bien.",
+    "company": "Votre SCI",
+    "companyIntro": "Une société civile immobilière à l'impôt sur le revenu : un seul bilan avec le vôtre, mais des prêts jugés « au différentiel », sur le loyer de chaque bien plutôt que sur votre taux d'endettement. Elle ne loue que nu, toujours au régime réel, avec son propre comptable.",
+    "create": "Créer la SCI ({amount})",
+    "created": "Créée le {date}",
+    "properties": "Biens détenus",
+    "rent": "Loyers par mois",
+    "payments": "Mensualités par mois",
+    "debt": "Dettes de la SCI",
+    "ceiling": "Plafond d'endettement de la SCI",
+    "headroom": "Encore possible",
+    "accountant": "Comptable de la SCI par an",
+    "rules": "Ses banques comptent {coverage} du loyer du bien, qui doit couvrir la mensualité ; elles demandent {fees} des frais et {extra} du prix en apport.",
+    "buyHint": "Pour acheter via la SCI, choisissez-la sur l'écran du compromis, avant de solliciter les banques."
   }
 }

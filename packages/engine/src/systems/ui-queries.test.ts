@@ -247,6 +247,7 @@ describe('cash forecast', () => {
       purchases: [
         {
           id: 'purchase-x',
+          holder: 'player',
           listingId: listing.id,
           property: listing.property,
           price: listing.askingPrice,

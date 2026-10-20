@@ -16,6 +16,7 @@ export {
   type LoanRequest,
   monthlyLoanPayments,
   type RateQuote,
+  notaryFees,
   requiredContribution,
   retainedIncome,
 } from './systems/banking.ts';

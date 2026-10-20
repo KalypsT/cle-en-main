@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { dpeLabelSchema } from './city.ts';
 import { euros, id, share } from './common.ts';
 import { itemKindSchema } from './works.ts';
+import { propertyKindSchema } from './market.ts';
 
 /** Renting rules (docs/03-systemes/04-location.md). */
 
@@ -19,7 +20,14 @@ const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 /** Five values, for states 1 to 5. */
 const byState = z.array(z.number()).length(5);
 
-export const LEASE_TYPES = ['bare', 'furnished'] as const;
+export const LEASE_TYPES = [
+  'bare',
+  'furnished',
+  'shared',
+  'shortTerm',
+  'commercial',
+  'parking',
+] as const;
 export const leaseTypeSchema = z.enum(LEASE_TYPES);
 export const CONTRACTS = ['permanent', 'fixedTerm', 'student', 'retired', 'selfEmployed'] as const;
 
@@ -37,6 +45,37 @@ const leaseTypeRulesSchema = z
     noticeMonths: months,
     /** Monthly chance that a satisfied tenant gives notice. */
     monthlyDepartureProbability: share,
+    /** Kinds of property it lets (a shop has its commercial lease). */
+    kinds: z.array(propertyKindSchema).min(1),
+    /** Incidents happen (a shop's tenant sees to his own repairs, a parking space has none). */
+    incidents: z.boolean(),
+    /** Needs furniture (bought when the property is first offered). */
+    furnished: z.boolean(),
+    /** Fewest rooms the dwelling needs (a flat-share needs bedrooms). */
+    minRooms: z.number().int().min(0),
+    /** Tax family of the rents: revenus fonciers (bare) or BIC (furnished). */
+    taxCategory: z.enum(['bare', 'furnished']),
+    /** Own micro-BIC allowance and ceiling (furnished tourist lets); null: the general one. */
+    microBic: z.object({ allowanceShare: share, receiptsCeiling: euros }).strict().nullable(),
+    /** Multiplier on the arrival of candidates. */
+    applicationRate: z.number().min(0),
+    /** The tenant pays back part of the co-ownership charges (not in a short-term let). */
+    recoverableCharges: z.boolean(),
+    /**
+     * Short-term let (milestone 8, simplified): no tenant to choose, the guests come at once;
+     * the rent above is the monthly income at the average occupancy, varied by month. A
+     * self-managing owner spends free time every day (a day missed is a day lost).
+     */
+    shortTerm: z
+      .object({
+        /** Twelve monthly factors, January first, averaging 1. */
+        seasonality: z.array(z.number().min(0)).length(12),
+        selfMinutesPerDay: minutes,
+        /** Tenant profile of the guests (no departure, no unpaid rent). */
+        guestProfileId: id,
+      })
+      .strict()
+      .nullable(),
   })
   .strict();
 
@@ -83,6 +122,8 @@ const agencySchema = z
     selectionDays: z.number().int().min(0),
     /** Days before its artisan fixes an incident. */
     incidentDays: intRange,
+    /** Lease types it manages (a conciergerie only does short-term lets). */
+    leaseTypes: z.array(leaseTypeSchema).min(1),
   })
   .strict();
 

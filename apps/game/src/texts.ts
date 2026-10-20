@@ -177,7 +177,11 @@ export function propertyShortLabel(property: Property): string {
   if (property.kind === 'building') {
     return format(t.listing.lots, { count: property.lots.length });
   }
-  return `${t.listings.kindShort.house} ${format(t.common.rooms, { rooms: property.rooms })}`;
+  if (property.kind === 'house') {
+    return `${t.listings.kindShort.house} ${format(t.common.rooms, { rooms: property.rooms })}`;
+  }
+  // A shop, a parking space or a plot: its kind and its area.
+  return `${t.listings.kindShort[property.kind]} ${format(t.common.surface, { surface: property.surface })}`;
 }
 
 /** « T2 · Centre historique ». */
@@ -360,6 +364,24 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':
       return events.resigned;
+    case 'worksDelegated':
+      return format(events.worksDelegated, { amount: formatMoney(event.fee) });
+    case 'transformationStarted':
+      return format(events.transformationStarted, {
+        kind: t.transformation.kinds[event.kind],
+        date: formatDayLong(event.endDay),
+      });
+    case 'transformationCompleted':
+      return format(events.transformationCompleted, {
+        kind: t.transformation.kinds[event.kind],
+        amount: formatMoney(event.cost),
+      });
+    case 'companyCreated':
+      return format(events.companyCreated, { amount: formatMoney(event.cost) });
+    case 'purchaseHolderSet':
+      return null;
+    case 'rivalArrived':
+      return format(events.rivalArrived, { rival: rivalName(event.rivalId) });
     case 'listingPublished':
       return events.listingPublished;
     case 'listingSold':
@@ -439,6 +461,9 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
     case 'propertyTaxCharged':
       return format(events.propertyTaxCharged, { amount: formatMoney(event.amount) });
     case 'taxAssessed':
+      if (event.wealthTax > 0) {
+        return format(events.wealthTax, { year: event.year, amount: formatMoney(event.wealthTax) });
+      }
       if (event.total === 0) return null;
       return event.total > 0
         ? format(events.taxAssessed, { year: event.year, amount: formatMoney(event.total) })

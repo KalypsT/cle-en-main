@@ -8,10 +8,11 @@ import {
   type NeighbourhoodData,
 } from '../content.ts';
 import { type Cents, toCents } from '../money.ts';
-import type { GameState, Property, PropertyKind } from '../state.ts';
+import type { GameState, OtherKind, Property, PropertyKind } from '../state.ts';
 import {
   believedView,
   interpolateByState,
+  isDwelling,
   stateValueFactor,
   tierShare,
   valueCeilingPerM2,
@@ -24,11 +25,12 @@ export function dwellingKindOf(kind: PropertyKind): DwellingKind {
 
 /** Chance that a property of this epoch and kind has a nuisance. */
 export function defectProbability(rule: DefectRule, kind: PropertyKind, epoch: Epoch): number {
-  if (!rule.kinds.includes(kind)) return 0;
+  if (!(rule.kinds as readonly PropertyKind[]).includes(kind)) return 0;
   const epochMultiplier = rule.epochMultipliers?.[epoch] ?? 1;
   return Math.min(0.95, rule.probability * epochMultiplier);
 }
 
+const MAX_ITEM_STATE = 5;
 const floorFactorCache = new WeakMap<GameContent, Map<number, number>>();
 
 function floorFactor(content: GameContent, floor: number | null): number {
@@ -198,6 +200,7 @@ function valueWith(
   property: Property,
   defectsFactor: number,
 ): ValueBreakdown {
+  if (!isDwelling(property.kind)) return otherKindValue(content, state, property, property.kind);
   const rules = content.market;
   const dwelling = dwellingKindOf(property.kind);
   const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
@@ -256,7 +259,110 @@ function valueWith(
     defectsFactor,
     normalization,
     buildingFactor,
-    value: toCents(Math.round(base * tierFactor)),
+    value: toCents(
+      Math.round(base * tierFactor + atticPotential(content, property, base * tierFactor)),
+    ),
+  };
+}
+
+/** Share of the cost of a transformation's works that includes the project manager's fee. */
+function managedCost(content: GameContent, cityId: string, euros: number): number {
+  const index = content.works.cityCostIndex[cityId] ?? 1;
+  return euros * index * (1 + content.works.projectManager.feeShare);
+}
+
+/** Area of the house one can build on a plot. */
+export function constructionSurface(content: GameContent, plot: number): number {
+  const rules = content.works.transformations.constructionSurface;
+  return Math.round(Math.min(rules.max, Math.max(rules.min, plot * rules.share)));
+}
+
+/**
+ * A convertible attic is part of a house's price: the seller asks for a share of what
+ * converting it would bring, its cost deducted (in euros, like `base`).
+ */
+function atticPotential(content: GameContent, property: Property, base: number): number {
+  if (property.kind !== 'house' || property.atticSurface <= 0 || property.surface <= 0) return 0;
+  const rules = content.works.transformations;
+  const gain = (base * property.atticSurface) / property.surface;
+  const cost = managedCost(
+    content,
+    property.cityId,
+    rules.rules.attic.costPerM2 * property.atticSurface,
+  );
+  return rules.residualShare * Math.max(0, gain - cost);
+}
+
+/** Value (cents, unrounded) of a new house built in a neighbourhood, as the market would see it. */
+function newHouseValue(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  surface: number,
+): number {
+  const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
+  const stats = neighbourhood.sales.house;
+  const city = findCity(content, property.cityId);
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  const surfaceFactor = (surface / stats.medianSurface) ** city.commune.surfaceElasticity.house;
+  const rules = content.market;
+  return (
+    ((surface *
+      stats.pricePerM2.median *
+      priceIndex *
+      surfaceFactor *
+      rules.epochFactors.after2012 *
+      rules.dpeFactors[content.works.transformations.constructionDpe] *
+      interpolateByState(content.works.valueByState, MAX_ITEM_STATE)) /
+      valueNormalization(content, property.cityId, neighbourhood, 'house')) *
+    100
+  );
+}
+
+/**
+ * A shop, a parking space or land (milestone 8): its surface at a hand-written share of the
+ * neighbourhood's median price per m² for apartments, at the current price level.
+ */
+function otherKindValue(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  kind: OtherKind,
+): ValueBreakdown {
+  const neighbourhood = neighbourhoodOf(content, property.cityId, property.neighbourhoodId);
+  const median = neighbourhood.sales.apartment.pricePerM2.median;
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  const ratio = content.market.otherKinds[kind].priceRatio;
+  const floorValue = toCents(property.surface * median * priceIndex * ratio);
+  // Building land is worth a share of the margin of the house it can hold (« compte à rebours »).
+  let residual = 0;
+  if (kind === 'land') {
+    const rules = content.works.transformations;
+    const surface = constructionSurface(content, property.surface);
+    const cost = managedCost(
+      content,
+      property.cityId,
+      rules.rules.construction.costPerM2 * surface,
+    );
+    residual =
+      rules.residualShare * (newHouseValue(content, state, property, surface) - cost * 100);
+  }
+  return {
+    medianPricePerM2: median,
+    priceIndex,
+    surfaceFactor: ratio,
+    epochFactor: 1,
+    dpeFactor: 1,
+    stateFactor: 1,
+    tierFactor: 1,
+    tierCeilingShare: 1,
+    floorFactor: 1,
+    defectsFactor: 1,
+    normalization: 1,
+    buildingFactor: 1,
+    value: Math.round(Math.max(floorValue, residual)),
   };
 }
 
@@ -312,7 +418,38 @@ export interface Estimate {
  * count fully, the others by their probability given what visits have (not)
  * shown.
  */
+/** Estimates of frozen properties, like their real values (see realValueCache). */
+const estimateCache = new WeakMap<
+  Property,
+  { content: GameContent; priceIndex: number; visited: boolean; value: Estimate }[]
+>();
+
 export function estimateValue(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  visited: boolean,
+): Estimate {
+  if (!Object.isFrozen(property)) return computeEstimate(content, state, property, visited);
+  const priceIndex =
+    state.market.cities[property.cityId]?.[property.neighbourhoodId]?.priceIndex ?? 1;
+  let entries = estimateCache.get(property);
+  const hit = entries?.find(
+    (entry) =>
+      entry.content === content && entry.priceIndex === priceIndex && entry.visited === visited,
+  );
+  if (hit) return hit.value;
+  const value = computeEstimate(content, state, property, visited);
+  // One entry per visited flag, at the latest price level.
+  entries = (entries ?? []).filter(
+    (entry) => entry.content === content && entry.visited !== visited,
+  );
+  entries.push({ content, priceIndex, visited, value });
+  estimateCache.set(property, entries);
+  return value;
+}
+
+function computeEstimate(
   content: GameContent,
   state: GameState,
   property: Property,

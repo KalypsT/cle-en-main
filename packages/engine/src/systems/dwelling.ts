@@ -67,6 +67,16 @@ export function freezeNested(property: Property): void {
   if (property.copro) Object.freeze(property.copro);
 }
 
+export type DwellingPropertyKind = 'apartment' | 'house' | 'building';
+
+/** Energy class recorded on a shop, a parking space or land: the housing DPE rules skip them. */
+export const OTHER_KIND_DPE: DpeLabel = 'D';
+
+/** Apartments, houses and buildings have rooms and items; shops, parking spaces and land do not. */
+export function isDwelling(kind: PropertyKind): kind is DwellingPropertyKind {
+  return kind === 'apartment' || kind === 'house' || kind === 'building';
+}
+
 export function clampState(state: number): number {
   return Math.min(MAX_STATE, Math.max(MIN_STATE, state));
 }
@@ -159,6 +169,7 @@ export function blankItems(
   spaces: readonly Space[],
 ): WorkItem[] {
   const items: WorkItem[] = [];
+  if (!isDwelling(kind)) return items;
   const rules = content.works.items;
   for (const space of spaces) {
     for (const itemKind of content.works.spaces[space.kind]) {
@@ -173,25 +184,40 @@ export function blankItems(
   return items;
 }
 
+/** Rooms of frozen layouts by id (items look up their room for every cost and weight). */
+const spaceIndex = new WeakMap<readonly Space[], Map<string, Space>>();
+
 function spaceOf(property: Property, spaceId: string | null): Space | undefined {
-  return spaceId === null ? undefined : property.spaces.find((space) => space.id === spaceId);
+  if (spaceId === null) return undefined;
+  const { spaces } = property;
+  if (!Object.isFrozen(spaces)) return spaces.find((space) => space.id === spaceId);
+  let index = spaceIndex.get(spaces);
+  if (!index) {
+    index = new Map();
+    // The first room of an id wins, as with find().
+    for (const space of spaces) if (!index.has(space.id)) index.set(space.id, space);
+    spaceIndex.set(spaces, index);
+  }
+  return index.get(spaceId);
 }
 
 /** Quantity of an item's cost basis: m², windows or units. */
 export function itemQuantity(content: GameContent, property: Property, item: WorkItem): number {
   const works = itemRule(content, item.kind).works;
   const areas = content.works.areas;
+  const { kind } = property;
+  if (!isDwelling(kind)) return 0;
   switch (works?.basis) {
     case 'space':
       return spaceOf(property, item.spaceId)?.surface ?? 0;
     case 'surface':
       return property.surface;
     case 'insulation':
-      return property.surface * areas.insulation[property.kind];
+      return property.surface * areas.insulation[kind];
     case 'roof':
-      return property.surface * areas.roof[property.kind];
+      return property.surface * areas.roof[kind];
     case 'facade':
-      return property.surface * areas.facade[property.kind];
+      return property.surface * areas.facade[kind];
     case 'windows':
       return Math.max(areas.minWindows, Math.round(property.surface * areas.windowsPerM2));
     case 'unit':

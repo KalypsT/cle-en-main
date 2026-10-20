@@ -7,6 +7,7 @@ import v5Save from '../test/fixtures/save-v5-milestone-2.json' with { type: 'jso
 import v6Save from '../test/fixtures/save-v6-milestone-3.json' with { type: 'json' };
 import v7Save from '../test/fixtures/save-v7-milestone-5.json' with { type: 'json' };
 import v8Save from '../test/fixtures/save-v8-milestone-6.json' with { type: 'json' };
+import v9Save from '../test/fixtures/save-v9-milestone-7.json' with { type: 'json' };
 import { advanceToNextMonth, content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -320,5 +321,37 @@ describe('migrations', () => {
     expect(engine.loadGame(serializeGame(later))).toEqual(later);
     // The migration is deterministic.
     expect(engine.loadGame(v8)).toEqual(migrated);
+  });
+
+  it('upgrades a milestone 7 save (version 9): no SCI, own name, IFI and crises at zero', () => {
+    const v9 = JSON.stringify(v9Save);
+    const original = JSON.parse(v9) as {
+      player: { balance: number };
+      properties: { property: { id: string } }[];
+      listings: unknown[];
+      tax: { lastAssessment: unknown };
+    };
+    const migrated = engine.loadGame(v9);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.company).toBeNull();
+    expect(migrated.player.balance).toBe(original.player.balance);
+    expect(migrated.properties.map((o) => o.property.id)).toEqual(
+      original.properties.map((o) => o.property.id),
+    );
+    expect(migrated.properties.every((o) => o.holder === 'player')).toBe(true);
+    expect(migrated.properties.every((o) => o.property.atticSurface === 0)).toBe(true);
+    expect(migrated.properties.every((o) => o.lease === null || o.lease.missedDays === 0)).toBe(
+      true,
+    );
+    expect(migrated.listings).toHaveLength(original.listings.length);
+    expect(migrated.market.crises).toEqual([]);
+    expect(migrated.rivals.horizon?.arrivedDay).toBeNull();
+    if (original.tax.lastAssessment) {
+      expect(migrated.tax.lastAssessment).toMatchObject({ wealthTax: 0, taxableWealth: 0 });
+    }
+    // Playing on works, and the result round-trips.
+    const later = advanceToNextMonth(migrated).state;
+    expect(engine.loadGame(serializeGame(later))).toEqual(later);
+    expect(engine.loadGame(v9)).toEqual(migrated);
   });
 });

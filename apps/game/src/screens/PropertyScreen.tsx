@@ -107,6 +107,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
         </Card>
       )}
       <DpeCard property={property} id={property.id} />
+      <Transformations owned={owned} />
       <Card title={t.property.actions}>
         <div className="stack">
           {canRent && (
@@ -149,6 +150,67 @@ function Overview({ owned }: { owned: OwnedProperty }) {
         </div>
       </Card>
     </>
+  );
+}
+
+/** « Transformer le bien » (milestone 8): the project manager's quotes, and the one under way. */
+function Transformations({ owned }: { owned: OwnedProperty }) {
+  const { state, act } = useGame();
+  const texts = t.transformation;
+  const running = owned.works?.transformation;
+  if (running) {
+    return (
+      <Card title={texts.heading} tint="amber" testId="transformation">
+        <p className="small">
+          {format(texts.inProgress, {
+            kind: texts.kinds[running.kind],
+            date: formatDayYear(running.endDay),
+          })}
+        </p>
+      </Card>
+    );
+  }
+  const options = engine
+    .transformationOptions(state, owned.property.id)
+    .flatMap((option) =>
+      typeof option.estimate === 'string' ? [] : [{ kind: option.kind, ...option.estimate }],
+    );
+  if (options.length === 0) return null;
+  return (
+    <Card title={texts.heading} testId="transformation">
+      <p className="small muted">{texts.intro}</p>
+      {options.map((option) => (
+        <div key={option.kind} className="stack tight">
+          <p className="strong">{texts.kinds[option.kind]}</p>
+          <p className="small">
+            {format(texts.descriptions[option.kind], {
+              count: option.quote.lots?.length ?? 1,
+              surface: format(t.common.surface, { surface: option.quote.surfaceAfter }),
+            })}
+          </p>
+          <KeyValues
+            rows={[
+              { label: texts.works, value: formatEuros(option.quote.works) },
+              { label: texts.fee, value: formatEuros(option.quote.fee) },
+              { label: texts.total, value: formatEuros(option.quote.total), total: true },
+              { label: texts.valueAfter, value: formatEuros(option.valueAfter) },
+            ]}
+          />
+          <p className="small muted">
+            {format(texts.duration, { months: Math.round(option.quote.days / 30) })}
+          </p>
+          <button
+            type="button"
+            className="button block"
+            onClick={() =>
+              act({ type: 'works/transform', propertyId: owned.property.id, kind: option.kind })
+            }
+          >
+            {texts.start}
+          </button>
+        </div>
+      ))}
+    </Card>
   );
 }
 
@@ -225,6 +287,15 @@ function Rental({ owned }: { owned: OwnedProperty }) {
             { label: t.property.insured, value: lease.insured ? t.common.yes : t.common.no },
           ]}
         />
+        {gameContent.renting.leaseTypes[lease.leaseType].shortTerm && (
+          <button
+            type="button"
+            className="button block"
+            onClick={() => act({ type: 'rent/withdraw', propertyId: property.id })}
+          >
+            {t.transformation.stopShortTerm}
+          </button>
+        )}
         {lease.noticeEndDay !== null && (
           <p className="small warning strong">
             {format(t.property.notice, { date: formatDayYear(lease.noticeEndDay) })}

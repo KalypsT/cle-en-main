@@ -20,14 +20,17 @@ import type {
 import {
   heavyWorksInProgress,
   interpolateByState,
+  isDwelling,
   isIndecent,
   tierShare,
   weightedState,
 } from './dwelling.ts';
 import { realValue } from './valuation.ts';
+import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { addCost, addRent, ledgerOf } from './taxes.ts';
 import { drawTenant, visibleReliability } from './tenants.ts';
+import { LEASE_TYPES } from '../content-constants.ts';
 import { spendFreeTime } from './travel.ts';
 import { homeRent } from './cities.ts';
 
@@ -46,6 +49,12 @@ export function monthsToDays(months: number): number {
 }
 
 export type RentRefusal =
+  | 'rent.notEnoughRooms'
+  | 'rent.leaseNotAllowed'
+  | 'rent.notLettable'
+  | 'agency.leaseType'
+  | 'company.leaseType'
+  | 'company.noHome'
   | 'property.unknown'
   | 'sale.agreed'
   | 'rent.isHome'
@@ -103,6 +112,20 @@ export function marketRent(
   leaseType: LeaseType = 'bare',
 ): Cents {
   const rules = content.renting;
+  const { kind } = property;
+  if (!isDwelling(kind)) {
+    // A shop or a parking space: a share of the neighbourhood's rent for large flats.
+    const ratio = content.market.otherKinds[kind].rentRatio;
+    const perM2 = findNeighbourhood(content, property.cityId, property.neighbourhoodId).rentPerM2;
+    const rent = toCents(
+      property.surface *
+        perM2.largeApartment *
+        ratio *
+        rentLevel(content, state, property) *
+        rules.leaseTypes[leaseType].rentFactor,
+    );
+    return rent > 0 ? Math.max(RENT_ROUNDING, Math.round(rent / RENT_ROUNDING) * RENT_ROUNDING) : 0;
+  }
   if (isIndecent(content, property)) return 0;
   const tiers = tierShare(content, property, 'rent');
   // The tiers' rent bonus stops where their value bonus does (the neighbourhood's ceiling).
@@ -151,12 +174,19 @@ export function letBanDay(content: GameContent, dpe: DpeLabel): number | null {
   return date ? toDayNumber(date) : null;
 }
 
+/** Why a new lease cannot be signed: indecent, DPE ban, or not a property one lets (land). */
+export type LettingBlock = 'rent.indecent' | 'rent.dpeBanned' | 'rent.notLettable';
+
 /** Why a new lease cannot be signed on `day`, or null if it can. */
 export function lettingBlock(
   content: GameContent,
   property: Property,
   day: number,
-): 'rent.indecent' | 'rent.dpeBanned' | null {
+): LettingBlock | null {
+  // Housing rules (decency, DPE) do not apply to a shop or a parking space; land is not let.
+  if (!isDwelling(property.kind)) {
+    return content.market.otherKinds[property.kind].rentRatio > 0 ? null : 'rent.notLettable';
+  }
   if (isIndecent(content, property)) return 'rent.indecent';
   const ban = letBanDay(content, property.dpe);
   return ban !== null && day >= ban ? 'rent.dpeBanned' : null;
@@ -172,7 +202,11 @@ export function furnitureCost(content: GameContent, property: Property): Cents {
 /** Landlord insurance (propriétaire non occupant), per month. */
 export function ownerInsurance(content: GameContent, property: Property): Cents {
   const rules = content.renting.ownerInsurance;
-  return Math.round(toCents(rules.base + rules.perM2 * property.surface) / MONTHS_PER_YEAR);
+  const { kind } = property;
+  const factor = isDwelling(kind) ? 1 : content.market.otherKinds[kind].insuranceFactor;
+  return Math.round(
+    (toCents(rules.base + rules.perM2 * property.surface) * factor) / MONTHS_PER_YEAR,
+  );
 }
 
 /** Rents currently paid by tenants, charges excluded: the banks retain a share of them. */
@@ -204,10 +238,18 @@ export function listForRent(
   if (state.player.homePropertyId === propertyId) return 'rent.isHome';
   if (owned.lease) return 'rent.alreadyLet';
   if (owned.sale?.agreement) return 'sale.agreed';
+  if (owned.holder === 'company' && !content.company.leaseTypes.includes(terms.leaseType)) {
+    return 'company.leaseType';
+  }
   const block = lettingBlock(content, owned.property, ctx.today);
   if (block) return block;
   if (heavyWorksInProgress(content, owned)) return 'works.inProgress';
-  if (terms.agencyId !== null && !findAgency(content, terms.agencyId)) return 'agency.unknown';
+  const leaseRules = content.renting.leaseTypes[terms.leaseType];
+  if (!leaseRules.kinds.includes(owned.property.kind)) return 'rent.leaseNotAllowed';
+  if (owned.property.rooms < leaseRules.minRooms) return 'rent.notEnoughRooms';
+  const agency = terms.agencyId === null ? undefined : findAgency(content, terms.agencyId);
+  if (terms.agencyId !== null && !agency) return 'agency.unknown';
+  if (agency && !agency.leaseTypes.includes(terms.leaseType)) return 'agency.leaseType';
   const range = rentRange(content, state, owned.property, terms.leaseType);
   if (
     !Number.isInteger(terms.monthlyRent) ||
@@ -216,7 +258,7 @@ export function listForRent(
   ) {
     return 'rent.invalidRent';
   }
-  if (terms.leaseType === 'furnished' && !owned.furniture) {
+  if (leaseRules.furnished && !owned.furniture) {
     const cost = furnitureCost(content, owned.property);
     if (state.player.balance < cost) return 'account.insufficientFunds';
     state.player.balance -= cost;
@@ -226,12 +268,48 @@ export function listForRent(
   owned.rental = { ...terms, listedDay: ctx.today, applications: [] };
   ledgerOf(state, owned).category = terms.leaseType;
   ctx.events.push({ type: 'rentalListed', propertyId, ...terms });
+  const shortTerm = leaseRules.shortTerm;
+  if (shortTerm) {
+    // No tenant to choose: the guests come at once.
+    const market = marketRent(content, state, owned.property, terms.leaseType);
+    moveIn(ctx, owned, {
+      id: `application-${state.nextId++}`,
+      tenant: drawTenant(ctx, terms.leaseType, terms.monthlyRent, market, agency),
+      expiresDay: ctx.today,
+    });
+  }
   return null;
+}
+
+/** A short-term let stops: no tenant to see out, the property is simply free again. */
+function endShortTerm(ctx: SystemContext, owned: OwnedProperty): void {
+  owned.lease = null;
+  ctx.events.push({
+    type: 'tenantLeft',
+    propertyId: owned.property.id,
+    reason: 'notice',
+    damages: 0,
+    depositReturned: 0,
+  });
+}
+
+/** Leases the property may have: its kind, its rooms, and the SCI's rules when it holds it. */
+export function leaseOptions(content: GameContent, owned: OwnedProperty): LeaseType[] {
+  return LEASE_TYPES.filter((leaseType) => {
+    const rules = content.renting.leaseTypes[leaseType];
+    if (!rules.kinds.includes(owned.property.kind)) return false;
+    if (owned.property.rooms < rules.minRooms) return false;
+    return owned.holder !== 'company' || content.company.leaseTypes.includes(leaseType);
+  });
 }
 
 export function withdrawRental(ctx: SystemContext, propertyId: string): RentRefusal | null {
   const owned = findOwned(ctx.state, propertyId);
   if (!owned) return 'property.unknown';
+  if (owned.lease && ctx.content.renting.leaseTypes[owned.lease.leaseType].shortTerm) {
+    endShortTerm(ctx, owned);
+    return null;
+  }
   if (!owned.rental) return 'rent.notListed';
   owned.rental = null;
   ctx.events.push({ type: 'rentalWithdrawn', propertyId });
@@ -279,6 +357,7 @@ function moveIn(ctx: SystemContext, owned: OwnedProperty, application: RentalApp
     noticeEndDay: null,
     incident: null,
     arrears: null,
+    missedDays: 0,
   };
   state.player.balance += deposit;
   owned.lease = lease;
@@ -361,6 +440,8 @@ export function runDailyRentalListings(ctx: SystemContext): void {
         rules.dailyProbability *
         (content.citiesRules.demand[owned.property.cityId]?.tenants ?? 1) *
         (agency?.applicationRate ?? 1) *
+        content.renting.leaseTypes[rental.leaseType].applicationRate *
+        crisisFactor(state, 'tenantDemand') *
         Math.exp(-rules.rentSensitivity * (rental.monthlyRent / market - 1));
       if (nextFloat(state.rng) < Math.min(1, chance))
         receiveApplication(ctx, owned, rental, market);
@@ -476,6 +557,7 @@ export function moveIntoHome(ctx: SystemContext, propertyId: string): RentRefusa
   const owned = findOwned(state, propertyId);
   if (!owned) return 'property.unknown';
   if (state.player.homePropertyId === propertyId) return 'home.already';
+  if (owned.holder === 'company') return 'company.noHome';
   if (owned.lease) return 'rent.alreadyLet';
   if (owned.sale?.agreement) return 'sale.agreed';
   owned.rental = null;

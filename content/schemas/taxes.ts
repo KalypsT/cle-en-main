@@ -69,6 +69,26 @@ export const taxRulesSchema = z
       .strict(),
     /** Yearly accountant fees for the properties in a real regime (Yvon Tableur). */
     accountantFees: z.object({ bare: feesSchema, furnished: feesSchema }).strict(),
+    /**
+     * Impôt sur la fortune immobilière (milestone 8): on the net real-estate wealth of 1 January,
+     * due from `threshold`, on a progressive scale, with a discount (décote) up to `decote.until`.
+     */
+    wealthTax: z
+      .object({
+        threshold: euros,
+        brackets: z
+          .array(z.object({ from: euros, rate: share }).strict())
+          .min(1)
+          .refine((b) => b[0]?.from === 0, { message: 'Le barème doit commencer à 0 €.' })
+          .refine((b) => b.every((x, i) => i === 0 || x.from > (b[i - 1]?.from ?? 0)), {
+            message: 'Les seuils doivent croître.',
+          }),
+        /** Tax lowered by `base − rate × wealth` below `until`. */
+        decote: z.object({ until: euros, base: euros, rate: share }).strict(),
+        /** Allowance on the main residence's value. */
+        homeAllowanceShare: share,
+      })
+      .strict(),
     /** Day the property tax is charged. */
     propertyTaxDate: z
       .object({ month: z.number().int().min(1).max(12), day: z.number().int().min(1).max(28) })

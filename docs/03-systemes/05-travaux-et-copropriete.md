@@ -118,6 +118,23 @@ C'est le cœur ludique de la gestion. Pas de mini-jeux : la richesse vient des c
 - **Aucune aide à la rénovation** (prime, crédit d'impôt) : le jeu reste simple.
 - Au **jalon 8** : un **maître d'œuvre** pour déléguer les gros chantiers, la **division** d'une maison en appartements, l'**aménagement des combles**.
 
+> **Jalon 8, le maître d'œuvre** (`content/travaux.json`, `projectManager`) : on lui confie des postes (action `works/delegate`) ; il demande les devis aux artisans les plus fiables du carnet, les signe, traite les imprévus aussitôt (« traiter ») et ne prend aucun temps libre ; ses honoraires valent **10 %** du chantier. L'interface n'a pas encore d'écran de chantier : le bouton viendra avec lui.
+>
+> **Jalon 8, les transformations** (`packages/engine/src/systems/transformations.ts`, décision validée : un projet de transformation qui produit des lots à partir d'un bien), toujours menées par le maître d'œuvre, sur un bien vide et hors vente (action `works/transform`) :
+>
+> | Projet | Pour | Coût (avant honoraires, indice de ville compris) | Durée | Résultat |
+> |---|---|---|---|---|
+> | Division | maison de 110 m² ou plus | 850 €/m² + 4 000 € par appartement | 6 mois | 2 à 4 appartements d'environ 45 m², refaits à neuf, **chacun possédé, loué et vendu séparément** |
+> | Vente à la découpe | immeuble de rapport | 3 500 € par appartement + 1 % de la valeur | 3 mois | ses appartements, dans l'état de leurs pièces, sans la décote de 15 % d'un immeuble vendu en bloc |
+> | Combles | maison qui en a | 1 300 €/m² aménagé | 4 mois | la surface des combles en plus et une chambre |
+> | Construction | terrain de 300 m² ou plus | 1 750 €/m² construit | 10 mois | une maison neuve (25 % du terrain, 80 à 150 m²), classe A |
+>
+> - Un acompte de 30 % au départ, le solde à la fin, avec un **dépassement caché** (35 % de chance, de 5 à 20 %). Le coût compte dans la plus-value, pas dans les charges déductibles des loyers.
+> - Une division ou une découpe répartit le prix d'achat, les frais et les travaux entre les appartements selon leur surface ; le prêt suit le premier appartement (il est remboursé quand celui-ci est vendu), l'enveloppe travaux aussi.
+> - On ne divise pas la maison où l'on habite (on peut en aménager les combles).
+> - Le titre **Promoteur** demande une transformation terminée (chapitre 2.9).
+> - Marges mesurées sur les annonces du départ (valeur après, moins 1,2 fois le coût, rapportée au prix) : la découpe et la construction rapportent souvent un peu, les combles sont proches de l'équilibre, la division d'une maison ne paie que sur une bonne affaire. Revendre aussitôt rapporte peu à un particulier (frais d'agence, plus-value imposée à 36 % avant 5 ans) : le statut de marchand de biens n'est pas modélisé.
+
 ## La copropriété (version simple)
 
 - Les **charges de copropriété** sont prélevées chaque mois.

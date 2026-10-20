@@ -1,7 +1,9 @@
 import type { GameEvent } from './events.ts';
 import type { Cents } from './money.ts';
 import type { LeaseType, Trade } from './content.ts';
-import type { GameState, SaleMode, TaxRegimeChoice } from './state.ts';
+import type { GameState, Holder, SaleMode, TaxRegimeChoice, TransformationKind } from './state.ts';
+import type { TransformationRefusal } from './systems/transformations.ts';
+import type { CompanyRefusal } from './systems/company.ts';
 import type { AgendaRefusal, VisitRefusal } from './systems/agenda.ts';
 import type { CatalogRefusal } from './systems/catalog.ts';
 import type { ChallengeRefusal } from './systems/challenges.ts';
@@ -19,6 +21,10 @@ export type GameAction =
   | { type: 'bank/meet'; bankId: string }
   | { type: 'bank/refinance'; loanId: string; bankId: string }
   | { type: 'job/resign' }
+  /** Creates the player's SCI (milestone 8). */
+  | { type: 'company/create' }
+  /** Buys in one's own name or through the SCI, before asking any bank. */
+  | { type: 'purchase/setHolder'; purchaseId: string; holder: Holder }
   | { type: 'market/favorite'; listingId: string; favorite: boolean }
   /** Interface data kept in the save: Gérard's tutorial, on or off, and its step. */
   | { type: 'tutorial/set'; enabled?: boolean; step?: number }
@@ -67,6 +73,10 @@ export type GameAction =
   | { type: 'works/quote'; propertyId: string; artisanId: string; items: ItemChoice[] }
   | { type: 'works/start'; propertyId: string; quoteIds: string[]; diy: ItemChoice[] }
   | { type: 'works/hazard'; propertyId: string; choice: HazardChoice }
+  /** Hands these items to the project manager (milestone 8). */
+  | { type: 'works/delegate'; propertyId: string; items: ItemChoice[] }
+  /** Starts a transformation, led by the project manager (milestone 8). */
+  | { type: 'works/transform'; propertyId: string; kind: TransformationKind }
   | {
       type: 'copro/vote';
       propertyId: string;
@@ -94,6 +104,8 @@ export type RefusalCode =
   | MoveRefusal
   | CatalogRefusal
   | ChallengeRefusal
+  | CompanyRefusal
+  | TransformationRefusal
   | 'game.over'
   | 'job.alreadyResigned'
   | 'tutorial.invalidStep';

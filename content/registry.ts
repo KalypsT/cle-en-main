@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import { cityDataSchema } from './schemas/city.ts';
+import { companyRulesSchema } from './schemas/company.ts';
 import { decisionRulesSchema } from './schemas/decisions.ts';
 import { banksFileSchema, creditRulesSchema, marketRateSchema } from './schemas/credit.ts';
 import { jobsFileSchema } from './schemas/jobs.ts';
@@ -55,6 +56,7 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'musique.json': musicSchema,
   'partie.json': startSchema,
   'rivaux.json': rivalsFileSchema,
+  'sci.json': companyRulesSchema,
   'taux.json': marketRateSchema,
   'temps.json': timeSettingsSchema,
   'train-de-vie.json': livingCostsSchema,

@@ -27,6 +27,19 @@
     "bare": { "first": 300, "perExtraProperty": 60 },
     "furnished": { "first": 550, "perExtraProperty": 120 }
   },
+  "wealthTax": {
+    "threshold": 1300000,
+    "brackets": [
+      { "from": 0, "rate": 0 },
+      { "from": 800000, "rate": 0.005 },
+      { "from": 1300000, "rate": 0.007 },
+      { "from": 2570000, "rate": 0.01 },
+      { "from": 5000000, "rate": 0.0125 },
+      { "from": 10000000, "rate": 0.015 }
+    ],
+    "decote": { "until": 1400000, "base": 17500, "rate": 0.0125 },
+    "homeAllowanceShare": 0.3
+  },
   "propertyTaxDate": { "month": 10, "day": 15 },
   "capitalGains": {
     "incomeTaxRate": 0.19,
