@@ -145,6 +145,7 @@
     "bathroom": 1
   },
   "maxBubbles": 2,
+  "placesPerBuilding": 3,
   "cities": {
     "dole": {
       "centreHistorique": {

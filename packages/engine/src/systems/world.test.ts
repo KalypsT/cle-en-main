@@ -91,8 +91,11 @@ describe('streets', () => {
     const streets = engine.streets(state, CITY, 'centreHistorique');
     const rules = content.world.cities[CITY]?.centreHistorique;
     expect(streets.map((street) => street.name)).toEqual(rules?.streets.map((s) => s.name));
+    // A street has a fixed number of places; ordinary buildings fill those not taken.
+    const places = (rules?.streets[0]?.buildings ?? 0) * content.world.placesPerBuilding;
+    expect(streets[0]?.buildings.length).toBe(places);
     const ordinary = streets[0]?.buildings.filter((b) => b.role === 'ordinary') ?? [];
-    expect(ordinary).toHaveLength(rules?.streets[0]?.buildings ?? 0);
+    expect(ordinary.length).toBeGreaterThan(0);
     for (const building of ordinary) {
       const range =
         content.world.floors[
@@ -112,6 +115,28 @@ describe('streets', () => {
         .streets(later, CITY, 'centreHistorique')[0]
         ?.buildings.filter((b) => b.role === 'ordinary'),
     ).toEqual(ordinary);
+  });
+
+  it("keeps the player's property in its place while listings come and go", () => {
+    const state = withOwned(newGame(), sampleOwned(toDayNumber(newGame().clock.date)));
+    const id = state.properties[0]?.property.id;
+    const where = (current: GameState) =>
+      engine
+        .streets(current, CITY, 'centreHistorique')
+        .map((street) => [
+          street.buildings.length,
+          street.buildings.findIndex((b) => b.propertyId === id),
+        ]);
+    const before = where(state);
+    expect(before.some(([, index]) => (index ?? -1) >= 0)).toBe(true);
+    // Every listing gone, or twice as many: the streets and the property do not move.
+    expect(where({ ...state, listings: [] })).toEqual(before);
+    const doubled = state.listings.map((listing) => ({
+      ...listing,
+      id: `${listing.id}-bis`,
+      property: { ...listing.property, id: `${listing.property.id}-bis` },
+    }));
+    expect(where({ ...state, listings: [...state.listings, ...doubled] })).toEqual(before);
   });
 
   it('places every listing of the neighbourhood once, with an « À vendre » bubble', () => {

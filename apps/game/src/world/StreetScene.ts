@@ -113,6 +113,8 @@ export class StreetScene {
   private people: Walker[] = [];
   private cars: (Walker & { lights: Sprite })[] = [];
   private flyers: Walker[] = [];
+  /** Actors of an earlier moment or weather: they leave the view and are not replaced. */
+  private stale = new WeakSet<Walker>();
   private workers: Walker[] = [];
   private data: SceneData | null = null;
   private staticKey = '';
@@ -253,7 +255,11 @@ export class StreetScene {
     };
     const staticKey = [
       data.layout.streets
-        .map((s) => `${s.street.id}/${s.street.weather}/${s.buildings.map(buildingKey).join(',')}`)
+        // Only snow changes the drawing (snow on the ground): rain or clouds redraw nothing.
+        .map(
+          (s) =>
+            `${s.street.id}/${s.street.weather === 'snow'}/${s.buildings.map(buildingKey).join(',')}`,
+        )
         .join('|'),
       data.season,
       data.christmas,
@@ -265,8 +271,16 @@ export class StreetScene {
       this.buildStatic();
       this.lightsKey = '';
     }
-    if (!previous || previous.moment !== data.moment || previous.season !== data.season) {
+    if (
+      !previous ||
+      previous.season !== data.season ||
+      previous.neighbourhoodId !== data.neighbourhoodId ||
+      previous.cityId !== data.cityId
+    ) {
       this.resetActors();
+    } else if (previous.moment !== data.moment) {
+      // A new moment of the day: the passers-by change little by little, not all at once.
+      this.renewActors();
     }
     this.updateTarget();
   }
@@ -312,7 +326,7 @@ export class StreetScene {
     if (weather !== this.currentWeather) {
       this.currentWeather = weather;
       this.configureWeather();
-      this.resetActors();
+      this.renewActors();
     }
   }
 
@@ -574,13 +588,34 @@ export class StreetScene {
   }
 
   private resetActors(): void {
-    const data = this.data;
-    if (!data || !this.app) return;
+    if (!this.data || !this.app) return;
     for (const walker of [...this.people, ...this.cars, ...this.flyers])
       walker.view.destroy({ children: true });
     this.people = [];
     this.cars = [];
     this.flyers = [];
+    this.addActors(true);
+  }
+
+  /**
+   * The moment or the weather changed: the actors on screen walk on and leave, the new ones
+   * come in from the sides (no one pops in or out in view).
+   */
+  private renewActors(): void {
+    if (!this.data || !this.app) return;
+    // Nobody walks with reduced motion: the new ones would never come in.
+    if (this.reducedMotion) {
+      this.resetActors();
+      return;
+    }
+    for (const walker of [...this.people, ...this.cars, ...this.flyers]) this.stale.add(walker);
+    this.addActors(false);
+  }
+
+  /** Passers-by, cars and birds of the current moment and weather; `anywhere` in view or outside. */
+  private addActors(anywhere: boolean): void {
+    const data = this.data;
+    if (!data) return;
     const quality = QUALITY[this.quality];
     const weatherFactor =
       this.currentWeather === 'rain' || this.currentWeather === 'snow' ? 0.6 : 1;
@@ -594,14 +629,15 @@ export class StreetScene {
         night,
         random: this.random,
       });
-      this.placeInView(walker, true);
+      this.placeInView(walker, anywhere);
+      walker.view.scale.x = walker.dir;
       this.people.push(walker);
       this.actors.addChild(walker.view);
     }
     if (!street?.street.quay) {
       for (let i = 0; i < CARS[data.moment]; i++) {
         const car = createCar(this.random, this.glow);
-        this.placeInView(car, true);
+        this.placeInView(car, anywhere);
         this.cars.push(car);
         this.actors.addChild(car.view);
       }
@@ -616,11 +652,20 @@ export class StreetScene {
     ) {
       for (let i = 0; i < 3; i++) {
         const bird = createBird(this.random);
-        bird.x = this.random() * this.width;
+        bird.x = anywhere ? this.random() * this.width : -30 - this.random() * 200;
         this.flyers.push(bird);
         this.birds.addChild(bird.view);
       }
     }
+  }
+
+  /** Removes the stale actors that went out of view, and destroys them. */
+  private dropStale<T extends Walker>(actors: T[], gone: (actor: T) => boolean): T[] {
+    return actors.filter((actor) => {
+      if (!this.stale.has(actor) || !gone(actor)) return true;
+      actor.view.destroy({ children: true });
+      return false;
+    });
   }
 
   /** Puts a walker in the visible part of the street (or just outside it). */
@@ -682,14 +727,19 @@ export class StreetScene {
       }
     }
 
+    const outOfView = (walker: Walker, margin: number) =>
+      walker.x < left - margin || walker.x > right + margin;
+    this.people = this.dropStale(this.people, (walker) => outOfView(walker, MARGIN));
+    this.cars = this.dropStale(this.cars, (car) => outOfView(car, MARGIN * 2));
+    this.flyers = this.dropStale(this.flyers, (bird) => bird.x < -40 || bird.x > this.width + 40);
     for (const walker of this.people) {
       walker.update(dt, still);
-      if (walker.x < left - MARGIN || walker.x > right + MARGIN) this.respawn(walker);
+      if (outOfView(walker, MARGIN)) this.respawn(walker);
     }
     for (const car of this.cars) {
       car.update(dt, still);
       car.lights.alpha = glowAlpha * 0.8;
-      if (car.x < left - MARGIN * 2 || car.x > right + MARGIN * 2) this.respawn(car);
+      if (outOfView(car, MARGIN * 2)) this.respawn(car);
     }
     for (const bird of this.flyers) {
       bird.update(dt, still);
