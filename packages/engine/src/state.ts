@@ -17,7 +17,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 11;
+export const FORMAT_VERSION = 12;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -349,6 +349,8 @@ export interface Lease {
   arrears: Arrears | null;
   /** Short-term let managed by the owner: days of this month he could not see to (lost). */
   missedDays: number;
+  /** Day the tenant last refused to leave for an indemnity; null if never asked. */
+  buyoutRefusedDay: number | null;
 }
 
 export type TaxRegimeChoice = 'auto' | 'micro' | 'real';

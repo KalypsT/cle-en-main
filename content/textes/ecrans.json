@@ -1132,6 +1132,17 @@
     "reject": "Refuser",
     "counter": "Contre-proposer",
     "counterAmount": "Votre contre-proposition",
-    "agreed": "Vendu {amount} : l'acte est signé le {date}."
+    "agreed": "Vendu {amount} : l'acte est signé le {date}.",
+    "occupied": "Vendu loué, les acheteurs en retirent environ {percent} (bail en cours) : comptez plutôt {amount}. Un départ négocié avant la vente l'évite."
+  },
+  "buyout": {
+    "heading": "Départ négocié",
+    "intro": "Proposer une indemnité à votre locataire pour qu'il parte dans un mois. Il accepte si elle atteint ce qu'il espère, sans le dire.",
+    "usual": "D'habitude, ce bail se négocie entre {min} et {max} mois de loyer, soit {low} à {high}. Un locataire mécontent demande moins ; une famille ou un retraité, plus.",
+    "amount": "Indemnité proposée",
+    "months": "{months} mois de loyer",
+    "cost": "Rencontre : {duration} de temps libre. Accepté, il vous en coûte {points} points de réputation. L'indemnité n'est pas déductible des loyers.",
+    "offer": "Proposer {amount}",
+    "wait": "Votre locataire a refusé : nouvelle proposition possible {when}."
   }
 }

@@ -67,6 +67,7 @@ function PriceCard({ owned }: { owned: OwnedProperty }) {
   const [price, setPrice] = useState(() => sale?.askingPrice ?? roundPrice(estimate));
   const [mode, setMode] = useState<SaleMode>(sale?.mode ?? 'agency');
   const rules = gameContent.market.resale;
+  const discount = engine.occupiedDiscount(state, propertyId);
   const proceeds = engine.saleProceeds(state, propertyId, price, sale?.mode ?? mode);
   const min = roundPrice(estimate * 0.6);
   const max = roundPrice(estimate * 1.4);
@@ -138,6 +139,14 @@ function PriceCard({ owned }: { owned: OwnedProperty }) {
         </>
       )}
       {owned.lease && <p className="small muted">{t.sale.tenant}</p>}
+      {discount > 0 && (
+        <p className="small warning">
+          {format(t.sale.occupied, {
+            percent: formatPercent(discount * 100),
+            amount: formatEuros(estimate * (1 - discount)),
+          })}
+        </p>
+      )}
       {sale ? (
         <>
           <p className="small">

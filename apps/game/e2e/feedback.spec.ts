@@ -80,3 +80,28 @@ test('shows the version of the game and looks for an update', async ({ page }) =
   await version.scrollIntoViewIfNeeded();
   await capture(page, '06-version', MILESTONE);
 });
+
+test('sells a let flat at a discount, or pays the tenant to leave', async ({ page }) => {
+  await openGame(page);
+  await importState(
+    page,
+    ownerGame(24 * 120, (s) => s.properties.some((o) => o.lease !== null)),
+  );
+  await tab(page, 'assets');
+  await page.locator('[data-testid^="property-"]').first().click();
+
+  // For sale with its tenant: the buyers take a discount.
+  await page.getByRole('button', { name: t.property.sell }).click();
+  await expect(page.getByText(t.sale.tenant)).toBeVisible();
+  await expect(page.getByText(/les acheteurs en retirent/)).toBeVisible();
+  await page.getByRole('button', { name: t.common.back }).click();
+
+  // A generous indemnity: the tenant leaves in a month.
+  await page.getByRole('button', { name: t.property.tabs.rental }).click();
+  const buyout = page.getByTestId('buyout');
+  await buyout.scrollIntoViewIfNeeded();
+  await capture(page, '07-depart-negocie', MILESTONE);
+  await buyout.getByTestId('buyout-amount').fill('5000');
+  await buyout.getByRole('button', { name: /Proposer/ }).click();
+  await expect(page.getByText(/Préavis donné/)).toBeVisible();
+});

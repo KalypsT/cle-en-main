@@ -53,6 +53,21 @@ const leaseTypeRulesSchema = z
     furnished: z.boolean(),
     /** Fewest rooms the dwelling needs (a flat-share needs bedrooms). */
     minRooms: z.number().int().min(0),
+    /**
+     * What the tenant hides he would take to leave early (« départ négocié »), in months of
+     * rent excluding charges; null: no negotiated departure (a short-term let just stops).
+     */
+    buyoutMonths: z
+      .object({ min: z.number().min(0), max: z.number().min(0) })
+      .strict()
+      .nullable(),
+    /**
+     * Discount buyers apply to a property sold with this tenant in place, by months left of
+     * the lease term (the first line whose minimum is reached, from the longest); empty: none.
+     */
+    occupiedSaleDiscounts: z.array(
+      z.object({ minMonthsLeft: z.number().int().min(0), share }).strict(),
+    ),
     /** Tax family of the rents: revenus fonciers (bare) or BIC (furnished). */
     taxCategory: z.enum(['bare', 'furnished']),
     /** Own micro-BIC allowance and ceiling (furnished tourist lets); null: the general one. */
@@ -181,6 +196,26 @@ export const rentingRulesSchema = z
     /** Rents the player may ask, as a share of the market rent of the lease type. */
     rentRange: range,
     leaseTypes: z.record(leaseTypeSchema, leaseTypeRulesSchema),
+    /** Negotiated departure of a tenant (feedback after milestone 8). */
+    buyout: z
+      .object({
+        /** Free time of the meeting with the tenant. */
+        minutes: z.number().int().min(0),
+        /** An unhappy tenant (satisfaction below this) asks for less. */
+        unhappyBelow: z.number().min(0).max(100),
+        unhappyFactor: z.number().positive(),
+        /** Profiles attached to their home, who ask for more. */
+        attachedProfiles: z.array(z.string()),
+        attachedFactor: z.number().positive(),
+        /** Satisfaction lost by a refused offer, and days before the next one. */
+        refusalSatisfaction: z.number().min(0),
+        retryDays: z.number().int().min(0),
+        /** Days between the agreement and the move out. */
+        leaveAfterDays: z.number().int().min(1),
+        /** Reputation lost by each negotiated departure (an eviction costs more). */
+        reputationPenalty: z.number().min(0),
+      })
+      .strict(),
     /** Share of the co-ownership charges the tenant pays back. */
     recoverableChargesShare: share,
     furniture: z.object({ perM2: euros, minimum: euros, maximum: euros }).strict(),

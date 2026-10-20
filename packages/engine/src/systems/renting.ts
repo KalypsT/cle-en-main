@@ -73,7 +73,10 @@ export type RentRefusal =
   | 'home.none'
   | 'time.notEnoughFreeTime'
   | 'account.insufficientFunds'
-  | 'works.inProgress';
+  | 'works.inProgress'
+  | 'rent.noBuyout'
+  | 'rent.alreadyLeaving'
+  | 'rent.buyoutTooSoon';
 
 export function findOwned(state: GameState, propertyId: string): OwnedProperty | undefined {
   return state.properties.find((owned) => owned.property.id === propertyId);
@@ -358,6 +361,7 @@ function moveIn(ctx: SystemContext, owned: OwnedProperty, application: RentalApp
     incident: null,
     arrears: null,
     missedDays: 0,
+    buyoutRefusedDay: null,
   };
   state.player.balance += deposit;
   owned.lease = lease;

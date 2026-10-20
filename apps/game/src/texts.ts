@@ -435,7 +435,18 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
         rent: formatMoney(event.monthlyRent),
       });
     case 'tenantGaveNotice':
-      return events.tenantGaveNotice;
+      // A negotiated departure is told by its answer.
+      return event.reason === 'buyout' ? null : events.tenantGaveNotice;
+    case 'buyoutAnswered': {
+      const leaveDay = state?.properties.find((o) => o.property.id === event.propertyId)?.lease
+        ?.noticeEndDay;
+      return event.accepted
+        ? format(events.buyoutAccepted, {
+            amount: formatEuros(event.amount),
+            date: leaveDay ? formatDayLong(leaveDay) : '',
+          })
+        : format(events.buyoutRefused, { amount: formatEuros(event.amount) });
+    }
     case 'tenantLeft':
       return event.reason === 'evicted' ? events.tenantEvicted : events.tenantLeft;
     case 'rentRevised':

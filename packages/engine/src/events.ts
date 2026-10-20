@@ -207,8 +207,10 @@ export type GameEvent =
       type: 'tenantGaveNotice';
       propertyId: string;
       leaveDay: number;
-      reason: 'departure' | 'lifeEvent' | 'incident';
+      reason: 'departure' | 'lifeEvent' | 'incident' | 'buyout';
     }
+  /** The player offered an indemnity for the tenant to leave (« départ négocié »). */
+  | { type: 'buyoutAnswered'; propertyId: string; amount: Cents; accepted: boolean }
   | {
       type: 'tenantLeft';
       propertyId: string;
