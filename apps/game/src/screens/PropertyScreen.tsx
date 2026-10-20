@@ -125,6 +125,26 @@ function Overview({ owned }: { owned: OwnedProperty }) {
                 : t.property.rent}
             </button>
           )}
+          {!owned.works?.transformation && (
+            <button
+              type="button"
+              className="button block"
+              onClick={() => nav.push({ name: 'works', id: property.id })}
+            >
+              {owned.works ? t.property.worksInProgress : t.property.works}
+            </button>
+          )}
+          {!owned.works && (
+            <button
+              type="button"
+              className="button block"
+              onClick={() => nav.push({ name: 'sale', id: property.id })}
+            >
+              {owned.sale
+                ? format(t.property.saleInProgress, { count: owned.sale.offers.length })
+                : t.property.sell}
+            </button>
+          )}
           {isHome ? (
             <>
               <p className="small muted">{t.property.isHome}</p>

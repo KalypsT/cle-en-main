@@ -2055,3 +2055,10 @@ select {
   fill: transparent;
   stroke: none;
 }
+
+/* An item picked for works: its tier and the « do it myself » switch, set off to the right. */
+.works-pick {
+  margin: 2px 0 8px 10px;
+  padding-left: 12px;
+  border-left: 3px solid var(--teal);
+}

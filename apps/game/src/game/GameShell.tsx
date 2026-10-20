@@ -27,6 +27,8 @@ import { MapTab } from '../screens/MapTab.tsx';
 import { MenuTab } from '../screens/MenuTab.tsx';
 import { PropertyScreen } from '../screens/PropertyScreen.tsx';
 import { PurchaseScreen } from '../screens/PurchaseScreen.tsx';
+import { SaleScreen } from '../screens/SaleScreen.tsx';
+import { WorksScreen } from '../screens/WorksScreen.tsx';
 import { RentScreen } from '../screens/RentScreen.tsx';
 import { SettingsScreen } from '../screens/SettingsScreen.tsx';
 import { SectionScreen } from '../screens/SectionScreen.tsx';
@@ -407,6 +409,10 @@ function RouteScreen({ route }: { route: Route }) {
       return <PropertyScreen id={route.id} initialTab={route.tab} />;
     case 'rent':
       return <RentScreen id={route.id} />;
+    case 'works':
+      return <WorksScreen id={route.id} />;
+    case 'sale':
+      return <SaleScreen id={route.id} />;
     case 'settings':
       return <SettingsScreen />;
     case 'event':

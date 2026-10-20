@@ -16,6 +16,8 @@ export type Route =
   | { name: 'purchase'; id: string }
   | { name: 'property'; id: string; tab?: PropertyTab }
   | { name: 'rent'; id: string }
+  | { name: 'works'; id: string }
+  | { name: 'sale'; id: string }
   | { name: 'section'; neighbourhoodId: string; buildingId: string }
   | { name: 'settings' }
   | { name: 'event'; id: string }

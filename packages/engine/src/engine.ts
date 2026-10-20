@@ -7,7 +7,13 @@ import type { GameEvent, StatementLine } from './events.ts';
 import { type Cents, toCents } from './money.ts';
 import { nextFloat, seedRng } from './random.ts';
 import { deserializeGame, type MigrationRegistry, MIGRATIONS } from './serialization.ts';
-import { type Avatar, FORMAT_VERSION, type GameState, type TransformationKind } from './state.ts';
+import {
+  type Avatar,
+  FORMAT_VERSION,
+  type GameState,
+  type SaleMode,
+  type TransformationKind,
+} from './state.ts';
 import { monthlyPoint, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
@@ -613,10 +619,10 @@ export function createEngine(content: GameContent) {
       const purchase = state.purchases.find((candidate) => candidate.id === purchaseId);
       return purchase ? cashDueAtDeed({ content }, purchase) : null;
     },
-    /** Net proceeds if an owned property sold today at `price`. */
-    saleProceeds: (state: GameState, propertyId: string, price: Cents) => {
+    /** Net proceeds if an owned property sold today at `price` (by `mode`, else as listed). */
+    saleProceeds: (state: GameState, propertyId: string, price: Cents, mode?: SaleMode) => {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
-      return owned ? saleProceeds(context(content, state, []), owned, price) : null;
+      return owned ? saleProceeds(context(content, state, []), owned, price, mode) : null;
     },
     /**
      * Rents the player may ask today for a listing, a purchase under compromis

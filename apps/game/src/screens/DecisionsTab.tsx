@@ -100,9 +100,11 @@ export function decisionRoute(decision: PendingDecision): Route | null {
     case 'incident':
       return { name: 'property', id: decision.propertyId, tab: 'rental' };
     case 'saleOffer':
+      return { name: 'sale', id: decision.propertyId };
     case 'worksHazard':
-    case 'coproVote':
     case 'quoteExpiring':
+      return { name: 'works', id: decision.propertyId };
+    case 'coproVote':
     case 'dpeWarning':
     case 'vacant':
       return { name: 'property', id: decision.propertyId };
