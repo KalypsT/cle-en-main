@@ -2,7 +2,7 @@ import { gameContent, type Job } from '@cle/content';
 import type { Avatar as AvatarParts } from '@cle/engine';
 import { useState } from 'react';
 import { cityName, format, formatDuration, formatEuros, t, texts } from '../texts.ts';
-import { Avatar, AVATAR_PARTS } from '../ui/Avatar.tsx';
+import { Avatar, AVATAR_CONTROLS, AVATAR_KEYS } from '../ui/Avatar.tsx';
 import { Card, Stepper, Switch } from '../ui/components.tsx';
 
 export interface NewGameChoices {
@@ -12,8 +12,6 @@ export interface NewGameChoices {
   tutorial: boolean;
   modeId: string;
 }
-
-const PARTS = ['face', 'hair', 'skin', 'outfit'] as const;
 
 function freeTimeText(job: Job): string {
   const { freeTime } = job;
@@ -43,11 +41,11 @@ export function CreateGameScreen({
   const [tutorial, setTutorial] = useState(true);
   const [modeId, setModeId] = useState(gameContent.modes.defaultModeId);
 
-  const shift = (part: (typeof PARTS)[number], delta: number) =>
-    setAvatar((current) => ({
-      ...current,
-      [part]: (current[part] + delta + AVATAR_PARTS[part]) % AVATAR_PARTS[part],
-    }));
+  const shift = (part: (typeof AVATAR_KEYS)[number], delta: number) =>
+    setAvatar((current) => {
+      const { count, get, set } = AVATAR_CONTROLS[part];
+      return set(current, (get(current) + delta + count) % count);
+    });
 
   return (
     <main className="screen">
@@ -80,13 +78,13 @@ export function CreateGameScreen({
             label={format(t.avatar.label, { name: name || start.defaultPlayerName })}
           />
           <div className="stack tight">
-            {PARTS.map((part) => (
+            {AVATAR_KEYS.map((part) => (
               <Stepper
                 key={part}
                 label={t.creation[part]}
                 value={format(t.creation.partValue, {
-                  index: avatar[part] + 1,
-                  count: AVATAR_PARTS[part],
+                  index: AVATAR_CONTROLS[part].get(avatar) + 1,
+                  count: AVATAR_CONTROLS[part].count,
                 })}
                 previousLabel={format(t.creation.previous, { part: t.creation[part] })}
                 nextLabel={format(t.creation.next, { part: t.creation[part] })}
