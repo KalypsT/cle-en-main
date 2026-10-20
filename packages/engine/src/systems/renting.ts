@@ -539,6 +539,10 @@ export function moveOut(
     day: ctx.today,
     tenantName: `${tenant.firstName} ${tenant.lastName}`,
     reason,
+    startDay: lease.startDay,
+    monthlyRent: lease.monthlyRent,
+    damages,
+    depositReturned: returned,
   });
   const propertyId = owned.property.id;
   ctx.events.push({ type: 'tenantLeft', propertyId, reason, damages, depositReturned: returned });

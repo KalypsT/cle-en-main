@@ -383,4 +383,43 @@ describe('migrations', () => {
     expect(engine.loadGame(serializeGame(later))).toEqual(later);
     expect(engine.loadGame(v10)).toEqual(migrated);
   });
+
+  it('completes the tenant exits of a version 14 history from the matching arrival', () => {
+    const raw = {
+      formatVersion: 14,
+      properties: [
+        {
+          log: [
+            { kind: 'tenantIn', day: 100, tenantName: 'Lucas Arnaud', monthlyRent: 52_000 },
+            { kind: 'tenantOut', day: 400, tenantName: 'Lucas Arnaud', reason: 'notice' },
+            { kind: 'tenantOut', day: 500, tenantName: 'Inconnu', reason: 'dpe' },
+          ],
+        },
+      ],
+    };
+    const migrated = migrateRaw(raw, context, 15) as { properties: { log: unknown[] }[] };
+    expect(migrated.properties[0]?.log).toEqual([
+      raw.properties[0]?.log[0],
+      {
+        kind: 'tenantOut',
+        day: 400,
+        tenantName: 'Lucas Arnaud',
+        reason: 'notice',
+        startDay: 100,
+        monthlyRent: 52_000,
+        damages: 0,
+        depositReturned: 0,
+      },
+      {
+        kind: 'tenantOut',
+        day: 500,
+        tenantName: 'Inconnu',
+        reason: 'dpe',
+        startDay: 500,
+        monthlyRent: 0,
+        damages: 0,
+        depositReturned: 0,
+      },
+    ]);
+  });
 });

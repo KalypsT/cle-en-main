@@ -422,6 +422,34 @@ export const MIGRATIONS: MigrationRegistry = {
       },
     };
   },
+  /**
+   * Version 14 to 15: a tenant's exit keeps the lease's start, its rent, the damages and the
+   * deposit returned. Earlier exits take the start and rent of the matching entry, the rest is
+   * unknown (0).
+   */
+  14: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => {
+      const log = (entry.log as Record<string, unknown>[]) ?? [];
+      return {
+        ...entry,
+        log: log.map((line, i) => {
+          if (line.kind !== 'tenantOut') return line;
+          const arrival = log
+            .slice(0, i)
+            .reverse()
+            .find((other) => other.kind === 'tenantIn' && other.tenantName === line.tenantName);
+          return {
+            ...line,
+            startDay: arrival?.day ?? line.day,
+            monthlyRent: arrival?.monthlyRent ?? 0,
+            damages: 0,
+            depositReturned: 0,
+          };
+        }),
+      };
+    }),
+  }),
   /** Version 13 to 14: the history of each property starts empty. */
   13: (raw) => ({
     ...raw,
@@ -1169,6 +1197,10 @@ const gameStateSchema = z
                   day,
                   tenantName: z.string(),
                   reason: z.enum(['notice', 'evicted', 'endOfTerm', 'dpe']),
+                  startDay: day,
+                  monthlyRent: cents,
+                  damages: cents,
+                  depositReturned: cents,
                 })
                 .strict(),
               z

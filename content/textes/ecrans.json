@@ -421,6 +421,10 @@
       "byYou": "vous-même (matériaux)",
       "tenantIn": "Entrée de {name}, loyer {rent} / mois",
       "tenantOut": "Départ de {name} ({reason})",
+      "tenantOutDetails": "Resté {duration} · dernier loyer {rent} / mois",
+      "years": "{count} an(s)",
+      "months": "{count} mois",
+      "tenantOutMoney": "Dépôt rendu {returned} · dégâts retenus {damages}",
       "tenantReasons": {
         "notice": "congé",
         "evicted": "expulsion",

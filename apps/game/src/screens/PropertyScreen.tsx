@@ -439,6 +439,18 @@ function Rooms({ owned }: { owned: OwnedProperty }) {
   );
 }
 
+/** « 8 mois », « 2 ans et 3 mois » (a lease, from a number of days). */
+function formatLeaseDuration(days: number): string {
+  const months = Math.max(1, Math.round(days / 30.4));
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  const parts = [
+    years > 0 ? format(t.property.history.years, { count: years }) : '',
+    rest > 0 ? format(t.property.history.months, { count: rest }) : '',
+  ].filter(Boolean);
+  return parts.join(' ');
+}
+
 /** What happened to the property, most recent first: works, tenants, incidents. */
 function History({ owned }: { owned: OwnedProperty }) {
   const texts = t.property.history;
@@ -482,6 +494,24 @@ function History({ owned }: { owned: OwnedProperty }) {
               </span>
               <span className="tiny muted">{formatDayYear(entry.day)}</span>
             </span>
+            {entry.kind === 'tenantOut' && (
+              <>
+                <span className="tiny muted">
+                  {format(texts.tenantOutDetails, {
+                    duration: formatLeaseDuration(entry.day - entry.startDay),
+                    rent: formatEuros(entry.monthlyRent),
+                  })}
+                </span>
+                {entry.depositReturned + entry.damages > 0 && (
+                  <span className="tiny muted">
+                    {format(texts.tenantOutMoney, {
+                      returned: formatEuros(entry.depositReturned),
+                      damages: formatEuros(entry.damages),
+                    })}
+                  </span>
+                )}
+              </>
+            )}
             {entry.kind === 'works' && (
               <span className="tiny muted">
                 {format(texts.worksBy, {

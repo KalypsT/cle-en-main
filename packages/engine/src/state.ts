@@ -17,7 +17,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 14;
+export const FORMAT_VERSION = 15;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -524,6 +524,12 @@ export type PropertyLogEntry =
       day: number;
       tenantName: string;
       reason: 'notice' | 'evicted' | 'endOfTerm' | 'dpe';
+      /** Day the lease began, and its last rent (excluding charges). */
+      startDay: number;
+      monthlyRent: Cents;
+      /** Damages found at the exit inventory, and the deposit given back. */
+      damages: Cents;
+      depositReturned: Cents;
     }
   | { kind: 'incident'; day: number; kindId: string; cost: Cents };
 
