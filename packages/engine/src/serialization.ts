@@ -421,6 +421,14 @@ export const MIGRATIONS: MigrationRegistry = {
       },
     };
   },
+  /** Version 10 (milestone 8) to 11: the value curve of each property starts empty. */
+  10: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      valueHistory: [],
+    })),
+  }),
 };
 
 /** Old defects (version 5) and the item each one becomes at state 1. */
@@ -1109,6 +1117,9 @@ const gameStateSchema = z
             .nullable(),
           coproCalls: z.array(
             z.object({ monthly: cents, monthsLeft: z.number().int().min(0) }).strict(),
+          ),
+          valueHistory: z.array(
+            z.object({ date: calendarDateSchema, value: cents, debt: cents }).strict(),
           ),
         })
         .strict(),

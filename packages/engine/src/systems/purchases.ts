@@ -13,6 +13,7 @@ import type { SystemContext } from './context.ts';
 import { freezeItems, itemId } from './dwelling.ts';
 import { removeListing } from './listings.ts';
 import { monthsToDays } from './renting.ts';
+import { estimateValue } from './valuation.ts';
 
 export type PurchaseRefusal =
   | 'purchase.unknown'
@@ -298,6 +299,14 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
     worksForCapitalGains: 0,
     coproMeeting: null,
     coproCalls: [],
+    // The curve starts at the estimate of the deed day.
+    valueHistory: [
+      {
+        date: { ...state.clock.date },
+        value: estimateValue(ctx.content, state, purchase.property, true).estimate,
+        debt: loan?.remaining ?? 0,
+      },
+    ],
   });
   ctx.events.push({
     type: 'deedSigned',

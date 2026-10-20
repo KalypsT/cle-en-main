@@ -17,7 +17,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 10;
+export const FORMAT_VERSION = 11;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -478,6 +478,11 @@ export interface OwnedProperty {
   coproMeeting: CoproMeeting | null;
   /** Calls for funds voted by the co-ownership, charged monthly. */
   coproCalls: { monthly: Cents; monthsLeft: number }[];
+  /**
+   * Estimated value and what its loans still owe, on the deed day then on the 1st of each
+   * month (the value curve).
+   */
+  valueHistory: { date: CalendarDate; value: Cents; debt: Cents }[];
 }
 
 /** A property a marchand de biens renovates before selling it again. */

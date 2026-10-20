@@ -3,6 +3,7 @@ import type { StatementLine } from '../events.ts';
 import type { Cents } from '../money.ts';
 import type { GameState, MonthlyPoint } from '../state.ts';
 import { netWorth } from './net-worth.ts';
+import { estimateValue } from './valuation.ts';
 
 const INCOME_KINDS: ReadonlySet<StatementLine['kind']> = new Set([
   'salary',
@@ -40,4 +41,22 @@ export function monthlyPoint(
 /** Rents of the current leases, charges excluded. */
 export function currentMonthlyRent(state: GameState): Cents {
   return state.properties.reduce((sum, owned) => sum + (owned.lease?.monthlyRent ?? 0), 0);
+}
+
+/** A point of each property's value curve: its estimate today, as the player sees it, and its debt. */
+export function recordPropertyValues(content: GameContent, state: GameState): void {
+  for (const owned of state.properties) {
+    owned.valueHistory.push({
+      date: { ...state.clock.date },
+      value: estimateValue(content, state, owned.property, true).estimate,
+      debt: propertyDebt(state, owned.property.id),
+    });
+  }
+}
+
+/** What the loans of a property still owe. */
+export function propertyDebt(state: GameState, propertyId: string): Cents {
+  return state.loans
+    .filter((loan) => loan.propertyId === propertyId)
+    .reduce((sum, loan) => sum + loan.remaining, 0);
 }

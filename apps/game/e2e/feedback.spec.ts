@@ -41,3 +41,16 @@ test('lists a property for sale, then paints a room oneself', async ({ page }) =
   await expect(loan).toContainText(t.bank.end);
   await capture(page, '04-banque', MILESTONE);
 });
+
+test('draws the value curve of a property owned for a few months', async ({ page }) => {
+  await openGame(page);
+  await importState(page, ownerGame(24 * 200));
+  await tab(page, 'assets');
+  await page.locator('[data-testid^="property-"]').first().click();
+  await page.getByRole('button', { name: t.property.tabs.finances }).click();
+  const curve = page.getByTestId('value-curve');
+  await expect(curve.locator('svg')).toBeVisible();
+  await expect(curve).toContainText(t.property.valueCurve.equity);
+  await curve.scrollIntoViewIfNeeded();
+  await capture(page, '05-valeur-du-bien', MILESTONE);
+});

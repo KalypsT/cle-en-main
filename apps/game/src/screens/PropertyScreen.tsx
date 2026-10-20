@@ -13,6 +13,7 @@ import {
   formatEuros,
   formatGameDate,
   formatPercent,
+  formatShortDate,
   formatSigned,
   formatWhen,
   propertyLabel,
@@ -32,6 +33,7 @@ import {
 import { DpeCard } from '../ui/DpeCard.tsx';
 import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
+import { LineChart } from '../ui/LineChart.tsx';
 
 /** « Fiche d'un bien » (docs/04): overview, rooms, letting, finances. */
 export function PropertyScreen({
@@ -174,6 +176,54 @@ function Overview({ owned }: { owned: OwnedProperty }) {
         </div>
       </Card>
     </>
+  );
+}
+
+/** The value curve (feedback after milestone 8): value, purchase price and debt month by month. */
+function ValueCurve({ owned }: { owned: OwnedProperty }) {
+  const { state } = useGame();
+  const texts = t.property.valueCurve;
+  const history = owned.valueHistory;
+  const value = engine.estimate(state, owned.property.id)?.estimate ?? owned.purchasePrice;
+  const debt = state.loans
+    .filter((loan) => loan.propertyId === owned.property.id)
+    .reduce((sum, loan) => sum + loan.remaining, 0);
+  const first = history[0];
+  const last = history.at(-1);
+  return (
+    <Card title={texts.heading} testId="value-curve">
+      <KeyValues
+        rows={[
+          { label: texts.value, value: formatEuros(value) },
+          { label: texts.price, value: formatEuros(owned.purchasePrice) },
+          {
+            label: texts.gain,
+            value: formatSigned(value - owned.purchasePrice),
+            className: tone(value - owned.purchasePrice),
+          },
+          { label: texts.debt, value: formatEuros(debt) },
+          { label: texts.equity, value: formatEuros(value - debt), total: true },
+        ]}
+      />
+      {first && last && history.length >= 2 ? (
+        <LineChart
+          title={texts.chart}
+          xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
+          series={[
+            { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
+            {
+              label: texts.price,
+              color: '#8a7f6a',
+              values: history.map(() => owned.purchasePrice),
+              dashed: true,
+            },
+            { label: texts.debt, color: '#a33a2a', values: history.map((p) => p.debt) },
+          ]}
+        />
+      ) : (
+        <p className="small muted">{texts.soon}</p>
+      )}
+    </Card>
   );
 }
 
@@ -500,6 +550,7 @@ function Finances({ owned }: { owned: OwnedProperty }) {
           />
         </Card>
       )}
+      <ValueCurve owned={owned} />
       <Card title={t.property.loan}>
         {loans.length === 0 && <p className="small muted">{t.property.noLoan}</p>}
         {loans.map((loan) => (

@@ -14,7 +14,7 @@ import {
   type SaleMode,
   type TransformationKind,
 } from './state.ts';
-import { monthlyPoint, statementNet } from './systems/history.ts';
+import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
 import {
   evaluateLoan,
   initialBankRelations,
@@ -336,6 +336,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     // The wealth curve, once the first day of the month has run.
     const net = statementNet(ctx.state.lastStatement?.lines ?? []);
     ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
+    recordPropertyValues(ctx.content, ctx.state);
   }
   if (yearStarted) ctx.state.lastYearReview = buildYearReview(ctx, regime);
 }

@@ -8,6 +8,7 @@ import v6Save from '../test/fixtures/save-v6-milestone-3.json' with { type: 'jso
 import v7Save from '../test/fixtures/save-v7-milestone-5.json' with { type: 'json' };
 import v8Save from '../test/fixtures/save-v8-milestone-6.json' with { type: 'json' };
 import v9Save from '../test/fixtures/save-v9-milestone-7.json' with { type: 'json' };
+import v10Save from '../test/fixtures/save-v10-milestone-8.json' with { type: 'json' };
 import { advanceToNextMonth, content, engine, newGame } from '../test/helpers.ts';
 import {
   deserializeGame,
@@ -353,5 +354,24 @@ describe('migrations', () => {
     const later = advanceToNextMonth(migrated).state;
     expect(engine.loadGame(serializeGame(later))).toEqual(later);
     expect(engine.loadGame(v9)).toEqual(migrated);
+  });
+
+  it('upgrades a milestone 8 save (version 10): the value curves start empty', () => {
+    const v10 = JSON.stringify(v10Save);
+    const original = JSON.parse(v10) as { properties: { property: { id: string } }[] };
+    const migrated = engine.loadGame(v10);
+    expect(migrated.formatVersion).toBe(FORMAT_VERSION);
+    expect(migrated.properties.map((o) => o.property.id)).toEqual(
+      original.properties.map((o) => o.property.id),
+    );
+    expect(migrated.properties.every((o) => o.valueHistory.length === 0)).toBe(true);
+    // The 1st of the next month adds a point to each curve, and the result round-trips.
+    const later = advanceToNextMonth(migrated).state;
+    expect(later.properties.every((o) => o.valueHistory.length === 1)).toBe(true);
+    expect(later.properties[0]?.valueHistory[0]?.value).toBe(
+      engine.estimate(later, later.properties[0]?.property.id ?? '')?.estimate,
+    );
+    expect(engine.loadGame(serializeGame(later))).toEqual(later);
+    expect(engine.loadGame(v10)).toEqual(migrated);
   });
 });

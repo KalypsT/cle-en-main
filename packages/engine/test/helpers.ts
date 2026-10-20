@@ -237,6 +237,7 @@ export function sampleOwned(
     worksForCapitalGains: 0,
     coproMeeting: null,
     coproCalls: [],
+    valueHistory: [],
   };
 }
 

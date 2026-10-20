@@ -477,7 +477,17 @@
     "worksFund": "Enveloppe travaux disponible",
     "worksFundUntil": "{amount}, jusqu'au {date}",
     "worksInProgress": "Suivre le chantier",
-    "saleInProgress": "Suivre la vente ({count} offre(s))"
+    "saleInProgress": "Suivre la vente ({count} offre(s))",
+    "valueCurve": {
+      "heading": "Valeur du bien",
+      "chart": "Valeur estimée, prix d'achat et crédit restant, mois par mois",
+      "value": "Valeur estimée",
+      "price": "Prix d'achat",
+      "debt": "Crédit restant dû",
+      "gain": "Plus-value latente (avant frais et impôt)",
+      "equity": "Votre part (valeur moins crédit)",
+      "soon": "La courbe se remplit le 1er de chaque mois."
+    }
   },
   "rent": {
     "heading": "Mise en location",
