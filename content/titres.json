@@ -92,9 +92,9 @@
       "name": "Magnat",
       "step": 5,
       "branch": "both",
-      "description": "Un patrimoine net de 1,3 million d'euros. L'IFI vous guette.",
-      "conditions": [{ "stat": "netWorth", "min": 1300000 }],
-      "requiresAny": ["developer"],
+      "description": "Un patrimoine net d'un million d'euros. L'IFI n'est plus très loin.",
+      "conditions": [{ "stat": "netWorth", "min": 1000000 }],
+      "requiresAny": ["seasonedInvestor", "propertyDealer", "developer"],
       "available": true,
       "perks": { "bankMarginPercent": -0.05, "offMarketChancePerMonth": 0.1 },
       "perkText": "Encore 0,05 point de marge en moins, et les plus beaux biens vous sont proposés en premier."

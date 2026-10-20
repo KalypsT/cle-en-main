@@ -66,6 +66,12 @@ describe('progression (docs/02, sections 2.8 to 2.10)', () => {
     checkMilestones(ctx);
     expect(ctx.state.progress.titles.map((t) => t.id)).toContain('seasonedInvestor');
     expect(ctx.state.progress.achievements.map((a) => a.id)).toContain('thousandAMonth');
+    // Magnat follows Investisseur aguerri too: no transformation needed (milestone 8).
+    expect(ctx.state.progress.titles.map((t) => t.id)).not.toContain('magnate');
+    ctx.state.player.balance += 1_000_000_00;
+    checkMilestones(ctx);
+    expect(ctx.state.progress.titles.map((t) => t.id)).toContain('magnate');
+    expect(ctx.state.progress.titles.map((t) => t.id)).not.toContain('developer');
   });
 
   it('counts works, DPE classes, rivals beaten and sales with a gain', () => {

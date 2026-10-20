@@ -18,7 +18,7 @@
     "diminishingFrom": 70,
     "diminishingSpan": 30,
     "erosionAbove": 80,
-    "erosionPerYear": 2
+    "erosionPerYear": 5
   },
   "effects": {
     "bankMargin": [

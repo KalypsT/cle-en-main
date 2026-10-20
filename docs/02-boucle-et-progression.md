@@ -117,7 +117,7 @@ Deux branches qui se rejoignent. Les seuils sont à calibrer.
 | 2 | Bailleur (3 biens loués) | Rénovateur (3 rénovations terminées) |
 | 3 | Investisseur aguerri (patrimoine net de 250 k€, 2 villes) | Marchand de biens (5 reventes avec plus-value) |
 | 4 | Promoteur (division ou transformation d'un bien, jalon 8) | Promoteur |
-| 5 | **Magnat** (patrimoine net de 1,3 M€, l'IFI arrive) | **Magnat** |
+| 5 | **Magnat** (patrimoine net de 1 M€, l'IFI approche) | **Magnat** |
 | Ultime | **Baron de la pierre** (5 M€ net, 4 villes, réputation de 90) | **Baron de la pierre** |
 
 Chaque titre apporte un **petit avantage** (une marge bancaire réduite, un agent de plus qui appelle) et une **scène de célébration** dans la rue.
@@ -127,7 +127,7 @@ Chaque titre apporte un **petit avantage** (une marge bancaire réduite, un agen
 > **Jalon 8** (décisions validées) :
 > - **Investisseur aguerri** : 150 000 € nets (250 000 € auparavant, jamais atteint en 10 ans) et des biens dans 2 villes.
 > - **Promoteur** est actif : une transformation terminée (division d'une maison, vente à la découpe d'un immeuble, combles, construction ; chapitre 3.5). Il suit Investisseur aguerri ou Marchand de biens.
-> - **Magnat** suit désormais **Promoteur** (chaque titre demande un titre de l'étape précédente de sa branche) : il faut avoir transformé un bien pour être Magnat.
+> - **Magnat** : 1 000 000 € nets (1,3 M€ auparavant). Il suit **Investisseur aguerri, Marchand de biens ou Promoteur** : transformer un bien n'est pas obligatoire, Promoteur reste une voie parmi d'autres (mesure du jalon 8 : avec Promoteur pour seul prérequis, un Chasseur ne devenait jamais Magnat).
 > - **Bailleur** ne compte que les logements loués (un parking ou un local ne fait pas un bailleur).
 
 Durées cibles, voir [08-equilibrage.md](08-equilibrage.md).
@@ -156,6 +156,6 @@ Les succès et les statistiques suffisent comme moteur à long terme : pas de co
 > - **Chronique** : départ, premiers achat, bail, chantier et revente, résidence principale, titres, succès, défis, grands événements nationaux, vente forcée, faillite, nouveau départ, fin de partie, retour en arrière, record de plus-value.
 > - **Statistiques** : le point mensuel de la courbe garde aussi les loyers en cours et la réputation ; courbes du patrimoine, des loyers, des dettes, du bilan mensuel et de la réputation ; records (patrimoine le plus haut, plus belle plus-value, plus beau chantier, meilleur mois) et compteurs.
 
-> **Jalon 8, la réputation** (point ouvert n° 14, décision validée ; `content/progression.json`) : au-delà de **70**, chaque gain est multiplié par (100 − réputation) / 30 : à 85, un gain de 3 points n'en vaut plus que 1,5 ; les pertes ne changent pas. Au bilan annuel, une réputation au-dessus de **80** perd **2 points** (sans descendre sous 80) : rester au sommet demande de continuer à bien faire. La réputation peut avoir une décimale. Le seuil de 90 du Baron de la pierre reste inchangé.
+> **Jalon 8, la réputation** (point ouvert n° 14, décision validée ; `content/progression.json`) : au-delà de **70**, chaque gain est multiplié par (100 − réputation) / 30 : à 85, un gain de 3 points n'en vaut plus que 1,5 ; les pertes ne changent pas. Au bilan annuel, une réputation au-dessus de **80** perd **5 points** (sans descendre sous 80 ; 2 points avant la mesure du jalon 8, qui laissait la réputation médiane à 95 en 25 ans) : rester au sommet demande de continuer à bien faire. La réputation peut avoir une décimale. Le seuil de 90 du Baron de la pierre reste inchangé.
 
 > **Jalon 7** : la **notoriété locale** existe (`player.renown`, 0 à 100, zéro dans chaque ville, y compris Dole). Chaque gain ou perte de réputation causé par un bien déplace aussi la notoriété de sa ville du même montant. Elle augmente la chance d'une offre hors marché dans la ville et raccourcit la file d'attente de ses artisans (détail au chapitre 3.8). Les conditions de villes des titres sont **actives** : Investisseur aguerri demande des biens dans 2 villes, Baron de la pierre dans 4 ; la condition compte les villes où le joueur possède un bien.

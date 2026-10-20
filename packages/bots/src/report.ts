@@ -430,19 +430,25 @@ function cityChecks(get: (id: BotId) => BotSummary | undefined, last: number): T
 }
 
 /**
- * The depth (milestone 8), over games of 20 years or more: Magnat reachable in 15 to 25 years,
- * Baron rare, the Promoteur title within reach of the Promoteur bot (docs/08, 8.1).
+ * The depth (milestone 8), over games of 20 years or more: Magnat in 10 to 25 % of the games
+ * (15 to 25 years), Baron rare, the Promoteur title in most games of the Promoteur bot (10 to
+ * 15 years; docs/08).
  */
 function depthChecks(get: (id: BotId) => BotSummary | undefined, years: number): TargetCheck[] {
   const list: TargetCheck[] = [];
   const promoter = get('promoteur');
   if (promoter) {
     const title = promoter.rhythm.titles.developer;
+    const share = title?.share ?? 0;
+    const at = title?.years ?? null;
     list.push({
       label: 'Titre Promoteur (Promoteur)',
-      target: 'plus de 50 % des parties en 10 ans',
-      measured: `${pct(title?.within10 ?? 0)} en 10 ans ; ${pct(title?.share ?? 0)} en ${years} ans (${num(title?.years ?? 0)} ans en médiane)`,
-      ok: (title?.within10 ?? 0) > 0.5,
+      target:
+        years >= 20
+          ? `plus de 50 % des parties en ${years} ans, de 10 à 15 ans en médiane`
+          : `information (cible jugée sur 20 ans ou plus)`,
+      measured: `${pct(share)} en ${years} ans (${num(at ?? 0)} ans en médiane) ; ${pct(title?.within10 ?? 0)} en 10 ans`,
+      ok: years >= 20 ? share > 0.5 && at !== null && at >= 10 && at <= 15 : null,
     });
   }
   if (years < 20) return list;
@@ -454,9 +460,9 @@ function depthChecks(get: (id: BotId) => BotSummary | undefined, years: number):
     const at = magnate?.years ?? null;
     list.push({
       label: `Titre Magnat (${BOT_NAMES[id]})`,
-      target: `25 à 50 % des parties en ${years} ans, de 15 à 25 ans en médiane`,
+      target: `10 à 25 % des parties en ${years} ans, de 15 à 25 ans en médiane`,
       measured: `${pct(share)} des parties${at === null ? '' : `, en ${num(at)} ans (médiane)`}`,
-      ok: share >= 0.25 && share <= 0.5 && at !== null && at >= 15 && at <= 25,
+      ok: share >= 0.1 && share <= 0.25 && at !== null && at >= 15 && at <= 25,
     });
     const baron = s.rhythm.titles.baron;
     list.push({
