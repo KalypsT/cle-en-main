@@ -80,5 +80,5 @@ Chaque métier change trois choses : le **salaire**, le **temps libre** et la **
 
 ## L'identité
 
-- Seulement un **nom** et un **avatar** composé (visage, coiffure, teint, tenue).
+- Seulement un **nom** et un **avatar** composé (visage, coiffure, couleur de cheveux, teint, tenue, accessoire).
 - Pas de situation familiale ni de jauge d'énergie ou de moral.

@@ -48,7 +48,7 @@ Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : 
   - accessoires contextuels : parapluie sous la pluie, poussette, chien en laisse, vélo, sac de courses, baguette sous le bras ;
   - marche animée par le code (balancement des bras et des jambes).
 - **Personnages nommés** (banquiers, comptable, rivaux, artisans, agences) : **portraits en buste** avec trois expressions (neutre, content, contrarié), dans les dialogues et les notifications.
-- **Avatar du joueur** : composé (visage, coiffure, teint, tenue).
+- **Avatar du joueur** : composé de six choix : visage (4), coiffure (11), couleur de cheveux (8), teint (6), tenue (8) et accessoire (7 : aucun, lunettes rondes ou carrées, barbe, barbe et lunettes, boucles d'oreilles, boucles et lunettes). Les cheveux sont dessinés en deux couches (derrière la tête pour le volume, la longueur, le chignon ; devant, découpée sur le visage, pour la frange), si bien que chaque coiffure suit chaque forme de visage. La sauvegarde garde quatre indices : la coiffure et la couleur partagent `hair`, la tenue et l'accessoire partagent `outfit`.
 
 ## 5.6 Les animations
 
