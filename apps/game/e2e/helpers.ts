@@ -95,9 +95,15 @@ export async function tab(page: Page, name: keyof typeof t.tabs) {
   await page.getByRole('navigation').getByRole('button', { name: t.tabs[name] }).click();
 }
 
+/** The tab's root screen: a tab shows the screen it was left on, touching it again goes back to its root. */
+export async function rootTab(page: Page, name: keyof typeof t.tabs) {
+  await tab(page, name);
+  await tab(page, name);
+}
+
 /** Opens an entry of the « Menu » tab. */
 export async function openMenuEntry(page: Page, label: string) {
-  await tab(page, 'menu');
+  await rootTab(page, 'menu');
   await page.getByRole('button', { name: label }).click();
 }
 
@@ -114,7 +120,7 @@ export async function dismissOverlays(page: Page) {
  * may pause itself for a decision: speed is set again on each try).
  */
 export async function waitForDecision(page: Page, kind: string, timeout = 90_000) {
-  await tab(page, 'decisions');
+  await rootTab(page, 'decisions');
   const row = page.getByTestId(`decision-${kind}`).first();
   await expect(async () => {
     await dismissOverlays(page);

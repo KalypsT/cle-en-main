@@ -151,6 +151,7 @@ export function GameShell({
     setViewCityId(baseCityId);
   }
   const [stacks, setStacks] = useState(EMPTY_STACKS);
+  const [memory] = useState(() => new Map<string, unknown>());
   const [shownStep, setShownStep] = useState<string | null>(null);
 
   useEffect(() => {
@@ -261,6 +262,7 @@ export function GameShell({
     () => ({
       tab,
       cityId: viewCityId,
+      memory,
       setCityId: setViewCityId,
       push: (next) => {
         scrolls.save(tab, depth, window.scrollY);
@@ -288,7 +290,7 @@ export function GameShell({
       },
       track: (screen: TrackedScreen) => raise([`screen:${screen}`]),
     }),
-    [tab, depth, scrolls, viewCityId, raise],
+    [tab, depth, scrolls, memory, viewCityId, raise],
   );
 
   // The phone's back button goes back one screen, then to the street; on the street it does

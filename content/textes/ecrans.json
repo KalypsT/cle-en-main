@@ -587,6 +587,11 @@
     "pinLabel": "{title}, {price}",
     "ownedLabel": "Mon bien : {title}",
     "close": "Fermer la fiche",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
+    "recenter": "Voir toute la ville",
+    "clusterLabel": "{count} annonces regroupées",
+    "groupTitle": "{count} annonces ici",
     "attribution": "Fond de carte : IGN (BD TOPO, IRIS), Licence Ouverte."
   },
   "menu": {

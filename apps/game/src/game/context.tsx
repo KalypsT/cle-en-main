@@ -50,6 +50,8 @@ export interface Navigation {
   tab: TabId;
   /** City the street, the map and the listings show (the base by default). */
   cityId: string;
+  /** What a screen keeps while another tab is shown (the map's zoom…); lost with the session. */
+  memory: Map<string, unknown>;
   setCityId: (cityId: string) => void;
   push: (route: Route) => void;
   pop: () => void;
