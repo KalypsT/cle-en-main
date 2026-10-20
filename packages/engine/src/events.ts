@@ -98,8 +98,8 @@ export type GameEvent =
   | { type: 'offerMade'; listingId: string; amount: Cents; responseDay: number }
   | { type: 'offerAnswered'; listingId: string; answer: 'accepted'; price: Cents }
   | { type: 'offerAnswered'; listingId: string; answer: 'counterOffer'; amount: Cents }
-  | { type: 'offerAnswered'; listingId: string; answer: 'refused' }
-  | { type: 'counterOfferExpired'; listingId: string }
+  | { type: 'offerAnswered'; listingId: string; answer: 'refused'; amount: Cents }
+  | { type: 'counterOfferExpired'; listingId: string; amount: Cents }
   | { type: 'counterOfferDeclined'; listingId: string }
   | { type: 'compromisImpossible'; listingId: string; deposit: Cents }
   | {

@@ -17,7 +17,7 @@ import type { LoanDecision } from './systems/banking.ts';
 import type { StatementLine } from './events.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 12;
+export const FORMAT_VERSION = 13;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -186,6 +186,22 @@ export interface ListingOffer {
   responseDay: number;
   /** Seller's counter-offer, waiting for the player's answer. */
   counter: { amount: Cents; expiresDay: number } | null;
+}
+
+/**
+ * The seller's last word on an offer that did not lead to a sale: kept so the player
+ * finds it again on the listing and in the decisions (until he closes it).
+ */
+export interface OfferNotice {
+  id: string;
+  listingId: string;
+  /** Day number of the answer (or of the counter-offer's expiry). */
+  day: number;
+  /** The player's offer, or the seller's counter-offer that was left to expire. */
+  amount: Cents;
+  outcome: 'refused' | 'counterExpired';
+  /** Closed by the player: no longer listed in the decisions (the listing still shows it). */
+  dismissed: boolean;
 }
 
 export interface Listing {
@@ -653,6 +669,8 @@ export interface GameState {
   worksDone: Record<string, number>;
   /** Listings the player marked, by id (removed with the listing). */
   favorites: string[];
+  /** Offers that were refused or whose counter-offer expired (removed with the listing). */
+  offerNotices: OfferNotice[];
   /** Gérard's tutorial: `step` indexes content/textes/didacticiel.json. */
   tutorial: { enabled: boolean; step: number };
   /** One point on the 1st of each month (and at the start): the wealth curve. */
