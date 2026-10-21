@@ -252,6 +252,8 @@ export const rhythmRulesSchema = z
         mailKeptDays: z.number().int().min(1),
       })
       .strict(),
+    /** Monthly statements kept for the « Bilan du mois » (the yearly reviews are all kept). */
+    statementsKept: z.number().int().min(1),
     /** Monthly rewind points kept (docs/02, section 2.7). */
     rewindPoints: z.number().int().min(1),
     /** Entries of the game log kept on the phone. */

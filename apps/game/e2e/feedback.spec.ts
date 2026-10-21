@@ -195,3 +195,29 @@ test('keeps the properties sold, the closed loans and the history of each bank',
   await expect(page.getByTestId('banker').locator('svg').first()).toBeVisible();
   await capture(page, '13-banquier', MILESTONE);
 });
+
+/** The months and the years are kept, and a property tells its whole story. */
+test('browses the past reviews and the full history of a property', async ({ page }) => {
+  await openGame(page);
+  await importState(page, ownerGame(24 * 450));
+  await tab(page, 'assets');
+  await page.locator('[data-testid^="property-"]').first().click();
+  await page.getByRole('button', { name: t.property.tabs.history }).click();
+  const history = page.getByTestId('property-history');
+  await expect(history.locator('li[data-kind="bought"]')).toHaveCount(1);
+  await capture(page, '14-historique-du-bien', MILESTONE);
+  await history.getByRole('button', { name: t.property.history.filters.market }).click();
+  await expect(history.locator('li[data-kind="tenantIn"]')).toHaveCount(0);
+  await expect(history.locator('li[data-kind="bought"]')).toHaveCount(1);
+
+  await openMenuEntry(page, t.menu.statement);
+  const heading = page.getByTestId('monthly-review').locator('h2').first();
+  const last = await heading.textContent();
+  await page.getByRole('button', { name: t.review.previous }).click();
+  await expect(heading).not.toHaveText(last ?? '');
+  await expect(page.getByText(t.review.pastMonthHint)).toBeVisible();
+  await capture(page, '15-bilan-passe', MILESTONE);
+
+  await openMenuEntry(page, t.menu.yearReview);
+  await expect(page.getByTestId('year-review')).toBeVisible();
+});

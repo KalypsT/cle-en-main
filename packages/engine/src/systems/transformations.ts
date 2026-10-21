@@ -297,7 +297,8 @@ function shareOwnership(
     coproMeeting: null,
     coproCalls: [],
     valueHistory: [],
-    log: [],
+    // Each flat keeps the history of the property it comes from.
+    log: [...owned.log],
     rentsReceived: share(owned.rentsReceived, flat),
   }));
   return { flats: result, firstId: flats[0]?.id ?? owned.property.id };

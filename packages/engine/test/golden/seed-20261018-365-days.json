@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 17,
+    "formatVersion": 18,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -1028,6 +1028,11 @@
         ],
         "log": [
           {
+            "kind": "bought",
+            "day": 20790,
+            "price": 4600000
+          },
+          {
             "kind": "works",
             "day": 20796,
             "itemKind": "walls",
@@ -1035,6 +1040,13 @@
             "tier": "eco",
             "artisanId": null,
             "cost": 32655
+          },
+          {
+            "kind": "worksCompleted",
+            "day": 20796,
+            "cost": 209055,
+            "dpeBefore": "E",
+            "dpeAfter": "E"
           },
           {
             "kind": "works",
@@ -1046,10 +1058,47 @@
             "cost": 166042
           },
           {
+            "kind": "worksCompleted",
+            "day": 20819,
+            "cost": 182352,
+            "dpeBefore": "E",
+            "dpeAfter": "E"
+          },
+          {
+            "kind": "listedForRent",
+            "day": 20819,
+            "leaseType": "bare",
+            "monthlyRent": 26100,
+            "agencyId": null,
+            "insured": false
+          },
+          {
             "kind": "tenantIn",
             "day": 20821,
             "tenantName": "Lucas Arnaud",
             "monthlyRent": 26100
+          },
+          {
+            "kind": "copro",
+            "day": 21014,
+            "results": [
+              {
+                "id": "stairwell",
+                "passed": true,
+                "textIndex": 0
+              },
+              {
+                "id": "facadeRenovation",
+                "passed": true,
+                "textIndex": 1
+              }
+            ]
+          },
+          {
+            "kind": "notice",
+            "day": 21031,
+            "leaveDay": 21122,
+            "reason": "departure"
           }
         ],
         "rentsReceived": 234900
@@ -5973,6 +6022,553 @@
         },
         {
           "kind": "firstYear"
+        }
+      ]
+    },
+    "reviews": {
+      "statements": [
+        {
+          "date": {
+            "year": 2026,
+            "month": 11,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            }
+          ],
+          "balance": 1513000
+        },
+        {
+          "date": {
+            "year": 2026,
+            "month": 12,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            }
+          ],
+          "balance": 1296000
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 1,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15448,
+              "capital": 12500
+            }
+          ],
+          "balance": 815853
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 2,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15406,
+              "capital": 12542
+            }
+          ],
+          "balance": 733219
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 3,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15364,
+              "capital": 12584
+            }
+          ],
+          "balance": 741597
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 4,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15322,
+              "capital": 12626
+            }
+          ],
+          "balance": 749975
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 5,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15280,
+              "capital": 12668
+            }
+          ],
+          "balance": 748453
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 6,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15237,
+              "capital": 12711
+            }
+          ],
+          "balance": 756831
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 7,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15194,
+              "capital": 12754
+            }
+          ],
+          "balance": 765209
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 8,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "coproCall",
+              "propertyId": "property-99",
+              "amount": 10408
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15152,
+              "capital": 12796
+            }
+          ],
+          "balance": 726079
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 9,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "coproCall",
+              "propertyId": "property-99",
+              "amount": 10408
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15109,
+              "capital": 12839
+            }
+          ],
+          "balance": 724049
+        },
+        {
+          "date": {
+            "year": 2027,
+            "month": 10,
+            "day": 1
+          },
+          "lines": [
+            {
+              "kind": "salary",
+              "amount": 200000
+            },
+            {
+              "kind": "rent",
+              "amount": 52000
+            },
+            {
+              "kind": "livingCosts",
+              "amount": 135000
+            },
+            {
+              "kind": "propertyCharges",
+              "propertyId": "property-99",
+              "amount": 5900
+            },
+            {
+              "kind": "ownerInsurance",
+              "propertyId": "property-99",
+              "amount": 1004
+            },
+            {
+              "kind": "rentalIncome",
+              "propertyId": "property-99",
+              "amount": 30230
+            },
+            {
+              "kind": "coproCall",
+              "propertyId": "property-99",
+              "amount": 10408
+            },
+            {
+              "kind": "loanPayment",
+              "loanId": "loan-1214",
+              "amount": 27948,
+              "interest": 15065,
+              "capital": 12883
+            }
+          ],
+          "balance": 722019
+        }
+      ],
+      "years": [
+        {
+          "review": {
+            "year": 2026,
+            "netWorthStart": 1500000,
+            "netWorthEnd": 843441,
+            "cashFlow": 4148,
+            "rents": 0,
+            "reputationStart": 10,
+            "reputationEnd": 17,
+            "rentTax": null,
+            "accountantFees": 0,
+            "titles": [
+              "firstInvestor"
+            ],
+            "achievements": [
+              "firstStone",
+              "firstDig"
+            ],
+            "advice": [
+              {
+                "kind": "netWorthDown",
+                "amount": 656559
+              },
+              {
+                "kind": "vacancy",
+                "propertyId": "property-99"
+              },
+              {
+                "kind": "goodYear",
+                "amount": 4148
+              },
+              {
+                "kind": "firstYear"
+              }
+            ]
+          },
+          "assessment": {
+            "year": 2026,
+            "incomeTax": 0,
+            "socialContributions": 0,
+            "accountantFees": 0,
+            "deficitOnSalary": 0,
+            "wealthTax": 0,
+            "taxableWealth": 0,
+            "properties": []
+          }
         }
       ]
     }

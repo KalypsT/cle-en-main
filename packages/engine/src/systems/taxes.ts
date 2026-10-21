@@ -680,6 +680,7 @@ export function setTaxRegime(
 ): 'property.unknown' | null {
   const owned = ctx.state.properties.find((o) => o.property.id === propertyId);
   if (!owned) return 'property.unknown';
+  if (owned.taxRegime !== regime) owned.log.push({ kind: 'regime', day: ctx.today, regime });
   owned.taxRegime = regime;
   ledgerOf(ctx.state, owned).regime = regime;
   return null;

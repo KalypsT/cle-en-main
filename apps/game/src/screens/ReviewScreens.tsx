@@ -1,5 +1,6 @@
 import { gameContent } from '@cle/content';
-import type { Advice, GameState } from '@cle/engine';
+import type { Advice, CalendarDate, GameState } from '@cle/engine';
+import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import {
@@ -15,12 +16,12 @@ import {
   titleName,
   tone,
 } from '../texts.ts';
-import { Badge, Card, Empty, KeyValues, ScreenHeader } from '../ui/components.tsx';
+import { Badge, Card, Chip, Empty, KeyValues, ScreenHeader } from '../ui/components.tsx';
 
-/** The short monthly review (docs/02, section 2.2). */
-export function MonthlyReviewContent() {
+/** The short monthly review (docs/02, section 2.2): the last one, or a kept one (`date`). */
+export function MonthlyReviewContent({ date }: { date?: CalendarDate | undefined }) {
   const { state } = useGame();
-  const review = engine.monthlyReview(state);
+  const review = engine.monthlyReview(state, date);
   if (!review) return <Empty icon="calendar">{t.review.noMonthReview}</Empty>;
   const reputationChange = review.reputationChange;
   return (
@@ -89,23 +90,29 @@ export function MonthlyReviewContent() {
 function adviceText(state: GameState, advice: Advice, year: number): string {
   const variants = gameContent.yvon.advice[advice.kind];
   const template = variants[year % variants.length] ?? variants[0] ?? '';
-  const owned = advice.propertyId
-    ? state.properties.find((o) => o.property.id === advice.propertyId)
+  // A property sold since is found among the ones sold.
+  const property = advice.propertyId
+    ? (state.properties.find((o) => o.property.id === advice.propertyId)?.property ??
+      state.soldProperties.findLast((s) => s.property.id === advice.propertyId)?.property)
     : undefined;
   return format(template, {
     montant: formatEuros(advice.amount ?? 0),
-    bien: owned ? propertyLabel(owned.property) : '',
+    bien: property ? propertyLabel(property) : '',
     annee: advice.year ?? year,
     taux: formatPercent((advice.ratio ?? 0) * 100),
   });
 }
 
-/** The yearly review with Yvon Tableur (docs/04, « Bilan annuel »). */
-export function YearReviewContent() {
+/**
+ * The yearly review with Yvon Tableur (docs/04, « Bilan annuel »): the last one, or a kept
+ * one (`year`).
+ */
+export function YearReviewContent({ year }: { year?: number | undefined }) {
   const { state } = useGame();
-  const review = state.lastYearReview;
+  const kept = state.reviews.years.find((entry) => entry.review.year === year);
+  const review = kept?.review ?? state.lastYearReview;
   if (!review) return <Empty icon="calendar">{t.review.noYearReview}</Empty>;
-  const assessment = state.tax.lastAssessment;
+  const assessment = kept ? kept.assessment : state.tax.lastAssessment;
   const wealthTax = assessment?.year === review.year ? assessment.wealthTax : 0;
   const { yvon } = gameContent;
   const pick = (list: readonly string[]) => list[review.year % list.length] ?? list[0] ?? '';
@@ -173,22 +180,62 @@ export function YearReviewContent() {
   );
 }
 
+/** « Bilan du mois », with the months kept before it (docs/04, « Bilans »). */
 export function MonthlyReviewScreen() {
   const nav = useNav();
+  const { state } = useGame();
+  const statements = state.reviews.statements;
+  const [index, setIndex] = useState(statements.length - 1);
+  const shown = statements[Math.min(index, statements.length - 1)];
+  const isLast = index >= statements.length - 1;
   return (
     <div className="screen">
       <ScreenHeader title={t.menu.statement} onBack={nav.pop} />
-      <MonthlyReviewContent />
+      {statements.length > 1 && (
+        <div className="row between">
+          <button
+            type="button"
+            className="link-button"
+            disabled={index <= 0}
+            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          >
+            {t.review.previous}
+          </button>
+          <button
+            type="button"
+            className="link-button"
+            disabled={isLast}
+            onClick={() => setIndex((i) => Math.min(statements.length - 1, i + 1))}
+          >
+            {t.review.next}
+          </button>
+        </div>
+      )}
+      {!isLast && <p className="small muted">{t.review.pastMonthHint}</p>}
+      <MonthlyReviewContent date={isLast ? undefined : shown?.date} />
     </div>
   );
 }
 
+/** « Bilan annuel », with every year kept (docs/04, « Bilans »). */
 export function YearReviewScreen() {
   const nav = useNav();
+  const { state } = useGame();
+  const years = state.reviews.years.map((entry) => entry.review.year).reverse();
+  const [year, setYear] = useState<number | undefined>(years[0]);
   return (
     <div className="screen">
       <ScreenHeader title={t.menu.yearReview} onBack={nav.pop} />
-      <YearReviewContent />
+      {years.length > 1 && (
+        <div className="chips" role="group" aria-label={t.review.years}>
+          {years.map((candidate) => (
+            <Chip key={candidate} pressed={candidate === year} onClick={() => setYear(candidate)}>
+              {String(candidate)}
+            </Chip>
+          ))}
+        </div>
+      )}
+      <YearReviewContent year={year} />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { deepClone } from '../clone.ts';
 import type { GameEvent } from '../events.ts';
 import type { Cents } from '../money.ts';
-import type { GameState, Loan, OwnedProperty } from '../state.ts';
+import type { GameState, Loan, OwnedProperty, PropertyLogEntry } from '../state.ts';
 import { interestPaidOf, refinancingFees } from './banking.ts';
 import type { SystemContext } from './context.ts';
 import { eventSubject, loanAnswerOf, subjectOf } from './inbox.ts';
@@ -103,5 +103,110 @@ export function recordBankHistory(
 export function recordBankTrust(state: GameState): void {
   for (const relation of Object.values(state.banks)) {
     relation.trustHistory.push({ date: { ...state.clock.date }, trust: relation.trust });
+  }
+}
+
+/** Keeps the statement of the month just closed (the last ones only). */
+export function keepStatement(ctx: SystemContext): void {
+  const { state } = ctx;
+  if (!state.lastStatement) return;
+  const kept = state.reviews.statements;
+  kept.push(deepClone(state.lastStatement));
+  const excess = kept.length - ctx.content.rhythm.statementsKept;
+  if (excess > 0) kept.splice(0, excess);
+}
+
+/** Keeps the yearly review just built, with the tax assessed for that year. */
+export function keepYearReview(state: GameState): void {
+  const review = state.lastYearReview;
+  if (!review) return;
+  const assessment = state.tax.lastAssessment;
+  state.reviews.years.push({
+    review: deepClone(review),
+    assessment: assessment?.year === review.year ? deepClone(assessment) : null,
+  });
+}
+
+/** The line an event adds to its property's history, if any. */
+function logEntry(event: GameEvent, day: number): PropertyLogEntry | null {
+  switch (event.type) {
+    case 'deedSigned':
+      return { kind: 'bought', day, price: event.price };
+    case 'saleListed':
+      return { kind: 'listedForSale', day, askingPrice: event.askingPrice, mode: event.mode };
+    case 'saleWithdrawn':
+      return { kind: 'saleWithdrawn', day };
+    case 'saleAgreed':
+      return { kind: 'saleAgreed', day, price: event.price };
+    case 'saleFellThrough':
+      return { kind: 'saleFellThrough', day };
+    case 'rentalListed':
+      return {
+        kind: 'listedForRent',
+        day,
+        leaseType: event.leaseType,
+        monthlyRent: event.monthlyRent,
+        agencyId: event.agencyId,
+        insured: event.insured,
+      };
+    case 'rentalWithdrawn':
+      return { kind: 'rentalWithdrawn', day };
+    case 'furnitureBought':
+      return { kind: 'furniture', day, cost: event.cost };
+    case 'tenantGaveNotice':
+      return { kind: 'notice', day, leaveDay: event.leaveDay, reason: event.reason };
+    case 'buyoutAnswered':
+      return { kind: 'buyout', day, amount: event.amount, accepted: event.accepted };
+    case 'rentMissed':
+      return { kind: 'rentMissed', day, amount: event.amount, insured: event.insured };
+    case 'reminderSent':
+      return { kind: 'reminder', day, settled: event.settled };
+    case 'procedureStarted':
+      return { kind: 'procedure', day, evictionDay: event.evictionDay, cost: event.cost };
+    case 'rentRevised':
+      return { kind: 'rentRevised', day, monthlyRent: event.monthlyRent };
+    case 'leaseRenewed':
+      return { kind: 'leaseRenewed', day, termDay: event.termDay };
+    case 'dpeWarning':
+      return { kind: 'dpeWarning', day, banDay: event.banDay };
+    case 'worksCompleted':
+      return {
+        kind: 'worksCompleted',
+        day,
+        cost: event.cost,
+        dpeBefore: event.dpeBefore,
+        dpeAfter: event.dpeAfter,
+      };
+    case 'coproMeetingHeld':
+      return { kind: 'copro', day, results: event.results.map((result) => ({ ...result })) };
+    case 'transformationCompleted':
+      return { kind: 'transformation', day, transformation: event.kind, cost: event.cost };
+    case 'movedIntoHome':
+      return { kind: 'home', day, movedIn: true };
+    case 'movedOutOfHome':
+      return { kind: 'home', day, movedIn: false };
+    default:
+      return null;
+  }
+}
+
+/**
+ * Adds to each property's history what its events tell (docs/04, « Historique d'un
+ * bien »): purchase, letting, sale, lease life, co-ownership. A property gone by then
+ * (sold the same day) keeps the history it had.
+ */
+export function recordPropertyLog(
+  state: GameState,
+  events: readonly GameEvent[],
+  today: number,
+): void {
+  for (const event of events) {
+    const entry = logEntry(event, today);
+    if (!entry || !('propertyId' in event)) continue;
+    // A transformation is told on each flat it produced.
+    const ids = event.type === 'transformationCompleted' ? event.propertyIds : [event.propertyId];
+    for (const id of ids) {
+      state.properties.find((owned) => owned.property.id === id)?.log.push({ ...entry });
+    }
   }
 }

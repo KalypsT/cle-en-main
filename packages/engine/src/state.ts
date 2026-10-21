@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 17;
+export const FORMAT_VERSION = 18;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -585,7 +585,45 @@ export type PropertyLogEntry =
       damages: Cents;
       depositReturned: Cents;
     }
-  | { kind: 'incident'; day: number; kindId: string; cost: Cents };
+  | { kind: 'incident'; day: number; kindId: string; cost: Cents }
+  // Added in version 18 (docs/04, « Historique d'un bien »).
+  | { kind: 'bought'; day: number; price: Cents }
+  | { kind: 'listedForSale'; day: number; askingPrice: Cents; mode: SaleMode }
+  | { kind: 'saleWithdrawn'; day: number }
+  | { kind: 'saleAgreed'; day: number; price: Cents }
+  | { kind: 'saleFellThrough'; day: number }
+  | {
+      kind: 'listedForRent';
+      day: number;
+      leaseType: LeaseType;
+      monthlyRent: Cents;
+      agencyId: string | null;
+      insured: boolean;
+    }
+  | { kind: 'rentalWithdrawn'; day: number }
+  | { kind: 'furniture'; day: number; cost: Cents }
+  | {
+      kind: 'notice';
+      day: number;
+      leaveDay: number;
+      reason: 'departure' | 'lifeEvent' | 'incident' | 'buyout';
+    }
+  | { kind: 'buyout'; day: number; amount: Cents; accepted: boolean }
+  | { kind: 'rentMissed'; day: number; amount: Cents; insured: boolean }
+  | { kind: 'reminder'; day: number; settled: boolean }
+  | { kind: 'procedure'; day: number; evictionDay: number; cost: Cents }
+  | { kind: 'rentRevised'; day: number; monthlyRent: Cents }
+  | { kind: 'leaseRenewed'; day: number; termDay: number }
+  | { kind: 'dpeWarning'; day: number; banDay: number }
+  | { kind: 'worksCompleted'; day: number; cost: Cents; dpeBefore: DpeLabel; dpeAfter: DpeLabel }
+  | {
+      kind: 'copro';
+      day: number;
+      results: { id: string; passed: boolean; textIndex: number }[];
+    }
+  | { kind: 'transformation'; day: number; transformation: TransformationKind; cost: Cents }
+  | { kind: 'home'; day: number; movedIn: boolean }
+  | { kind: 'regime'; day: number; regime: TaxRegimeChoice };
 
 /** A property a marchand de biens renovates before selling it again. */
 export interface RivalProject {
@@ -863,6 +901,13 @@ export interface GameState {
   catalog: CatalogState;
   /** Last yearly review with Yvon Tableur, built on the 1st of January. */
   lastYearReview: YearReview | null;
+  /** The reviews kept (docs/04, « Bilans ») : the last statements, and every year. */
+  reviews: {
+    /** Oldest first, the last ones only (content/rythme.json). */
+    statements: MonthlyStatement[];
+    /** Each yearly review, with the tax assessed for that year. */
+    years: { review: YearReview; assessment: TaxAssessment | null }[];
+  };
 }
 
 /** A piece of Yvon's advice; the interface picks the text (content/textes/yvon.json). */

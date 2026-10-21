@@ -5,7 +5,6 @@ import { engine } from '../engine.ts';
 import { type PropertyTab, useGame, useNav } from '../game/context.tsx';
 import {
   agencyName,
-  artisanName,
   bankName,
   format,
   formatDayLong,
@@ -18,9 +17,7 @@ import {
   formatShortDate,
   formatSigned,
   formatWhen,
-  itemName,
   propertyLabel,
-  spaceName,
   t,
   tone,
 } from '../texts.ts';
@@ -38,6 +35,7 @@ import { DpeCard } from '../ui/DpeCard.tsx';
 import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
+import { History } from './PropertyHistory.tsx';
 
 /** « Fiche d'un bien » (docs/04): overview, rooms, letting, finances. */
 export function PropertyScreen({
@@ -446,98 +444,6 @@ function Rooms({ owned }: { owned: OwnedProperty }) {
   return (
     <Card>
       <ItemsList property={owned.property} items={catalog} />
-    </Card>
-  );
-}
-
-/** « 8 mois », « 2 ans et 3 mois » (a lease, from a number of days). */
-export function formatLeaseDuration(days: number): string {
-  const months = Math.max(1, Math.round(days / 30.4));
-  const years = Math.floor(months / 12);
-  const rest = months % 12;
-  const parts = [
-    years > 0 ? format(t.property.history.years, { count: years }) : '',
-    rest > 0 ? format(t.property.history.months, { count: rest }) : '',
-  ].filter(Boolean);
-  return parts.join(' ');
-}
-
-/** What happened to the property, most recent first: works, tenants, incidents. */
-export function History({
-  property,
-  log,
-}: {
-  property: OwnedProperty['property'];
-  log: OwnedProperty['log'];
-}) {
-  const texts = t.property.history;
-  const tiers = gameContent.worksTexts.tiers;
-  const tenantTexts = gameContent.tenantTexts;
-  const entries = [...log].reverse();
-  const spent = log.reduce((sum, entry) => sum + (entry.kind === 'works' ? entry.cost : 0), 0);
-  return (
-    <Card title={texts.heading} testId="property-history">
-      {entries.length === 0 && <p className="small muted">{texts.empty}</p>}
-      <ul className="stack">
-        {entries.map((entry, i) => (
-          <li key={`${entry.day}-${entries.length - i}`} className="stack tight">
-            <span className="row between small">
-              <span className="strong">
-                {entry.kind === 'works' &&
-                  format(texts.works, {
-                    item: entry.spaceId
-                      ? `${spaceName(property, entry.spaceId)} : ${itemName(entry.itemKind)}`
-                      : itemName(entry.itemKind),
-                    tier: tiers[entry.tier].toLowerCase(),
-                  })}
-                {entry.kind === 'tenantIn' &&
-                  format(texts.tenantIn, {
-                    name: entry.tenantName,
-                    rent: formatEuros(entry.monthlyRent),
-                  })}
-                {entry.kind === 'tenantOut' &&
-                  format(texts.tenantOut, {
-                    name: entry.tenantName,
-                    reason: texts.tenantReasons[entry.reason],
-                  })}
-                {entry.kind === 'incident' &&
-                  format(texts.incident, {
-                    text: tenantTexts.incidents[entry.kindId] ?? entry.kindId,
-                    cost: formatEuros(entry.cost),
-                  })}
-              </span>
-              <span className="tiny muted">{formatDayYear(entry.day)}</span>
-            </span>
-            {entry.kind === 'tenantOut' && (
-              <>
-                <span className="tiny muted">
-                  {format(texts.tenantOutDetails, {
-                    duration: formatLeaseDuration(entry.day - entry.startDay),
-                    rent: formatEuros(entry.monthlyRent),
-                  })}
-                </span>
-                {entry.depositReturned + entry.damages > 0 && (
-                  <span className="tiny muted">
-                    {format(texts.tenantOutMoney, {
-                      returned: formatEuros(entry.depositReturned),
-                      damages: formatEuros(entry.damages),
-                    })}
-                  </span>
-                )}
-              </>
-            )}
-            {entry.kind === 'works' && (
-              <span className="tiny muted">
-                {format(texts.worksBy, {
-                  who: entry.artisanId ? artisanName(entry.artisanId) : texts.byYou,
-                  cost: formatEuros(entry.cost),
-                })}
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
-      {spent > 0 && <p className="small">{format(texts.total, { amount: formatEuros(spent) })}</p>}
     </Card>
   );
 }

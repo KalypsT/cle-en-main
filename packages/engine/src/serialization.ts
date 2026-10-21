@@ -62,6 +62,24 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  */
 export const MIGRATIONS: MigrationRegistry = {
   /**
+   * Version 17 to 18: the reviews kept start with the last ones (the last statement,
+   * the last yearly review with its tax); the properties' histories are unchanged.
+   */
+  17: (raw) => {
+    const review = isRecord(raw.lastYearReview) ? raw.lastYearReview : null;
+    const tax = isRecord(raw.tax) ? raw.tax : {};
+    const assessment = isRecord(tax.lastAssessment) ? tax.lastAssessment : null;
+    return {
+      ...raw,
+      reviews: {
+        statements: isRecord(raw.lastStatement) ? [raw.lastStatement] : [],
+        years: review
+          ? [{ review, assessment: assessment?.year === review.year ? assessment : null }]
+          : [],
+      },
+    };
+  },
+  /**
    * Version 16 to 17: no sale nor loan was archived, no bank kept a history, and the
    * rents received by each property start counting now.
    */
@@ -1004,6 +1022,59 @@ const catalogInstanceSchema = noteBase
 
 const NEWS_TYPES: ReadonlySet<string> = new Set(NEWS_EVENT_TYPES);
 
+const statementSchema = z
+  .object({ date: calendarDateSchema, lines: z.array(statementLineSchema), balance: cents })
+  .strict();
+
+const assessmentSchema = z
+  .object({
+    year: z.number().int(),
+    incomeTax: cents,
+    socialContributions: cents,
+    accountantFees: cents.min(0),
+    deficitOnSalary: cents.min(0),
+    wealthTax: cents.min(0),
+    taxableWealth: cents.min(0),
+    properties: z.array(
+      z
+        .object({
+          propertyId: z.string(),
+          category: leaseTypeSchema,
+          regime: z.enum(['micro', 'real']),
+          taxable: cents,
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+
+const yearReviewSchema = z
+  .object({
+    year: z.number().int(),
+    netWorthStart: cents,
+    netWorthEnd: cents,
+    cashFlow: cents,
+    rents: cents,
+    reputationStart: z.number(),
+    reputationEnd: z.number(),
+    rentTax: cents.nullable(),
+    accountantFees: cents,
+    titles: z.array(z.string()),
+    achievements: z.array(z.string()),
+    advice: z.array(
+      z
+        .object({
+          kind: z.enum(ADVICE_KINDS),
+          propertyId: z.string().optional(),
+          amount: cents.optional(),
+          year: z.number().int().optional(),
+          ratio: z.number().optional(),
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+
 const valueHistorySchema = z.array(
   z.object({ date: calendarDateSchema, value: cents, debt: cents }).strict(),
 );
@@ -1042,6 +1113,76 @@ const propertyLogSchema = z.array(
       })
       .strict(),
     z.object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents }).strict(),
+    // Added in version 18.
+    z.object({ kind: z.literal('bought'), day, price: cents }).strict(),
+    z
+      .object({
+        kind: z.literal('listedForSale'),
+        day,
+        askingPrice: cents,
+        mode: z.enum(['agency', 'self']),
+      })
+      .strict(),
+    z.object({ kind: z.literal('saleWithdrawn'), day }).strict(),
+    z.object({ kind: z.literal('saleAgreed'), day, price: cents }).strict(),
+    z.object({ kind: z.literal('saleFellThrough'), day }).strict(),
+    z
+      .object({
+        kind: z.literal('listedForRent'),
+        day,
+        leaseType: leaseTypeSchema,
+        monthlyRent: cents,
+        agencyId: z.string().nullable(),
+        insured: z.boolean(),
+      })
+      .strict(),
+    z.object({ kind: z.literal('rentalWithdrawn'), day }).strict(),
+    z.object({ kind: z.literal('furniture'), day, cost: cents }).strict(),
+    z
+      .object({
+        kind: z.literal('notice'),
+        day,
+        leaveDay: day,
+        reason: z.enum(['departure', 'lifeEvent', 'incident', 'buyout']),
+      })
+      .strict(),
+    z.object({ kind: z.literal('buyout'), day, amount: cents, accepted: z.boolean() }).strict(),
+    z.object({ kind: z.literal('rentMissed'), day, amount: cents, insured: z.boolean() }).strict(),
+    z.object({ kind: z.literal('reminder'), day, settled: z.boolean() }).strict(),
+    z.object({ kind: z.literal('procedure'), day, evictionDay: day, cost: cents }).strict(),
+    z.object({ kind: z.literal('rentRevised'), day, monthlyRent: cents }).strict(),
+    z.object({ kind: z.literal('leaseRenewed'), day, termDay: day }).strict(),
+    z.object({ kind: z.literal('dpeWarning'), day, banDay: day }).strict(),
+    z
+      .object({
+        kind: z.literal('worksCompleted'),
+        day,
+        cost: cents,
+        dpeBefore: z.enum(DPE_LABELS),
+        dpeAfter: z.enum(DPE_LABELS),
+      })
+      .strict(),
+    z
+      .object({
+        kind: z.literal('copro'),
+        day,
+        results: z.array(
+          z
+            .object({ id: z.string(), passed: z.boolean(), textIndex: z.number().int().min(0) })
+            .strict(),
+        ),
+      })
+      .strict(),
+    z
+      .object({
+        kind: z.literal('transformation'),
+        day,
+        transformation: z.enum(['division', 'splitBuilding', 'attic', 'construction']),
+        cost: cents,
+      })
+      .strict(),
+    z.object({ kind: z.literal('home'), day, movedIn: z.boolean() }).strict(),
+    z.object({ kind: z.literal('regime'), day, regime: taxRegimeSchema }).strict(),
   ]),
 );
 
@@ -1458,28 +1599,7 @@ const gameStateSchema = z
         installments: z
           .object({ monthly: cents, remaining: z.number().int().min(0).max(12) })
           .strict(),
-        lastAssessment: z
-          .object({
-            year: z.number().int(),
-            incomeTax: cents,
-            socialContributions: cents,
-            accountantFees: cents.min(0),
-            deficitOnSalary: cents.min(0),
-            wealthTax: cents.min(0),
-            taxableWealth: cents.min(0),
-            properties: z.array(
-              z
-                .object({
-                  propertyId: z.string(),
-                  category: leaseTypeSchema,
-                  regime: z.enum(['micro', 'real']),
-                  taxable: cents,
-                })
-                .strict(),
-            ),
-          })
-          .strict()
-          .nullable(),
+        lastAssessment: assessmentSchema.nullable(),
       })
       .strict(),
     artisans: z.record(z.string(), z.object({ jobs: z.number().int().min(0) }).strict()),
@@ -1546,10 +1666,7 @@ const gameStateSchema = z
         })
         .strict(),
     ),
-    lastStatement: z
-      .object({ date: calendarDateSchema, lines: z.array(statementLineSchema), balance: cents })
-      .strict()
-      .nullable(),
+    lastStatement: statementSchema.nullable(),
     modeId: z.string(),
     rewinds: z.number().int().min(0),
     gameOver: z.object({ day }).strict().nullable(),
@@ -1598,33 +1715,15 @@ const gameStateSchema = z
         anecdotes: z.array(noteBase.extend({ anecdoteId: z.string() }).strict()),
       })
       .strict(),
-    lastYearReview: z
+    lastYearReview: yearReviewSchema.nullable(),
+    reviews: z
       .object({
-        year: z.number().int(),
-        netWorthStart: cents,
-        netWorthEnd: cents,
-        cashFlow: cents,
-        rents: cents,
-        reputationStart: z.number(),
-        reputationEnd: z.number(),
-        rentTax: cents.nullable(),
-        accountantFees: cents,
-        titles: z.array(z.string()),
-        achievements: z.array(z.string()),
-        advice: z.array(
-          z
-            .object({
-              kind: z.enum(ADVICE_KINDS),
-              propertyId: z.string().optional(),
-              amount: cents.optional(),
-              year: z.number().int().optional(),
-              ratio: z.number().optional(),
-            })
-            .strict(),
+        statements: z.array(statementSchema),
+        years: z.array(
+          z.object({ review: yearReviewSchema, assessment: assessmentSchema.nullable() }).strict(),
         ),
       })
-      .strict()
-      .nullable(),
+      .strict(),
   })
   .strict();
 

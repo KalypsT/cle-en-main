@@ -420,7 +420,7 @@
     },
     "history": {
       "heading": "Historique du bien",
-      "empty": "Rien à signaler pour l'instant : les travaux, locataires et incidents s'afficheront ici.",
+      "empty": "Rien à signaler pour l'instant : l'achat, les travaux, la location, les locataires et la vente s'afficheront ici.",
       "works": "{item} refait, gamme {tier}",
       "worksBy": "Par {who} · {cost}",
       "byYou": "vous-même (matériaux)",
@@ -437,7 +437,54 @@
         "dpe": "logement devenu non louable"
       },
       "incident": "Incident réparé : {text} · {cost}",
-      "total": "Travaux enregistrés : {amount}"
+      "total": "Travaux enregistrés : {amount}",
+      "filters": {
+        "all": "Tout",
+        "works": "Travaux",
+        "tenants": "Locataires",
+        "market": "Achat et vente",
+        "other": "Autres"
+      },
+      "bought": "Achat signé chez le notaire : {price}",
+      "listedForSale": "Mis en vente à {price} ({mode})",
+      "saleModes": {
+        "agency": "en agence",
+        "self": "entre particuliers"
+      },
+      "saleWithdrawn": "Retiré de la vente",
+      "saleAgreed": "Offre acceptée à {price}, acte à venir",
+      "saleFellThrough": "Vente annulée : l'acheteur n'a pas obtenu son prêt",
+      "listedForRent": "Mis en location : {lease}, {rent} / mois",
+      "rentHow": "{management} · {insurance}",
+      "selfManaged": "géré par vous",
+      "insured": "avec garantie loyers impayés",
+      "notInsured": "sans garantie loyers impayés",
+      "rentalWithdrawn": "Annonce de location retirée",
+      "furniture": "Meubles achetés : {cost}",
+      "notice": "Préavis donné : départ le {date}",
+      "noticeReasons": {
+        "departure": "il déménage",
+        "lifeEvent": "un changement de vie",
+        "incident": "un incident mal vécu",
+        "buyout": "départ négocié"
+      },
+      "buyoutAccepted": "Départ négocié accepté : {amount}",
+      "buyoutRefused": "Départ négocié refusé : {amount}",
+      "rentMissed": "Loyer impayé : {amount}",
+      "rentMissedInsured": "Loyer impayé : {amount}, couvert par l'assurance",
+      "reminderSettled": "Relance : le locataire a payé",
+      "reminderFailed": "Relance restée sans effet",
+      "procedure": "Procédure d'expulsion engagée : {cost}, expulsion prévue le {date}",
+      "rentRevised": "Loyer révisé : {rent} / mois",
+      "leaseRenewed": "Bail reconduit jusqu'au {date}",
+      "dpeWarning": "Alerte DPE : location interdite à partir du {date}",
+      "worksCompleted": "Chantier terminé : {cost} au total, imprévus compris",
+      "dpeChange": "DPE {before} → {after}",
+      "copro": "Assemblée générale : {passed} résolution(s) adoptée(s) sur {count}",
+      "transformation": "{kind} terminée : {cost}",
+      "movedIn": "Vous vous y installez (résidence principale)",
+      "movedOut": "Vous quittez ce logement",
+      "regime": "Régime fiscal : {regime}"
     },
     "bought": "Acheté {price} le {date}",
     "value": "Valeur estimée",
@@ -984,7 +1031,11 @@
     "yearAchievements": "Succès de l'année",
     "noYearReview": "Le premier bilan annuel arrive le 1er janvier.",
     "noMonthReview": "Le premier bilan arrive le 1er du mois prochain.",
-    "yearWealthTax": "Impôt sur la fortune immobilière"
+    "yearWealthTax": "Impôt sur la fortune immobilière",
+    "previous": "Mois précédent",
+    "next": "Mois suivant",
+    "pastMonthHint": "Bilan d'un mois passé : la réputation est celle du jour du bilan.",
+    "years": "Années"
   },
   "celebration": {
     "title": "Nouveau titre !",

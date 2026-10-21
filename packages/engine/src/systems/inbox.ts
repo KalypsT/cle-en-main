@@ -74,6 +74,8 @@ export function freezeInbox(state: GameState): void {
   for (const item of state.inbox.mail) deepFreeze(item);
   for (const sold of state.soldProperties) deepFreeze(sold);
   for (const loan of state.closedLoans) deepFreeze(loan);
+  for (const statement of state.reviews.statements) deepFreeze(statement);
+  for (const year of state.reviews.years) deepFreeze(year);
   for (const relation of Object.values(state.banks)) {
     for (const entry of relation.log) deepFreeze(entry);
     for (const point of relation.trustHistory) deepFreeze(point);

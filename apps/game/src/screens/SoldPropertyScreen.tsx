@@ -4,7 +4,8 @@ import { useGame, useNav } from '../game/context.tsx';
 import { formatDayLong, formatEuros, formatSigned, propertyLabel, t, tone } from '../texts.ts';
 import { Card, Empty, KeyValues, ScreenHeader, Segmented } from '../ui/components.tsx';
 import { Facade } from '../ui/Facade.tsx';
-import { formatLeaseDuration, History, ValueChart } from './PropertyScreen.tsx';
+import { formatLeaseDuration, History } from './PropertyHistory.tsx';
+import { ValueChart } from './PropertyScreen.tsx';
 
 type Tab = 'summary' | 'value' | 'history';
 const TABS: readonly Tab[] = ['summary', 'value', 'history'];

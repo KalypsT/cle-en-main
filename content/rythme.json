@@ -19,6 +19,7 @@
     "mailKept": 80,
     "mailKeptDays": 365
   },
+  "statementsKept": 24,
   "rewindPoints": 6,
   "journalEntries": 20000
 }

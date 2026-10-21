@@ -15,7 +15,13 @@ import {
   type TransformationKind,
 } from './state.ts';
 import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
-import { recordBankHistory, recordBankTrust } from './systems/archives.ts';
+import {
+  keepStatement,
+  keepYearReview,
+  recordBankHistory,
+  recordBankTrust,
+  recordPropertyLog,
+} from './systems/archives.ts';
 import {
   dismissMail,
   emptyInbox,
@@ -271,6 +277,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     chronicle: [{ day: toDayNumber(startDate), kind: 'start', ref: null, amount: null }],
     catalog: { pending: [], lastDay: {}, anecdotes: [] },
     lastYearReview: null,
+    reviews: { statements: [], years: [] },
   };
   if (!isValidAvatar(state.player.avatar)) {
     throw new RangeError(`Invalid avatar ${JSON.stringify(options.avatar)}`);
@@ -325,6 +332,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     }
     ctx.events.push({ type: 'monthlyStatement', lines, balance: player.balance });
     ctx.state.lastStatement = { date: { ...ctx.state.clock.date }, lines, balance: player.balance };
+    keepStatement(ctx);
   }
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
@@ -351,7 +359,10 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     recordPropertyValues(ctx.content, ctx.state);
     recordBankTrust(ctx.state);
   }
-  if (yearStarted) ctx.state.lastYearReview = buildYearReview(ctx, regime);
+  if (yearStarted) {
+    ctx.state.lastYearReview = buildYearReview(ctx, regime);
+    keepYearReview(ctx.state);
+  }
 }
 
 function playerName(content: GameContent, name: string | undefined): string {
@@ -379,6 +390,7 @@ export function createEngine(content: GameContent) {
     );
     recordInbox(content, draft, state, events, ctx.today);
     recordBankHistory(draft, state, events, ctx.today);
+    recordPropertyLog(draft, events, ctx.today);
     freezeListings(draft);
     freezeInbox(draft);
     return { state: draft, events };
@@ -569,6 +581,7 @@ export function createEngine(content: GameContent) {
     checkMilestones(ctx);
     recordInbox(content, draft, state, events, ctx.today);
     recordBankHistory(draft, state, events, ctx.today);
+    recordPropertyLog(draft, events, ctx.today);
     freezeListings(draft);
     freezeInbox(draft);
     return { ok: true, state: draft, events };
@@ -608,7 +621,7 @@ export function createEngine(content: GameContent) {
     /** Nothing waits for the player: the automatic acceleration may run. */
     pace: (state: GameState) => pace(content, state),
     /** The short monthly review, from the last statement (null before the first one). */
-    monthlyReview: (state: GameState) => monthlyReview(content, state),
+    monthlyReview: (state: GameState, date?: CalendarDate) => monthlyReview(content, state, date),
     /** Titles, achievements, reputation, challenge, records (« Progression »). */
     progression: (state: GameState) => progressionView(content, state),
     /** The coming days of the agenda. */
