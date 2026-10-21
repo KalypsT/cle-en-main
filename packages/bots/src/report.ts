@@ -381,8 +381,11 @@ const pct = (value: number) => percentFormat.format(value);
 const num = (value: number) => (Number.isFinite(value) ? numberFormat.format(value) : '> 10');
 const money = (value: number) => moneyFormat.format(value);
 
-/** The savings of a do-nothing player at the best saving rate of docs/03-systemes/01. */
-const INACTIVE_CEILING_MONTHLY_SAVINGS = 550;
+/**
+ * The savings of a do-nothing player at the best saving rate of docs/03-systemes/01, with the
+ * bonuses and windfalls of the « Vie perso » events (about 100 € a month on average).
+ */
+const INACTIVE_CEILING_MONTHLY_SAVINGS = 650;
 
 /**
  * Milestone 7 (docs/09): « une expansion à Dijon est viable mais demande un vrai effort ».
