@@ -1,0 +1,428 @@
+{
+  "games": 100,
+  "years": 10,
+  "summaries": [
+    {
+      "botId": "chasseur",
+      "games": 100,
+      "bankruptShare": 0.03,
+      "forcedSaleShare": 0.14,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.084931506849315,
+      "firstPurchaseInWindowShare": 0.98,
+      "bailleurYears": 3.3191780821917805,
+      "bailleurShare": 0.84,
+      "seasonedYears": null,
+      "seasonedShare": 0,
+      "netWorth": {
+        "p10": [
+          23936.3,
+          30313.8,
+          36075.8,
+          42650.3,
+          46920.5,
+          53137,
+          61510.7,
+          67052.8,
+          64182.8,
+          71603.1
+        ],
+        "p50": [
+          31785.5,
+          44463.5,
+          55623,
+          65843.5,
+          77207,
+          87799,
+          101779,
+          108452,
+          121057.5,
+          130402.5
+        ],
+        "p90": [
+          42163.70000000001,
+          60344.60000000001,
+          77350.1,
+          97356.00000000001,
+          111323.90000000001,
+          126237.80000000005,
+          147726.30000000002,
+          167414.2,
+          187668.6,
+          212780.90000000002
+        ]
+      },
+      "maxFinalNetWorth": 325850,
+      "medianProperties": 3,
+      "medianMonthlyRent": 1468,
+      "medianDebtRatio": 0.2789466646003972,
+      "medianVisits": 26,
+      "medianOffers": 7,
+      "meanLostToRivals": 5.3,
+      "meanRivalOffers": 0.02,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.1943672953167424,
+        "martinot": 15.727218279209911
+      },
+      "byJob": {
+        "civilServant": 126040,
+        "teacher": 120641,
+        "nurse": 130488,
+        "developer": 196699.5,
+        "electrician": 111226.5,
+        "salesperson": 126473,
+        "realEstateAgent": 142895.5
+      },
+      "renting": {
+        "occupancy": 0.9814318529862175,
+        "rentMissed": 0.25459418070444106,
+        "incidents": 0.5356049004594181,
+        "departures": 0.2951761102603369,
+        "evictionShare": 0.15,
+        "rentTaxPerYear": 865.2590367862229,
+        "propertyTaxPerYear": 1285.574189099797,
+        "accountantPerYear": 858.3174031012097,
+        "capitalGainsTax": 584.41,
+        "realRegimeShare": 0.9793772745653053,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 45.1129506748374,
+        "intervalByJob": {
+          "civilServant": 50.02810776410691,
+          "teacher": 49.19932482019668,
+          "nurse": 50.30700435893582,
+          "developer": 39.46622670807454,
+          "electrician": 45.7128323385784,
+          "salesperson": 43.56791015368449,
+          "realEstateAgent": 40.6209584295612
+        },
+        "decisionsPerYear": 54.42609119754235,
+        "catalogPerYear": 33.79046092094494,
+        "interestingPerYear": 20.36246650446794,
+        "challengesPerYear": 1.7341295646421724,
+        "challengesWonPerYear": 0.15755513448666345,
+        "anecdotesPerYear": 109.69929701427274,
+        "calmShare": 0.9877369914004777,
+        "realHoursPerYear": 0.6820337687830361,
+        "medianAchievements": 19,
+        "medianReputation": 91.00000000000001,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.09041095890410959,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.84,
+            "years": 2.921917808219178,
+            "within10": 0.84
+          },
+          "renovator": {
+            "share": 0.01,
+            "years": 9.657534246575343,
+            "within10": 0.01
+          },
+          "seasonedInvestor": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0,
+        "firstRemoteMonths": null,
+        "remotePurchases": 0,
+        "tripsPerYear": 0,
+        "tripHoursPerYear": 0,
+        "tripCostPerYear": 0,
+        "remoteFeesPerYear": 0,
+        "twoCitiesShare": 0,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 97.5,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0,
+        "buyersNetWorth": null
+      },
+      "works": {
+        "projects": 1.14,
+        "cost": 10262.97,
+        "hazardsPerProject": 0.2719298245614035,
+        "dpeClassesGained": 1.84,
+        "sales": 0.31,
+        "passoireShare": 0.002932551319648094
+      },
+      "depth": {
+        "companyShare": 0.77,
+        "companyYears": 3.421917808219178,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    },
+    {
+      "botId": "chasseurDijon",
+      "games": 100,
+      "bankruptShare": 0.04,
+      "forcedSaleShare": 0.2,
+      "boughtShare": 1,
+      "firstPurchaseMonths": 1.084931506849315,
+      "firstPurchaseInWindowShare": 0.98,
+      "bailleurYears": 3.0232876712328767,
+      "bailleurShare": 0.84,
+      "seasonedYears": null,
+      "seasonedShare": 0.06,
+      "netWorth": {
+        "p10": [
+          24041.3,
+          30674.9,
+          34876.1,
+          44020.8,
+          45604.9,
+          50145.3,
+          55684.8,
+          54054.100000000006,
+          49476.100000000006,
+          55435.9
+        ],
+        "p50": [
+          31923,
+          44174.5,
+          56227,
+          67887.5,
+          76247,
+          82386,
+          93506.5,
+          104310.5,
+          115448,
+          131283.5
+        ],
+        "p90": [
+          43668.5,
+          60221.40000000002,
+          77087.1,
+          93632.1,
+          108992.90000000001,
+          120933.70000000003,
+          138597.6,
+          158181.9,
+          176192.5,
+          200552.7
+        ]
+      },
+      "maxFinalNetWorth": 301804,
+      "medianProperties": 3,
+      "medianMonthlyRent": 1542.5,
+      "medianDebtRatio": 0.2857428036345688,
+      "medianVisits": 27.5,
+      "medianOffers": 7,
+      "meanLostToRivals": 4.77,
+      "meanRivalOffers": 0,
+      "rivalPurchasesPerYear": {
+        "delaporte": 3.1844157118783274,
+        "martinot": 15.407010384210073
+      },
+      "byJob": {
+        "civilServant": 124100,
+        "teacher": 128246,
+        "nurse": 111760.5,
+        "developer": 149036,
+        "electrician": 107627.5,
+        "salesperson": 150585.5,
+        "realEstateAgent": 160796.5
+      },
+      "renting": {
+        "occupancy": 0.9814096860302529,
+        "rentMissed": 0.2112622346510741,
+        "incidents": 0.5258675479852548,
+        "departures": 0.27875937460277106,
+        "evictionShare": 0.1,
+        "rentTaxPerYear": 836.3364946793083,
+        "propertyTaxPerYear": 1294.0575518904718,
+        "accountantPerYear": 892.1004834944513,
+        "capitalGainsTax": 809.61,
+        "realRegimeShare": 0.9843937575030012,
+        "furnishedShare": 0
+      },
+      "rhythm": {
+        "interval": 44.01559811065139,
+        "intervalByJob": {
+          "civilServant": 50.52274699840879,
+          "teacher": 48.60694614443084,
+          "nurse": 50.73588709677419,
+          "developer": 37.32072742302129,
+          "electrician": 43.99453710886993,
+          "salesperson": 40.00538487699807,
+          "realEstateAgent": 41.76550549713193
+        },
+        "decisionsPerYear": 56.14119614893995,
+        "catalogPerYear": 34.08227571855385,
+        "interestingPerYear": 21.846163160369787,
+        "challengesPerYear": 1.72980910839343,
+        "challengesWonPerYear": 0.16136662508482977,
+        "anecdotesPerYear": 109.26576144040234,
+        "calmShare": 0.9874043641217268,
+        "realHoursPerYear": 0.6864134242063861,
+        "medianAchievements": 19,
+        "medianReputation": 91.75,
+        "titles": {
+          "firstInvestor": {
+            "share": 1,
+            "years": 0.09041095890410959,
+            "within10": 1
+          },
+          "landlord": {
+            "share": 0.84,
+            "years": 2.6890410958904107,
+            "within10": 0.84
+          },
+          "renovator": {
+            "share": 0.02,
+            "years": 9.708219178082192,
+            "within10": 0.02
+          },
+          "seasonedInvestor": {
+            "share": 0.06,
+            "years": 8.354794520547944,
+            "within10": 0.06
+          },
+          "propertyDealer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "developer": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "magnate": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          },
+          "baron": {
+            "share": 0,
+            "years": null,
+            "within10": 0
+          }
+        }
+      },
+      "cities": {
+        "remoteBuyerShare": 0.38,
+        "firstRemoteMonths": 38.219178082191775,
+        "remotePurchases": 0.54,
+        "tripsPerYear": 0.3053693126872011,
+        "tripHoursPerYear": 0.45805396903080164,
+        "tripCostPerYear": 3.664431752246413,
+        "remoteFeesPerYear": 0.9535115803814713,
+        "twoCitiesShare": 0.36,
+        "medianCities": 1,
+        "medianRenown": {
+          "dole": 93.5,
+          "dijon": 0,
+          "besancon": 0,
+          "chalon": 0
+        },
+        "buyersTripHoursPerYear": 0.7398626846407572,
+        "buyersNetWorth": 121620
+      },
+      "works": {
+        "projects": 1.51,
+        "cost": 12904.7,
+        "hazardsPerProject": 0.2781456953642384,
+        "dpeClassesGained": 2.71,
+        "sales": 0.4,
+        "passoireShare": 0.002932551319648094
+      },
+      "depth": {
+        "companyShare": 0.83,
+        "companyYears": 4.109589041095891,
+        "companyProperties": 0,
+        "transformations": 0,
+        "wealthTaxShare": 0,
+        "wealthTax": 0,
+        "horizonShare": 0,
+        "horizonYears": null
+      }
+    }
+  ],
+  "checks": [
+    {
+      "label": "Premier achat (Chasseur de bonnes affaires)",
+      "target": "entre le 2e et le 6e mois (médiane)",
+      "measured": "1,1 mois (98 % des parties dans la fenêtre, 100 % achètent)",
+      "ok": true
+    },
+    {
+      "label": "Titre Bailleur (Chasseur de bonnes affaires)",
+      "target": "2 à 4 ans",
+      "measured": "3,3 ans (atteint dans 84 % des parties)",
+      "ok": true
+    },
+    {
+      "label": "Titre Investisseur aguerri (Chasseur de bonnes affaires)",
+      "target": "6 à 10 ans (demande aussi 2 villes : jugé sur le Chasseur à Dijon)",
+      "measured": "> 10 ans (atteint dans 0 % des parties)",
+      "ok": null
+    },
+    {
+      "label": "Titre Investisseur aguerri (Chasseur à Dijon)",
+      "target": "6 à 10 ans (patrimoine de 150 k€ et 2 villes)",
+      "measured": "> 10 ans (atteint dans 6 % des parties)",
+      "ok": false
+    },
+    {
+      "label": "Densité de décisions (Chasseur de bonnes affaires)",
+      "target": "une décision toutes les 30 à 60 s réelles à ×1, pour chaque métier",
+      "measured": "45,1 s en moyenne (de 39,5 à 50,3 s selon le métier)",
+      "ok": true
+    },
+    {
+      "label": "Une expansion à Dijon est viable",
+      "target": "médiane à 10 ans du Chasseur à Dijon d’au moins 90 % de celle du Chasseur, et pas plus de 3 points de faillites en plus",
+      "measured": "131 284 € contre 130 403 € (100,7 %) ; faillites 4 % contre 3 %",
+      "ok": true
+    },
+    {
+      "label": "Une expansion à Dijon demande un vrai effort",
+      "target": "premier achat à Dijon après plus de 24 mois (médiane), et moins de la moitié des parties y achètent en 10 ans",
+      "measured": "38,2 mois ; 38 % des parties y achètent ; 0,7 h de route par an pour celles-ci",
+      "ok": true
+    },
+    {
+      "label": "Aucune stratégie ne domine",
+      "target": "information (une seule ville et un seul mode au jalon 1)",
+      "measured": "meilleure médiane : Chasseur à Dijon (131 284 €)",
+      "ok": null
+    }
+  ]
+}

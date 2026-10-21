@@ -170,6 +170,8 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 > | Densité de décisions | Chasseur 47,4 s, Prudent 33,1 s | Chasseur 45,2 s, Prudent 31,0 s (28,2 s pour le métier le plus dense) |
 >
 > Le plafond du test anti-idle suit la nouvelle épargne la plus forte : **apport plus 550 € par mois** (au lieu de 250). Nouveaux écarts, à trancher avant les étapes suivantes : l'expansion à Dijon n'est plus « un vrai effort » et un peu moins viable (87 % contre 90 %) ; les faillites du Levier tombent juste à la limite de 40 % ; le Prudent devient un peu trop dense en décisions pour un métier ; le Marchand de biens ne dépasse presque plus l'Inactif.
+>
+> **Dijon recalé** (`packages/bots/rapports/progression-dijon.md` : 100 parties de 10 ans du Chasseur et du Chasseur à Dijon) : flux d'annonces de Dijon de 0,25 à **0,1** (0,15 essayé : 58 % des parties y achètent, au 20e mois). Le Chasseur à Dijon fait 101 % de la médiane du Chasseur (faillites 4 % contre 3 %), achète à Dijon au 38e mois dans 38 % des parties : les deux cibles du jalon 7 sont de nouveau atteintes.
 
 ## 8.3 Les leviers de difficulté
 
