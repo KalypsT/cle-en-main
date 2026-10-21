@@ -64,9 +64,20 @@ const GROUP_OF: Record<StatementLine['kind'], ReviewGroup> = {
   overdraftInterest: 'bank',
 };
 
-/** The short monthly review (docs/02, section 2.2), from the last statement and the curve. */
-export function monthlyReview(content: GameContent, state: GameState) {
-  const statement = state.lastStatement;
+/**
+ * The short monthly review (docs/02, section 2.2), from the last statement and the curve;
+ * with `date`, the review of a statement kept since (its reputation from the curve, without
+ * the challenge nor the streak, which only exist now).
+ */
+export function monthlyReview(content: GameContent, state: GameState, date?: CalendarDate) {
+  const last = state.lastStatement;
+  const isLast =
+    date === undefined || (last !== null && toDayNumber(last.date) === toDayNumber(date));
+  const past = isLast
+    ? undefined
+    : state.reviews.statements.find((kept) => toDayNumber(kept.date) === toDayNumber(date));
+  if (!isLast && !past) return null;
+  const statement = past ?? last;
   if (!statement) return null;
   const groups = new Map<ReviewGroup, Cents>();
   for (const line of statement.lines) {
@@ -75,10 +86,14 @@ export function monthlyReview(content: GameContent, state: GameState) {
   }
   const net = [...groups.values()].reduce((sum, amount) => sum + amount, 0);
   const points = state.history;
-  const now = points.at(-1);
-  const before = points.at(-2) ?? points[0];
-  const since = before ? toDayNumber(before.date) : 0;
   const statementDay = toDayNumber(statement.date);
+  // The point of the curve taken on the statement's day (the last one for the last statement).
+  const index = past
+    ? points.findIndex((point) => toDayNumber(point.date) === statementDay)
+    : points.length - 1;
+  const now = index >= 0 ? points[index] : undefined;
+  const before = points[index - 1] ?? points[0];
+  const since = before ? toDayNumber(before.date) : 0;
   return {
     date: statement.date,
     groups: [...groups].map(([group, amount]) => ({ group, amount })),
@@ -86,7 +101,7 @@ export function monthlyReview(content: GameContent, state: GameState) {
     balance: statement.balance,
     netWorth: now?.netWorth ?? 0,
     netWorthChange: now && before ? now.netWorth - before.netWorth : 0,
-    reputation: state.player.reputation,
+    reputation: past ? (now?.reputation ?? 0) : state.player.reputation,
     reputationChange: now && before ? now.reputation - before.reputation : 0,
     monthlyRent: now?.monthlyRent ?? 0,
     titles: state.progress.titles
@@ -95,8 +110,8 @@ export function monthlyReview(content: GameContent, state: GameState) {
     achievements: state.progress.achievements
       .filter((a) => a.day > since && a.day <= statementDay)
       .map((a) => a.id),
-    challenge: challengeView(content, state),
-    positiveStreak: state.progress.counters.positiveStreak ?? 0,
+    challenge: past ? null : challengeView(content, state),
+    positiveStreak: past ? 0 : (state.progress.counters.positiveStreak ?? 0),
   };
 }
 

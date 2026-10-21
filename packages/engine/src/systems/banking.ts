@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../calendar.ts';
+import { archiveLoan } from './archives.ts';
 import { type Bank, findBank, findJob, type GameContent } from '../content.ts';
 import type { StatementLine } from '../events.ts';
 import {
@@ -45,6 +46,8 @@ export function initialBankRelations(content: GameContent, jobTrust: JobTrustLev
       trust: content.credit.trust.startByJob[jobTrust],
       relationshipMonths: 0,
       lastMeetingDay: null,
+      log: [],
+      trustHistory: [],
     };
   }
   return relations;
@@ -466,6 +469,7 @@ export function runMonthlyLoanPayments(ctx: SystemContext, lines: StatementLine[
     loan.paymentsMade += 1;
     lines.push({ kind: 'loanPayment', loanId: loan.id, amount: due, interest, capital });
     if (loan.remaining <= 0 || loan.paymentsMade >= loan.durationMonths) {
+      archiveLoan(ctx, loan, 'repaid');
       ctx.events.push({ type: 'loanRepaid', loanId: loan.id });
     } else {
       stillRunning.push(loan);
@@ -619,6 +623,7 @@ export function refinanceLoan(
     renegotiationSuggested: false,
     propertyId: loan.propertyId,
   };
+  archiveLoan(ctx, loan, 'refinanced', replacement.id);
   state.loans = state.loans.map((other) => (other.id === loan.id ? replacement : other));
   ctx.events.push({ type: 'loanRefinanced', oldLoanId: loan.id, newLoanId: replacement.id, fees });
   return null;
@@ -665,6 +670,12 @@ export interface LoanSheet {
 }
 
 /** Interest and capital left after paying `payment` each month from `remaining`. */
+/** Interest paid so far on a loan, by its original schedule. */
+export function interestPaidOf(loan: Loan): Cents {
+  const original = annuityPayment(loan.principal, loan.ratePercent, loan.durationMonths);
+  return amortize(loan.principal, loan.ratePercent, original, loan.paymentsMade).interest;
+}
+
 function amortize(remaining: Cents, ratePercent: number, payment: Cents, months: number) {
   let left = remaining;
   let interest = 0;
@@ -685,8 +696,6 @@ function amortize(remaining: Cents, ratePercent: number, payment: Cents, months:
 export function loanSheets(content: GameContent, state: GameState): LoanSheet[] {
   return state.loans.map((loan) => {
     const monthsLeft = remainingMonths(loan);
-    const original = annuityPayment(loan.principal, loan.ratePercent, loan.durationMonths);
-    const past = amortize(loan.principal, loan.ratePercent, original, loan.paymentsMade);
     const future = amortize(loan.remaining, loan.ratePercent, loan.monthlyPayment, monthsLeft);
     const end =
       loan.startDate.year * MONTHS_PER_YEAR + loan.startDate.month - 1 + loan.durationMonths;
@@ -726,7 +735,7 @@ export function loanSheets(content: GameContent, state: GameState): LoanSheet[] 
         month: (end % MONTHS_PER_YEAR) + 1,
         day: 1,
       },
-      interestPaid: past.interest,
+      interestPaid: interestPaidOf(loan),
       interestLeft: future.interest,
       remainingByYear: future.byYear,
       refinance,

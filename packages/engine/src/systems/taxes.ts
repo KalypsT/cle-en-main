@@ -58,7 +58,10 @@ function isHome(state: GameState, owned: OwnedProperty): boolean {
 }
 
 export function addRent(state: GameState, owned: OwnedProperty, amount: Cents): void {
-  if (!isHome(state, owned)) ledgerOf(state, owned).rents += amount;
+  if (isHome(state, owned)) return;
+  ledgerOf(state, owned).rents += amount;
+  owned.rentsReceived += amount;
+  if (owned.lease) owned.lease.rentsReceived += amount;
 }
 
 export function addCost(state: GameState, owned: OwnedProperty, amount: Cents): void {
@@ -678,6 +681,7 @@ export function setTaxRegime(
 ): 'property.unknown' | null {
   const owned = ctx.state.properties.find((o) => o.property.id === propertyId);
   if (!owned) return 'property.unknown';
+  if (owned.taxRegime !== regime) owned.log.push({ kind: 'regime', day: ctx.today, regime });
   owned.taxRegime = regime;
   ledgerOf(ctx.state, owned).regime = regime;
   return null;

@@ -98,7 +98,13 @@ describe('migrations', () => {
     expect(migrated.formatVersion).toBe(FORMAT_VERSION);
     expect(migrated.clock).toEqual(original.clock);
     expect(migrated.player.balance).toBe(original.player.balance);
-    expect(migrated.banks).toEqual(original.banks);
+    // Version 17: each bank starts an empty history.
+    const banks = original.banks as Record<string, object>;
+    expect(migrated.banks).toEqual(
+      Object.fromEntries(
+        Object.entries(banks).map(([id, bank]) => [id, { ...bank, log: [], trustHistory: [] }]),
+      ),
+    );
     expect(migrated.market.laggedRatePercent).toBe(original.market.ratePercent);
     expect(Object.keys(migrated.market.cities.dole ?? {})).toHaveLength(5);
     expect(migrated.listings.length).toBeGreaterThan(20);
@@ -367,8 +373,12 @@ describe('migrations', () => {
     expect(migrated.properties.every((o) => o.valueHistory.length === 0)).toBe(true);
     // Version 14: the history of each property starts empty.
     expect(migrated.properties.every((o) => o.log.length === 0)).toBe(true);
-    // Version 13: no refused offer was ever kept.
-    expect(migrated.offerNotices).toEqual([]);
+    // Version 13: no refused offer was ever kept; version 16: no news nor mail either.
+    expect(migrated.inbox).toEqual({ news: [], newsSeenId: 0, mail: [], nextId: 1 });
+    // Version 17: nothing archived yet, the rents start counting.
+    expect(migrated.soldProperties).toEqual([]);
+    expect(migrated.closedLoans).toEqual([]);
+    expect(migrated.properties.every((o) => o.rentsReceived === 0)).toBe(true);
     // Version 12: no tenant was ever offered an indemnity.
     expect(migrated.properties.some((o) => o.lease !== null)).toBe(true);
     expect(
@@ -421,5 +431,116 @@ describe('migrations', () => {
         depositReturned: 0,
       },
     ]);
+  });
+
+  it('turns the sellers answers of a version 15 save into letters, the news empty', () => {
+    const property = {
+      id: 'p-7',
+      kind: 'apartment',
+      rooms: 2,
+      surface: 45,
+      lots: [],
+      cityId: 'dole',
+      neighbourhoodId: 'centre',
+    };
+    const raw = {
+      formatVersion: 15,
+      listings: [{ id: 'l-3', property }],
+      offerNotices: [
+        {
+          id: 'notice-9',
+          listingId: 'l-3',
+          day: 21_000,
+          amount: 40_000_00,
+          outcome: 'refused',
+          dismissed: true,
+        },
+        {
+          id: 'notice-12',
+          listingId: 'l-gone',
+          day: 21_004,
+          amount: 61_000_00,
+          outcome: 'counterExpired',
+          dismissed: false,
+        },
+      ],
+    };
+    const migrated = migrateRaw(raw, context, 16);
+    expect(migrated.offerNotices).toBeUndefined();
+    expect(migrated.inbox).toEqual({
+      news: [],
+      newsSeenId: 0,
+      nextId: 3,
+      mail: [
+        {
+          id: 1,
+          day: 21_000,
+          subject: {
+            propertyId: 'p-7',
+            listingId: 'l-3',
+            kind: 'apartment',
+            rooms: 2,
+            surface: 45,
+            lots: 0,
+            cityId: 'dole',
+            neighbourhoodId: 'centre',
+          },
+          dismissed: true,
+          kind: 'offerReply',
+          listingId: 'l-3',
+          outcome: 'refused',
+          amount: 40_000_00,
+        },
+        {
+          id: 2,
+          day: 21_004,
+          subject: null,
+          dismissed: false,
+          kind: 'offerReply',
+          listingId: 'l-gone',
+          outcome: 'counterExpired',
+          amount: 61_000_00,
+        },
+      ],
+    });
+  });
+
+  it('starts the market curves and the lease counters of a version 18 save', () => {
+    const exit = {
+      kind: 'tenantOut',
+      day: 400,
+      tenantName: 'Lucas Arnaud',
+      reason: 'notice',
+      startDay: 100,
+      monthlyRent: 52_000,
+      damages: 0,
+      depositReturned: 52_000,
+    };
+    const raw = {
+      formatVersion: 18,
+      properties: [{ lease: { monthlyRent: 52_000 }, log: [exit] }],
+      soldProperties: [{ log: [exit] }],
+    };
+    const migrated = migrateRaw(raw, context, 19) as {
+      marketHistory: unknown[];
+      properties: { lease: Record<string, unknown>; log: unknown[] }[];
+      soldProperties: { log: unknown[] }[];
+    };
+    const upgraded = {
+      ...exit,
+      profileId: null,
+      traitId: null,
+      rentsReceived: null,
+      missedRents: null,
+      satisfaction: null,
+    };
+    expect(migrated.marketHistory).toEqual([]);
+    expect(migrated.properties[0]?.lease).toEqual({
+      monthlyRent: 52_000,
+      rentsReceived: 0,
+      missedRents: 0,
+    });
+    expect(migrated.properties[0]?.log).toEqual([upgraded]);
+    expect(migrated.soldProperties[0]?.log).toEqual([upgraded]);
   });
 });

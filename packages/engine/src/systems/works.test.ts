@@ -327,6 +327,8 @@ describe('works', () => {
         artisanId: null,
         cost: catalog?.diy?.tiers.eco.materials,
       },
+      // Then the end of the works, with the DPE before and after.
+      expect.objectContaining({ kind: 'worksCompleted', cost: catalog?.diy?.tiers.eco.materials }),
     ]);
 
     const electrician = { ...state, player: { ...state.player, jobId: 'electrician' } };

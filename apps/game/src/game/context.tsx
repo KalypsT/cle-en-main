@@ -41,7 +41,11 @@ export type Route =
   | { name: 'yearReview' }
   | { name: 'rewind' }
   | { name: 'cities' }
-  | { name: 'bank' };
+  | { name: 'bank' }
+  /** A property sold, read only (« Biens vendus »). */
+  | { name: 'soldProperty'; id: string }
+  /** The history with one bank. */
+  | { name: 'banker'; id: string };
 
 /** A screen the tutorial waits for (content/textes/didacticiel.json). */
 export type TrackedScreen = 'listings' | 'listing' | 'financing';

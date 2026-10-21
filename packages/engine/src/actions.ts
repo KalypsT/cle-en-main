@@ -26,8 +26,10 @@ export type GameAction =
   /** Buys in one's own name or through the SCI, before asking any bank. */
   | { type: 'purchase/setHolder'; purchaseId: string; holder: Holder }
   | { type: 'market/favorite'; listingId: string; favorite: boolean }
-  /** Closes the notice of a refused offer, or all of them (`noticeId` null). */
-  | { type: 'market/dismissOfferNotice'; noticeId: string | null }
+  /** Closes a letter of the mail, or all of them (`mailId` null). */
+  | { type: 'inbox/dismissMail'; mailId: number | null }
+  /** The player has read the news so far. */
+  | { type: 'inbox/seeNews' }
   /** Interface data kept in the save: Gérard's tutorial, on or off, and its step. */
   | { type: 'tutorial/set'; enabled?: boolean; step?: number }
   | { type: 'market/visit'; listingId: string }
@@ -110,6 +112,7 @@ export type RefusalCode =
   | ChallengeRefusal
   | CompanyRefusal
   | TransformationRefusal
+  | 'mail.unknown'
   | 'game.over'
   | 'job.alreadyResigned'
   | 'tutorial.invalidStep';

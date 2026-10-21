@@ -1225,6 +1225,21 @@ select {
   border-bottom: 0;
 }
 
+/* News not seen yet when the section opened (« Décisions » > Actualités). */
+.feed li.unseen {
+  padding-left: 8px;
+  border-left: 3px solid var(--teal);
+}
+
+.feed .link-button {
+  min-height: 0;
+  padding: 4px 0 0;
+}
+
+.block {
+  display: block;
+}
+
 /* ---------- Start screens ---------- */
 
 .title-screen {

@@ -1,4 +1,5 @@
 import { gameContent } from '@cle/content';
+import { NeighbourhoodPrices } from '../ui/MarketCurves.tsx';
 import { useMemo, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -226,6 +227,7 @@ export function CitiesScreen() {
           </div>
         </Card>
       )}
+      {selected && <NeighbourhoodPrices cityId={selected.cityId} title={t.cities.prices} />}
       <p className="tiny muted">{t.cities.attribution}</p>
 
       {moving && (

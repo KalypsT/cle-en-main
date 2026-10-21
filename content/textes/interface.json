@@ -79,8 +79,10 @@
     "rivalArrived": "{rival} arrive sur le marché. Ses lettres commencent toutes par « Nous reviendrons vers vous ».",
     "wealthTax": "Félicitations, vous êtes officiellement riche : {amount} d'IFI pour {year}, prélevés avec l'impôt.",
     "listingPublished": "Nouvelle annonce en ligne.",
-    "listingSold": "Une annonce vient d'être vendue à un autre acheteur.",
-    "listingSoldToRival": "Vendu à {rival}.",
+    "listingSold": "Le bien que vous suiviez ({property}) a trouvé un autre acheteur.",
+    "listingSoldToRival": "{rival} a acheté le bien que vous suiviez ({property}).",
+    "listingWithdrawn": "Le bien que vous suiviez ({property}) n'est plus en vente.",
+    "listingPriceDropped": "Le bien que vous suiviez ({property}) baisse son prix : {price}.",
     "visitDone": "Visite terminée.",
     "visitPlanned": "Visite prévue dans votre agenda.",
     "offerAccepted": "Offre acceptée !",
@@ -145,7 +147,8 @@
     "tripMade": "Trajet à {city} : {duration} de route, {cost}.",
     "movedCity": "Vous voilà installé à {city} : loyer de {rent} par mois, déménagement {cost}.",
     "buyoutAccepted": "Votre locataire accepte {amount} pour partir : il libère le logement le {date}.",
-    "buyoutRefused": "Votre locataire refuse {amount} : il reste, un peu vexé."
+    "buyoutRefused": "Votre locataire refuse {amount} : il reste, un peu vexé.",
+    "leaseRenewed": "Bail reconduit jusqu'au {date}."
   },
   "refusals": {
     "bank.unknown": "Cette banque n'existe pas.",
@@ -237,7 +240,8 @@
     "move.noMoney": "Pas assez d'argent sur le compte pour payer le déménagement.",
     "rent.noBuyout": "Ce bail ne se prête pas à un départ négocié.",
     "rent.alreadyLeaving": "Votre locataire est déjà sur le départ.",
-    "rent.buyoutTooSoon": "Votre locataire vient de refuser : laissez-lui un peu de temps."
+    "rent.buyoutTooSoon": "Votre locataire vient de refuser : laissez-lui un peu de temps.",
+    "mail.unknown": "Ce courrier n'existe plus."
   },
   "errors": {
     "importFailed": "Ce fichier ne contient pas une partie valide.",

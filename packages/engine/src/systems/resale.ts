@@ -1,4 +1,5 @@
 import type { Cents } from '../money.ts';
+import { archiveLoan, archiveSale } from './archives.ts';
 import { toCents } from '../money.ts';
 import { nextFloat, nextRange } from '../random.ts';
 import type { OwnedProperty, SaleMode } from '../state.ts';
@@ -152,6 +153,8 @@ export function transferProperty(ctx: SystemContext, owned: OwnedProperty, price
   const proceeds = settlement(ctx, owned, price);
   const propertyId = owned.property.id;
   state.player.balance += proceeds.net;
+  for (const loan of state.loans)
+    if (loan.propertyId === propertyId) archiveLoan(ctx, loan, 'sold');
   state.loans = state.loans.filter((loan) => loan.propertyId !== propertyId);
   // This year's rents and costs are still taxed at the yearly review.
   const ledger = state.tax.ledgers[propertyId];
@@ -165,6 +168,7 @@ function closeSale(ctx: SystemContext, owned: OwnedProperty, price: Cents) {
   const buyerId = owned.sale?.agreement?.buyerId ?? null;
   const { agencyFees } = saleProceeds(ctx, owned, price);
   const proceeds = transferProperty(ctx, owned, price - agencyFees);
+  archiveSale(ctx, owned, { price, agencyFees, ...proceeds }, false);
   ctx.events.push({
     type: 'propertySold',
     propertyId: owned.property.id,

@@ -15,6 +15,22 @@ import {
   type TransformationKind,
 } from './state.ts';
 import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
+import {
+  keepStatement,
+  keepYearReview,
+  priceChange,
+  recordBankHistory,
+  recordBankTrust,
+  recordMarketPoint,
+  recordPropertyLog,
+} from './systems/archives.ts';
+import {
+  dismissMail,
+  emptyInbox,
+  freezeInbox,
+  markNewsSeen,
+  recordInbox,
+} from './systems/inbox.ts';
 import { buyoutRetryDay, occupiedDiscount, offerBuyout } from './systems/buyout.ts';
 import {
   evaluateLoan,
@@ -250,7 +266,10 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     artisans: {},
     worksDone: {},
     favorites: [],
-    offerNotices: [],
+    inbox: emptyInbox(),
+    soldProperties: [],
+    closedLoans: [],
+    marketHistory: [],
     tutorial: { enabled: options.tutorial ?? true, step: 0 },
     history: [],
     lastStatement: null,
@@ -261,6 +280,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     chronicle: [{ day: toDayNumber(startDate), kind: 'start', ref: null, amount: null }],
     catalog: { pending: [], lastDay: {}, anecdotes: [] },
     lastYearReview: null,
+    reviews: { statements: [], years: [] },
   };
   if (!isValidAvatar(state.player.avatar)) {
     throw new RangeError(`Invalid avatar ${JSON.stringify(options.avatar)}`);
@@ -269,6 +289,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
   for (const cityId of Object.keys(content.cities))
     seedListings(context(content, state, []), cityId);
   state.history.push(monthlyPoint(content, state, 0));
+  recordMarketPoint(state);
   // Free time left on the first day, prorated to the hours remaining.
   const fullDay = dailyFreeTime(content, state, startDate);
   state.player.freeTimeMinutes = Math.floor(
@@ -315,6 +336,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     }
     ctx.events.push({ type: 'monthlyStatement', lines, balance: player.balance });
     ctx.state.lastStatement = { date: { ...ctx.state.clock.date }, lines, balance: player.balance };
+    keepStatement(ctx);
   }
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
@@ -339,8 +361,13 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     const net = statementNet(ctx.state.lastStatement?.lines ?? []);
     ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
     recordPropertyValues(ctx.content, ctx.state);
+    recordBankTrust(ctx.state);
+    recordMarketPoint(ctx.state);
   }
-  if (yearStarted) ctx.state.lastYearReview = buildYearReview(ctx, regime);
+  if (yearStarted) {
+    ctx.state.lastYearReview = buildYearReview(ctx, regime);
+    keepYearReview(ctx.state);
+  }
 }
 
 function playerName(content: GameContent, name: string | undefined): string {
@@ -360,12 +387,17 @@ export function createEngine(content: GameContent) {
     const { clock, events } = advanceClock(state.clock);
     if (events.length === 0) return { state: { ...state, clock }, events };
     const draft = deepClone({ ...state, clock });
+    const ctx = context(content, draft, events);
     runNewDay(
-      context(content, draft, events),
+      ctx,
       events.some((event) => event.type === 'monthStarted'),
       events.some((event) => event.type === 'yearStarted'),
     );
+    recordInbox(content, draft, state, events, ctx.today);
+    recordBankHistory(draft, state, events, ctx.today);
+    recordPropertyLog(draft, events, ctx.today);
     freezeListings(draft);
+    freezeInbox(draft);
     return { state: draft, events };
   }
 
@@ -519,8 +551,11 @@ export function createEngine(content: GameContent) {
       case 'market/favorite':
         refusal = setFavorite(draft, action.listingId, action.favorite);
         break;
-      case 'market/dismissOfferNotice':
-        refusal = dismissOfferNotice(draft, action.noticeId);
+      case 'inbox/dismissMail':
+        refusal = dismissMail(draft, action.mailId);
+        break;
+      case 'inbox/seeNews':
+        refusal = markNewsSeen(draft);
         break;
       case 'tutorial/set':
         refusal = null;
@@ -549,7 +584,11 @@ export function createEngine(content: GameContent) {
     if (refusal) return { ok: false, state, reason: { code: refusal } };
     recordProgress(ctx, events.slice());
     checkMilestones(ctx);
+    recordInbox(content, draft, state, events, ctx.today);
+    recordBankHistory(draft, state, events, ctx.today);
+    recordPropertyLog(draft, events, ctx.today);
     freezeListings(draft);
+    freezeInbox(draft);
     return { ok: true, state: draft, events };
   }
 
@@ -587,7 +626,10 @@ export function createEngine(content: GameContent) {
     /** Nothing waits for the player: the automatic acceleration may run. */
     pace: (state: GameState) => pace(content, state),
     /** The short monthly review, from the last statement (null before the first one). */
-    monthlyReview: (state: GameState) => monthlyReview(content, state),
+    monthlyReview: (state: GameState, date?: CalendarDate) => monthlyReview(content, state, date),
+    /** How a neighbourhood's prices moved over the last months (docs/04, « Fiche annonce »). */
+    priceChange: (state: GameState, cityId: string, neighbourhoodId: string, months: number) =>
+      priceChange(state, cityId, neighbourhoodId, months),
     /** Titles, achievements, reputation, challenge, records (« Progression »). */
     progression: (state: GameState) => progressionView(content, state),
     /** The coming days of the agenda. */
@@ -817,16 +859,6 @@ function setFavorite(state: GameState, listingId: string, favorite: boolean): Re
   if (!state.listings.some((listing) => listing.id === listingId)) return 'listing.unknown';
   state.favorites = state.favorites.filter((id) => id !== listingId);
   if (favorite) state.favorites.push(listingId);
-  return null;
-}
-
-function dismissOfferNotice(state: GameState, noticeId: string | null): RefusalCode | null {
-  if (noticeId !== null && !state.offerNotices.some((notice) => notice.id === noticeId)) {
-    return 'listing.unknown';
-  }
-  for (const notice of state.offerNotices) {
-    if (noticeId === null || notice.id === noticeId) notice.dismissed = true;
-  }
   return null;
 }
 

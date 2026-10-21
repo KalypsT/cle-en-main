@@ -197,6 +197,7 @@
     "counter": "Contre-offre",
     "offerRefused": "Offre refusée",
     "counterExpired": "Contre-offre expirée",
+    "counterDeclined": "Contre-offre déclinée",
     "favorite": "Favori",
     "kindShort": {
       "apartment": "Appartement",
@@ -270,7 +271,9 @@
       "after2012": "après 2012"
     },
     "visitTrip": "Visiter · {duration} + trajet {trip} ({cost})",
-    "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)"
+    "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)",
+    "counterDeclinedText": "Vous avez décliné sa contre-offre de {amount} le {date}.",
+    "neighbourhoodTrend": "Prix du quartier : {change} en {months} mois"
   },
   "financing": {
     "heading": "Financement simulé",
@@ -403,7 +406,10 @@
       "listedForRent": "À louer",
       "vacant": "Vacant"
     },
-    "deedOn": "Acte le {date}"
+    "deedOn": "Acte le {date}",
+    "sold": "Biens vendus",
+    "soldLine": "Vendu le {date}",
+    "forced": "Vente forcée"
   },
   "property": {
     "tabs": {
@@ -415,7 +421,7 @@
     },
     "history": {
       "heading": "Historique du bien",
-      "empty": "Rien à signaler pour l'instant : les travaux, locataires et incidents s'afficheront ici.",
+      "empty": "Rien à signaler pour l'instant : l'achat, les travaux, la location, les locataires et la vente s'afficheront ici.",
       "works": "{item} refait, gamme {tier}",
       "worksBy": "Par {who} · {cost}",
       "byYou": "vous-même (matériaux)",
@@ -432,7 +438,54 @@
         "dpe": "logement devenu non louable"
       },
       "incident": "Incident réparé : {text} · {cost}",
-      "total": "Travaux enregistrés : {amount}"
+      "total": "Travaux enregistrés : {amount}",
+      "filters": {
+        "all": "Tout",
+        "works": "Travaux",
+        "tenants": "Locataires",
+        "market": "Achat et vente",
+        "other": "Autres"
+      },
+      "bought": "Achat signé chez le notaire : {price}",
+      "listedForSale": "Mis en vente à {price} ({mode})",
+      "saleModes": {
+        "agency": "en agence",
+        "self": "entre particuliers"
+      },
+      "saleWithdrawn": "Retiré de la vente",
+      "saleAgreed": "Offre acceptée à {price}, acte à venir",
+      "saleFellThrough": "Vente annulée : l'acheteur n'a pas obtenu son prêt",
+      "listedForRent": "Mis en location : {lease}, {rent} / mois",
+      "rentHow": "{management} · {insurance}",
+      "selfManaged": "géré par vous",
+      "insured": "avec garantie loyers impayés",
+      "notInsured": "sans garantie loyers impayés",
+      "rentalWithdrawn": "Annonce de location retirée",
+      "furniture": "Meubles achetés : {cost}",
+      "notice": "Préavis donné : départ le {date}",
+      "noticeReasons": {
+        "departure": "il déménage",
+        "lifeEvent": "un changement de vie",
+        "incident": "un incident mal vécu",
+        "buyout": "départ négocié"
+      },
+      "buyoutAccepted": "Départ négocié accepté : {amount}",
+      "buyoutRefused": "Départ négocié refusé : {amount}",
+      "rentMissed": "Loyer impayé : {amount}",
+      "rentMissedInsured": "Loyer impayé : {amount}, couvert par l'assurance",
+      "reminderSettled": "Relance : le locataire a payé",
+      "reminderFailed": "Relance restée sans effet",
+      "procedure": "Procédure d'expulsion engagée : {cost}, expulsion prévue le {date}",
+      "rentRevised": "Loyer révisé : {rent} / mois",
+      "leaseRenewed": "Bail reconduit jusqu'au {date}",
+      "dpeWarning": "Alerte DPE : location interdite à partir du {date}",
+      "worksCompleted": "Chantier terminé : {cost} au total, imprévus compris",
+      "dpeChange": "DPE {before} → {after}",
+      "copro": "Assemblée générale : {passed} résolution(s) adoptée(s) sur {count}",
+      "transformation": "{kind} terminée : {cost}",
+      "movedIn": "Vous vous y installez (résidence principale)",
+      "movedOut": "Vous quittez ce logement",
+      "regime": "Régime fiscal : {regime}"
     },
     "bought": "Acheté {price} le {date}",
     "value": "Valeur estimée",
@@ -518,7 +571,19 @@
       "equity": "Votre part (valeur moins crédit)",
       "soon": "La courbe se remplit le 1er de chaque mois."
     },
-    "leaseStart": "Début du bail"
+    "leaseStart": "Début du bail",
+    "rentsReceived": "Loyers encaissés",
+    "missedRents": "Mois impayés",
+    "formerTenants": {
+      "heading": "Anciens locataires",
+      "empty": "Aucun locataire n'est encore parti.",
+      "period": "Du {start} au {end} ({duration})",
+      "rent": "Dernier loyer {rent} / mois",
+      "money": "Loyers encaissés {rents} · {missed} mois impayé(s)",
+      "satisfaction": "Satisfaction au départ : {value} / 100",
+      "reason": "Départ : {reason}",
+      "untracked": "Parti avant ce suivi : loyers, impayés et satisfaction non comptés."
+    }
   },
   "rent": {
     "heading": "Mise en location",
@@ -567,13 +632,63 @@
     "deadline": "Échéance {when}",
     "noDeadline": "Sans échéance",
     "pauses": "Met le jeu en pause",
-    "recent": "Réponses récentes",
+    "sections": {
+      "pending": "À décider",
+      "mail": "Courrier",
+      "news": "Actualités"
+    },
+    "sectionLabel": "{label} ({count})",
+    "mailHint": "Les réponses reçues et les décisions tranchées restent ici {months} mois, ou jusqu'à ce que vous les fermiez.",
+    "mailEmpty": "Aucun courrier pour l'instant.",
+    "newsHint": "Ce qui s'est passé ces {days} derniers jours, le plus récent en haut.",
+    "newsEmpty": "Rien à signaler pour l'instant.",
+    "newsFilters": {
+      "all": "Tout",
+      "market": "Achats",
+      "rental": "Location",
+      "works": "Travaux",
+      "money": "Argent",
+      "life": "Vie locale",
+      "progress": "Progression"
+    },
+    "unseen": "Nouveau",
+    "auto": "Sans réponse, choix par défaut",
+    "openSubject": "Voir le bien",
+    "mail": {
+      "offerReply": {
+        "accepted": "Offre acceptée : {amount}",
+        "refused": "Offre refusée : {amount}",
+        "counterExpired": "Contre-offre expirée : {amount}",
+        "counterDeclined": "Contre-offre déclinée : {amount}"
+      },
+      "loanAnswer": {
+        "accepted": "{banker} accorde le prêt : {amount} à {rate}",
+        "partial": "{banker} prête moins : {amount} à {rate}",
+        "counterOffer": "{banker} propose une autre durée : {amount} à {rate}",
+        "refused": "{banker} refuse le prêt"
+      },
+      "loanRefusedBecause": "Motif : {reason}",
+      "saleReply": {
+        "counterAccepted": "{buyer} accepte votre contre-offre : {amount}",
+        "counterRefused": "{buyer} refuse votre contre-offre : {amount}",
+        "expired": "L'offre de {buyer} a expiré : {amount}"
+      },
+      "household": "Un acheteur",
+      "buyout": {
+        "accepted": "Départ négocié accepté : {amount}",
+        "refused": "Départ négocié refusé : {amount}"
+      },
+      "catalogEvent": "Événement : {choice}",
+      "copro": "Assemblée générale : {passed} résolution(s) adoptée(s) sur {count}",
+      "coproLine": "{resolution} : {verdict}",
+      "hazard": {
+        "treat": "Imprévu traité : {amount}",
+        "postpone": "Imprévu reporté : {amount} évités",
+        "eco": "Imprévu passé en Éco : {amount}"
+      }
+    },
     "closeNotice": "Fermer",
     "closeAllNotices": "Tout fermer",
-    "notices": {
-      "refused": "Offre refusée : {amount}",
-      "counterExpired": "Contre-offre expirée : {amount}"
-    },
     "kinds": {
       "counterOffer": "Contre-offre du vendeur : {amount}",
       "loanNeeded": "Compromis signé : demandez votre prêt",
@@ -851,7 +966,14 @@
     "freshStart": "Nouveau départ, avec {amount}.",
     "gameOver": "Fin de partie.",
     "rewind": "Retour en arrière (depuis le {date}).",
-    "record": "Record : plus belle plus-value, {amount}."
+    "record": "Record : plus belle plus-value, {amount}.",
+    "companyCreated": "Création de la SCI ({amount}).",
+    "rivalArrived": "{rival} arrive sur le marché.",
+    "movedCity": "Déménagement à {city} ({amount}).",
+    "firstRemotePurchase": "Premier achat hors de sa ville, à {city} ({amount}).",
+    "firstEviction": "Première expulsion d'un locataire.",
+    "firstLoanRepaid": "Premier crédit remboursé jusqu'au bout.",
+    "firstTransformation": "Première transformation : {kind} ({amount})."
   },
   "statistics": {
     "heading": "Statistiques",
@@ -867,7 +989,10 @@
     "maxNetWorth": "Patrimoine net le plus haut",
     "counters": "Compteurs",
     "empty": "Les courbes se remplissent au 1er de chaque mois.",
-    "chartLabel": "{label}, depuis le début de la partie"
+    "chartLabel": "{label}, depuis le début de la partie",
+    "rate": "Taux du marché (20 ans, hors assurance)",
+    "prices": "Prix des quartiers de {city}",
+    "pricesHint": "Indice 100 au premier relevé (début de la partie, ou arrivée de ce suivi)."
   },
   "agenda": {
     "heading": "Agenda",
@@ -929,7 +1054,11 @@
     "yearAchievements": "Succès de l'année",
     "noYearReview": "Le premier bilan annuel arrive le 1er janvier.",
     "noMonthReview": "Le premier bilan arrive le 1er du mois prochain.",
-    "yearWealthTax": "Impôt sur la fortune immobilière"
+    "yearWealthTax": "Impôt sur la fortune immobilière",
+    "previous": "Mois précédent",
+    "next": "Mois suivant",
+    "pastMonthHint": "Bilan d'un mois passé : la réputation est celle du jour du bilan.",
+    "years": "Années"
   },
   "celebration": {
     "title": "Nouveau titre !",
@@ -1002,7 +1131,8 @@
     "moved": "Vous voilà à {city}.",
     "viewing": "Vous regardez {city}",
     "switch": "Changer de ville",
-    "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN."
+    "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN.",
+    "prices": "Prix des quartiers"
   },
   "transformation": {
     "heading": "Transformer le bien",
@@ -1071,7 +1201,38 @@
     "totalPayments": "Mensualités par mois",
     "totalRemaining": "Capital restant dû",
     "totalInterestLeft": "Intérêts encore à payer",
-    "curve": "Capital restant dû, année par année"
+    "curve": "Capital restant dû, année par année",
+    "closedLoans": "Crédits soldés",
+    "noClosedLoans": "Aucun crédit terminé pour l'instant.",
+    "closedTitle": "{bank} · {amount}",
+    "closedReasons": {
+      "repaid": "Remboursé jusqu'au bout",
+      "sold": "Remboursé à la vente du bien",
+      "refinanced": "Racheté par {bank}",
+      "freshStart": "Effacé par la faillite"
+    },
+    "started": "Commencé le",
+    "closedOn": "Terminé le",
+    "duration": "Durée prévue",
+    "paymentsMade": "Mensualités payées",
+    "paymentsValue": "{count} sur {total}",
+    "remainingAtClose": "Restant dû à la fin",
+    "earlyFees": "Indemnités de remboursement anticipé",
+    "bankers": "Vos banquiers",
+    "bankerLine": "Confiance {trust} / 100",
+    "lastMeeting": "Dernier rendez-vous le {date}",
+    "noMeeting": "Jamais rencontré",
+    "banker": {
+      "trust": "Confiance",
+      "trustCurve": "Confiance mois par mois",
+      "trustSoon": "La courbe se dessine le 1er de chaque mois.",
+      "history": "Historique de la relation",
+      "empty": "Aucun rendez-vous ni demande de prêt pour l'instant.",
+      "meeting": "Rendez-vous : la confiance passe à {trust}",
+      "loans": "Crédits chez {bank}",
+      "running": "En cours : {amount} restant dû"
+    },
+    "interestPaidTotal": "Intérêts payés"
   },
   "coproMeeting": {
     "heading": "Assemblée générale de copropriété",
@@ -1192,5 +1353,36 @@
     "cost": "Rencontre : {duration} de temps libre. Accepté, il vous en coûte {points} points de réputation. L'indemnité n'est pas déductible des loyers.",
     "offer": "Proposer {amount}",
     "wait": "Votre locataire a refusé : nouvelle proposition possible {when}."
+  },
+  "soldProperty": {
+    "heading": "Bien vendu",
+    "tabs": {
+      "summary": "Bilan",
+      "value": "Valeur",
+      "history": "Historique",
+      "tenants": "Locataires"
+    },
+    "summary": "Bilan de l'opération",
+    "bought": "Acheté le",
+    "purchasePrice": "Prix d'achat",
+    "acquisitionCost": "Avec les frais (notaire, banque)",
+    "works": "Travaux (historique)",
+    "rents": "Loyers encaissés",
+    "rentsHint": "Loyers hors charges. Pour un bien acheté avant ce suivi, ils ne sont comptés que depuis son arrivée dans le jeu.",
+    "held": "Détention",
+    "soldOn": "Vendu le",
+    "price": "Prix de vente",
+    "agencyFees": "Frais d'agence",
+    "loanRepaid": "Crédit remboursé",
+    "loanFees": "Indemnités de remboursement anticipé",
+    "capitalGainsTax": "Impôt sur la plus-value",
+    "depositTransferred": "Dépôt de garantie remis à l'acheteur",
+    "net": "Reste sur le compte",
+    "gain": "Plus-value",
+    "gainHint": "Prix net des frais, moins le coût d'achat (frais compris) et les travaux comptés dans la plus-value.",
+    "forced": "Vendu par la banque, avec une décote, pour combler le découvert.",
+    "company": "Détenu par votre SCI.",
+    "valueHeading": "Valeur mois par mois",
+    "gone": "Ce bien n'est plus dans vos archives."
   }
 }

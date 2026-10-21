@@ -13,11 +13,11 @@ import type { CalendarDate } from './calendar.ts';
 import type { Clock } from './clock.ts';
 import type { Cents } from './money.ts';
 import type { RngState } from './random.ts';
-import type { LoanDecision } from './systems/banking.ts';
-import type { StatementLine } from './events.ts';
+import type { NewsEvent, StatementLine } from './events.ts';
+import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 15;
+export const FORMAT_VERSION = 19;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -66,6 +66,83 @@ export interface BankRelation {
   relationshipMonths: number;
   /** Day number (see calendar.toDayNumber) of the last meeting. */
   lastMeetingDay: number | null;
+  /** Meetings and answers to loan requests, oldest first (kept for good). */
+  log: BankLogEntry[];
+  /** The banker's trust on the 1st of each month: its curve. */
+  trustHistory: { date: CalendarDate; trust: number }[];
+}
+
+/** One line of the history with a bank. */
+export type BankLogEntry =
+  | { kind: 'meeting'; day: number; trust: number }
+  | {
+      kind: 'answer';
+      day: number;
+      decision: LoanDecision['decision'];
+      /** What the loan was for. */
+      subject: InboxSubject | null;
+      amount: Cents | null;
+      ratePercent: number | null;
+      reason: LoanRefusalCode | null;
+      debtRatio: number | null;
+    };
+
+/** A loan that came to an end, kept for good (« Crédits soldés »). */
+export interface ClosedLoan {
+  id: string;
+  bankId: string;
+  propertyId: string | null;
+  /** The financed property, as it was. */
+  subject: InboxSubject | null;
+  principal: Cents;
+  ratePercent: number;
+  durationMonths: number;
+  monthlyPayment: Cents;
+  startDate: CalendarDate;
+  closedDay: number;
+  paymentsMade: number;
+  interestPaid: Cents;
+  /** Capital still owed when it ended early: repaid by a sale, taken over, or written off. */
+  remaining: Cents;
+  /** Early repayment fees. */
+  fees: Cents;
+  /** `freshStart`: written off by the bankruptcy. */
+  reason: 'repaid' | 'sold' | 'refinanced' | 'freshStart';
+  /** The loan that took over a refinanced one. */
+  replacedBy: string | null;
+}
+
+/** The market on the 1st of a month (docs/04, « Statistiques »). */
+export interface MarketPoint {
+  date: CalendarDate;
+  /** 20-year reference rate, insurance excluded. */
+  ratePercent: number;
+  /** Price level of each neighbourhood, by city (1 = the city file's prices). */
+  priceIndex: Record<string, Record<string, number>>;
+}
+
+/** A property sold, kept for good with its history (« Biens vendus »). */
+export interface SoldProperty {
+  property: Property;
+  holder: Holder;
+  purchasePrice: Cents;
+  acquisitionCost: Cents;
+  purchaseDate: CalendarDate;
+  soldDay: number;
+  /** Sold by the bank in the descent towards bankruptcy. */
+  forced: boolean;
+  price: Cents;
+  agencyFees: Cents;
+  loanRepaid: Cents;
+  loanFees: Cents;
+  capitalGainsTax: Cents;
+  depositTransferred: Cents;
+  net: Cents;
+  /** Price net of fees, minus the cost of the property and of its works. */
+  gain: Cents;
+  rentsReceived: Cents;
+  valueHistory: OwnedProperty['valueHistory'];
+  log: PropertyLogEntry[];
 }
 
 export interface Loan {
@@ -186,22 +263,6 @@ export interface ListingOffer {
   responseDay: number;
   /** Seller's counter-offer, waiting for the player's answer. */
   counter: { amount: Cents; expiresDay: number } | null;
-}
-
-/**
- * The seller's last word on an offer that did not lead to a sale: kept so the player
- * finds it again on the listing and in the decisions (until he closes it).
- */
-export interface OfferNotice {
-  id: string;
-  listingId: string;
-  /** Day number of the answer (or of the counter-offer's expiry). */
-  day: number;
-  /** The player's offer, or the seller's counter-offer that was left to expire. */
-  amount: Cents;
-  outcome: 'refused' | 'counterExpired';
-  /** Closed by the player: no longer listed in the decisions (the listing still shows it). */
-  dismissed: boolean;
 }
 
 export interface Listing {
@@ -367,6 +428,10 @@ export interface Lease {
   missedDays: number;
   /** Day the tenant last refused to leave for an indemnity; null if never asked. */
   buyoutRefusedDay: number | null;
+  /** Rents received during this lease, charges excluded (counted since save format 19). */
+  rentsReceived: Cents;
+  /** Months the tenant did not pay. */
+  missedRents: number;
 }
 
 export type TaxRegimeChoice = 'auto' | 'micro' | 'real';
@@ -503,6 +568,8 @@ export interface OwnedProperty {
   valueHistory: { date: CalendarDate; value: Cents; debt: Cents }[];
   /** What happened to the property, oldest first (works, tenants, incidents). */
   log: PropertyLogEntry[];
+  /** Rents received, charges excluded (counted since save format 17). */
+  rentsReceived: Cents;
 }
 
 /** One line of a property's history. */
@@ -530,8 +597,53 @@ export type PropertyLogEntry =
       /** Damages found at the exit inventory, and the deposit given back. */
       damages: Cents;
       depositReturned: Cents;
+      /** The tenant's profile and trait, the rents received, the months unpaid and the
+       * satisfaction at the end (null for a departure before save format 19). */
+      profileId: string | null;
+      traitId: string | null;
+      rentsReceived: Cents | null;
+      missedRents: number | null;
+      satisfaction: number | null;
     }
-  | { kind: 'incident'; day: number; kindId: string; cost: Cents };
+  | { kind: 'incident'; day: number; kindId: string; cost: Cents }
+  // Added in version 18 (docs/04, « Historique d'un bien »).
+  | { kind: 'bought'; day: number; price: Cents }
+  | { kind: 'listedForSale'; day: number; askingPrice: Cents; mode: SaleMode }
+  | { kind: 'saleWithdrawn'; day: number }
+  | { kind: 'saleAgreed'; day: number; price: Cents }
+  | { kind: 'saleFellThrough'; day: number }
+  | {
+      kind: 'listedForRent';
+      day: number;
+      leaseType: LeaseType;
+      monthlyRent: Cents;
+      agencyId: string | null;
+      insured: boolean;
+    }
+  | { kind: 'rentalWithdrawn'; day: number }
+  | { kind: 'furniture'; day: number; cost: Cents }
+  | {
+      kind: 'notice';
+      day: number;
+      leaveDay: number;
+      reason: 'departure' | 'lifeEvent' | 'incident' | 'buyout';
+    }
+  | { kind: 'buyout'; day: number; amount: Cents; accepted: boolean }
+  | { kind: 'rentMissed'; day: number; amount: Cents; insured: boolean }
+  | { kind: 'reminder'; day: number; settled: boolean }
+  | { kind: 'procedure'; day: number; evictionDay: number; cost: Cents }
+  | { kind: 'rentRevised'; day: number; monthlyRent: Cents }
+  | { kind: 'leaseRenewed'; day: number; termDay: number }
+  | { kind: 'dpeWarning'; day: number; banDay: number }
+  | { kind: 'worksCompleted'; day: number; cost: Cents; dpeBefore: DpeLabel; dpeAfter: DpeLabel }
+  | {
+      kind: 'copro';
+      day: number;
+      results: { id: string; passed: boolean; textIndex: number }[];
+    }
+  | { kind: 'transformation'; day: number; transformation: TransformationKind; cost: Cents }
+  | { kind: 'home'; day: number; movedIn: boolean }
+  | { kind: 'regime'; day: number; regime: TaxRegimeChoice };
 
 /** A property a marchand de biens renovates before selling it again. */
 export interface RivalProject {
@@ -661,7 +773,15 @@ export type ChronicleKind =
   | 'freshStart'
   | 'gameOver'
   | 'rewind'
-  | 'record';
+  | 'record'
+  // Added in version 19.
+  | 'companyCreated'
+  | 'rivalArrived'
+  | 'movedCity'
+  | 'firstRemotePurchase'
+  | 'firstEviction'
+  | 'firstLoanRepaid'
+  | 'firstTransformation';
 
 /** A step of the career (« Chronique »). `ref` names a title, achievement, challenge or event. */
 export interface ChronicleEntry {
@@ -669,6 +789,93 @@ export interface ChronicleEntry {
   kind: ChronicleKind;
   ref: string | null;
   amount: Cents | null;
+}
+
+/**
+ * What a news or a letter is about, frozen when it happened: the listing or the
+ * property may be gone since (sold, withdrawn).
+ */
+export interface InboxSubject {
+  /** The property's id, the same from the listing to the deed. */
+  propertyId: string;
+  /** The listing it was offered by, if it was one. */
+  listingId: string | null;
+  kind: PropertyKind;
+  rooms: number;
+  surface: number;
+  /** Lots of a building. */
+  lots: number;
+  cityId: string;
+  neighbourhoodId: string;
+}
+
+/** Something that happened, for the news (kept a while, then forgotten). */
+export interface NewsItem {
+  id: number;
+  day: number;
+  event: NewsEvent;
+  subject: InboxSubject | null;
+}
+
+interface MailBase {
+  id: number;
+  day: number;
+  subject: InboxSubject | null;
+  /** Closed by the player: no longer listed (a listing still shows its seller's last word). */
+  dismissed: boolean;
+}
+
+/** What a letter says. */
+export type MailContent =
+  | {
+      kind: 'offerReply';
+      listingId: string;
+      /** `counterDeclined`: the player turned the seller's counter-offer down. */
+      outcome: 'accepted' | 'refused' | 'counterExpired' | 'counterDeclined';
+      /** The price agreed, the player's offer, or the seller's counter-offer. */
+      amount: Cents;
+    }
+  | {
+      kind: 'loanAnswer';
+      bankId: string;
+      decision: LoanDecision['decision'];
+      reason: LoanRefusalCode | null;
+      /** Debt ratio the loan would have led to, for a refusal on that ground. */
+      debtRatio: number | null;
+      amount: Cents | null;
+      ratePercent: number | null;
+    }
+  | {
+      kind: 'saleReply';
+      /** Rival buyer; null for an anonymous household. */
+      buyerId: string | null;
+      outcome: 'counterAccepted' | 'counterRefused' | 'expired';
+      /** The player's counter-offer, or the buyer's offer that expired. */
+      amount: Cents;
+    }
+  | { kind: 'buyout'; amount: Cents; accepted: boolean }
+  | {
+      kind: 'catalogEvent';
+      event: CatalogEventInstance;
+      choiceId: string;
+      /** The deadline passed: the default choice applied. */
+      auto: boolean;
+    }
+  | { kind: 'copro'; results: { id: string; passed: boolean; textIndex: number }[] }
+  | { kind: 'hazard'; hazardId: string; choice: 'treat' | 'postpone' | 'eco'; cost: Cents };
+
+/** An answer, or a decision that was settled: kept until closed or too old. */
+export type MailItem = MailBase & MailContent;
+
+export interface InboxState {
+  /** Oldest first; forgotten past the limits of content/rythme.json. */
+  news: NewsItem[];
+  /** Id of the latest news the player has seen. */
+  newsSeenId: number;
+  /** Oldest first; dropped past the limits of content/rythme.json. */
+  mail: MailItem[];
+  /** Ids of the news and mail, apart from `nextId` so the world's ids do not move. */
+  nextId: number;
 }
 
 /** The whole world. Must stay plain JSON data: no classes, no functions. */
@@ -699,8 +906,14 @@ export interface GameState {
   worksDone: Record<string, number>;
   /** Listings the player marked, by id (removed with the listing). */
   favorites: string[];
-  /** Offers that were refused or whose counter-offer expired (removed with the listing). */
-  offerNotices: OfferNotice[];
+  /** News and mail kept for the « Décisions » tab (docs/04, section 4.10). */
+  inbox: InboxState;
+  /** Properties sold, oldest first. */
+  soldProperties: SoldProperty[];
+  /** Loans that came to an end, oldest first. */
+  closedLoans: ClosedLoan[];
+  /** The market on the 1st of each month: its rate, and the price level of each neighbourhood. */
+  marketHistory: MarketPoint[];
   /** Gérard's tutorial: `step` indexes content/textes/didacticiel.json. */
   tutorial: { enabled: boolean; step: number };
   /** One point on the 1st of each month (and at the start): the wealth curve. */
@@ -718,6 +931,13 @@ export interface GameState {
   catalog: CatalogState;
   /** Last yearly review with Yvon Tableur, built on the 1st of January. */
   lastYearReview: YearReview | null;
+  /** The reviews kept (docs/04, « Bilans ») : the last statements, and every year. */
+  reviews: {
+    /** Oldest first, the last ones only (content/rythme.json). */
+    statements: MonthlyStatement[];
+    /** Each yearly review, with the tax assessed for that year. */
+    years: { review: YearReview; assessment: TaxAssessment | null }[];
+  };
 }
 
 /** A piece of Yvon's advice; the interface picks the text (content/textes/yvon.json). */

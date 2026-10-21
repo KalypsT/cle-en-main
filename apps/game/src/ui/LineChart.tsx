@@ -17,17 +17,20 @@ export function LineChart({
   xLabels,
   title,
   formatTick = formatKilo,
+  fromZero = true,
 }: {
   series: Series[];
   xLabels: [string, string];
   title: string;
   /** Labels of the vertical axis (amounts in cents by default). */
   formatTick?: (value: number) => string;
+  /** The vertical axis starts at 0 (amounts); false fits it to the values (a rate, an index). */
+  fromZero?: boolean;
 }) {
   const all = series.flatMap((s) => s.values);
   const count = Math.max(...series.map((s) => s.values.length));
   if (all.length === 0 || count < 2) return null;
-  let min = Math.min(0, ...all);
+  let min = fromZero ? Math.min(0, ...all) : Math.min(...all);
   let max = Math.max(...all);
   if (max === min) max = min + 1;
   const span = max - min;

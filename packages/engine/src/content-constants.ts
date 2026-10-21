@@ -104,6 +104,13 @@ export const CHRONICLE_KINDS = [
   'gameOver',
   'rewind',
   'record',
+  'companyCreated',
+  'rivalArrived',
+  'movedCity',
+  'firstRemotePurchase',
+  'firstEviction',
+  'firstLoanRepaid',
+  'firstTransformation',
 ] as const satisfies readonly ChronicleKind[];
 
 type Exhaustive<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;

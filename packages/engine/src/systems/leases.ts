@@ -135,6 +135,7 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
       };
       lease.arrears.amount += due;
       lease.arrears.months += 1;
+      lease.missedRents += 1;
       ctx.events.push({ type: 'rentMissed', propertyId, amount: due, insured: lease.insured });
       startProcedureIfDue(ctx, owned, lease, lines);
     }

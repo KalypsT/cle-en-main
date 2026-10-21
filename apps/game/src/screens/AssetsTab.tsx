@@ -5,6 +5,7 @@ import {
   format,
   formatDay,
   formatDayLong,
+  formatDayYear,
   formatEuros,
   formatSigned,
   propertyLabel,
@@ -173,6 +174,29 @@ export function AssetsTab() {
             ]}
           />
         </Card>
+      )}
+      {state.soldProperties.length > 0 && (
+        <>
+          <SectionTitle title={t.assets.sold} />
+          <div className="list" data-testid="sold-properties">
+            {[...state.soldProperties].reverse().map((sold) => (
+              <ListRow
+                key={`${sold.property.id}-${sold.soldDay}`}
+                thumb={<KindThumb property={sold.property} />}
+                title={propertyLabel(sold.property)}
+                subtitle={format(t.assets.soldLine, { date: formatDayYear(sold.soldDay) })}
+                extra={sold.forced ? <Badge tone="amber">{t.assets.forced}</Badge> : undefined}
+                side={
+                  <span className="stack tight">
+                    <span className="strong">{formatEuros(sold.price)}</span>
+                    <span className={`small ${tone(sold.gain)}`}>{formatSigned(sold.gain)}</span>
+                  </span>
+                }
+                onClick={() => nav.push({ name: 'soldProperty', id: sold.property.id })}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -48,6 +48,10 @@ describe('descent towards bankruptcy', () => {
     expect(sale.price).toBe(Math.round(value * (1 - content.credit.distress.forcedSaleDiscount)));
     expect(ctx.state.properties).toEqual([]);
     expect(ctx.state.loans).toEqual([]);
+    expect(ctx.state.soldProperties).toEqual([
+      expect.objectContaining({ forced: true, price: sale.price, agencyFees: 0, net: sale.net }),
+    ]);
+    expect(ctx.state.closedLoans.map((loan) => loan.reason)).toEqual(['sold']);
     expect(ctx.state.banks[content.start.accountBankId]?.trust).toBeLessThan(trustBefore);
     // The sale does not cover the loan: bankruptcy, then the Classique fresh start.
     expect(-100_000 + sale.net).toBeLessThan(0);

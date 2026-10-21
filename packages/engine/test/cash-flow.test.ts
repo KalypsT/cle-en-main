@@ -118,6 +118,8 @@ function setup(): GameState {
       arrears: null,
       missedDays: 0,
       buyoutRefusedDay: null,
+      rentsReceived: 0,
+      missedRents: 0,
     },
     furniture: null,
     taxRegime: 'auto',
@@ -135,6 +137,7 @@ function setup(): GameState {
     coproCalls: [],
     valueHistory: [],
     log: [],
+    rentsReceived: 0,
   };
   state.properties = [owned];
   state.loans = [

@@ -9,6 +9,7 @@ import {
   useGame,
   useNav,
 } from '../game/context.tsx';
+import { sellerReply } from '../inbox.ts';
 import { cityName, format, formatDecimal, formatEuros, propertyLabel, t } from '../texts.ts';
 import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
 import { KindThumb } from '../ui/Facade.tsx';
@@ -26,7 +27,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
     (item) => item.kind === 'visit' && item.listingId === listing.id,
   );
   const favorite = state.favorites.includes(listing.id);
-  const reply = state.offerNotices.findLast((notice) => notice.listingId === listing.id);
+  const reply = sellerReply(state, listing.id);
   return (
     <ListRow
       thumb={<KindThumb property={property} />}
@@ -48,7 +49,13 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
             <Badge tone="teal">{t.listings.offerPending}</Badge>
           ) : reply ? (
             <Badge tone="brick">
-              {reply.outcome === 'refused' ? t.listings.offerRefused : t.listings.counterExpired}
+              {
+                {
+                  refused: t.listings.offerRefused,
+                  counterExpired: t.listings.counterExpired,
+                  counterDeclined: t.listings.counterDeclined,
+                }[reply.outcome]
+              }
             </Badge>
           ) : null}
           {listing.visited ? (

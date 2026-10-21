@@ -1,11 +1,10 @@
 import { gameContent } from '@cle/content';
-import { type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
+import { type Cents, type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { type PropertyTab, useGame, useNav } from '../game/context.tsx';
 import {
   agencyName,
-  artisanName,
   bankName,
   format,
   formatDayLong,
@@ -18,9 +17,7 @@ import {
   formatShortDate,
   formatSigned,
   formatWhen,
-  itemName,
   propertyLabel,
-  spaceName,
   t,
   tone,
 } from '../texts.ts';
@@ -38,6 +35,7 @@ import { DpeCard } from '../ui/DpeCard.tsx';
 import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
+import { FormerTenants, History } from './PropertyHistory.tsx';
 
 /** « Fiche d'un bien » (docs/04): overview, rooms, letting, finances. */
 export function PropertyScreen({
@@ -76,7 +74,7 @@ export function PropertyScreen({
       {tab === 'rooms' && <Rooms owned={owned} />}
       {tab === 'rental' && <Rental owned={owned} />}
       {tab === 'finances' && <Finances owned={owned} />}
-      {tab === 'history' && <History owned={owned} />}
+      {tab === 'history' && <History property={owned.property} log={owned.log} />}
     </div>
   );
 }
@@ -193,8 +191,6 @@ function ValueCurve({ owned }: { owned: OwnedProperty }) {
   const debt = state.loans
     .filter((loan) => loan.propertyId === owned.property.id)
     .reduce((sum, loan) => sum + loan.remaining, 0);
-  const first = history[0];
-  const last = history.at(-1);
   return (
     <Card title={texts.heading} testId="value-curve">
       <KeyValues
@@ -210,25 +206,38 @@ function ValueCurve({ owned }: { owned: OwnedProperty }) {
           { label: texts.equity, value: formatEuros(value - debt), total: true },
         ]}
       />
-      {first && last && history.length >= 2 ? (
-        <LineChart
-          title={texts.chart}
-          xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
-          series={[
-            { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
-            {
-              label: texts.price,
-              color: '#8a7f6a',
-              values: history.map(() => owned.purchasePrice),
-              dashed: true,
-            },
-            { label: texts.debt, color: '#a33a2a', values: history.map((p) => p.debt) },
-          ]}
-        />
-      ) : (
-        <p className="small muted">{texts.soon}</p>
-      )}
+      <ValueChart history={history} purchasePrice={owned.purchasePrice} />
     </Card>
+  );
+}
+
+/** Value, purchase price and debt month by month (an owned or a sold property). */
+export function ValueChart({
+  history,
+  purchasePrice,
+}: {
+  history: OwnedProperty['valueHistory'];
+  purchasePrice: Cents;
+}) {
+  const texts = t.property.valueCurve;
+  const first = history[0];
+  const last = history.at(-1);
+  if (!first || !last || history.length < 2) return <p className="small muted">{texts.soon}</p>;
+  return (
+    <LineChart
+      title={texts.chart}
+      xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
+      series={[
+        { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
+        {
+          label: texts.price,
+          color: '#8a7f6a',
+          values: history.map(() => purchasePrice),
+          dashed: true,
+        },
+        { label: texts.debt, color: '#a33a2a', values: history.map((p) => p.debt) },
+      ]}
+    />
   );
 }
 
@@ -439,96 +448,17 @@ function Rooms({ owned }: { owned: OwnedProperty }) {
   );
 }
 
-/** « 8 mois », « 2 ans et 3 mois » (a lease, from a number of days). */
-function formatLeaseDuration(days: number): string {
-  const months = Math.max(1, Math.round(days / 30.4));
-  const years = Math.floor(months / 12);
-  const rest = months % 12;
-  const parts = [
-    years > 0 ? format(t.property.history.years, { count: years }) : '',
-    rest > 0 ? format(t.property.history.months, { count: rest }) : '',
-  ].filter(Boolean);
-  return parts.join(' ');
-}
-
-/** What happened to the property, most recent first: works, tenants, incidents. */
-function History({ owned }: { owned: OwnedProperty }) {
-  const texts = t.property.history;
-  const tiers = gameContent.worksTexts.tiers;
-  const tenantTexts = gameContent.tenantTexts;
-  const entries = [...owned.log].reverse();
-  const spent = owned.log.reduce(
-    (sum, entry) => sum + (entry.kind === 'works' ? entry.cost : 0),
-    0,
-  );
-  return (
-    <Card title={texts.heading} testId="property-history">
-      {entries.length === 0 && <p className="small muted">{texts.empty}</p>}
-      <ul className="stack">
-        {entries.map((entry, i) => (
-          <li key={`${entry.day}-${entries.length - i}`} className="stack tight">
-            <span className="row between small">
-              <span className="strong">
-                {entry.kind === 'works' &&
-                  format(texts.works, {
-                    item: entry.spaceId
-                      ? `${spaceName(owned.property, entry.spaceId)} : ${itemName(entry.itemKind)}`
-                      : itemName(entry.itemKind),
-                    tier: tiers[entry.tier].toLowerCase(),
-                  })}
-                {entry.kind === 'tenantIn' &&
-                  format(texts.tenantIn, {
-                    name: entry.tenantName,
-                    rent: formatEuros(entry.monthlyRent),
-                  })}
-                {entry.kind === 'tenantOut' &&
-                  format(texts.tenantOut, {
-                    name: entry.tenantName,
-                    reason: texts.tenantReasons[entry.reason],
-                  })}
-                {entry.kind === 'incident' &&
-                  format(texts.incident, {
-                    text: tenantTexts.incidents[entry.kindId] ?? entry.kindId,
-                    cost: formatEuros(entry.cost),
-                  })}
-              </span>
-              <span className="tiny muted">{formatDayYear(entry.day)}</span>
-            </span>
-            {entry.kind === 'tenantOut' && (
-              <>
-                <span className="tiny muted">
-                  {format(texts.tenantOutDetails, {
-                    duration: formatLeaseDuration(entry.day - entry.startDay),
-                    rent: formatEuros(entry.monthlyRent),
-                  })}
-                </span>
-                {entry.depositReturned + entry.damages > 0 && (
-                  <span className="tiny muted">
-                    {format(texts.tenantOutMoney, {
-                      returned: formatEuros(entry.depositReturned),
-                      damages: formatEuros(entry.damages),
-                    })}
-                  </span>
-                )}
-              </>
-            )}
-            {entry.kind === 'works' && (
-              <span className="tiny muted">
-                {format(texts.worksBy, {
-                  who: entry.artisanId ? artisanName(entry.artisanId) : texts.byYou,
-                  cost: formatEuros(entry.cost),
-                })}
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
-      {spent > 0 && <p className="small">{format(texts.total, { amount: formatEuros(spent) })}</p>}
-    </Card>
-  );
-}
-
 function Rental({ owned }: { owned: OwnedProperty }) {
+  return (
+    <>
+      <CurrentLease owned={owned} />
+      <FormerTenants log={owned.log} />
+    </>
+  );
+}
+
+/** The lease under way, or the property's letting state without one. */
+function CurrentLease({ owned }: { owned: OwnedProperty }) {
   const { state, act } = useGame();
   const nav = useNav();
   const { lease, rental, property } = owned;
@@ -583,6 +513,10 @@ function Rental({ owned }: { owned: OwnedProperty }) {
             { label: t.property.leaseStart, value: formatDayYear(lease.startDay) },
             { label: t.property.term, value: formatDayYear(lease.termDay) },
             { label: t.property.satisfaction, value: `${Math.round(lease.satisfaction)} / 100` },
+            { label: t.property.rentsReceived, value: formatEuros(lease.rentsReceived) },
+            ...(lease.missedRents > 0
+              ? [{ label: t.property.missedRents, value: String(lease.missedRents) }]
+              : []),
             { label: t.property.depositHeld, value: formatEuros(lease.deposit) },
             {
               label: t.property.management,

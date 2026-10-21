@@ -3,6 +3,7 @@ import { fromDayNumber, type Listing, toDayNumber, type Trade, type VisitQuote }
 import { useEffect, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
+import { sellerReply } from '../inbox.ts';
 import {
   format,
   formatDecimal,
@@ -27,6 +28,12 @@ import { DpeCard } from '../ui/DpeCard.tsx';
 
 /** Step of the offer slider, in cents (presentation only). */
 const OFFER_STEP = 500_00;
+/** The seller's last word, by outcome (« Dernière réponse du vendeur »). */
+const REPLY_TEXTS = {
+  refused: t.listing.refusedText,
+  counterExpired: t.listing.counterExpiredText,
+  counterDeclined: t.listing.counterDeclinedText,
+} as const;
 
 export function ListingScreen({ id }: { id: string }) {
   const { state, act } = useGame();
@@ -103,8 +110,10 @@ function ListingBody({ listing }: { listing: Listing }) {
   const rules = gameContent.market.negotiation;
   const offersLeft = rules.maxOffersPerListing - listing.offersMade;
   const offer = listing.offer;
-  const reply = state.offerNotices.findLast((notice) => notice.listingId === listing.id);
+  const reply = sellerReply(state, listing.id);
 
+  // How the neighbourhood's prices moved over the last year (or since the curve began).
+  const trend = engine.priceChange(state, property.cityId, property.neighbourhoodId, 12);
   const details = format(t.listing.details, {
     city: cityName(property.cityId),
     surface: property.surface,
@@ -159,6 +168,16 @@ function ListingBody({ listing }: { listing: Listing }) {
           </span>
         </div>
         <p className="muted small">{details}</p>
+        {trend && (
+          <p className="small" data-testid="neighbourhood-trend">
+            {format(t.listing.neighbourhoodTrend, {
+              change: `${trend.change >= 0 ? t.common.plus : t.common.minus}${formatPercent(
+                Math.round(Math.abs(trend.change) * 1000) / 10,
+              )}`,
+              months: trend.months,
+            })}
+          </p>
+        )}
         <p className="strong small">{listingTitle(listing.titleId, property)}</p>
         {view && (
           <p className={`small strong ${view.priceGap < 0 ? 'positive' : 'warning'}`}>{gapText}</p>
@@ -217,13 +236,10 @@ function ListingBody({ listing }: { listing: Listing }) {
       {!offer && reply && (
         <Card title={t.listing.lastReplyHeading} tint="amber" testId="last-reply">
           <p>
-            {format(
-              reply.outcome === 'refused' ? t.listing.refusedText : t.listing.counterExpiredText,
-              {
-                amount: formatEuros(reply.amount),
-                date: formatGameDate(fromDayNumber(reply.day)),
-              },
-            )}
+            {format(REPLY_TEXTS[reply.outcome], {
+              amount: formatEuros(reply.amount),
+              date: formatGameDate(fromDayNumber(reply.day)),
+            })}
           </p>
         </Card>
       )}

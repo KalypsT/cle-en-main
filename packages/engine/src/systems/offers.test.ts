@@ -82,40 +82,36 @@ describe('offers', () => {
     expect(taken.state.purchases[0]?.price).toBe(counter.amount);
   });
 
-  it('keeps a refused offer as a notice the player can close', () => {
+  it('keeps a refused offer as a letter the player can close', () => {
     let state = newGame();
     const listing = firstListing(state);
     const amount = Math.round(listing.askingPrice * 0.5);
     state = act(state, { type: 'market/offer', listingId: listing.id, amount }).state;
     const refused = advanceUntil(state, (e) => e.type === 'offerAnswered', 3);
     expect(refused.event).toMatchObject({ answer: 'refused', amount, listingId: listing.id });
-    expect(refused.state.offerNotices).toEqual([
+    expect(refused.state.inbox.mail).toEqual([
       expect.objectContaining({
+        kind: 'offerReply',
         listingId: listing.id,
         amount,
         outcome: 'refused',
         dismissed: false,
+        subject: expect.objectContaining({ listingId: listing.id }),
       }),
     ]);
     // The seller let the player offer again, and the listing is still there.
     expect(refused.state.listings.find((l) => l.id === listing.id)?.offer).toBeNull();
 
-    const [notice] = refused.state.offerNotices;
-    const unknown = engine.dispatch(refused.state, {
-      type: 'market/dismissOfferNotice',
-      noticeId: 'nope',
-    });
+    const [letter] = refused.state.inbox.mail;
+    const unknown = engine.dispatch(refused.state, { type: 'inbox/dismissMail', mailId: 999 });
     expect(unknown.ok).toBe(false);
-    const closed = act(refused.state, {
-      type: 'market/dismissOfferNotice',
-      noticeId: notice?.id ?? '',
-    });
-    expect(closed.state.offerNotices[0]?.dismissed).toBe(true);
-    const all = act(refused.state, { type: 'market/dismissOfferNotice', noticeId: null });
-    expect(all.state.offerNotices.every((n) => n.dismissed)).toBe(true);
+    const closed = act(refused.state, { type: 'inbox/dismissMail', mailId: letter?.id ?? 0 });
+    expect(closed.state.inbox.mail[0]?.dismissed).toBe(true);
+    const all = act(refused.state, { type: 'inbox/dismissMail', mailId: null });
+    expect(all.state.inbox.mail.every((item) => item.dismissed)).toBe(true);
   });
 
-  it('keeps a counter-offer left to expire as a notice', () => {
+  it('keeps a counter-offer left to expire as a letter', () => {
     let state = newGame();
     const listing = firstListing(state);
     const floor = sellerFloor(systemContext(state), listing);
@@ -127,11 +123,12 @@ describe('offers', () => {
     const countered = advanceUntil(state, (e) => e.type === 'offerAnswered', 3);
     const counter = countered.state.listings.find((l) => l.id === listing.id)?.offer?.counter;
     if (!counter) throw new Error('No counter-offer');
-    expect(countered.state.offerNotices).toEqual([]);
+    expect(countered.state.inbox.mail).toEqual([]);
     const expired = advanceUntil(countered.state, (e) => e.type === 'counterOfferExpired', 10);
     expect(expired.event).toMatchObject({ listingId: listing.id, amount: counter.amount });
-    expect(expired.state.offerNotices).toEqual([
+    expect(expired.state.inbox.mail).toEqual([
       expect.objectContaining({
+        kind: 'offerReply',
         listingId: listing.id,
         amount: counter.amount,
         outcome: 'counterExpired',

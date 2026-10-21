@@ -1,12 +1,13 @@
 import { decisionKey } from '@cle/engine';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
+import { newsLines } from '../inbox.ts';
 import { cityName, format, formatEuros, formatSigned, jobName, t, tone } from '../texts.ts';
 import { Avatar } from '../ui/Avatar.tsx';
 import { useState } from 'react';
 import { Empty, SectionTitle, Tile } from '../ui/components.tsx';
 import { Icon } from '../ui/Icon.tsx';
-import { DecisionRow } from './DecisionsTab.tsx';
+import { DecisionRow, showDecisionsSection } from './DecisionsTab.tsx';
 import { ListingRow } from './ListingsScreen.tsx';
 
 /** How many items each section of the dashboard shows. */
@@ -35,6 +36,7 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
     .map((listing) => ({ listing, view: engine.listingView(state, listing.id) }))
     .sort((a, b) => (b.view?.valueGap ?? -1) - (a.view?.valueGap ?? -1))
     .slice(0, OPPORTUNITIES);
+  const news = newsLines(state);
 
   return (
     <section
@@ -136,7 +138,10 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
                 <button
                   type="button"
                   className="link-button"
-                  onClick={() => nav.goTab('decisions')}
+                  onClick={() => {
+                    showDecisionsSection('pending');
+                    nav.goTab('decisions');
+                  }}
                 >
                   {format(t.common.seeAll, { count: snapshot.decisions.length })}
                 </button>
@@ -153,13 +158,29 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
             </div>
           )}
 
-          <SectionTitle title={t.street.news} />
-          {snapshot.feed.length === 0 ? (
+          <SectionTitle
+            title={t.street.news}
+            action={
+              news.length > NEWS && (
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => {
+                    showDecisionsSection('news');
+                    nav.goTab('decisions');
+                  }}
+                >
+                  {format(t.common.seeAll, { count: news.length })}
+                </button>
+              )
+            }
+          />
+          {news.length === 0 ? (
             <Empty icon="street">{t.street.noNews}</Empty>
           ) : (
             <ul className="card feed" aria-live="polite">
-              {snapshot.feed.slice(0, NEWS).map((item) => (
-                <li key={item.id}>{item.text}</li>
+              {news.slice(0, NEWS).map(({ item, text }) => (
+                <li key={item.id}>{text}</li>
               ))}
             </ul>
           )}

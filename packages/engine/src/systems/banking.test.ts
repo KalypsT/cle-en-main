@@ -1,6 +1,6 @@
 import { toDayNumber } from '../calendar.ts';
 import { describe, expect, it } from 'vitest';
-import { advanceToNextMonth, content, engine, newGame } from '../../test/helpers.ts';
+import { act, advanceToNextMonth, content, engine, newGame } from '../../test/helpers.ts';
 import { deepClone } from '../clone.ts';
 import { findBank } from '../content.ts';
 import type { GameEvent } from '../events.ts';
@@ -242,6 +242,44 @@ describe('loans', () => {
     expect(current.loans).toEqual([]);
     expect(events.filter((e) => e.type === 'loanRepaid')).toHaveLength(1);
     expect(Math.abs(interest - offer.totalCost)).toBeLessThan(100);
+    // Kept among the closed loans, with the interest it cost.
+    expect(current.closedLoans).toEqual([
+      expect.objectContaining({
+        bankId: offer.bankId,
+        principal: offer.amount,
+        reason: 'repaid',
+        remaining: 0,
+        fees: 0,
+        paymentsMade: 60,
+        replacedBy: null,
+      }),
+    ]);
+    expect(Math.abs((current.closedLoans[0]?.interestPaid ?? 0) - interest)).toBeLessThan(100);
+  });
+
+  it('keeps a refinanced loan, with its fees and the loan that took it over', () => {
+    const state = newGame();
+    const offer = acceptedOffer(state, { amount: toCents(60_000) });
+    const ratePercent = offer.ratePercent + 1.5;
+    const monthlyPayment = annuityPayment(offer.amount, ratePercent, offer.durationYears * 12);
+    const owing = withLoan(state, { ...offer, ratePercent, monthlyPayment });
+    const [sheet] = engine.loanSheets(owing);
+    const [loan] = owing.loans;
+    if (!sheet?.refinance || !loan) throw new Error('No refinancing');
+    const result = act(owing, {
+      type: 'bank/refinance',
+      loanId: loan.id,
+      bankId: sheet.refinance.bankId,
+    });
+    expect(result.state.closedLoans).toEqual([
+      expect.objectContaining({
+        id: loan.id,
+        reason: 'refinanced',
+        remaining: loan.remaining,
+        fees: sheet.refinance.fees,
+        replacedBy: result.state.loans[0]?.id,
+      }),
+    ]);
   });
 
   it('builds trust with payments made on time', () => {
@@ -329,6 +367,18 @@ describe('meetings', () => {
     expect(met.state.banks.tirelire?.trust).toBe(
       (monday.banks.tirelire?.trust ?? 0) + content.credit.trust.meeting,
     );
+    // Kept in the history of the bank, and its trust on the 1st of the next month.
+    expect(met.state.banks.tirelire?.log).toEqual([
+      {
+        kind: 'meeting',
+        day: toDayNumber(monday.clock.date),
+        trust: met.state.banks.tirelire?.trust,
+      },
+    ]);
+    const nextMonth = advanceToNextMonth(met.state).state;
+    expect(nextMonth.banks.tirelire?.trustHistory).toEqual([
+      { date: nextMonth.clock.date, trust: nextMonth.banks.tirelire?.trust },
+    ]);
     expect(met.state.player.freeTimeMinutes).toBe(
       monday.player.freeTimeMinutes - content.credit.trust.meetingMinutes,
     );

@@ -223,6 +223,8 @@ export function sampleOwned(
             arrears: null,
             missedDays: 0,
             buyoutRefusedDay: null,
+            rentsReceived: 0,
+            missedRents: 0,
           },
     furniture: null,
     taxRegime: 'auto',
@@ -240,6 +242,7 @@ export function sampleOwned(
     coproCalls: [],
     valueHistory: [],
     log: [],
+    rentsReceived: 0,
   };
 }
 

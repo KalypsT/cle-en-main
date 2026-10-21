@@ -114,6 +114,47 @@ export function addChronicle(
   if (chronicle.length > max) chronicle.splice(0, chronicle.length - max);
 }
 
+/** A step of the career told only the first time it happens (chronicle kinds `first…`). */
+function once(ctx: SystemContext, kind: ChronicleKind, ref: string | null, amount: Cents | null) {
+  if (!ctx.state.chronicle.some((entry) => entry.kind === kind)) {
+    addChronicle(ctx, kind, ref, amount);
+  }
+}
+
+/** Steps of the career with no counter of their own (docs/02, section 2.10). */
+function recordChronicle(ctx: SystemContext, event: GameEvent): void {
+  const { state } = ctx;
+  switch (event.type) {
+    case 'companyCreated':
+      addChronicle(ctx, 'companyCreated', null, event.cost);
+      break;
+    case 'rivalArrived':
+      addChronicle(ctx, 'rivalArrived', event.rivalId);
+      break;
+    case 'movedCity':
+      addChronicle(ctx, 'movedCity', event.cityId, event.cost);
+      break;
+    case 'deedSigned': {
+      const cityId = cityOf(state, event.propertyId);
+      if (cityId && cityId !== state.player.baseCityId) {
+        once(ctx, 'firstRemotePurchase', cityId, event.price);
+      }
+      break;
+    }
+    case 'tenantLeft':
+      if (event.reason === 'evicted') once(ctx, 'firstEviction', null, null);
+      break;
+    case 'loanRepaid':
+      once(ctx, 'firstLoanRepaid', null, null);
+      break;
+    case 'transformationCompleted':
+      once(ctx, 'firstTransformation', event.kind, event.cost);
+      break;
+    default:
+      break;
+  }
+}
+
 /** First time a counter moves from 0: a step of the career. */
 function firstTime(ctx: SystemContext, stat: Stat, kind: ChronicleKind, amount: Cents | null) {
   if ((ctx.state.progress.counters[stat] ?? 0) === 1) addChronicle(ctx, kind, null, amount);
@@ -134,6 +175,7 @@ export function recordProgress(ctx: SystemContext, events: readonly GameEvent[])
   const gains = rules.reputation;
   const progress = state.progress;
   for (const event of events) {
+    recordChronicle(ctx, event);
     switch (event.type) {
       case 'deedSigned': {
         bump(state, 'purchases');
