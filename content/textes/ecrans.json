@@ -850,7 +850,8 @@
       "bank": "Banque",
       "copro": "Copropriété",
       "city": "Ville",
-      "france": "France"
+      "france": "France",
+      "life": "Vie perso"
     },
     "deadline": "Sans réponse {when}, ce choix s'appliquera : « {choice} ».",
     "freeTime": "{duration} de temps libre",

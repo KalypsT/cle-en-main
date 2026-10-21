@@ -16,6 +16,8 @@ export const EVENT_FAMILIES = [
   'copro',
   'city',
   'france',
+  /** The player's own life: bonuses, a side job, an inheritance (progression, step 2). */
+  'life',
 ] as const;
 
 /**

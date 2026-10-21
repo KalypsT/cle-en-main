@@ -18,6 +18,7 @@ import type {
   WorksProject,
   WorksTask,
 } from '../state.ts';
+import { DPE_LABELS } from '../content-constants.ts';
 import { crisisFactor } from './crises.ts';
 import type { SystemContext } from './context.ts';
 import { modeOf } from './modes.ts';
@@ -664,10 +665,53 @@ function finishTask(ctx: SystemContext, owned: OwnedProperty, task: WorksTask): 
   });
 }
 
+/**
+ * Energy renovation aid (progression, step 2): a share of what the artisans billed for the
+ * energy items, by DPE classes gained; works done oneself and transformations get none.
+ */
+export function renovationAid(
+  content: GameContent,
+  property: Property,
+  project: WorksProject,
+  dpeAfter: Property['dpe'],
+): Cents {
+  if (project.transformation) return 0;
+  const gained = DPE_LABELS.indexOf(project.dpeBefore) - DPE_LABELS.indexOf(dpeAfter);
+  const rules = content.works.renovationAid;
+  const step = rules.steps
+    .filter((candidate) => candidate.minClassesGained <= gained)
+    .sort((a, b) => b.minClassesGained - a.minClassesGained)[0];
+  if (!step) return 0;
+  let billed = 0;
+  for (const task of project.tasks) {
+    if (task.artisanId === null || task.status !== 'done') continue;
+    for (const line of task.items) {
+      const item = property.items.find((candidate) => itemId(candidate) === line.itemId);
+      if (item && itemRule(content, item.kind).energy) {
+        billed += Math.round(line.price * (1 + task.overrun));
+      }
+    }
+  }
+  return Math.min(Math.round(billed * step.share), toCents(rules.maxEuros));
+}
+
 function completeProject(ctx: SystemContext, owned: OwnedProperty, project: WorksProject): void {
   const { content, state } = ctx;
   const property = owned.property;
   const dpeAfter = dpeOf(content, energyNeeds(content, property));
+  const aid = renovationAid(content, property, project, dpeAfter);
+  if (aid > 0) {
+    state.player.balance += aid;
+    // The aid lowers the works the taxes take into account.
+    addWorks(state, owned, -aid);
+    ctx.events.push({
+      type: 'renovationAidPaid',
+      propertyId: property.id,
+      amount: aid,
+      dpeBefore: project.dpeBefore,
+      dpeAfter,
+    });
+  }
   property.dpe = dpeAfter;
   const energy = content.taxes.landlordDeficit.energyRenovation;
   if (energy.fromLabels.includes(project.dpeBefore) && energy.toLabels.includes(dpeAfter)) {

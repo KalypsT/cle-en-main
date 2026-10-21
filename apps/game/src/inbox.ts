@@ -62,6 +62,7 @@ const NEWS_CATEGORIES: Record<NewsEventType, Exclude<NewsCategory, 'all'>> = {
   worksHazard: 'works',
   worksCompleted: 'works',
   worksFundReturned: 'works',
+  renovationAidPaid: 'money',
   coproMeetingCalled: 'works',
   coproMeetingHeld: 'works',
   monthlyStatement: 'money',

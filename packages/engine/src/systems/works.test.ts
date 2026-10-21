@@ -7,6 +7,7 @@ import { createEngine } from '../engine.ts';
 import type { GameEvent } from '../events.ts';
 import type { GameState, OwnedProperty } from '../state.ts';
 import { findItem, itemId } from './dwelling.ts';
+import { renovationAid } from './works.ts';
 
 /**
  * The content with predictable artisans: reliable, free right away, quotes
@@ -146,9 +147,53 @@ describe('works', () => {
     for (const item of ['insulation', 'windows', 'heating']) {
       expect(property && findItem(property, item)).toMatchObject({ state: 5, tier: 'standard' });
     }
-    expect(done.state.tax.ledgers[id]?.works).toBe(18_240_00);
+    // Three DPE classes gained: 40 % of the energy items paid back, deducted from the works.
+    const aid = done.events.find((e) => e.type === 'renovationAidPaid');
+    expect(aid).toMatchObject({ amount: 7_296_00, dpeBefore: 'F', dpeAfter: 'C' });
+    expect(done.state.tax.ledgers[id]?.works).toBe(18_240_00 - 7_296_00);
     expect(done.state.worksDone.dole).toBe(1);
     expect(done.state.artisans.batiJura?.jobs).toBe(1);
+  });
+
+  it('pays no renovation aid without a DPE class gained, and caps it', () => {
+    const content = steadyContent();
+    const rules = content.works.renovationAid;
+    const property = flat(1).property;
+    const project = {
+      id: 'w',
+      startDay: 0,
+      managed: false,
+      transformation: null,
+      hazard: null,
+      dpeBefore: 'F' as const,
+      paid: 0,
+      tasks: [
+        {
+          id: 't',
+          artisanId: 'batiJura',
+          trade: 'mason' as const,
+          phase: 3,
+          items: [{ itemId: 'insulation', tier: 'standard' as const, price: 20_000_00 }],
+          status: 'done' as const,
+          availableDay: 0,
+          days: 1,
+          startDay: 0,
+          endDay: 1,
+          overrun: 0,
+          deposit: 0,
+          minutesNeeded: 0,
+          minutesDone: 0,
+        },
+      ],
+    };
+    expect(renovationAid(content, property, project, 'F')).toBe(0);
+    // One class: 15 % of 20 000 €; four classes: 40 %, capped at 10 000 € on a bigger bill.
+    expect(renovationAid(content, property, project, 'E')).toBe(3_000_00);
+    expect(renovationAid(content, property, project, 'B')).toBe(8_000_00);
+    const big = { ...project, tasks: project.tasks.map((task) => ({ ...task, overrun: 1.5 })) };
+    expect(renovationAid(content, property, big, 'B')).toBe(rules.maxEuros * 100);
+    const diy = { ...project, tasks: project.tasks.map((task) => ({ ...task, artisanId: null })) };
+    expect(renovationAid(content, property, diy, 'B')).toBe(0);
   });
 
   it('raises the value and the rent with the state of the home, within the neighbourhood ceiling', () => {

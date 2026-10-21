@@ -693,6 +693,14 @@
   ],
   "hazardDecisionDays": 3,
   "occupiedSatisfactionPerDay": 1.2,
+  "renovationAid": {
+    "steps": [
+      { "minClassesGained": 1, "share": 0.15 },
+      { "minClassesGained": 2, "share": 0.3 },
+      { "minClassesGained": 3, "share": 0.4 }
+    ],
+    "maxEuros": 10000
+  },
   "diyDailyMaxMinutes": 300,
   "copro": {
     "lots": { "min": 4, "max": 30 },

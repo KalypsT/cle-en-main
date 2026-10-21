@@ -106,6 +106,7 @@
     "worksHazard": "Imprévu sur le chantier : {text} ({amount} et {days} jours de plus). Sans réponse, il sera traité le {date}.",
     "worksCompleted": "Chantier terminé pour {amount}. DPE : {before} → {after}.",
     "worksFundReturned": "L'enveloppe travaux non utilisée ({amount}) rembourse une partie du prêt.",
+    "renovationAidPaid": "Aide à la rénovation énergétique versée : {amount} pour le passage du DPE de {before} à {after}.",
     "coproMeetingCalled": "Assemblée générale de copropriété le {date} : {count} résolution(s) à voter.",
     "coproMeetingHeld": "{resolution} : {verdict}",
     "diagnosisDone": "Diagnostic de l'artisan : {count} poste(s) révélé(s) pour {amount}.",

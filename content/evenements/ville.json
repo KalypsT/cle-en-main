@@ -538,6 +538,27 @@
       ],
       "deadlineDays": 5,
       "defaultChoice": "no"
+    },
+    {
+      "id": "neighbourhoodShop",
+      "family": "city",
+      "target": "owned",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.01,
+      "cooldownDays": 1825,
+      "pause": false,
+      "texts": [
+        "Une boulangerie primée ouvre au coin de la rue de {bien}. Les agents immobiliers du quartier {quartier} s'en frottent les mains.",
+        "Le marché couvert du quartier {quartier} rouvre après travaux : {bien} prend un peu de valeur."
+      ],
+      "effects": [
+        {
+          "type": "priceIndex",
+          "scope": "neighbourhood",
+          "percent": 1.5
+        }
+      ]
     }
   ]
 }
