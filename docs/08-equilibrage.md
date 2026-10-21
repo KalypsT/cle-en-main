@@ -171,7 +171,22 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > Le plafond du test anti-idle suit la nouvelle épargne la plus forte : **apport plus 550 € par mois** (au lieu de 250). Nouveaux écarts, à trancher avant les étapes suivantes : l'expansion à Dijon n'est plus « un vrai effort » et un peu moins viable (87 % contre 90 %) ; les faillites du Levier tombent juste à la limite de 40 % ; le Prudent devient un peu trop dense en décisions pour un métier ; le Marchand de biens ne dépasse presque plus l'Inactif.
 >
-> **Dijon recalé** (`packages/bots/rapports/progression-dijon.md` : 100 parties de 10 ans du Chasseur et du Chasseur à Dijon) : flux d'annonces de Dijon de 0,25 à **0,1** (0,15 essayé : 58 % des parties y achètent, au 20e mois). Le Chasseur à Dijon fait 101 % de la médiane du Chasseur (faillites 4 % contre 3 %), achète à Dijon au 38e mois dans 38 % des parties : les deux cibles du jalon 7 sont de nouveau atteintes.
+> **Dijon recalé** : flux d'annonces de Dijon de 0,25 à 0,1 après l'étape 1 (100 parties : 0,15 donnait 58 % des parties qui y achètent, au 20e mois ; 0,1 donnait 38 %, au 38e mois), puis à **0,08** après l'étape 2, dont les bonnes nouvelles relançaient les achats à Dijon (53,7 % des parties sur 300 à 0,1). Mesure finale (`packages/bots/rapports/progression-dijon.md` : 300 parties de 10 ans du Chasseur et du Chasseur à Dijon) : 95 % de la médiane du Chasseur, faillites 2,3 % contre 1,7 %, premier achat à Dijon au 32e mois dans 44 % des parties : les deux cibles du jalon 7 sont atteintes.
+>
+> **Progression, étape 2** (`packages/bots/rapports/progression-etape-2.md` : 100 parties de 10 ans par bot, flux de Dijon encore à 0,1) : dix bonnes nouvelles et l'aide à la rénovation énergétique (chapitres 3.5 et 3.7).
+>
+> | Repère (10 ans) | Étape 1 | Étape 2 |
+> |---|---|---|
+> | Chasseur, médiane | 137,1 k€, faillites 3 % | 170,7 k€, faillites 0 % |
+> | Chasseur, titre Bailleur | 3,3 ans (83 %) | 2,5 ans (93 %) ; 2,2 ans sur 300 parties |
+> | Prudent | 122,7 k€ | 128,1 k€ |
+> | Levier maximal | 40 % de faillites, D9 122,1 k€ | 37 % de faillites, D9 149,4 k€ (au-dessus des 128,1 k€ du Prudent : « peut progresser vite » atteint) |
+> | Marchand de biens / Inactif | 52,4 k€ / 50,4 k€ | 64,4 k€ / 56,1 k€ |
+> | Rénovateur premium | 49,1 k€, faillites 11 % | 61,8 k€, faillites 9 % |
+> | Promoteur | 176,2 k€, titre dans 63 % des parties | 214,9 k€, titre dans 68 % des parties |
+> | Densité de décisions | Chasseur 45,2 s, Prudent 31,0 s | Chasseur 39,9 s, Prudent 27,6 s |
+>
+> L'Inactif touche lui aussi les primes, l'intéressement et parfois un héritage : le plafond du test anti-idle passe à **apport plus 650 € par mois** (84,5 k€ pour le métier le plus favorable, au-dessus de l'ancien plafond de 81 k€). Écarts restants : faillites du Levier à 37 % (cible : plus de 40 %) ; le Prudent devient un peu trop dense en décisions (27,6 s : les nouveaux choix « un extra » et « le locataire repeint ») ; Investisseur aguerri toujours manqué (écart connu).
 
 ## 8.3 Les leviers de difficulté
 
