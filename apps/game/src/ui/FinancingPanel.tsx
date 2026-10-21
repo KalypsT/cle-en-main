@@ -56,7 +56,8 @@ export function FinancingPanel({
   const nav = useNav();
   const [open, setOpen] = useState(false);
   const [bankId, setBankId] = useState(gameContent.start.accountBankId);
-  const [years, setYears] = useState(20);
+  // Same length as the « Cash-flow prévu » above it.
+  const [years, setYears] = useState(gameContent.yvon.thresholds.outlookYears);
   const [contribution, setContribution] = useState<number | null>(null);
 
   useEffect(() => {

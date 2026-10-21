@@ -12,6 +12,7 @@ import {
   formatGameDate,
   formatMoney,
   formatPercent,
+  formatSigned,
   formatWhen,
   cityName,
   listingTitle,
@@ -22,6 +23,7 @@ import {
 import { Amount, Badge, BottomSheet, Card, Empty, ScreenHeader } from '../ui/components.tsx';
 import { ItemsList, ItemsSummary, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
+import { CashFlowOutlookCard, outlookAdvice, outlookTone } from '../ui/CashFlowOutlook.tsx';
 import { FinancingPanel } from '../ui/FinancingPanel.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { DpeCard } from '../ui/DpeCard.tsx';
@@ -85,6 +87,7 @@ function ListingBody({ listing }: { listing: Listing }) {
   const [offering, setOffering] = useState(false);
   const { property } = listing;
   const view = engine.listingView(state, listing.id);
+  const outlook = engine.cashFlowOutlook(state, listing.id);
   const catalog = engine.worksCatalog(state, listing.id) ?? [];
   const today = toDayNumber(state.clock.date);
   const quote = engine.visitQuote(state, listing.id);
@@ -277,6 +280,8 @@ function ListingBody({ listing }: { listing: Listing }) {
 
       <DpeCard property={property} id={listing.id} />
 
+      {outlook && <CashFlowOutlookCard outlook={outlook} />}
+
       <FinancingPanel listingId={listing.id} askingPrice={listing.askingPrice} />
 
       <Card
@@ -353,11 +358,12 @@ function OfferSheet({
   offersLeft: number;
   onClose: () => void;
 }) {
-  const { act } = useGame();
+  const { act, state } = useGame();
   const asking = listing.askingPrice;
   const min = Math.round((asking * 0.7) / OFFER_STEP) * OFFER_STEP;
   const [amount, setAmount] = useState(Math.round((asking * 0.95) / OFFER_STEP) * OFFER_STEP);
   const share = gameContent.market.purchase.depositShare;
+  const outlook = amount > 0 ? engine.cashFlowOutlook(state, listing.id, amount) : null;
 
   const send = () => {
     if (act({ type: 'market/offer', listingId: listing.id, amount })) onClose();
@@ -395,6 +401,14 @@ function OfferSheet({
       <p className="small">
         {format(t.listing.offerDeposit, { share: formatPercent(share * 100) })}
       </p>
+      {outlook && (
+        <div className="stack tight" data-testid="offer-outlook">
+          <p className={`small strong ${outlookTone(outlook)}`}>
+            {format(t.outlook.offer, { amount: formatSigned(outlook.monthly) })}
+          </p>
+          <p className="small">{outlookAdvice(outlook)}</p>
+        </div>
+      )}
       <p className="small muted">{format(t.listing.offersLeft, { count: offersLeft })}</p>
       <button type="button" className="button primary block" onClick={send}>
         {t.listing.send}

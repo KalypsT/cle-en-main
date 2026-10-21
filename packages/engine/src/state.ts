@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 19;
+export const FORMAT_VERSION = 20;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {

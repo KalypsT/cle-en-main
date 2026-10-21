@@ -10,7 +10,16 @@ import {
   useNav,
 } from '../game/context.tsx';
 import { sellerReply } from '../inbox.ts';
-import { cityName, format, formatDecimal, formatEuros, propertyLabel, t } from '../texts.ts';
+import {
+  cityName,
+  format,
+  formatDecimal,
+  formatEuros,
+  formatSigned,
+  propertyLabel,
+  t,
+} from '../texts.ts';
+import { outlookTone } from '../ui/CashFlowOutlook.tsx';
 import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
 import { KindThumb } from '../ui/Facade.tsx';
 
@@ -28,6 +37,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
   );
   const favorite = state.favorites.includes(listing.id);
   const reply = sellerReply(state, listing.id);
+  const outlook = engine.cashFlowOutlook(state, listing.id);
   return (
     <ListRow
       thumb={<KindThumb property={property} />}
@@ -79,6 +89,11 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
           {view && (
             <span className="small positive">
               {format(t.listings.grossYield, { value: formatDecimal(view.grossYieldPercent) })}
+            </span>
+          )}
+          {outlook && (
+            <span className={`small ${outlookTone(outlook)}`} data-testid="listing-outlook">
+              {format(t.outlook.badge, { amount: formatSigned(outlook.monthly) })}
             </span>
           )}
         </span>

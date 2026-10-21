@@ -275,6 +275,18 @@
     "counterDeclinedText": "Vous avez décliné sa contre-offre de {amount} le {date}.",
     "neighbourhoodTrend": "Prix du quartier : {change} en {months} mois"
   },
+  "outlook": {
+    "heading": "Cash-flow prévu",
+    "label": "Chaque mois, avec un crédit de {years} ans",
+    "perMonth": "{amount} / mois",
+    "hint": "Banque du compte, apport limité aux frais, location nue au loyer de marché ; avant impôt, sans vacance ni incident.",
+    "positive": "Yvon Tableur : « Ce bien se paierait tout seul : il vous laisserait {amount} par mois, avant impôt. »",
+    "balanced": "Yvon Tableur : « Ni gain ni perte chaque mois : c'est la valeur du bien qui fera le travail. »",
+    "negative": "Yvon Tableur : « À ce prix, ce bien vous coûterait {amount} par mois. Il se paierait tout seul à {price} ou moins. »",
+    "negativeNoPrice": "Yvon Tableur : « Même pour une bouchée de pain, ses charges dépasseraient le loyer. »",
+    "offer": "Cash-flow prévu à ce prix : {amount} / mois",
+    "badge": "{amount} / mois"
+  },
   "financing": {
     "heading": "Financement simulé",
     "open": "Simuler le financement",

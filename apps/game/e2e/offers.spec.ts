@@ -44,7 +44,9 @@ test('tells a refused offer, on the listing and in the mail', async ({ page }) =
   await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.news}`) }).click();
   await expect(page.getByTestId('news')).toContainText(/refuse votre offre/);
 
-  // The listing still tells it.
+  // The listing still tells it, unless another buyer took it meanwhile.
   await tab(page, 'assets');
-  await expect(page.getByTestId('last-reply')).toBeVisible();
+  await expect(
+    page.getByTestId('last-reply').or(page.getByText(t.listing.gone, { exact: true })),
+  ).toBeVisible();
 });
