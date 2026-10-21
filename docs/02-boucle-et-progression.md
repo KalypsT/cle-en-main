@@ -48,13 +48,16 @@ Choisis à la création, ils règlent la faillite, le retour en arrière et, rai
 
 | | Serein | Classique (par défaut) | Exigeant |
 |---|---|---|---|
-| Imprévus de chantier et incidents | −30 % | normal | +20 % |
+| Incidents et événements fâcheux | −50 % | −25 % | +20 % |
+| Imprévus de chantier | −30 % | normal | +20 % |
 | Rivaux | plus lents | normaux | plus vifs |
 | Confiance des banquiers | monte plus vite | normale | monte plus lentement |
 | Faillite | seulement des saisies | nouveau départ | fin de partie |
 | Retours en arrière | illimités | 3 par partie | aucun |
 
 > **Jalon 6** : table dans `content/modes.json`. Serein : imprévus et incidents ×0,7, rivaux ×0,75, gains de confiance ×1,3 ; Exigeant : ×1,2, ×1,25 et ×0,75. Les coefficients s'appliquent aux incidents des locataires, aux imprévus de chantier, aux événements « fâcheux » du catalogue, à l'agressivité des rivaux et aux seuls gains de confiance des banquiers (jamais aux pertes). « Seulement des saisies » en Serein : les ventes forcées ont lieu, mais la faillite devient un nouveau départ qui garde **toute** la réputation (choix de Thibaud).
+
+> **Progression, étape 1** (2026-10-21, point ouvert n° 16) : les incidents des locataires et les événements « fâcheux » du catalogue deviennent moins fréquents (coefficient d'incidents de Serein 0,7 → 0,5, de Classique 1 → 0,75) ; Exigeant garde 1,2, soit son niveau d'avant. Les imprévus de chantier ne changent pas. L'épargne plus forte (chapitre 3.1) et les loyers +10 % (chapitre 3.4) valent pour les trois modes : Exigeant reste plus dur par ses autres coefficients.
 
 ## 2.6 La faillite
 

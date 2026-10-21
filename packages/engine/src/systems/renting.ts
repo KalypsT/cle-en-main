@@ -124,6 +124,7 @@ export function marketRent(
       property.surface *
         perM2.largeApartment *
         ratio *
+        rules.marketRentFactor *
         rentLevel(content, state, property) *
         rules.leaseTypes[leaseType].rentFactor,
     );
@@ -148,6 +149,7 @@ export function marketRent(
     base *
       factor *
       rules.dpeFactors[property.dpe] *
+      rules.marketRentFactor *
       rentLevel(content, state, property) *
       rules.leaseTypes[leaseType].rentFactor,
   );

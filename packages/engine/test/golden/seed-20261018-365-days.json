@@ -34,7 +34,7 @@
       },
       "jobId": "civilServant",
       "employed": true,
-      "balance": 686919,
+      "balance": 836919,
       "overdraftDays": 0,
       "overdraftInterestThisMonth": 0,
       "monthlyRent": 52000,
@@ -881,27 +881,27 @@
             "lastName": "Arnaud",
             "profileId": "employee",
             "traitId": "amateurChef",
-            "monthlyIncome": 124000,
+            "monthlyIncome": 138000,
             "guarantor": false,
             "desiredYears": 4,
             "reliability": 0.804,
             "mobility": 0.9
           },
-          "monthlyRent": 26100,
+          "monthlyRent": 29100,
           "startDay": 20821,
           "termDay": 21916,
           "anniversaryDay": 21186,
           "revisionFactor": 1.0027961538229224,
-          "deposit": 26100,
+          "deposit": 29100,
           "agencyId": null,
           "insured": false,
-          "satisfaction": 66.25918277787434,
+          "satisfaction": 66.31913954019389,
           "noticeEndDay": 21122,
           "incident": null,
           "arrears": null,
           "missedDays": 0,
           "buyoutRefusedDay": null,
-          "rentsReceived": 234900,
+          "rentsReceived": 261900,
           "missedRents": 0
         },
         "furniture": null,
@@ -1070,7 +1070,7 @@
             "kind": "listedForRent",
             "day": 20819,
             "leaseType": "bare",
-            "monthlyRent": 26100,
+            "monthlyRent": 29100,
             "agencyId": null,
             "insured": false
           },
@@ -1078,7 +1078,7 @@
             "kind": "tenantIn",
             "day": 20821,
             "tenantName": "Lucas Arnaud",
-            "monthlyRent": 26100
+            "monthlyRent": 29100
           },
           {
             "kind": "copro",
@@ -1103,7 +1103,7 @@
             "reason": "departure"
           }
         ],
-        "rentsReceived": 234900
+        "rentsReceived": 261900
       }
     ],
     "agenda": [],
@@ -2244,7 +2244,7 @@
           "category": "bare",
           "regime": "auto",
           "company": false,
-          "rents": 234900,
+          "rents": 261900,
           "costs": 66970,
           "works": 148336,
           "energyRenovation": false,
@@ -2486,7 +2486,7 @@
               },
               {
                 "kind": "livingCosts",
-                "amount": 135000
+                "amount": 125000
               },
               {
                 "kind": "propertyCharges",
@@ -2501,7 +2501,7 @@
               {
                 "kind": "rentalIncome",
                 "propertyId": "property-99",
-                "amount": 30230
+                "amount": 33230
               },
               {
                 "kind": "loanPayment",
@@ -2511,7 +2511,7 @@
                 "capital": 12668
               }
             ],
-            "balance": 748453
+            "balance": 833453
           },
           "subject": null
         },
@@ -2986,7 +2986,7 @@
               },
               {
                 "kind": "livingCosts",
-                "amount": 135000
+                "amount": 125000
               },
               {
                 "kind": "propertyCharges",
@@ -3001,7 +3001,7 @@
               {
                 "kind": "rentalIncome",
                 "propertyId": "property-99",
-                "amount": 30230
+                "amount": 33230
               },
               {
                 "kind": "loanPayment",
@@ -3011,7 +3011,7 @@
                 "capital": 12711
               }
             ],
-            "balance": 756831
+            "balance": 854831
           },
           "subject": null
         },
@@ -3342,7 +3342,7 @@
               },
               {
                 "kind": "livingCosts",
-                "amount": 135000
+                "amount": 125000
               },
               {
                 "kind": "propertyCharges",
@@ -3357,7 +3357,7 @@
               {
                 "kind": "rentalIncome",
                 "propertyId": "property-99",
-                "amount": 30230
+                "amount": 33230
               },
               {
                 "kind": "loanPayment",
@@ -3367,7 +3367,7 @@
                 "capital": 12754
               }
             ],
-            "balance": 765209
+            "balance": 876209
           },
           "subject": null
         },
@@ -3804,7 +3804,7 @@
               },
               {
                 "kind": "livingCosts",
-                "amount": 135000
+                "amount": 125000
               },
               {
                 "kind": "propertyCharges",
@@ -3819,7 +3819,7 @@
               {
                 "kind": "rentalIncome",
                 "propertyId": "property-99",
-                "amount": 30230
+                "amount": 33230
               },
               {
                 "kind": "coproCall",
@@ -3834,7 +3834,7 @@
                 "capital": 12796
               }
             ],
-            "balance": 726079
+            "balance": 850079
           },
           "subject": null
         },
@@ -3882,7 +3882,7 @@
           "day": 21032,
           "event": {
             "type": "challengeOffered",
-            "challengeId": "kevinNewProperty",
+            "challengeId": "moniqueBeatMe",
             "deadlineDay": 21037
           },
           "subject": null
@@ -4126,7 +4126,7 @@
               },
               {
                 "kind": "livingCosts",
-                "amount": 135000
+                "amount": 125000
               },
               {
                 "kind": "propertyCharges",
@@ -4141,7 +4141,7 @@
               {
                 "kind": "rentalIncome",
                 "propertyId": "property-99",
-                "amount": 30230
+                "amount": 33230
               },
               {
                 "kind": "coproCall",
@@ -4156,7 +4156,7 @@
                 "capital": 12839
               }
             ],
-            "balance": 724049
+            "balance": 861049
           },
           "subject": null
         },
@@ -4614,7 +4614,7 @@
               },
               {
                 "kind": "livingCosts",
-                "amount": 135000
+                "amount": 125000
               },
               {
                 "kind": "propertyCharges",
@@ -4629,7 +4629,7 @@
               {
                 "kind": "rentalIncome",
                 "propertyId": "property-99",
-                "amount": 30230
+                "amount": 33230
               },
               {
                 "kind": "coproCall",
@@ -4644,7 +4644,7 @@
                 "capital": 12883
               }
             ],
-            "balance": 722019
+            "balance": 872019
           },
           "subject": null
         },
@@ -6112,10 +6112,10 @@
           "month": 11,
           "day": 1
         },
-        "netWorth": 1513000,
-        "balance": 1513000,
+        "netWorth": 1523000,
+        "balance": 1523000,
         "debt": 0,
-        "cashFlow": 13000,
+        "cashFlow": 23000,
         "monthlyRent": 0,
         "reputation": 10
       },
@@ -6125,10 +6125,10 @@
           "month": 12,
           "day": 1
         },
-        "netWorth": 1526000,
-        "balance": 1296000,
+        "netWorth": 1546000,
+        "balance": 1316000,
         "debt": 0,
-        "cashFlow": 13000,
+        "cashFlow": 23000,
         "monthlyRent": 0,
         "reputation": 10
       },
@@ -6138,10 +6138,10 @@
           "month": 1,
           "day": 1
         },
-        "netWorth": 843441,
-        "balance": 698741,
+        "netWorth": 873441,
+        "balance": 728741,
         "debt": 4587500,
-        "cashFlow": -21852,
+        "cashFlow": -11852,
         "monthlyRent": 0,
         "reputation": 17
       },
@@ -6151,11 +6151,11 @@
           "month": 2,
           "day": 1
         },
-        "netWorth": 857661,
-        "balance": 733219,
+        "netWorth": 900661,
+        "balance": 779219,
         "debt": 4574958,
-        "cashFlow": 8378,
-        "monthlyRent": 26100,
+        "cashFlow": 21378,
+        "monthlyRent": 29100,
         "reputation": 17
       },
       {
@@ -6164,11 +6164,11 @@
           "month": 3,
           "day": 1
         },
-        "netWorth": 851223,
-        "balance": 741597,
+        "netWorth": 907223,
+        "balance": 800597,
         "debt": 4562374,
-        "cashFlow": 8378,
-        "monthlyRent": 26100,
+        "cashFlow": 21378,
+        "monthlyRent": 29100,
         "reputation": 17
       },
       {
@@ -6177,11 +6177,11 @@
           "month": 4,
           "day": 1
         },
-        "netWorth": 889127,
-        "balance": 749975,
+        "netWorth": 958127,
+        "balance": 821975,
         "debt": 4549748,
-        "cashFlow": 8378,
-        "monthlyRent": 26100,
+        "cashFlow": 21378,
+        "monthlyRent": 29100,
         "reputation": 17
       },
       {
@@ -6190,11 +6190,11 @@
           "month": 5,
           "day": 1
         },
-        "netWorth": 888773,
-        "balance": 748453,
+        "netWorth": 970773,
+        "balance": 833453,
         "debt": 4537080,
-        "cashFlow": 8378,
-        "monthlyRent": 26100,
+        "cashFlow": 21378,
+        "monthlyRent": 29100,
         "reputation": 17
       },
       {
@@ -6203,11 +6203,11 @@
           "month": 6,
           "day": 1
         },
-        "netWorth": 882762,
-        "balance": 756831,
+        "netWorth": 977762,
+        "balance": 854831,
         "debt": 4524369,
-        "cashFlow": 8378,
-        "monthlyRent": 26100,
+        "cashFlow": 21378,
+        "monthlyRent": 29100,
         "reputation": 17
       },
       {
@@ -6216,11 +6216,11 @@
           "month": 7,
           "day": 1
         },
-        "netWorth": 901394,
-        "balance": 765209,
+        "netWorth": 1009394,
+        "balance": 876209,
         "debt": 4511615,
-        "cashFlow": 8378,
-        "monthlyRent": 26100,
+        "cashFlow": 21378,
+        "monthlyRent": 29100,
         "reputation": 17
       },
       {
@@ -6229,11 +6229,11 @@
           "month": 8,
           "day": 1
         },
-        "netWorth": 1038660,
-        "balance": 726079,
+        "netWorth": 1159660,
+        "balance": 850079,
         "debt": 4498819,
-        "cashFlow": -2030,
-        "monthlyRent": 26100,
+        "cashFlow": 10970,
+        "monthlyRent": 29100,
         "reputation": 16
       },
       {
@@ -6242,11 +6242,11 @@
           "month": 9,
           "day": 1
         },
-        "netWorth": 1072569,
-        "balance": 724049,
+        "netWorth": 1206569,
+        "balance": 861049,
         "debt": 4485980,
-        "cashFlow": -2030,
-        "monthlyRent": 26100,
+        "cashFlow": 10970,
+        "monthlyRent": 29100,
         "reputation": 16
       },
       {
@@ -6255,11 +6255,11 @@
           "month": 10,
           "day": 1
         },
-        "netWorth": 1105622,
-        "balance": 722019,
+        "netWorth": 1252622,
+        "balance": 872019,
         "debt": 4473097,
-        "cashFlow": -2030,
-        "monthlyRent": 26100,
+        "cashFlow": 10970,
+        "monthlyRent": 29100,
         "reputation": 16
       }
     ],
@@ -6280,7 +6280,7 @@
         },
         {
           "kind": "livingCosts",
-          "amount": 135000
+          "amount": 125000
         },
         {
           "kind": "propertyCharges",
@@ -6295,7 +6295,7 @@
         {
           "kind": "rentalIncome",
           "propertyId": "property-99",
-          "amount": 30230
+          "amount": 33230
         },
         {
           "kind": "coproCall",
@@ -6310,7 +6310,7 @@
           "capital": 12883
         }
       ],
-      "balance": 722019
+      "balance": 872019
     },
     "modeId": "classic",
     "rewinds": 0,
@@ -6358,8 +6358,8 @@
       ],
       "counters": {
         "anecdotes": 117,
-        "positiveStreak": 0,
-        "bestPositiveStreak": 6,
+        "positiveStreak": 9,
+        "bestPositiveStreak": 9,
         "bankMeetings": 11,
         "rivalBeaten.martinot": 1,
         "purchases": 1,
@@ -6372,8 +6372,8 @@
       "records": {
         "bestCapitalGain": 0,
         "biggestWorks": 209055,
-        "bestMonth": 13000,
-        "maxNetWorth": 1526000
+        "bestMonth": 23000,
+        "maxNetWorth": 1546000
       },
       "troubledYear": false,
       "challenge": null,
@@ -6427,7 +6427,7 @@
         "day": 20821,
         "kind": "firstLease",
         "ref": null,
-        "amount": 26100
+        "amount": 29100
       },
       {
         "day": 20821,
@@ -6569,8 +6569,8 @@
     "lastYearReview": {
       "year": 2026,
       "netWorthStart": 1500000,
-      "netWorthEnd": 843441,
-      "cashFlow": 4148,
+      "netWorthEnd": 873441,
+      "cashFlow": 34148,
       "rents": 0,
       "reputationStart": 10,
       "reputationEnd": 17,
@@ -6586,7 +6586,7 @@
       "advice": [
         {
           "kind": "netWorthDown",
-          "amount": 656559
+          "amount": 626559
         },
         {
           "kind": "vacancy",
@@ -6594,7 +6594,7 @@
         },
         {
           "kind": "goodYear",
-          "amount": 4148
+          "amount": 34148
         },
         {
           "kind": "firstYear"
@@ -6620,10 +6620,10 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             }
           ],
-          "balance": 1513000
+          "balance": 1523000
         },
         {
           "date": {
@@ -6642,10 +6642,10 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             }
           ],
-          "balance": 1296000
+          "balance": 1316000
         },
         {
           "date": {
@@ -6664,7 +6664,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6684,7 +6684,7 @@
               "capital": 12500
             }
           ],
-          "balance": 815853
+          "balance": 845853
         },
         {
           "date": {
@@ -6703,7 +6703,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6718,7 +6718,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "loanPayment",
@@ -6728,7 +6728,7 @@
               "capital": 12542
             }
           ],
-          "balance": 733219
+          "balance": 779219
         },
         {
           "date": {
@@ -6747,7 +6747,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6762,7 +6762,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "loanPayment",
@@ -6772,7 +6772,7 @@
               "capital": 12584
             }
           ],
-          "balance": 741597
+          "balance": 800597
         },
         {
           "date": {
@@ -6791,7 +6791,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6806,7 +6806,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "loanPayment",
@@ -6816,7 +6816,7 @@
               "capital": 12626
             }
           ],
-          "balance": 749975
+          "balance": 821975
         },
         {
           "date": {
@@ -6835,7 +6835,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6850,7 +6850,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "loanPayment",
@@ -6860,7 +6860,7 @@
               "capital": 12668
             }
           ],
-          "balance": 748453
+          "balance": 833453
         },
         {
           "date": {
@@ -6879,7 +6879,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6894,7 +6894,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "loanPayment",
@@ -6904,7 +6904,7 @@
               "capital": 12711
             }
           ],
-          "balance": 756831
+          "balance": 854831
         },
         {
           "date": {
@@ -6923,7 +6923,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6938,7 +6938,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "loanPayment",
@@ -6948,7 +6948,7 @@
               "capital": 12754
             }
           ],
-          "balance": 765209
+          "balance": 876209
         },
         {
           "date": {
@@ -6967,7 +6967,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -6982,7 +6982,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "coproCall",
@@ -6997,7 +6997,7 @@
               "capital": 12796
             }
           ],
-          "balance": 726079
+          "balance": 850079
         },
         {
           "date": {
@@ -7016,7 +7016,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -7031,7 +7031,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "coproCall",
@@ -7046,7 +7046,7 @@
               "capital": 12839
             }
           ],
-          "balance": 724049
+          "balance": 861049
         },
         {
           "date": {
@@ -7065,7 +7065,7 @@
             },
             {
               "kind": "livingCosts",
-              "amount": 135000
+              "amount": 125000
             },
             {
               "kind": "propertyCharges",
@@ -7080,7 +7080,7 @@
             {
               "kind": "rentalIncome",
               "propertyId": "property-99",
-              "amount": 30230
+              "amount": 33230
             },
             {
               "kind": "coproCall",
@@ -7095,7 +7095,7 @@
               "capital": 12883
             }
           ],
-          "balance": 722019
+          "balance": 872019
         }
       ],
       "years": [
@@ -7103,8 +7103,8 @@
           "review": {
             "year": 2026,
             "netWorthStart": 1500000,
-            "netWorthEnd": 843441,
-            "cashFlow": 4148,
+            "netWorthEnd": 873441,
+            "cashFlow": 34148,
             "rents": 0,
             "reputationStart": 10,
             "reputationEnd": 17,
@@ -7120,7 +7120,7 @@
             "advice": [
               {
                 "kind": "netWorthDown",
-                "amount": 656559
+                "amount": 626559
               },
               {
                 "kind": "vacancy",
@@ -7128,7 +7128,7 @@
               },
               {
                 "kind": "goodYear",
-                "amount": 4148
+                "amount": 34148
               },
               {
                 "kind": "firstYear"
@@ -7540,7 +7540,7 @@
       "listing-4899"
     ]
   },
-  "netWorth": 1070522,
+  "netWorth": 1217522,
   "eventCounts": {
     "dayStarted": 365,
     "listingSold": 1913,

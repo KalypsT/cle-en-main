@@ -691,6 +691,7 @@ export function neighbourhoodMarkets(
       pricePerM2: Math.round(neighbourhood.sales.apartment.pricePerM2.median * priceIndex * 100),
       rentPerM2: Math.round(
         neighbourhood.rentPerM2.smallApartment *
+          content.renting.marketRentFactor *
           priceIndex ** content.renting.priceIndexElasticity *
           100,
       ),

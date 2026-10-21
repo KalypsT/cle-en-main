@@ -382,7 +382,7 @@ const num = (value: number) => (Number.isFinite(value) ? numberFormat.format(val
 const money = (value: number) => moneyFormat.format(value);
 
 /** The savings of a do-nothing player at the best saving rate of docs/03-systemes/01. */
-const INACTIVE_CEILING_MONTHLY_SAVINGS = 250;
+const INACTIVE_CEILING_MONTHLY_SAVINGS = 550;
 
 /**
  * Milestone 7 (docs/09): « une expansion à Dijon est viable mais demande un vrai effort ».
