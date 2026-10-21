@@ -54,6 +54,31 @@ describe('resale', () => {
     expect(net).toBe(price - agencyFees - loanRepaid - loanFees);
     expect(closed.state.properties).toEqual([]);
     expect(closed.state.loans.some((l) => l.propertyId === propertyId)).toBe(false);
+    // Kept among the properties sold, with its history; its loan among the closed ones.
+    const owned = current.properties[0];
+    expect(closed.state.soldProperties).toEqual([
+      expect.objectContaining({
+        forced: false,
+        price,
+        agencyFees,
+        net,
+        gain: closed.event.gain,
+        purchasePrice: owned?.purchasePrice,
+        log: owned?.log,
+        // The curve went on until the deed.
+        valueHistory: expect.arrayContaining(owned?.valueHistory ?? []),
+        property: expect.objectContaining({ id: propertyId }),
+      }),
+    ]);
+    expect(closed.state.closedLoans).toEqual([
+      expect.objectContaining({
+        id: loan?.id,
+        reason: 'sold',
+        remaining: loanRepaid,
+        fees: loanFees,
+        subject: expect.objectContaining({ propertyId }),
+      }),
+    ]);
   });
 
   it('gets fewer visits when overpriced, and self-selling costs free time', () => {

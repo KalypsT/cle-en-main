@@ -1,4 +1,5 @@
 import { toCents } from '../money.ts';
+import { archiveLoan, archiveSale } from './archives.ts';
 import { clampTrust } from './banking.ts';
 import type { SystemContext } from './context.ts';
 import { editableListing } from './listings.ts';
@@ -39,6 +40,7 @@ export function runDailyDistress(ctx: SystemContext): void {
   for (const { owned, price } of candidates) {
     if (player.balance >= 0) break;
     const proceeds = transferProperty(ctx, owned, price);
+    archiveSale(ctx, owned, { price, agencyFees: 0, ...proceeds }, true);
     const relation = state.banks[content.start.accountBankId];
     if (relation) relation.trust = clampTrust(relation.trust + rules.forcedSaleTrust);
     ctx.events.push({
@@ -95,6 +97,7 @@ export function freshStart(
   player.rentalHistoryMonths = 0;
   player.bankruptDay = null;
   player.reputation = Math.round(player.reputation * rules.reputationShare);
+  for (const loan of state.loans) archiveLoan(ctx, loan, 'freshStart');
   state.loans = [];
   state.purchases = [];
   state.properties = [];

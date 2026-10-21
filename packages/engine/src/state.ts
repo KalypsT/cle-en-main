@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 16;
+export const FORMAT_VERSION = 17;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -66,6 +66,74 @@ export interface BankRelation {
   relationshipMonths: number;
   /** Day number (see calendar.toDayNumber) of the last meeting. */
   lastMeetingDay: number | null;
+  /** Meetings and answers to loan requests, oldest first (kept for good). */
+  log: BankLogEntry[];
+  /** The banker's trust on the 1st of each month: its curve. */
+  trustHistory: { date: CalendarDate; trust: number }[];
+}
+
+/** One line of the history with a bank. */
+export type BankLogEntry =
+  | { kind: 'meeting'; day: number; trust: number }
+  | {
+      kind: 'answer';
+      day: number;
+      decision: LoanDecision['decision'];
+      /** What the loan was for. */
+      subject: InboxSubject | null;
+      amount: Cents | null;
+      ratePercent: number | null;
+      reason: LoanRefusalCode | null;
+      debtRatio: number | null;
+    };
+
+/** A loan that came to an end, kept for good (« Crédits soldés »). */
+export interface ClosedLoan {
+  id: string;
+  bankId: string;
+  propertyId: string | null;
+  /** The financed property, as it was. */
+  subject: InboxSubject | null;
+  principal: Cents;
+  ratePercent: number;
+  durationMonths: number;
+  monthlyPayment: Cents;
+  startDate: CalendarDate;
+  closedDay: number;
+  paymentsMade: number;
+  interestPaid: Cents;
+  /** Capital still owed when it ended early: repaid by a sale, taken over, or written off. */
+  remaining: Cents;
+  /** Early repayment fees. */
+  fees: Cents;
+  /** `freshStart`: written off by the bankruptcy. */
+  reason: 'repaid' | 'sold' | 'refinanced' | 'freshStart';
+  /** The loan that took over a refinanced one. */
+  replacedBy: string | null;
+}
+
+/** A property sold, kept for good with its history (« Biens vendus »). */
+export interface SoldProperty {
+  property: Property;
+  holder: Holder;
+  purchasePrice: Cents;
+  acquisitionCost: Cents;
+  purchaseDate: CalendarDate;
+  soldDay: number;
+  /** Sold by the bank in the descent towards bankruptcy. */
+  forced: boolean;
+  price: Cents;
+  agencyFees: Cents;
+  loanRepaid: Cents;
+  loanFees: Cents;
+  capitalGainsTax: Cents;
+  depositTransferred: Cents;
+  net: Cents;
+  /** Price net of fees, minus the cost of the property and of its works. */
+  gain: Cents;
+  rentsReceived: Cents;
+  valueHistory: OwnedProperty['valueHistory'];
+  log: PropertyLogEntry[];
 }
 
 export interface Loan {
@@ -487,6 +555,8 @@ export interface OwnedProperty {
   valueHistory: { date: CalendarDate; value: Cents; debt: Cents }[];
   /** What happened to the property, oldest first (works, tenants, incidents). */
   log: PropertyLogEntry[];
+  /** Rents received, charges excluded (counted since save format 17). */
+  rentsReceived: Cents;
 }
 
 /** One line of a property's history. */
@@ -772,6 +842,10 @@ export interface GameState {
   favorites: string[];
   /** News and mail kept for the « Décisions » tab (docs/04, section 4.10). */
   inbox: InboxState;
+  /** Properties sold, oldest first. */
+  soldProperties: SoldProperty[];
+  /** Loans that came to an end, oldest first. */
+  closedLoans: ClosedLoan[];
   /** Gérard's tutorial: `step` indexes content/textes/didacticiel.json. */
   tutorial: { enabled: boolean; step: number };
   /** One point on the 1st of each month (and at the start): the wealth curve. */

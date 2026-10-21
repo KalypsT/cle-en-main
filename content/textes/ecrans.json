@@ -405,7 +405,10 @@
       "listedForRent": "À louer",
       "vacant": "Vacant"
     },
-    "deedOn": "Acte le {date}"
+    "deedOn": "Acte le {date}",
+    "sold": "Biens vendus",
+    "soldLine": "Vendu le {date}",
+    "forced": "Vente forcée"
   },
   "property": {
     "tabs": {
@@ -1123,7 +1126,38 @@
     "totalPayments": "Mensualités par mois",
     "totalRemaining": "Capital restant dû",
     "totalInterestLeft": "Intérêts encore à payer",
-    "curve": "Capital restant dû, année par année"
+    "curve": "Capital restant dû, année par année",
+    "closedLoans": "Crédits soldés",
+    "noClosedLoans": "Aucun crédit terminé pour l'instant.",
+    "closedTitle": "{bank} · {amount}",
+    "closedReasons": {
+      "repaid": "Remboursé jusqu'au bout",
+      "sold": "Remboursé à la vente du bien",
+      "refinanced": "Racheté par {bank}",
+      "freshStart": "Effacé par la faillite"
+    },
+    "started": "Commencé le",
+    "closedOn": "Terminé le",
+    "duration": "Durée prévue",
+    "paymentsMade": "Mensualités payées",
+    "paymentsValue": "{count} sur {total}",
+    "remainingAtClose": "Restant dû à la fin",
+    "earlyFees": "Indemnités de remboursement anticipé",
+    "bankers": "Vos banquiers",
+    "bankerLine": "Confiance {trust} / 100",
+    "lastMeeting": "Dernier rendez-vous le {date}",
+    "noMeeting": "Jamais rencontré",
+    "banker": {
+      "trust": "Confiance",
+      "trustCurve": "Confiance mois par mois",
+      "trustSoon": "La courbe se dessine le 1er de chaque mois.",
+      "history": "Historique de la relation",
+      "empty": "Aucun rendez-vous ni demande de prêt pour l'instant.",
+      "meeting": "Rendez-vous : la confiance passe à {trust}",
+      "loans": "Crédits chez {bank}",
+      "running": "En cours : {amount} restant dû"
+    },
+    "interestPaidTotal": "Intérêts payés"
   },
   "coproMeeting": {
     "heading": "Assemblée générale de copropriété",
@@ -1244,5 +1278,35 @@
     "cost": "Rencontre : {duration} de temps libre. Accepté, il vous en coûte {points} points de réputation. L'indemnité n'est pas déductible des loyers.",
     "offer": "Proposer {amount}",
     "wait": "Votre locataire a refusé : nouvelle proposition possible {when}."
+  },
+  "soldProperty": {
+    "heading": "Bien vendu",
+    "tabs": {
+      "summary": "Bilan",
+      "value": "Valeur",
+      "history": "Historique"
+    },
+    "summary": "Bilan de l'opération",
+    "bought": "Acheté le",
+    "purchasePrice": "Prix d'achat",
+    "acquisitionCost": "Avec les frais (notaire, banque)",
+    "works": "Travaux (historique)",
+    "rents": "Loyers encaissés",
+    "rentsHint": "Loyers hors charges. Pour un bien acheté avant ce suivi, ils ne sont comptés que depuis son arrivée dans le jeu.",
+    "held": "Détention",
+    "soldOn": "Vendu le",
+    "price": "Prix de vente",
+    "agencyFees": "Frais d'agence",
+    "loanRepaid": "Crédit remboursé",
+    "loanFees": "Indemnités de remboursement anticipé",
+    "capitalGainsTax": "Impôt sur la plus-value",
+    "depositTransferred": "Dépôt de garantie remis à l'acheteur",
+    "net": "Reste sur le compte",
+    "gain": "Plus-value",
+    "gainHint": "Prix net des frais, moins le coût d'achat (frais compris) et les travaux comptés dans la plus-value.",
+    "forced": "Vendu par la banque, avec une décote, pour combler le découvert.",
+    "company": "Détenu par votre SCI.",
+    "valueHeading": "Valeur mois par mois",
+    "gone": "Ce bien n'est plus dans vos archives."
   }
 }

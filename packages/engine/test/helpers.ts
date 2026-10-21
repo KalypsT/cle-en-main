@@ -240,6 +240,7 @@ export function sampleOwned(
     coproCalls: [],
     valueHistory: [],
     log: [],
+    rentsReceived: 0,
   };
 }
 

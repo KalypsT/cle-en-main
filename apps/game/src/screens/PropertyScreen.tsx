@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import { type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
+import { type Cents, type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { type PropertyTab, useGame, useNav } from '../game/context.tsx';
@@ -76,7 +76,7 @@ export function PropertyScreen({
       {tab === 'rooms' && <Rooms owned={owned} />}
       {tab === 'rental' && <Rental owned={owned} />}
       {tab === 'finances' && <Finances owned={owned} />}
-      {tab === 'history' && <History owned={owned} />}
+      {tab === 'history' && <History property={owned.property} log={owned.log} />}
     </div>
   );
 }
@@ -193,8 +193,6 @@ function ValueCurve({ owned }: { owned: OwnedProperty }) {
   const debt = state.loans
     .filter((loan) => loan.propertyId === owned.property.id)
     .reduce((sum, loan) => sum + loan.remaining, 0);
-  const first = history[0];
-  const last = history.at(-1);
   return (
     <Card title={texts.heading} testId="value-curve">
       <KeyValues
@@ -210,25 +208,38 @@ function ValueCurve({ owned }: { owned: OwnedProperty }) {
           { label: texts.equity, value: formatEuros(value - debt), total: true },
         ]}
       />
-      {first && last && history.length >= 2 ? (
-        <LineChart
-          title={texts.chart}
-          xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
-          series={[
-            { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
-            {
-              label: texts.price,
-              color: '#8a7f6a',
-              values: history.map(() => owned.purchasePrice),
-              dashed: true,
-            },
-            { label: texts.debt, color: '#a33a2a', values: history.map((p) => p.debt) },
-          ]}
-        />
-      ) : (
-        <p className="small muted">{texts.soon}</p>
-      )}
+      <ValueChart history={history} purchasePrice={owned.purchasePrice} />
     </Card>
+  );
+}
+
+/** Value, purchase price and debt month by month (an owned or a sold property). */
+export function ValueChart({
+  history,
+  purchasePrice,
+}: {
+  history: OwnedProperty['valueHistory'];
+  purchasePrice: Cents;
+}) {
+  const texts = t.property.valueCurve;
+  const first = history[0];
+  const last = history.at(-1);
+  if (!first || !last || history.length < 2) return <p className="small muted">{texts.soon}</p>;
+  return (
+    <LineChart
+      title={texts.chart}
+      xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
+      series={[
+        { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
+        {
+          label: texts.price,
+          color: '#8a7f6a',
+          values: history.map(() => purchasePrice),
+          dashed: true,
+        },
+        { label: texts.debt, color: '#a33a2a', values: history.map((p) => p.debt) },
+      ]}
+    />
   );
 }
 
@@ -440,7 +451,7 @@ function Rooms({ owned }: { owned: OwnedProperty }) {
 }
 
 /** « 8 mois », « 2 ans et 3 mois » (a lease, from a number of days). */
-function formatLeaseDuration(days: number): string {
+export function formatLeaseDuration(days: number): string {
   const months = Math.max(1, Math.round(days / 30.4));
   const years = Math.floor(months / 12);
   const rest = months % 12;
@@ -452,15 +463,18 @@ function formatLeaseDuration(days: number): string {
 }
 
 /** What happened to the property, most recent first: works, tenants, incidents. */
-function History({ owned }: { owned: OwnedProperty }) {
+export function History({
+  property,
+  log,
+}: {
+  property: OwnedProperty['property'];
+  log: OwnedProperty['log'];
+}) {
   const texts = t.property.history;
   const tiers = gameContent.worksTexts.tiers;
   const tenantTexts = gameContent.tenantTexts;
-  const entries = [...owned.log].reverse();
-  const spent = owned.log.reduce(
-    (sum, entry) => sum + (entry.kind === 'works' ? entry.cost : 0),
-    0,
-  );
+  const entries = [...log].reverse();
+  const spent = log.reduce((sum, entry) => sum + (entry.kind === 'works' ? entry.cost : 0), 0);
   return (
     <Card title={texts.heading} testId="property-history">
       {entries.length === 0 && <p className="small muted">{texts.empty}</p>}
@@ -472,7 +486,7 @@ function History({ owned }: { owned: OwnedProperty }) {
                 {entry.kind === 'works' &&
                   format(texts.works, {
                     item: entry.spaceId
-                      ? `${spaceName(owned.property, entry.spaceId)} : ${itemName(entry.itemKind)}`
+                      ? `${spaceName(property, entry.spaceId)} : ${itemName(entry.itemKind)}`
                       : itemName(entry.itemKind),
                     tier: tiers[entry.tier].toLowerCase(),
                   })}

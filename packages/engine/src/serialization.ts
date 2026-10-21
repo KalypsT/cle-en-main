@@ -62,6 +62,25 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  */
 export const MIGRATIONS: MigrationRegistry = {
   /**
+   * Version 16 to 17: no sale nor loan was archived, no bank kept a history, and the
+   * rents received by each property start counting now.
+   */
+  16: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      rentsReceived: 0,
+    })),
+    banks: Object.fromEntries(
+      Object.entries(isRecord(raw.banks) ? raw.banks : {}).map(([id, relation]) => [
+        id,
+        { ...(relation as Record<string, unknown>), log: [], trustHistory: [] },
+      ]),
+    ),
+    soldProperties: [],
+    closedLoans: [],
+  }),
+  /**
    * Version 15 to 16: the news start empty; the sellers' answers kept so far
    * (`offerNotices`) become letters of the mail.
    */
@@ -985,6 +1004,47 @@ const catalogInstanceSchema = noteBase
 
 const NEWS_TYPES: ReadonlySet<string> = new Set(NEWS_EVENT_TYPES);
 
+const valueHistorySchema = z.array(
+  z.object({ date: calendarDateSchema, value: cents, debt: cents }).strict(),
+);
+
+const propertyLogSchema = z.array(
+  z.discriminatedUnion('kind', [
+    z
+      .object({
+        kind: z.literal('works'),
+        day,
+        itemKind: itemKindSchema,
+        spaceId: z.string().nullable(),
+        tier: tierSchema,
+        artisanId: z.string().nullable(),
+        cost: cents,
+      })
+      .strict(),
+    z
+      .object({
+        kind: z.literal('tenantIn'),
+        day,
+        tenantName: z.string(),
+        monthlyRent: cents,
+      })
+      .strict(),
+    z
+      .object({
+        kind: z.literal('tenantOut'),
+        day,
+        tenantName: z.string(),
+        reason: z.enum(['notice', 'evicted', 'endOfTerm', 'dpe']),
+        startDay: day,
+        monthlyRent: cents,
+        damages: cents,
+        depositReturned: cents,
+      })
+      .strict(),
+    z.object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents }).strict(),
+  ]),
+);
+
 const inboxSubjectSchema = z
   .object({
     propertyId: z.string(),
@@ -1142,6 +1202,28 @@ const gameStateSchema = z
           trust: z.number().min(0).max(100),
           relationshipMonths: z.number().int().min(0),
           lastMeetingDay: z.number().int().nullable(),
+          log: z.array(
+            z.discriminatedUnion('kind', [
+              z
+                .object({ kind: z.literal('meeting'), day, trust: z.number().min(0).max(100) })
+                .strict(),
+              z
+                .object({
+                  kind: z.literal('answer'),
+                  day,
+                  decision: z.enum(['accepted', 'partial', 'counterOffer', 'refused']),
+                  subject: inboxSubjectSchema.nullable(),
+                  amount: cents.nullable(),
+                  ratePercent: z.number().nullable(),
+                  reason: loanRefusalSchema.nullable(),
+                  debtRatio: z.number().nullable(),
+                })
+                .strict(),
+            ]),
+          ),
+          trustHistory: z.array(
+            z.object({ date: calendarDateSchema, trust: z.number().min(0).max(100) }).strict(),
+          ),
         })
         .strict(),
     ),
@@ -1323,47 +1405,10 @@ const gameStateSchema = z
           coproCalls: z.array(
             z.object({ monthly: cents, monthsLeft: z.number().int().min(0) }).strict(),
           ),
-          valueHistory: z.array(
-            z.object({ date: calendarDateSchema, value: cents, debt: cents }).strict(),
-          ),
-          log: z.array(
-            z.discriminatedUnion('kind', [
-              z
-                .object({
-                  kind: z.literal('works'),
-                  day,
-                  itemKind: itemKindSchema,
-                  spaceId: z.string().nullable(),
-                  tier: tierSchema,
-                  artisanId: z.string().nullable(),
-                  cost: cents,
-                })
-                .strict(),
-              z
-                .object({
-                  kind: z.literal('tenantIn'),
-                  day,
-                  tenantName: z.string(),
-                  monthlyRent: cents,
-                })
-                .strict(),
-              z
-                .object({
-                  kind: z.literal('tenantOut'),
-                  day,
-                  tenantName: z.string(),
-                  reason: z.enum(['notice', 'evicted', 'endOfTerm', 'dpe']),
-                  startDay: day,
-                  monthlyRent: cents,
-                  damages: cents,
-                  depositReturned: cents,
-                })
-                .strict(),
-              z
-                .object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents })
-                .strict(),
-            ]),
-          ),
+          valueHistory: valueHistorySchema,
+          log: propertyLogSchema,
+          // Added in version 17.
+          rentsReceived: cents.min(0),
         })
         .strict(),
     ),
@@ -1441,6 +1486,52 @@ const gameStateSchema = z
     worksDone: z.record(z.string(), z.number().int().min(0)),
     favorites: z.array(z.string()),
     inbox: inboxSchema,
+    soldProperties: z.array(
+      z
+        .object({
+          property: propertySchema,
+          holder: holderSchema,
+          purchasePrice: cents.positive(),
+          acquisitionCost: cents.positive(),
+          purchaseDate: calendarDateSchema,
+          soldDay: day,
+          forced: z.boolean(),
+          price: cents.min(0),
+          agencyFees: cents.min(0),
+          loanRepaid: cents.min(0),
+          loanFees: cents.min(0),
+          capitalGainsTax: cents.min(0),
+          depositTransferred: cents.min(0),
+          net: cents,
+          gain: cents,
+          rentsReceived: cents.min(0),
+          valueHistory: valueHistorySchema,
+          log: propertyLogSchema,
+        })
+        .strict(),
+    ),
+    closedLoans: z.array(
+      z
+        .object({
+          id: z.string(),
+          bankId: z.string(),
+          propertyId: z.string().nullable(),
+          subject: inboxSubjectSchema.nullable(),
+          principal: cents.min(0),
+          ratePercent: z.number(),
+          durationMonths: z.number().int().positive(),
+          monthlyPayment: cents.min(0),
+          startDate: calendarDateSchema,
+          closedDay: day,
+          paymentsMade: z.number().int().min(0),
+          interestPaid: cents.min(0),
+          remaining: cents.min(0),
+          fees: cents.min(0),
+          reason: z.enum(['repaid', 'sold', 'refinanced', 'freshStart']),
+          replacedBy: z.string().nullable(),
+        })
+        .strict(),
+    ),
     tutorial: z.object({ enabled: z.boolean(), step: z.number().int().min(0) }).strict(),
     history: z.array(
       z
@@ -1601,6 +1692,7 @@ export function deserializeGame(
   for (const listing of state.listings) freezeDwelling(listing.property);
   for (const purchase of state.purchases) freezeDwelling(purchase.property);
   for (const owned of state.properties) freezeDwelling(owned.property);
+  for (const sold of state.soldProperties) freezeDwelling(sold.property);
   for (const rival of Object.values(state.rivals)) {
     for (const project of rival.projects) freezeDwelling(project.property);
   }

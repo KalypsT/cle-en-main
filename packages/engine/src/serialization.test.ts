@@ -98,7 +98,13 @@ describe('migrations', () => {
     expect(migrated.formatVersion).toBe(FORMAT_VERSION);
     expect(migrated.clock).toEqual(original.clock);
     expect(migrated.player.balance).toBe(original.player.balance);
-    expect(migrated.banks).toEqual(original.banks);
+    // Version 17: each bank starts an empty history.
+    const banks = original.banks as Record<string, object>;
+    expect(migrated.banks).toEqual(
+      Object.fromEntries(
+        Object.entries(banks).map(([id, bank]) => [id, { ...bank, log: [], trustHistory: [] }]),
+      ),
+    );
     expect(migrated.market.laggedRatePercent).toBe(original.market.ratePercent);
     expect(Object.keys(migrated.market.cities.dole ?? {})).toHaveLength(5);
     expect(migrated.listings.length).toBeGreaterThan(20);
@@ -369,6 +375,10 @@ describe('migrations', () => {
     expect(migrated.properties.every((o) => o.log.length === 0)).toBe(true);
     // Version 13: no refused offer was ever kept; version 16: no news nor mail either.
     expect(migrated.inbox).toEqual({ news: [], newsSeenId: 0, mail: [], nextId: 1 });
+    // Version 17: nothing archived yet, the rents start counting.
+    expect(migrated.soldProperties).toEqual([]);
+    expect(migrated.closedLoans).toEqual([]);
+    expect(migrated.properties.every((o) => o.rentsReceived === 0)).toBe(true);
     // Version 12: no tenant was ever offered an indemnity.
     expect(migrated.properties.some((o) => o.lease !== null)).toBe(true);
     expect(

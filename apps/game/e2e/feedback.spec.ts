@@ -1,3 +1,4 @@
+import type { GameState } from '@cle/engine';
 import { expect, test } from '@playwright/test';
 import {
   capture,
@@ -9,6 +10,7 @@ import {
   pause,
   t,
   tab,
+  testEngine,
   ui,
 } from './helpers.ts';
 
@@ -138,4 +140,58 @@ test('keeps the mail and the news of the decisions across a reload', async ({ pa
   await tab(page, 'decisions');
   await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.mail}`) }).click();
   await expect(letters.first()).toBeVisible();
+});
+
+/** A game whose first property was sold (its loan repaid with it) after a few months. */
+function sellerGame(): GameState {
+  let state = ownerGame(24 * 150, (s) => s.properties.some((o) => o.lease !== null));
+  const owned = state.properties[0];
+  if (!owned) throw new Error('No property');
+  const propertyId = owned.property.id;
+  const listed = testEngine.dispatch(state, {
+    type: 'sale/list',
+    propertyId,
+    askingPrice: testEngine.estimate(state, propertyId)?.estimate ?? owned.purchasePrice,
+    mode: 'agency',
+  });
+  if (listed.ok) state = listed.state;
+  for (let hour = 0; hour < 24 * 400 && state.soldProperties.length === 0; hour++) {
+    state = testEngine.tick(state).state;
+    const offer = state.properties[0]?.sale?.offers[0];
+    if (offer && !state.properties[0]?.sale?.agreement) {
+      const accepted = testEngine.dispatch(state, {
+        type: 'sale/acceptOffer',
+        propertyId,
+        offerId: offer.id,
+      });
+      if (accepted.ok) state = accepted.state;
+    }
+  }
+  return state;
+}
+
+/** A property sold stays readable, its loan among the closed ones, and each banker has a history. */
+test('keeps the properties sold, the closed loans and the history of each bank', async ({
+  page,
+}) => {
+  await openGame(page);
+  await importState(page, sellerGame());
+  await tab(page, 'assets');
+  const sold = page.getByTestId('sold-properties').getByRole('button').first();
+  await sold.scrollIntoViewIfNeeded();
+  await sold.click();
+  await expect(page.getByTestId('sold-summary')).toContainText(t.soldProperty.net);
+  await capture(page, '11-bien-vendu', MILESTONE);
+  await page.getByRole('button', { name: t.soldProperty.tabs.history }).click();
+  await expect(page.getByTestId('property-history')).toBeVisible();
+
+  await openMenuEntry(page, t.menu.bank);
+  const closed = page.getByTestId('closed-loan').first();
+  await closed.scrollIntoViewIfNeeded();
+  await expect(closed).toContainText(t.bank.closedReasons.sold);
+  await capture(page, '12-credits-soldes', MILESTONE);
+  await page.getByTestId('banker-tirelire').click();
+  await expect(page.getByTestId('bank-log')).toBeVisible();
+  await expect(page.getByTestId('banker').locator('svg').first()).toBeVisible();
+  await capture(page, '13-banquier', MILESTONE);
 });

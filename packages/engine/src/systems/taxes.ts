@@ -58,7 +58,9 @@ function isHome(state: GameState, owned: OwnedProperty): boolean {
 }
 
 export function addRent(state: GameState, owned: OwnedProperty, amount: Cents): void {
-  if (!isHome(state, owned)) ledgerOf(state, owned).rents += amount;
+  if (isHome(state, owned)) return;
+  ledgerOf(state, owned).rents += amount;
+  owned.rentsReceived += amount;
 }
 
 export function addCost(state: GameState, owned: OwnedProperty, amount: Cents): void {

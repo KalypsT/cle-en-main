@@ -130,6 +130,9 @@ export function subjectRoute(state: GameState, subject: InboxSubject | null): Ro
   if (subject.listingId && state.listings.some((listing) => listing.id === subject.listingId)) {
     return { name: 'listing', id: subject.listingId };
   }
+  if (state.soldProperties.some((sold) => sold.property.id === subject.propertyId)) {
+    return { name: 'soldProperty', id: subject.propertyId };
+  }
   return null;
 }
 
@@ -154,6 +157,32 @@ export const MAIL_ICONS: Record<MailItem['kind'], IconName> = {
   hazard: 'wrench',
 };
 
+/** A bank's answer (a letter, or a line of the bank's history), and the reason of a refusal. */
+export function loanAnswerText(
+  answer: Pick<
+    Extract<MailItem, { kind: 'loanAnswer' }>,
+    'bankId' | 'decision' | 'amount' | 'ratePercent' | 'reason' | 'debtRatio'
+  >,
+): { title: string; details: string[] } {
+  const texts = t.decisions.mail;
+  const values = {
+    banker: bankerName(answer.bankId),
+    amount: answer.amount === null ? '' : formatEuros(answer.amount),
+    rate: answer.ratePercent === null ? '' : formatPercent(answer.ratePercent),
+  };
+  const reason = answer.reason
+    ? format(texts.loanRefusedBecause, {
+        reason: format(t.financing.loanRefusals[answer.reason], {
+          ratio: formatPercent((answer.debtRatio ?? 0) * 100),
+        }),
+      })
+    : null;
+  return {
+    title: format(texts.loanAnswer[answer.decision], values),
+    details: reason ? [reason] : [],
+  };
+}
+
 /** A letter's title, and its details (the reason, the text of the event, the verdicts). */
 export function mailText(state: GameState, item: MailItem): { title: string; details: string[] } {
   const texts = t.decisions.mail;
@@ -163,24 +192,8 @@ export function mailText(state: GameState, item: MailItem): { title: string; det
         title: format(texts.offerReply[item.outcome], { amount: formatEuros(item.amount) }),
         details: [],
       };
-    case 'loanAnswer': {
-      const values = {
-        banker: bankerName(item.bankId),
-        amount: item.amount === null ? '' : formatEuros(item.amount),
-        rate: item.ratePercent === null ? '' : formatPercent(item.ratePercent),
-      };
-      const reason = item.reason
-        ? format(texts.loanRefusedBecause, {
-            reason: format(t.financing.loanRefusals[item.reason], {
-              ratio: formatPercent((item.debtRatio ?? 0) * 100),
-            }),
-          })
-        : null;
-      return {
-        title: format(texts.loanAnswer[item.decision], values),
-        details: reason ? [reason] : [],
-      };
-    }
+    case 'loanAnswer':
+      return loanAnswerText(item);
     case 'saleReply':
       return {
         title: format(texts.saleReply[item.outcome], {

@@ -15,6 +15,7 @@ import {
   type TransformationKind,
 } from './state.ts';
 import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
+import { recordBankHistory, recordBankTrust } from './systems/archives.ts';
 import {
   dismissMail,
   emptyInbox,
@@ -258,6 +259,8 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     worksDone: {},
     favorites: [],
     inbox: emptyInbox(),
+    soldProperties: [],
+    closedLoans: [],
     tutorial: { enabled: options.tutorial ?? true, step: 0 },
     history: [],
     lastStatement: null,
@@ -346,6 +349,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     const net = statementNet(ctx.state.lastStatement?.lines ?? []);
     ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
     recordPropertyValues(ctx.content, ctx.state);
+    recordBankTrust(ctx.state);
   }
   if (yearStarted) ctx.state.lastYearReview = buildYearReview(ctx, regime);
 }
@@ -374,6 +378,7 @@ export function createEngine(content: GameContent) {
       events.some((event) => event.type === 'yearStarted'),
     );
     recordInbox(content, draft, state, events, ctx.today);
+    recordBankHistory(draft, state, events, ctx.today);
     freezeListings(draft);
     freezeInbox(draft);
     return { state: draft, events };
@@ -563,6 +568,7 @@ export function createEngine(content: GameContent) {
     recordProgress(ctx, events.slice());
     checkMilestones(ctx);
     recordInbox(content, draft, state, events, ctx.today);
+    recordBankHistory(draft, state, events, ctx.today);
     freezeListings(draft);
     freezeInbox(draft);
     return { ok: true, state: draft, events };

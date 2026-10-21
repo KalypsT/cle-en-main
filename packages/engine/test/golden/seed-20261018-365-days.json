@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 16,
+    "formatVersion": 17,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -54,22 +54,493 @@
       "tirelire": {
         "trust": 100,
         "relationshipMonths": 12,
-        "lastMeetingDay": 21093
+        "lastMeetingDay": 21093,
+        "log": [
+          {
+            "kind": "meeting",
+            "day": 20759,
+            "trust": 63.2
+          },
+          {
+            "kind": "answer",
+            "day": 20765,
+            "subject": {
+              "propertyId": "property-99",
+              "listingId": "listing-100",
+              "kind": "apartment",
+              "rooms": 1,
+              "surface": 27,
+              "lots": 0,
+              "cityId": "dole",
+              "neighbourhoodId": "centreHistorique"
+            },
+            "decision": "accepted",
+            "reason": null,
+            "debtRatio": null,
+            "amount": 4600000,
+            "ratePercent": 4.03
+          },
+          {
+            "kind": "meeting",
+            "day": 20789,
+            "trust": 66.4
+          },
+          {
+            "kind": "meeting",
+            "day": 20820,
+            "trust": 70.1
+          },
+          {
+            "kind": "meeting",
+            "day": 20851,
+            "trust": 73.8
+          },
+          {
+            "kind": "meeting",
+            "day": 20910,
+            "trust": 78.2
+          },
+          {
+            "kind": "meeting",
+            "day": 20940,
+            "trust": 81.9
+          },
+          {
+            "kind": "meeting",
+            "day": 20971,
+            "trust": 85.6
+          },
+          {
+            "kind": "meeting",
+            "day": 21001,
+            "trust": 89.3
+          },
+          {
+            "kind": "meeting",
+            "day": 21032,
+            "trust": 93
+          },
+          {
+            "kind": "meeting",
+            "day": 21063,
+            "trust": 96.7
+          },
+          {
+            "kind": "meeting",
+            "day": 21093,
+            "trust": 100
+          }
+        ],
+        "trustHistory": [
+          {
+            "date": {
+              "year": 2026,
+              "month": 11,
+              "day": 1
+            },
+            "trust": 60.2
+          },
+          {
+            "date": {
+              "year": 2026,
+              "month": 12,
+              "day": 1
+            },
+            "trust": 63.4
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 1,
+              "day": 1
+            },
+            "trust": 67.1
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 2,
+              "day": 1
+            },
+            "trust": 70.8
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 3,
+              "day": 1
+            },
+            "trust": 74.5
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 4,
+              "day": 1
+            },
+            "trust": 75.2
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 5,
+              "day": 1
+            },
+            "trust": 78.9
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 6,
+              "day": 1
+            },
+            "trust": 82.6
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 7,
+              "day": 1
+            },
+            "trust": 86.3
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 8,
+              "day": 1
+            },
+            "trust": 90
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 9,
+              "day": 1
+            },
+            "trust": 93.7
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 10,
+              "day": 1
+            },
+            "trust": 97.4
+          }
+        ]
       },
       "fougueux": {
         "trust": 60,
         "relationshipMonths": 0,
-        "lastMeetingDay": null
+        "lastMeetingDay": null,
+        "log": [],
+        "trustHistory": [
+          {
+            "date": {
+              "year": 2026,
+              "month": 11,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2026,
+              "month": 12,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 1,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 2,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 3,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 4,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 5,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 6,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 7,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 8,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 9,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 10,
+              "day": 1
+            },
+            "trust": 60
+          }
+        ]
       },
       "rigueur": {
         "trust": 57,
         "relationshipMonths": 0,
-        "lastMeetingDay": null
+        "lastMeetingDay": null,
+        "log": [],
+        "trustHistory": [
+          {
+            "date": {
+              "year": 2026,
+              "month": 11,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2026,
+              "month": 12,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 1,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 2,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 3,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 4,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 5,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 6,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 7,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 8,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 9,
+              "day": 1
+            },
+            "trust": 57
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 10,
+              "day": 1
+            },
+            "trust": 57
+          }
+        ]
       },
       "zeroPapier": {
         "trust": 60,
         "relationshipMonths": 0,
-        "lastMeetingDay": null
+        "lastMeetingDay": null,
+        "log": [],
+        "trustHistory": [
+          {
+            "date": {
+              "year": 2026,
+              "month": 11,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2026,
+              "month": 12,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 1,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 2,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 3,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 4,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 5,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 6,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 7,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 8,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 9,
+              "day": 1
+            },
+            "trust": 60
+          },
+          {
+            "date": {
+              "year": 2027,
+              "month": 10,
+              "day": 1
+            },
+            "trust": 60
+          }
+        ]
       }
     },
     "market": {
@@ -580,7 +1051,8 @@
             "tenantName": "Lucas Arnaud",
             "monthlyRent": 26100
           }
-        ]
+        ],
+        "rentsReceived": 234900
       }
     ],
     "agenda": [],
@@ -4989,6 +5461,8 @@
       ],
       "nextId": 234
     },
+    "soldProperties": [],
+    "closedLoans": [],
     "tutorial": {
       "enabled": true,
       "step": 0

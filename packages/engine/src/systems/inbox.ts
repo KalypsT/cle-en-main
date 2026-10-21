@@ -65,10 +65,19 @@ export function recordInbox(
   }
 }
 
-/** Freezes the news and the mail: the daily copy of the state then shares them. */
+/**
+ * Freezes what is kept and never changes (news, mail, archives, bank logs): the daily copy
+ * of the state then shares it.
+ */
 export function freezeInbox(state: GameState): void {
   for (const item of state.inbox.news) deepFreeze(item);
   for (const item of state.inbox.mail) deepFreeze(item);
+  for (const sold of state.soldProperties) deepFreeze(sold);
+  for (const loan of state.closedLoans) deepFreeze(loan);
+  for (const relation of Object.values(state.banks)) {
+    for (const entry of relation.log) deepFreeze(entry);
+    for (const point of relation.trustHistory) deepFreeze(point);
+  }
 }
 
 function deepFreeze(value: object): void {
@@ -137,20 +146,8 @@ function mailOf(event: GameEvent, state: GameState, before: GameState): MailCont
       if (amount === undefined) return null;
       return { kind: 'offerReply', listingId: event.listingId, outcome: 'counterDeclined', amount };
     }
-    case 'loanAnswered': {
-      const decision = [...state.purchases, ...before.purchases]
-        .find((purchase) => purchase.id === event.purchaseId)
-        ?.applications.find((application) => application.id === event.applicationId)?.decision;
-      return {
-        kind: 'loanAnswer',
-        bankId: event.bankId,
-        decision: event.decision,
-        reason: event.reason ?? null,
-        debtRatio: decision?.decision === 'refused' ? (decision.debtRatioAfter ?? null) : null,
-        amount: event.amount ?? null,
-        ratePercent: event.ratePercent ?? null,
-      };
-    }
+    case 'loanAnswered':
+      return loanAnswerOf(event, state, before);
     case 'saleCounterAccepted':
     case 'saleCounterRefused':
     case 'saleOfferExpired': {
@@ -195,8 +192,32 @@ function mailOf(event: GameEvent, state: GameState, before: GameState): MailCont
   }
 }
 
+/** A bank's answer, with the debt ratio of a refusal on that ground (read on the application). */
+export function loanAnswerOf(
+  event: Extract<GameEvent, { type: 'loanAnswered' }>,
+  state: GameState,
+  before: GameState,
+): Extract<MailContent, { kind: 'loanAnswer' }> {
+  const decision = [...state.purchases, ...before.purchases]
+    .find((purchase) => purchase.id === event.purchaseId)
+    ?.applications.find((application) => application.id === event.applicationId)?.decision;
+  return {
+    kind: 'loanAnswer',
+    bankId: event.bankId,
+    decision: event.decision,
+    reason: event.reason ?? null,
+    debtRatio: decision?.decision === 'refused' ? (decision.debtRatioAfter ?? null) : null,
+    amount: event.amount ?? null,
+    ratePercent: event.ratePercent ?? null,
+  };
+}
+
 /** What an event is about: a listing, a purchase or a property, looked up now, then before. */
-function eventSubject(state: GameState, before: GameState, event: GameEvent): InboxSubject | null {
+export function eventSubject(
+  state: GameState,
+  before: GameState,
+  event: GameEvent,
+): InboxSubject | null {
   if ('listingId' in event)
     return listingSubject(state, event.listingId) ?? listingSubject(before, event.listingId);
   if ('purchaseId' in event) {
@@ -233,7 +254,7 @@ function propertySubject(state: GameState, propertyId: string): InboxSubject | n
   return purchase ? subjectOf(purchase.property, purchase.listingId) : null;
 }
 
-function subjectOf(property: Property, listingId: string | null): InboxSubject {
+export function subjectOf(property: Property, listingId: string | null): InboxSubject {
   return {
     propertyId: property.id,
     listingId,

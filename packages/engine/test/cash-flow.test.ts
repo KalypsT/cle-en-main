@@ -135,6 +135,7 @@ function setup(): GameState {
     coproCalls: [],
     valueHistory: [],
     log: [],
+    rentsReceived: 0,
   };
   state.properties = [owned];
   state.loans = [
