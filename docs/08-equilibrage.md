@@ -188,6 +188,8 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > L'Inactif touche lui aussi les primes, l'intéressement et parfois un héritage : le plafond du test anti-idle passe à **apport plus 650 € par mois** (84,5 k€ pour le métier le plus favorable, au-dessus de l'ancien plafond de 81 k€). Écarts restants : faillites du Levier à 37 % (cible : plus de 40 %) ; le Prudent devient un peu trop dense en décisions (27,6 s : les nouveaux choix « un extra » et « le locataire repeint ») ; Investisseur aguerri toujours manqué (écart connu).
 
+> **Progression, étape 4** (`packages/bots/rapports/progression-etape-4.md` : 100 parties de 10 ans du Chasseur et du Prudent) : accélération automatique à ×8 au lieu de ×4. Le temps réel passe de 0,7 à **0,5 heure par année de jeu** pour le Chasseur (0,8 à 0,6 pour le Prudent). La densité de décisions, mesurée en secondes réelles, se resserre d'autant : **Chasseur 28,1 s** (39,9 s à l'étape 2), Prudent 20,6 s (27,6 s), sous la cible de 30 à 60 s. Variante essayée : 24 heures de jeu à la vitesse choisie après chaque nouvelle décision (au lieu de 18) : Chasseur 32 s, Prudent 24,4 s, 0,6 heure par an. **À trancher par Thibaud** : garder ×8 et 18 heures (plus rapide, décisions plus rapprochées, cible à revoir), ou passer à 24 heures (densité du Chasseur dans la cible).
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :
