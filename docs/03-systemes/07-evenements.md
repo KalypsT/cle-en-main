@@ -15,6 +15,7 @@ Les événements font vivre la simulation et maintiennent un **flux régulier de
 | **Copropriété** | Assemblée générale, appel de fonds, sinistre dans les parties communes |
 | **Ville** | Arrivée d'un tramway, fermeture d'usine, rénovation urbaine, nouvelle école |
 | **France** | Hausse ou baisse des taux, crise, nouvelle loi (fictive mais crédible) |
+| **Vie perso** | Prime de fin d'année, intéressement, extra rémunéré, héritage (étape 2 de la progression) |
 | **Anecdotes** | Un locataire envoie la photo de son chat, un artisan raconte ses vacances |
 
 ## Fréquences
@@ -70,6 +71,22 @@ Chaque événement est un objet JSON dans `content/evenements/` (un fichier par 
 - **Textes** avec variantes et variables : `{bien}`, `{locataire}`, `{quartier}`, `{ville}`, `{artisan}` (tiré du métier `artisanTrade`), `{banquier}`, `{rival}`, `{montant}` (le montant du choix).
 - Les grands événements nationaux (`france`, `major`) vont dans la chronique.
 - **Catalogue du jalon 6** : 107 événements à enjeu (16 marché, 26 locataires, 15 artisans, 13 banque, 13 copropriété, 16 ville, 8 France), en plus des incidents et événements de vie des locataires et des imprévus de chantier déjà codés aux jalons 2 et 3. Les fréquences ont été calées par les bots sur la densité de décisions (voir [08-equilibrage.md](../08-equilibrage.md)).
+- **Progression, étape 2 : les bonnes nouvelles** (2026-10-21, point ouvert n° 16). Le catalogue penchait vers la dépense : 45 événements sur 110 pouvaient coûter de l'argent, 16 en rapporter (souvent contre du temps libre ou une démarche). Dix s'ajoutent, presque tous sans contrepartie :
+
+  | Événement | Famille | Cible | Chance | Effet |
+  |---|---|---|---|---|
+  | Prime de fin d'année | Vie perso | — (salarié, décembre) | 35 % | +300 à 900 € |
+  | Intéressement | Vie perso | — (salarié, mai) | 25 % | +400 à 1 200 € |
+  | Un extra | Vie perso | — (salarié) | 4 % par mois | 5 h de temps libre contre 300 à 700 €, ou décliner |
+  | Trop-perçu d'impôt | Vie perso | — (salarié, août-septembre) | 15 % par mois | +100 à 450 € |
+  | Héritage | Vie perso | — | 0,4 % par mois, une fois en 10 ans | +3 000 à 8 000 €, pause |
+  | Remboursement d'assurance | Vie perso | bien possédé | 1,5 % par mois, tous les 2 ans au plus | +150 à 450 € |
+  | Régularisation de charges | Copropriété | appartement en copropriété (mars à juin) | 6 % par mois | +80 à 350 € |
+  | Le locataire repeint | Locataires | bien loué, satisfaction ≥ 60 | 2 % par mois | murs +1 état, satisfaction +3 (accepté par défaut) |
+  | Frais remboursés | Banque | — (crédit en cours) | 2 % par mois | +150 à 450 €, confiance +1 |
+  | Un commerce ouvre | Ville | bien possédé | 1 % par mois | prix du quartier +1,5 % |
+
+  Ordre de grandeur pour un salarié propriétaire de deux biens : environ 1 000 à 1 300 € par an en moyenne, soit à peu près le coût des événements fâcheux depuis l'étape 1.
 - **Simplification** : l'argent d'un événement passe directement sur le compte courant ; il n'apparaît pas dans les lignes du bilan mensuel ni dans les charges déductibles.
 
 > **Anecdotes** (`content/anecdotes.json`, 54) : locataires, voisins, artisans, banquiers, rivaux, ville ; une chance de 30 % par jour, sans effet. Elles arrivent dans le fil d'actualité et, pendant 3 jours, en bulle « … » sur le bâtiment concerné de la rue.
