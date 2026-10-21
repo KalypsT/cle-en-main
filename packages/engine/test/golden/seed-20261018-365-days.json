@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 18,
+    "formatVersion": 19,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -900,7 +900,9 @@
           "incident": null,
           "arrears": null,
           "missedDays": 0,
-          "buyoutRefusedDay": null
+          "buyoutRefusedDay": null,
+          "rentsReceived": 234900,
+          "missedRents": 0
         },
         "furniture": null,
         "taxRegime": "auto",
@@ -5512,6 +5514,580 @@
     },
     "soldProperties": [],
     "closedLoans": [],
+    "marketHistory": [
+      {
+        "date": {
+          "year": 2026,
+          "month": 10,
+          "day": 18
+        },
+        "ratePercent": 3.65,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0082,
+            "mesnilsPasteur": 1.0083,
+            "paters": 1.0059,
+            "plumontValFleuri": 1.0058,
+            "azans": 1.0081
+          },
+          "dijon": {
+            "centreHistorique": 1.0017,
+            "montchapetRepublique": 0.9964,
+            "universiteVoltaire": 1.001,
+            "gareArsenal": 1.0017,
+            "bourrochesLarrey": 1.0021,
+            "lacFontaineDOuche": 0.9959,
+            "gresillesStalingrad": 1.0018,
+            "toisonDOr": 1.0008
+          },
+          "besancon": {
+            "centreAncien": 0.9984,
+            "chapraisMouillere": 0.9962,
+            "montrapon": 1.0024,
+            "grettBregille": 1.0043,
+            "viotteVesoul": 1.0004,
+            "palenteSaragosse": 1.0013,
+            "planoise": 1.0057
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0084,
+            "saintCosmeBellevue": 1.0099,
+            "presSaintJean": 1.008,
+            "saintJeanDesVignes": 1.0108,
+            "stadeFontaineAuxLoups": 1.0045,
+            "champFleuriVerrerie": 1.0093
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2026,
+          "month": 11,
+          "day": 1
+        },
+        "ratePercent": 3.7,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0143,
+            "mesnilsPasteur": 1.0099,
+            "paters": 1.0025,
+            "plumontValFleuri": 1.0093,
+            "azans": 1.0132
+          },
+          "dijon": {
+            "centreHistorique": 1.0023,
+            "montchapetRepublique": 0.9945,
+            "universiteVoltaire": 0.9972,
+            "gareArsenal": 1.0052,
+            "bourrochesLarrey": 1.005,
+            "lacFontaineDOuche": 0.9952,
+            "gresillesStalingrad": 1.0027,
+            "toisonDOr": 1.0033
+          },
+          "besancon": {
+            "centreAncien": 0.9892,
+            "chapraisMouillere": 0.9912,
+            "montrapon": 1.0041,
+            "grettBregille": 1.0039,
+            "viotteVesoul": 0.9936,
+            "palenteSaragosse": 1.0076,
+            "planoise": 1.01
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0066,
+            "saintCosmeBellevue": 1.0064,
+            "presSaintJean": 1.0144,
+            "saintJeanDesVignes": 1.0124,
+            "stadeFontaineAuxLoups": 1.007,
+            "champFleuriVerrerie": 1.0159
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2026,
+          "month": 12,
+          "day": 1
+        },
+        "ratePercent": 3.8,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0119,
+            "mesnilsPasteur": 1.0123,
+            "paters": 1.0063,
+            "plumontValFleuri": 1.0096,
+            "azans": 1.0147
+          },
+          "dijon": {
+            "centreHistorique": 1.0041,
+            "montchapetRepublique": 0.9885,
+            "universiteVoltaire": 0.995,
+            "gareArsenal": 1.0078,
+            "bourrochesLarrey": 1.0056,
+            "lacFontaineDOuche": 0.9927,
+            "gresillesStalingrad": 1.0047,
+            "toisonDOr": 1.0014
+          },
+          "besancon": {
+            "centreAncien": 0.9893,
+            "chapraisMouillere": 0.9864,
+            "montrapon": 1.0072,
+            "grettBregille": 1.0048,
+            "viotteVesoul": 0.9943,
+            "palenteSaragosse": 1.0091,
+            "planoise": 1.0156
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0051,
+            "saintCosmeBellevue": 1.0106,
+            "presSaintJean": 1.0224,
+            "saintJeanDesVignes": 1.0139,
+            "stadeFontaineAuxLoups": 1.0088,
+            "champFleuriVerrerie": 1.0226
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 1,
+          "day": 1
+        },
+        "ratePercent": 3.84,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0056,
+            "mesnilsPasteur": 1.0089,
+            "paters": 1.0102,
+            "plumontValFleuri": 1.0097,
+            "azans": 1.0154
+          },
+          "dijon": {
+            "centreHistorique": 0.9957,
+            "montchapetRepublique": 0.9925,
+            "universiteVoltaire": 0.9958,
+            "gareArsenal": 1.01,
+            "bourrochesLarrey": 1.0024,
+            "lacFontaineDOuche": 0.9881,
+            "gresillesStalingrad": 1.0068,
+            "toisonDOr": 0.999
+          },
+          "besancon": {
+            "centreAncien": 0.9882,
+            "chapraisMouillere": 0.9806,
+            "montrapon": 1.0038,
+            "grettBregille": 1.0095,
+            "viotteVesoul": 0.9973,
+            "palenteSaragosse": 1.0143,
+            "planoise": 1.0173
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0068,
+            "saintCosmeBellevue": 1.015,
+            "presSaintJean": 1.0188,
+            "saintJeanDesVignes": 1.0164,
+            "stadeFontaineAuxLoups": 1.0126,
+            "champFleuriVerrerie": 1.023
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 2,
+          "day": 1
+        },
+        "ratePercent": 3.96,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0042,
+            "mesnilsPasteur": 1.0121,
+            "paters": 1.0166,
+            "plumontValFleuri": 1.0169,
+            "azans": 1.0172
+          },
+          "dijon": {
+            "centreHistorique": 0.9926,
+            "montchapetRepublique": 0.9924,
+            "universiteVoltaire": 0.9974,
+            "gareArsenal": 1.0107,
+            "bourrochesLarrey": 0.9983,
+            "lacFontaineDOuche": 0.9867,
+            "gresillesStalingrad": 1.0048,
+            "toisonDOr": 0.9903
+          },
+          "besancon": {
+            "centreAncien": 0.988,
+            "chapraisMouillere": 0.9767,
+            "montrapon": 1.0069,
+            "grettBregille": 1.0105,
+            "viotteVesoul": 1.0026,
+            "palenteSaragosse": 1.0109,
+            "planoise": 1.0172
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0044,
+            "saintCosmeBellevue": 1.017,
+            "presSaintJean": 1.0083,
+            "saintJeanDesVignes": 1.0259,
+            "stadeFontaineAuxLoups": 1.0139,
+            "champFleuriVerrerie": 1.0186
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 3,
+          "day": 1
+        },
+        "ratePercent": 3.96,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 0.9984,
+            "mesnilsPasteur": 1.0187,
+            "paters": 1.0185,
+            "plumontValFleuri": 1.0205,
+            "azans": 1.0199
+          },
+          "dijon": {
+            "centreHistorique": 0.9909,
+            "montchapetRepublique": 0.9933,
+            "universiteVoltaire": 0.9962,
+            "gareArsenal": 1.0077,
+            "bourrochesLarrey": 0.9953,
+            "lacFontaineDOuche": 0.9774,
+            "gresillesStalingrad": 1.0066,
+            "toisonDOr": 0.9897
+          },
+          "besancon": {
+            "centreAncien": 0.9912,
+            "chapraisMouillere": 0.9774,
+            "montrapon": 1.0075,
+            "grettBregille": 1.0069,
+            "viotteVesoul": 1.0007,
+            "palenteSaragosse": 1.0086,
+            "planoise": 1.0171
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0057,
+            "saintCosmeBellevue": 1.0173,
+            "presSaintJean": 1.0112,
+            "saintJeanDesVignes": 1.0291,
+            "stadeFontaineAuxLoups": 1.0139,
+            "champFleuriVerrerie": 1.0233
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 4,
+          "day": 1
+        },
+        "ratePercent": 3.9,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0019,
+            "mesnilsPasteur": 1.0185,
+            "paters": 1.0203,
+            "plumontValFleuri": 1.0213,
+            "azans": 1.0229
+          },
+          "dijon": {
+            "centreHistorique": 0.9911,
+            "montchapetRepublique": 0.9958,
+            "universiteVoltaire": 0.9948,
+            "gareArsenal": 1.0123,
+            "bourrochesLarrey": 0.9942,
+            "lacFontaineDOuche": 0.9728,
+            "gresillesStalingrad": 1.0089,
+            "toisonDOr": 0.9887
+          },
+          "besancon": {
+            "centreAncien": 0.9879,
+            "chapraisMouillere": 0.9729,
+            "montrapon": 1.0022,
+            "grettBregille": 1.0029,
+            "viotteVesoul": 1.001,
+            "palenteSaragosse": 1.0099,
+            "planoise": 1.0235
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0004,
+            "saintCosmeBellevue": 1.015,
+            "presSaintJean": 1.0117,
+            "saintJeanDesVignes": 1.031,
+            "stadeFontaineAuxLoups": 1.0085,
+            "champFleuriVerrerie": 1.0219
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 5,
+          "day": 1
+        },
+        "ratePercent": 3.93,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.001,
+            "mesnilsPasteur": 1.016,
+            "paters": 1.0159,
+            "plumontValFleuri": 1.021,
+            "azans": 1.0197
+          },
+          "dijon": {
+            "centreHistorique": 0.9904,
+            "montchapetRepublique": 0.9937,
+            "universiteVoltaire": 0.9901,
+            "gareArsenal": 1.0067,
+            "bourrochesLarrey": 0.9934,
+            "lacFontaineDOuche": 0.9746,
+            "gresillesStalingrad": 1.0134,
+            "toisonDOr": 0.9953
+          },
+          "besancon": {
+            "centreAncien": 0.9877,
+            "chapraisMouillere": 0.9683,
+            "montrapon": 1.0002,
+            "grettBregille": 0.9993,
+            "viotteVesoul": 0.997,
+            "palenteSaragosse": 1.009,
+            "planoise": 1.019
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0019,
+            "saintCosmeBellevue": 1.0168,
+            "presSaintJean": 1.0115,
+            "saintJeanDesVignes": 1.0332,
+            "stadeFontaineAuxLoups": 1.0113,
+            "champFleuriVerrerie": 1.0216
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 6,
+          "day": 1
+        },
+        "ratePercent": 3.98,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 0.9952,
+            "mesnilsPasteur": 1.019,
+            "paters": 1.0256,
+            "plumontValFleuri": 1.0244,
+            "azans": 1.0193
+          },
+          "dijon": {
+            "centreHistorique": 0.9867,
+            "montchapetRepublique": 0.9895,
+            "universiteVoltaire": 0.99,
+            "gareArsenal": 1.0104,
+            "bourrochesLarrey": 0.9949,
+            "lacFontaineDOuche": 0.9732,
+            "gresillesStalingrad": 1.0149,
+            "toisonDOr": 0.9923
+          },
+          "besancon": {
+            "centreAncien": 0.9815,
+            "chapraisMouillere": 0.9642,
+            "montrapon": 0.9931,
+            "grettBregille": 0.9971,
+            "viotteVesoul": 0.9939,
+            "palenteSaragosse": 1.0055,
+            "planoise": 1.0223
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0026,
+            "saintCosmeBellevue": 1.0195,
+            "presSaintJean": 1.0108,
+            "saintJeanDesVignes": 1.0287,
+            "stadeFontaineAuxLoups": 1.008,
+            "champFleuriVerrerie": 1.0222
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 7,
+          "day": 1
+        },
+        "ratePercent": 3.99,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 0.9947,
+            "mesnilsPasteur": 1.0254,
+            "paters": 1.0301,
+            "plumontValFleuri": 1.0264,
+            "azans": 1.0244
+          },
+          "dijon": {
+            "centreHistorique": 0.9872,
+            "montchapetRepublique": 0.9936,
+            "universiteVoltaire": 0.9938,
+            "gareArsenal": 1.0082,
+            "bourrochesLarrey": 0.9972,
+            "lacFontaineDOuche": 0.9699,
+            "gresillesStalingrad": 1.0177,
+            "toisonDOr": 0.9896
+          },
+          "besancon": {
+            "centreAncien": 0.9845,
+            "chapraisMouillere": 0.9591,
+            "montrapon": 1.0012,
+            "grettBregille": 0.9977,
+            "viotteVesoul": 0.9941,
+            "palenteSaragosse": 1.0005,
+            "planoise": 1.0273
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0057,
+            "saintCosmeBellevue": 1.0243,
+            "presSaintJean": 1.0161,
+            "saintJeanDesVignes": 1.0247,
+            "stadeFontaineAuxLoups": 1.007,
+            "champFleuriVerrerie": 1.0259
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 8,
+          "day": 1
+        },
+        "ratePercent": 3.9,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 0.9966,
+            "mesnilsPasteur": 1.0351,
+            "paters": 1.0309,
+            "plumontValFleuri": 1.0252,
+            "azans": 1.0266
+          },
+          "dijon": {
+            "centreHistorique": 0.9863,
+            "montchapetRepublique": 0.9913,
+            "universiteVoltaire": 0.9925,
+            "gareArsenal": 1.0066,
+            "bourrochesLarrey": 0.9982,
+            "lacFontaineDOuche": 0.9718,
+            "gresillesStalingrad": 1.0246,
+            "toisonDOr": 0.9899
+          },
+          "besancon": {
+            "centreAncien": 0.9837,
+            "chapraisMouillere": 0.957,
+            "montrapon": 1.0045,
+            "grettBregille": 0.9942,
+            "viotteVesoul": 0.9917,
+            "palenteSaragosse": 1.0004,
+            "planoise": 1.0311
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.007,
+            "saintCosmeBellevue": 1.024,
+            "presSaintJean": 1.0177,
+            "saintJeanDesVignes": 1.0205,
+            "stadeFontaineAuxLoups": 1.0073,
+            "champFleuriVerrerie": 1.0263
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 9,
+          "day": 1
+        },
+        "ratePercent": 3.89,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0014,
+            "mesnilsPasteur": 1.0408,
+            "paters": 1.0408,
+            "plumontValFleuri": 1.0259,
+            "azans": 1.0288
+          },
+          "dijon": {
+            "centreHistorique": 0.9883,
+            "montchapetRepublique": 0.9891,
+            "universiteVoltaire": 0.9939,
+            "gareArsenal": 1.0027,
+            "bourrochesLarrey": 1.0024,
+            "lacFontaineDOuche": 0.9717,
+            "gresillesStalingrad": 1.0261,
+            "toisonDOr": 0.9991
+          },
+          "besancon": {
+            "centreAncien": 0.9859,
+            "chapraisMouillere": 0.9507,
+            "montrapon": 1.0149,
+            "grettBregille": 0.9988,
+            "viotteVesoul": 0.9878,
+            "palenteSaragosse": 1.0002,
+            "planoise": 1.0256
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0125,
+            "saintCosmeBellevue": 1.0222,
+            "presSaintJean": 1.0247,
+            "saintJeanDesVignes": 1.0248,
+            "stadeFontaineAuxLoups": 1.0121,
+            "champFleuriVerrerie": 1.0261
+          }
+        }
+      },
+      {
+        "date": {
+          "year": 2027,
+          "month": 10,
+          "day": 1
+        },
+        "ratePercent": 3.96,
+        "priceIndex": {
+          "dole": {
+            "centreHistorique": 1.0059,
+            "mesnilsPasteur": 1.0404,
+            "paters": 1.0412,
+            "plumontValFleuri": 1.027,
+            "azans": 1.0326
+          },
+          "dijon": {
+            "centreHistorique": 0.9935,
+            "montchapetRepublique": 0.9897,
+            "universiteVoltaire": 0.9928,
+            "gareArsenal": 1.0052,
+            "bourrochesLarrey": 1.0128,
+            "lacFontaineDOuche": 0.9638,
+            "gresillesStalingrad": 1.0298,
+            "toisonDOr": 1.0056
+          },
+          "besancon": {
+            "centreAncien": 0.9884,
+            "chapraisMouillere": 0.9514,
+            "montrapon": 1.0179,
+            "grettBregille": 1.0046,
+            "viotteVesoul": 0.9922,
+            "palenteSaragosse": 1.0026,
+            "planoise": 1.027
+          },
+          "chalon": {
+            "centreSaintLaurent": 1.0183,
+            "saintCosmeBellevue": 1.0304,
+            "presSaintJean": 1.0252,
+            "saintJeanDesVignes": 1.027,
+            "stadeFontaineAuxLoups": 1.0117,
+            "champFleuriVerrerie": 1.0262
+          }
+        }
+      }
+    ],
     "tutorial": {
       "enabled": true,
       "step": 0

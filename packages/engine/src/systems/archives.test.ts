@@ -7,9 +7,13 @@ import {
   content,
   engine,
   newGame,
+  sampleOwned,
+  systemContext,
 } from '../../test/helpers.ts';
 import { toDayNumber } from '../calendar.ts';
 import type { GameState } from '../state.ts';
+import { recordProgress } from './progress.ts';
+import { moveOut } from './renting.ts';
 
 function months(state: GameState, count: number): GameState {
   let current = state;
@@ -79,5 +83,87 @@ describe('history of a property', () => {
     // The same regime again adds nothing.
     const again = act(state, { type: 'tax/setRegime', propertyId, regime: 'real' }).state;
     expect(again.properties[0]?.log).toHaveLength(4);
+  });
+});
+
+describe('former tenants', () => {
+  it('keeps the profile, the rents, the unpaid months and the satisfaction of a departure', () => {
+    const state = newGame();
+    const owned = sampleOwned(toDayNumber(state.clock.date));
+    if (!owned.lease) throw new Error('let');
+    owned.lease = { ...owned.lease, rentsReceived: 3_120_00, missedRents: 2, satisfaction: 40 };
+    const ctx = systemContext({ ...state, properties: [owned] });
+    moveOut(ctx, owned, 'notice');
+    expect(owned.log.at(-1)).toMatchObject({
+      kind: 'tenantOut',
+      profileId: expect.any(String),
+      rentsReceived: 3_120_00,
+      missedRents: 2,
+      satisfaction: 40,
+    });
+  });
+});
+
+describe('market curves', () => {
+  it('takes the rate and every neighbourhood price on the start day and each 1st', () => {
+    const start = newGame();
+    expect(start.marketHistory).toHaveLength(1);
+    const state = advanceToNextMonth(start).state;
+    expect(state.marketHistory).toHaveLength(2);
+    const point = state.marketHistory.at(-1);
+    expect(point?.date).toEqual(state.clock.date);
+    expect(point?.ratePercent).toBe(state.market.ratePercent);
+    expect(Object.keys(point?.priceIndex ?? {})).toEqual(Object.keys(state.market.cities));
+    expect(point?.priceIndex.dole?.centreHistorique).toBeCloseTo(
+      state.market.cities.dole?.centreHistorique?.priceIndex ?? 0,
+      4,
+    );
+  });
+});
+
+describe('chronicle', () => {
+  it('tells the SCI, a rival, a move, and the first eviction and loan repaid only once', () => {
+    const ctx = systemContext(newGame());
+    recordProgress(ctx, [
+      { type: 'companyCreated', cost: 300_00 },
+      { type: 'rivalArrived', rivalId: 'horizon' },
+      { type: 'movedCity', fromCityId: 'dole', cityId: 'dijon', monthlyRent: 600_00, cost: 900_00 },
+      { type: 'loanRepaid', loanId: 'loan-1' },
+      { type: 'loanRepaid', loanId: 'loan-2' },
+      {
+        type: 'tenantLeft',
+        propertyId: 'p',
+        reason: 'evicted',
+        damages: 0,
+        depositReturned: 0,
+      },
+      {
+        type: 'tenantLeft',
+        propertyId: 'p',
+        reason: 'evicted',
+        damages: 0,
+        depositReturned: 0,
+      },
+    ]);
+    const kinds = ctx.state.chronicle.map((entry) => entry.kind);
+    for (const kind of ['companyCreated', 'rivalArrived', 'movedCity'] as const) {
+      expect(kinds.filter((k) => k === kind)).toHaveLength(1);
+    }
+    expect(kinds.filter((k) => k === 'firstLoanRepaid')).toHaveLength(1);
+    expect(kinds.filter((k) => k === 'firstEviction')).toHaveLength(1);
+    expect(ctx.state.chronicle.find((e) => e.kind === 'movedCity')?.ref).toBe('dijon');
+  });
+});
+
+describe('price change of a neighbourhood', () => {
+  it('compares today with the point some months ago, or the oldest one', () => {
+    const start = newGame();
+    expect(engine.priceChange(start, 'dole', 'centreHistorique', 12)).toBeNull();
+    const state = months(start, 3);
+    const change = engine.priceChange(state, 'dole', 'centreHistorique', 12);
+    const first = state.marketHistory[0]?.priceIndex.dole?.centreHistorique ?? 1;
+    const now = state.market.cities.dole?.centreHistorique?.priceIndex ?? 1;
+    expect(change?.months).toBe(3);
+    expect(change?.change).toBeCloseTo(now / first - 1, 6);
   });
 });

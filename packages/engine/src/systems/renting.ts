@@ -362,6 +362,8 @@ function moveIn(ctx: SystemContext, owned: OwnedProperty, application: RentalApp
     arrears: null,
     missedDays: 0,
     buyoutRefusedDay: null,
+    rentsReceived: 0,
+    missedRents: 0,
   };
   state.player.balance += deposit;
   owned.lease = lease;
@@ -543,6 +545,11 @@ export function moveOut(
     monthlyRent: lease.monthlyRent,
     damages,
     depositReturned: returned,
+    profileId: tenant.profileId,
+    traitId: tenant.traitId,
+    rentsReceived: lease.rentsReceived,
+    missedRents: lease.missedRents,
+    satisfaction: lease.satisfaction,
   });
   const propertyId = owned.property.id;
   ctx.events.push({ type: 'tenantLeft', propertyId, reason, damages, depositReturned: returned });

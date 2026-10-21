@@ -210,3 +210,40 @@ export function recordPropertyLog(
     }
   }
 }
+
+/** The market on the 1st of the month: its rate and each neighbourhood's price level. */
+export function recordMarketPoint(state: GameState): void {
+  const priceIndex: Record<string, Record<string, number>> = {};
+  for (const [cityId, neighbourhoods] of Object.entries(state.market.cities)) {
+    const levels: Record<string, number> = {};
+    for (const [id, market] of Object.entries(neighbourhoods)) {
+      // Four decimals are enough for a curve, and keep the save small.
+      levels[id] = Math.round(market.priceIndex * 10_000) / 10_000;
+    }
+    priceIndex[cityId] = levels;
+  }
+  state.marketHistory.push({
+    date: { ...state.clock.date },
+    ratePercent: state.market.ratePercent,
+    priceIndex,
+  });
+}
+
+/**
+ * How a neighbourhood's price level moved since the monthly point `months` ago (or the
+ * oldest kept, if the curve is shorter): the change, and over how many months; null
+ * without any point before this month.
+ */
+export function priceChange(
+  state: GameState,
+  cityId: string,
+  neighbourhoodId: string,
+  months: number,
+): { change: number; months: number } | null {
+  const now = state.market.cities[cityId]?.[neighbourhoodId]?.priceIndex;
+  const points = state.marketHistory;
+  const back = Math.min(months, points.length - 1);
+  const then = points[points.length - 1 - back]?.priceIndex[cityId]?.[neighbourhoodId];
+  if (back < 1 || now === undefined || then === undefined) return null;
+  return { change: now / then - 1, months: back };
+}

@@ -319,6 +319,12 @@ export function chronicleText(entry: ChronicleEntry): string {
     giver: entry.ref ? giverName(entry.ref) : '',
     event: entry.ref ? (findCatalogEvent(entry.ref)?.texts[0] ?? '') : '',
     date: entry.ref ?? '',
+    rival: entry.ref ? rivalName(entry.ref) : '',
+    city: entry.ref ? cityName(entry.ref) : '',
+    kind:
+      entry.ref && entry.ref in t.transformation.kinds
+        ? t.transformation.kinds[entry.ref as keyof typeof t.transformation.kinds].toLowerCase()
+        : '',
   };
   if (entry.kind === 'majorEvent') {
     return format(values.event, { ville: cityName(gameContent.start.cityId) });

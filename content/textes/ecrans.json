@@ -272,7 +272,8 @@
     },
     "visitTrip": "Visiter · {duration} + trajet {trip} ({cost})",
     "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)",
-    "counterDeclinedText": "Vous avez décliné sa contre-offre de {amount} le {date}."
+    "counterDeclinedText": "Vous avez décliné sa contre-offre de {amount} le {date}.",
+    "neighbourhoodTrend": "Prix du quartier : {change} en {months} mois"
   },
   "financing": {
     "heading": "Financement simulé",
@@ -570,7 +571,19 @@
       "equity": "Votre part (valeur moins crédit)",
       "soon": "La courbe se remplit le 1er de chaque mois."
     },
-    "leaseStart": "Début du bail"
+    "leaseStart": "Début du bail",
+    "rentsReceived": "Loyers encaissés",
+    "missedRents": "Mois impayés",
+    "formerTenants": {
+      "heading": "Anciens locataires",
+      "empty": "Aucun locataire n'est encore parti.",
+      "period": "Du {start} au {end} ({duration})",
+      "rent": "Dernier loyer {rent} / mois",
+      "money": "Loyers encaissés {rents} · {missed} mois impayé(s)",
+      "satisfaction": "Satisfaction au départ : {value} / 100",
+      "reason": "Départ : {reason}",
+      "untracked": "Parti avant ce suivi : loyers, impayés et satisfaction non comptés."
+    }
   },
   "rent": {
     "heading": "Mise en location",
@@ -953,7 +966,14 @@
     "freshStart": "Nouveau départ, avec {amount}.",
     "gameOver": "Fin de partie.",
     "rewind": "Retour en arrière (depuis le {date}).",
-    "record": "Record : plus belle plus-value, {amount}."
+    "record": "Record : plus belle plus-value, {amount}.",
+    "companyCreated": "Création de la SCI ({amount}).",
+    "rivalArrived": "{rival} arrive sur le marché.",
+    "movedCity": "Déménagement à {city} ({amount}).",
+    "firstRemotePurchase": "Premier achat hors de sa ville, à {city} ({amount}).",
+    "firstEviction": "Première expulsion d'un locataire.",
+    "firstLoanRepaid": "Premier crédit remboursé jusqu'au bout.",
+    "firstTransformation": "Première transformation : {kind} ({amount})."
   },
   "statistics": {
     "heading": "Statistiques",
@@ -969,7 +989,10 @@
     "maxNetWorth": "Patrimoine net le plus haut",
     "counters": "Compteurs",
     "empty": "Les courbes se remplissent au 1er de chaque mois.",
-    "chartLabel": "{label}, depuis le début de la partie"
+    "chartLabel": "{label}, depuis le début de la partie",
+    "rate": "Taux du marché (20 ans, hors assurance)",
+    "prices": "Prix des quartiers de {city}",
+    "pricesHint": "Indice 100 au premier relevé (début de la partie, ou arrivée de ce suivi)."
   },
   "agenda": {
     "heading": "Agenda",
@@ -1108,7 +1131,8 @@
     "moved": "Vous voilà à {city}.",
     "viewing": "Vous regardez {city}",
     "switch": "Changer de ville",
-    "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN."
+    "attribution": "Distances et durées indicatives. Données des villes : DVF, carte des loyers, ADEME, IGN.",
+    "prices": "Prix des quartiers"
   },
   "transformation": {
     "heading": "Transformer le bien",
@@ -1335,7 +1359,8 @@
     "tabs": {
       "summary": "Bilan",
       "value": "Valeur",
-      "history": "Historique"
+      "history": "Historique",
+      "tenants": "Locataires"
     },
     "summary": "Bilan de l'opération",
     "bought": "Acheté le",

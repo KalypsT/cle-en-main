@@ -221,3 +221,31 @@ test('browses the past reviews and the full history of a property', async ({ pag
   await openMenuEntry(page, t.menu.yearReview);
   await expect(page.getByTestId('year-review')).toBeVisible();
 });
+
+/** Former tenants, market curves and the trend of a neighbourhood on a listing. */
+test('shows the former tenants, the market curves and the trend of a neighbourhood', async ({
+  page,
+}) => {
+  await openGame(page);
+  await importState(page, ownerGame(24 * 450));
+  await tab(page, 'assets');
+  await page.locator('[data-testid^="property-"]').first().click();
+  await page.getByRole('button', { name: t.property.tabs.rental }).click();
+  const former = page.getByTestId('former-tenants');
+  await former.scrollIntoViewIfNeeded();
+  await expect(former).toBeVisible();
+  await capture(page, '16-anciens-locataires', MILESTONE);
+
+  await openMenuEntry(page, t.menu.statistics);
+  const prices = page.getByTestId('neighbourhood-prices');
+  await prices.scrollIntoViewIfNeeded();
+  await expect(prices.locator('svg')).toBeVisible();
+  await expect(page.getByTestId('rate-curve').locator('svg')).toBeVisible();
+  await capture(page, '17-courbes-de-marche', MILESTONE);
+
+  // The city sheet shows the same curves; then a listing tells its neighbourhood's trend.
+  await openMenuEntry(page, t.menu.cities);
+  await page.getByRole('button', { name: t.cities.seeListings }).click();
+  await page.locator('[data-testid^="listing-"]').first().click();
+  await expect(page.getByTestId('neighbourhood-trend')).toBeVisible();
+});

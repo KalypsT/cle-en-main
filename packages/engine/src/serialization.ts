@@ -62,6 +62,25 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  */
 export const MIGRATIONS: MigrationRegistry = {
   /**
+   * Version 18 to 19: the market curves start empty; the current leases start counting
+   * their rents and unpaid months; the tenants gone before keep a departure without them.
+   */
+  18: (raw) => ({
+    ...raw,
+    marketHistory: [],
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      lease: isRecord(entry.lease)
+        ? { ...entry.lease, rentsReceived: 0, missedRents: 0 }
+        : entry.lease,
+      log: upgradeTenantExits(entry.log),
+    })),
+    soldProperties: ((raw.soldProperties as Record<string, unknown>[]) ?? []).map((sold) => ({
+      ...sold,
+      log: upgradeTenantExits(sold.log),
+    })),
+  }),
+  /**
    * Version 17 to 18: the reviews kept start with the last ones (the last statement,
    * the last yearly review with its tax); the properties' histories are unchanged.
    */
@@ -290,6 +309,8 @@ export const MIGRATIONS: MigrationRegistry = {
           arrears: null,
           missedDays: 0,
           buyoutRefusedDay: null,
+          rentsReceived: 0,
+          missedRents: 0,
         };
         owned.lease = lease;
         state.player.balance += deposit;
@@ -550,6 +571,23 @@ export const MIGRATIONS: MigrationRegistry = {
     })),
   }),
 };
+
+/** Departures of tenants written before version 19: what they did not record is null. */
+function upgradeTenantExits(log: unknown): unknown {
+  if (!Array.isArray(log)) return log;
+  return log.map((line: unknown) =>
+    isRecord(line) && line.kind === 'tenantOut'
+      ? {
+          ...line,
+          profileId: null,
+          traitId: null,
+          rentsReceived: null,
+          missedRents: null,
+          satisfaction: null,
+        }
+      : line,
+  );
+}
 
 /** Old defects (version 5) and the item each one becomes at state 1. */
 const DEFECT_ITEMS: Readonly<Record<string, ItemKind>> = {
@@ -895,6 +933,9 @@ const leaseSchema = z
     // Added in version 10 (short-term lets).
     missedDays: z.number().int().min(0).default(0),
     buyoutRefusedDay: z.number().int().nullable(),
+    // Added in version 19.
+    rentsReceived: cents.min(0),
+    missedRents: z.number().int().min(0),
   })
   .strict();
 
@@ -1110,6 +1151,12 @@ const propertyLogSchema = z.array(
         monthlyRent: cents,
         damages: cents,
         depositReturned: cents,
+        // Added in version 19 (null for an older departure).
+        profileId: z.string().nullable(),
+        traitId: z.string().nullable(),
+        rentsReceived: cents.nullable(),
+        missedRents: z.number().int().min(0).nullable(),
+        satisfaction: z.number().nullable(),
       })
       .strict(),
     z.object({ kind: z.literal('incident'), day, kindId: z.string(), cost: cents }).strict(),
@@ -1627,6 +1674,15 @@ const gameStateSchema = z
           rentsReceived: cents.min(0),
           valueHistory: valueHistorySchema,
           log: propertyLogSchema,
+        })
+        .strict(),
+    ),
+    marketHistory: z.array(
+      z
+        .object({
+          date: calendarDateSchema,
+          ratePercent: z.number(),
+          priceIndex: z.record(z.string(), z.record(z.string(), z.number().positive())),
         })
         .strict(),
     ),

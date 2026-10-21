@@ -504,4 +504,43 @@ describe('migrations', () => {
       ],
     });
   });
+
+  it('starts the market curves and the lease counters of a version 18 save', () => {
+    const exit = {
+      kind: 'tenantOut',
+      day: 400,
+      tenantName: 'Lucas Arnaud',
+      reason: 'notice',
+      startDay: 100,
+      monthlyRent: 52_000,
+      damages: 0,
+      depositReturned: 52_000,
+    };
+    const raw = {
+      formatVersion: 18,
+      properties: [{ lease: { monthlyRent: 52_000 }, log: [exit] }],
+      soldProperties: [{ log: [exit] }],
+    };
+    const migrated = migrateRaw(raw, context, 19) as {
+      marketHistory: unknown[];
+      properties: { lease: Record<string, unknown>; log: unknown[] }[];
+      soldProperties: { log: unknown[] }[];
+    };
+    const upgraded = {
+      ...exit,
+      profileId: null,
+      traitId: null,
+      rentsReceived: null,
+      missedRents: null,
+      satisfaction: null,
+    };
+    expect(migrated.marketHistory).toEqual([]);
+    expect(migrated.properties[0]?.lease).toEqual({
+      monthlyRent: 52_000,
+      rentsReceived: 0,
+      missedRents: 0,
+    });
+    expect(migrated.properties[0]?.log).toEqual([upgraded]);
+    expect(migrated.soldProperties[0]?.log).toEqual([upgraded]);
+  });
 });

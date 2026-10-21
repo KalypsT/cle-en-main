@@ -18,8 +18,10 @@ import { monthlyPoint, recordPropertyValues, statementNet } from './systems/hist
 import {
   keepStatement,
   keepYearReview,
+  priceChange,
   recordBankHistory,
   recordBankTrust,
+  recordMarketPoint,
   recordPropertyLog,
 } from './systems/archives.ts';
 import {
@@ -267,6 +269,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     inbox: emptyInbox(),
     soldProperties: [],
     closedLoans: [],
+    marketHistory: [],
     tutorial: { enabled: options.tutorial ?? true, step: 0 },
     history: [],
     lastStatement: null,
@@ -286,6 +289,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
   for (const cityId of Object.keys(content.cities))
     seedListings(context(content, state, []), cityId);
   state.history.push(monthlyPoint(content, state, 0));
+  recordMarketPoint(state);
   // Free time left on the first day, prorated to the hours remaining.
   const fullDay = dailyFreeTime(content, state, startDate);
   state.player.freeTimeMinutes = Math.floor(
@@ -358,6 +362,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     ctx.state.history.push(monthlyPoint(ctx.content, ctx.state, net));
     recordPropertyValues(ctx.content, ctx.state);
     recordBankTrust(ctx.state);
+    recordMarketPoint(ctx.state);
   }
   if (yearStarted) {
     ctx.state.lastYearReview = buildYearReview(ctx, regime);
@@ -622,6 +627,9 @@ export function createEngine(content: GameContent) {
     pace: (state: GameState) => pace(content, state),
     /** The short monthly review, from the last statement (null before the first one). */
     monthlyReview: (state: GameState, date?: CalendarDate) => monthlyReview(content, state, date),
+    /** How a neighbourhood's prices moved over the last months (docs/04, « Fiche annonce »). */
+    priceChange: (state: GameState, cityId: string, neighbourhoodId: string, months: number) =>
+      priceChange(state, cityId, neighbourhoodId, months),
     /** Titles, achievements, reputation, challenge, records (« Progression »). */
     progression: (state: GameState) => progressionView(content, state),
     /** The coming days of the agenda. */

@@ -112,6 +112,8 @@ function ListingBody({ listing }: { listing: Listing }) {
   const offer = listing.offer;
   const reply = sellerReply(state, listing.id);
 
+  // How the neighbourhood's prices moved over the last year (or since the curve began).
+  const trend = engine.priceChange(state, property.cityId, property.neighbourhoodId, 12);
   const details = format(t.listing.details, {
     city: cityName(property.cityId),
     surface: property.surface,
@@ -166,6 +168,16 @@ function ListingBody({ listing }: { listing: Listing }) {
           </span>
         </div>
         <p className="muted small">{details}</p>
+        {trend && (
+          <p className="small" data-testid="neighbourhood-trend">
+            {format(t.listing.neighbourhoodTrend, {
+              change: `${trend.change >= 0 ? t.common.plus : t.common.minus}${formatPercent(
+                Math.round(Math.abs(trend.change) * 1000) / 10,
+              )}`,
+              months: trend.months,
+            })}
+          </p>
+        )}
         <p className="strong small">{listingTitle(listing.titleId, property)}</p>
         {view && (
           <p className={`small strong ${view.priceGap < 0 ? 'positive' : 'warning'}`}>{gapText}</p>

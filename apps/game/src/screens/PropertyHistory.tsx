@@ -281,3 +281,66 @@ export function History({
     </Card>
   );
 }
+
+/** The tenants gone, most recent first: when, for how much, how it went (docs/04, « Location »). */
+export function FormerTenants({ log }: { log: OwnedProperty['log'] }) {
+  const texts = t.property.formerTenants;
+  const history = t.property.history;
+  const tenantTexts = gameContent.tenantTexts;
+  const exits = log
+    .filter((entry): entry is Extract<PropertyLogEntry, { kind: 'tenantOut' }> => {
+      return entry.kind === 'tenantOut';
+    })
+    .reverse();
+  return (
+    <Card title={texts.heading} testId="former-tenants">
+      {exits.length === 0 && <p className="small muted">{texts.empty}</p>}
+      <ul className="stack">
+        {exits.map((exit) => (
+          <li key={`${exit.day}-${exit.tenantName}`} className="stack tight">
+            <span className="strong small">
+              {exit.tenantName}
+              {exit.profileId && ` · ${tenantTexts.profiles[exit.profileId] ?? exit.profileId}`}
+            </span>
+            <span className="tiny muted">
+              {format(texts.period, {
+                start: formatDayYear(exit.startDay),
+                end: formatDayYear(exit.day),
+                duration: formatLeaseDuration(exit.day - exit.startDay),
+              })}
+            </span>
+            <span className="tiny muted">
+              {format(texts.reason, { reason: history.tenantReasons[exit.reason] })} ·{' '}
+              {format(texts.rent, { rent: formatEuros(exit.monthlyRent) })}
+            </span>
+            {exit.rentsReceived === null ? (
+              <span className="tiny muted">{texts.untracked}</span>
+            ) : (
+              <>
+                <span className="tiny muted">
+                  {format(texts.money, {
+                    rents: formatEuros(exit.rentsReceived),
+                    missed: exit.missedRents ?? 0,
+                  })}
+                </span>
+                {exit.satisfaction !== null && (
+                  <span className="tiny muted">
+                    {format(texts.satisfaction, { value: Math.round(exit.satisfaction) })}
+                  </span>
+                )}
+              </>
+            )}
+            {exit.depositReturned + exit.damages > 0 && (
+              <span className="tiny muted">
+                {format(history.tenantOutMoney, {
+                  returned: formatEuros(exit.depositReturned),
+                  damages: formatEuros(exit.damages),
+                })}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}

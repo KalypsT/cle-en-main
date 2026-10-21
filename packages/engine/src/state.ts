@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 18;
+export const FORMAT_VERSION = 19;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -110,6 +110,15 @@ export interface ClosedLoan {
   reason: 'repaid' | 'sold' | 'refinanced' | 'freshStart';
   /** The loan that took over a refinanced one. */
   replacedBy: string | null;
+}
+
+/** The market on the 1st of a month (docs/04, « Statistiques »). */
+export interface MarketPoint {
+  date: CalendarDate;
+  /** 20-year reference rate, insurance excluded. */
+  ratePercent: number;
+  /** Price level of each neighbourhood, by city (1 = the city file's prices). */
+  priceIndex: Record<string, Record<string, number>>;
 }
 
 /** A property sold, kept for good with its history (« Biens vendus »). */
@@ -419,6 +428,10 @@ export interface Lease {
   missedDays: number;
   /** Day the tenant last refused to leave for an indemnity; null if never asked. */
   buyoutRefusedDay: number | null;
+  /** Rents received during this lease, charges excluded (counted since save format 19). */
+  rentsReceived: Cents;
+  /** Months the tenant did not pay. */
+  missedRents: number;
 }
 
 export type TaxRegimeChoice = 'auto' | 'micro' | 'real';
@@ -584,6 +597,13 @@ export type PropertyLogEntry =
       /** Damages found at the exit inventory, and the deposit given back. */
       damages: Cents;
       depositReturned: Cents;
+      /** The tenant's profile and trait, the rents received, the months unpaid and the
+       * satisfaction at the end (null for a departure before save format 19). */
+      profileId: string | null;
+      traitId: string | null;
+      rentsReceived: Cents | null;
+      missedRents: number | null;
+      satisfaction: number | null;
     }
   | { kind: 'incident'; day: number; kindId: string; cost: Cents }
   // Added in version 18 (docs/04, « Historique d'un bien »).
@@ -753,7 +773,15 @@ export type ChronicleKind =
   | 'freshStart'
   | 'gameOver'
   | 'rewind'
-  | 'record';
+  | 'record'
+  // Added in version 19.
+  | 'companyCreated'
+  | 'rivalArrived'
+  | 'movedCity'
+  | 'firstRemotePurchase'
+  | 'firstEviction'
+  | 'firstLoanRepaid'
+  | 'firstTransformation';
 
 /** A step of the career (« Chronique »). `ref` names a title, achievement, challenge or event. */
 export interface ChronicleEntry {
@@ -884,6 +912,8 @@ export interface GameState {
   soldProperties: SoldProperty[];
   /** Loans that came to an end, oldest first. */
   closedLoans: ClosedLoan[];
+  /** The market on the 1st of each month: its rate, and the price level of each neighbourhood. */
+  marketHistory: MarketPoint[];
   /** Gérard's tutorial: `step` indexes content/textes/didacticiel.json. */
   tutorial: { enabled: boolean; step: number };
   /** One point on the 1st of each month (and at the start): the wealth curve. */

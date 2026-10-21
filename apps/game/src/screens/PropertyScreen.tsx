@@ -35,7 +35,7 @@ import { DpeCard } from '../ui/DpeCard.tsx';
 import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
-import { History } from './PropertyHistory.tsx';
+import { FormerTenants, History } from './PropertyHistory.tsx';
 
 /** « Fiche d'un bien » (docs/04): overview, rooms, letting, finances. */
 export function PropertyScreen({
@@ -449,6 +449,16 @@ function Rooms({ owned }: { owned: OwnedProperty }) {
 }
 
 function Rental({ owned }: { owned: OwnedProperty }) {
+  return (
+    <>
+      <CurrentLease owned={owned} />
+      <FormerTenants log={owned.log} />
+    </>
+  );
+}
+
+/** The lease under way, or the property's letting state without one. */
+function CurrentLease({ owned }: { owned: OwnedProperty }) {
   const { state, act } = useGame();
   const nav = useNav();
   const { lease, rental, property } = owned;
@@ -503,6 +513,10 @@ function Rental({ owned }: { owned: OwnedProperty }) {
             { label: t.property.leaseStart, value: formatDayYear(lease.startDay) },
             { label: t.property.term, value: formatDayYear(lease.termDay) },
             { label: t.property.satisfaction, value: `${Math.round(lease.satisfaction)} / 100` },
+            { label: t.property.rentsReceived, value: formatEuros(lease.rentsReceived) },
+            ...(lease.missedRents > 0
+              ? [{ label: t.property.missedRents, value: String(lease.missedRents) }]
+              : []),
             { label: t.property.depositHeld, value: formatEuros(lease.deposit) },
             {
               label: t.property.management,

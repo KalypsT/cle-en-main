@@ -4,11 +4,11 @@ import { useGame, useNav } from '../game/context.tsx';
 import { formatDayLong, formatEuros, formatSigned, propertyLabel, t, tone } from '../texts.ts';
 import { Card, Empty, KeyValues, ScreenHeader, Segmented } from '../ui/components.tsx';
 import { Facade } from '../ui/Facade.tsx';
-import { formatLeaseDuration, History } from './PropertyHistory.tsx';
+import { FormerTenants, formatLeaseDuration, History } from './PropertyHistory.tsx';
 import { ValueChart } from './PropertyScreen.tsx';
 
-type Tab = 'summary' | 'value' | 'history';
-const TABS: readonly Tab[] = ['summary', 'value', 'history'];
+type Tab = 'summary' | 'value' | 'tenants' | 'history';
+const TABS: readonly Tab[] = ['summary', 'value', 'tenants', 'history'];
 
 /** The last sale of a property (a property bought back and sold again keeps its last sale). */
 export function findSold(sold: readonly SoldProperty[], propertyId: string) {
@@ -46,6 +46,7 @@ export function SoldPropertyScreen({ id }: { id: string }) {
           <ValueChart history={sold.valueHistory} purchasePrice={sold.purchasePrice} />
         </Card>
       )}
+      {tab === 'tenants' && <FormerTenants log={sold.log} />}
       {tab === 'history' && <History property={sold.property} log={sold.log} />}
     </div>
   );
