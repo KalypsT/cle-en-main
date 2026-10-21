@@ -1,6 +1,6 @@
 {
   "autoSpeed": {
-    "speed": 4,
+    "speed": 8,
     "quietHours": 18,
     "ignoredDecisions": ["vacant", "dpeWarning", "renegotiation", "quoteExpiring", "cashAlert"],
     "urgentDays": 1,

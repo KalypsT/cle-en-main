@@ -876,7 +876,7 @@ export function formatReport(report: Report, title: string): string {
     '',
     '## Rythme et progression',
     '',
-    'Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×4 quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).',
+    `Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×${gameContent.rhythm.autoSpeed.speed} quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).`,
     '',
     table(
       [

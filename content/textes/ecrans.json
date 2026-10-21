@@ -71,7 +71,7 @@
     "cashAlert": "Trésorerie : passage sous zéro prévu {when} ({amount}).",
     "overdraft": "Découvert : {amount}. Les agios courent chaque jour.",
     "bankrupt": "Faillite : votre patrimoine net est resté négatif.",
-    "autoSpeed": "accéléré",
+    "autoSpeed": "accéléré ×{speed}",
     "autoSpeedHint": "Accélération automatique : rien ne presse."
   },
   "tabs": {
@@ -804,7 +804,7 @@
     "soundHint": "Le son démarre au premier toucher de l'écran.",
     "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
     "autoSpeed": "Accélération automatique",
-    "autoSpeedHint": "Quand rien ne presse, le temps passe en ×4, puis revient en ×1 à la prochaine décision.",
+    "autoSpeedHint": "Quand rien ne presse, le temps passe en ×{speed}, puis revient à la vitesse choisie à la prochaine décision.",
     "monthlyReview": "Afficher le bilan chaque mois",
     "monthlyReviewHint": "Le bilan annuel avec Yvon Tableur s'affiche toujours.",
     "rewind": "Revenir en arrière",

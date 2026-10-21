@@ -1,4 +1,4 @@
-import { timeSettings } from '@cle/content';
+import { gameContent, timeSettings } from '@cle/content';
 import { engine } from '../engine.ts';
 import { Icon } from '../ui/Icon.tsx';
 import {
@@ -34,7 +34,7 @@ export function StatusBar() {
             {autoPaused && ` · ${t.status.paused}`}
             {accelerated && (
               <span title={t.status.autoSpeedHint} data-testid="accelerated">
-                {` · ${t.status.autoSpeed}`}
+                {` · ${format(t.status.autoSpeed, { speed: gameContent.rhythm.autoSpeed.speed })}`}
               </span>
             )}
           </span>
