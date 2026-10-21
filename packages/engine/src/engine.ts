@@ -15,6 +15,13 @@ import {
   type TransformationKind,
 } from './state.ts';
 import { monthlyPoint, recordPropertyValues, statementNet } from './systems/history.ts';
+import {
+  dismissMail,
+  emptyInbox,
+  freezeInbox,
+  markNewsSeen,
+  recordInbox,
+} from './systems/inbox.ts';
 import { buyoutRetryDay, occupiedDiscount, offerBuyout } from './systems/buyout.ts';
 import {
   evaluateLoan,
@@ -250,7 +257,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
     artisans: {},
     worksDone: {},
     favorites: [],
-    offerNotices: [],
+    inbox: emptyInbox(),
     tutorial: { enabled: options.tutorial ?? true, step: 0 },
     history: [],
     lastStatement: null,
@@ -360,12 +367,15 @@ export function createEngine(content: GameContent) {
     const { clock, events } = advanceClock(state.clock);
     if (events.length === 0) return { state: { ...state, clock }, events };
     const draft = deepClone({ ...state, clock });
+    const ctx = context(content, draft, events);
     runNewDay(
-      context(content, draft, events),
+      ctx,
       events.some((event) => event.type === 'monthStarted'),
       events.some((event) => event.type === 'yearStarted'),
     );
+    recordInbox(content, draft, state, events, ctx.today);
     freezeListings(draft);
+    freezeInbox(draft);
     return { state: draft, events };
   }
 
@@ -519,8 +529,11 @@ export function createEngine(content: GameContent) {
       case 'market/favorite':
         refusal = setFavorite(draft, action.listingId, action.favorite);
         break;
-      case 'market/dismissOfferNotice':
-        refusal = dismissOfferNotice(draft, action.noticeId);
+      case 'inbox/dismissMail':
+        refusal = dismissMail(draft, action.mailId);
+        break;
+      case 'inbox/seeNews':
+        refusal = markNewsSeen(draft);
         break;
       case 'tutorial/set':
         refusal = null;
@@ -549,7 +562,9 @@ export function createEngine(content: GameContent) {
     if (refusal) return { ok: false, state, reason: { code: refusal } };
     recordProgress(ctx, events.slice());
     checkMilestones(ctx);
+    recordInbox(content, draft, state, events, ctx.today);
     freezeListings(draft);
+    freezeInbox(draft);
     return { ok: true, state: draft, events };
   }
 
@@ -817,16 +832,6 @@ function setFavorite(state: GameState, listingId: string, favorite: boolean): Re
   if (!state.listings.some((listing) => listing.id === listingId)) return 'listing.unknown';
   state.favorites = state.favorites.filter((id) => id !== listingId);
   if (favorite) state.favorites.push(listingId);
-  return null;
-}
-
-function dismissOfferNotice(state: GameState, noticeId: string | null): RefusalCode | null {
-  if (noticeId !== null && !state.offerNotices.some((notice) => notice.id === noticeId)) {
-    return 'listing.unknown';
-  }
-  for (const notice of state.offerNotices) {
-    if (noticeId === null || notice.id === noticeId) notice.dismissed = true;
-  }
   return null;
 }
 

@@ -1,16 +1,29 @@
-import { decisionKey, type GameState, type OfferNotice, type PendingDecision } from '@cle/engine';
+import { gameContent } from '@cle/content';
+import { decisionKey, type GameState, type MailItem, type PendingDecision } from '@cle/engine';
+import { useEffect, useState } from 'react';
 import { useGame, useNav, type Route } from '../game/context.tsx';
+import {
+  MAIL_ICONS,
+  mailText,
+  NEWS_FILTERS,
+  type NewsCategory,
+  newsCategory,
+  newsLines,
+  subjectRoute,
+} from '../inbox.ts';
 import {
   findCatalogEvent,
   format,
+  formatDayYear,
   formatEuros,
   formatPercent,
   formatWhen,
   giverName,
   propertyLabel,
+  subjectLabel,
   t,
 } from '../texts.ts';
-import { Badge, Empty, ListRow, ScreenHeader, SectionTitle } from '../ui/components.tsx';
+import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
 import type { IconName } from '../ui/Icon.tsx';
 
 const ICONS: Record<PendingDecision['kind'], IconName> = {
@@ -149,72 +162,189 @@ export function DecisionRow({ decision }: { decision: PendingDecision }) {
   );
 }
 
-/** The seller's last word on an offer, until the player closes it. */
-function NoticeRow({ notice }: { notice: OfferNotice }) {
+/** A letter of the mail: an answer received or a decision settled, until it is closed. */
+function MailRow({ item }: { item: MailItem }) {
   const { state, act } = useGame();
   const nav = useNav();
-  const listing = state.listings.find((candidate) => candidate.id === notice.listingId);
+  const route = subjectRoute(state, item.subject);
+  const { title, details } = mailText(state, item);
   return (
     <ListRow
-      icon="tag"
-      title={format(t.decisions.notices[notice.outcome], { amount: formatEuros(notice.amount) })}
-      subtitle={listing ? propertyLabel(listing.property) : undefined}
-      testId={`notice-${notice.id}`}
-      extra={<Badge icon="clock">{formatWhen(notice.day, state.clock.date)}</Badge>}
+      icon={MAIL_ICONS[item.kind]}
+      title={title}
+      subtitle={
+        <>
+          {item.subject && <span className="block">{subjectLabel(item.subject)}</span>}
+          {details.map((line, index) => (
+            <span key={index} className="block small">
+              {line}
+            </span>
+          ))}
+        </>
+      }
+      testId={`mail-${item.kind}`}
+      extra={
+        <>
+          <Badge icon="clock">{formatDayYear(item.day)}</Badge>
+          {item.kind === 'catalogEvent' && item.auto && (
+            <Badge tone="amber">{t.decisions.auto}</Badge>
+          )}
+        </>
+      }
       side={
         <button
           type="button"
           className="link-button"
           onClick={(event) => {
             event.stopPropagation();
-            act({ type: 'market/dismissOfferNotice', noticeId: notice.id });
+            act({ type: 'inbox/dismissMail', mailId: item.id });
           }}
         >
           {t.decisions.closeNotice}
         </button>
       }
-      onClick={() => nav.push({ name: 'listing', id: notice.listingId })}
+      onClick={route ? () => nav.push(route) : undefined}
     />
   );
 }
 
-export function DecisionsTab() {
-  const { snapshot, state, act } = useGame();
-  const { decisions } = snapshot;
-  const notices = state.offerNotices.filter((notice) => !notice.dismissed);
+function Mail() {
+  const { state, act } = useGame();
+  const mail = state.inbox.mail.filter((item) => !item.dismissed).reverse();
+  const months = Math.round(gameContent.rhythm.inbox.mailKeptDays / 30);
   return (
-    <div className="screen">
-      <ScreenHeader title={t.decisions.heading} />
-      {decisions.length === 0 ? (
-        <Empty icon="check">{t.decisions.empty}</Empty>
+    <>
+      <div className="section-title">
+        <p className="small muted">{format(t.decisions.mailHint, { months })}</p>
+        {mail.length > 0 && (
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => act({ type: 'inbox/dismissMail', mailId: null })}
+          >
+            {t.decisions.closeAllNotices}
+          </button>
+        )}
+      </div>
+      {mail.length === 0 ? (
+        <Empty icon="check">{t.decisions.mailEmpty}</Empty>
       ) : (
         <div className="list">
-          {decisions.map((decision) => (
-            <DecisionRow key={decisionKey(decision)} decision={decision} />
+          {mail.map((item) => (
+            <MailRow key={item.id} item={item} />
           ))}
         </div>
       )}
-      {notices.length > 0 && (
-        <>
-          <SectionTitle
-            title={t.decisions.recent}
-            action={
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => act({ type: 'market/dismissOfferNotice', noticeId: null })}
-              >
-                {t.decisions.closeAllNotices}
-              </button>
-            }
-          />
+    </>
+  );
+}
+
+function News() {
+  const { state, act } = useGame();
+  const nav = useNav();
+  const [filter, setFilter] = useState<NewsCategory>('all');
+  // What was new when the section opened stays marked while it is open.
+  const [seenAtOpen] = useState(state.inbox.newsSeenId);
+  const latest = state.inbox.news.at(-1)?.id ?? 0;
+  useEffect(() => {
+    if (latest > state.inbox.newsSeenId) act({ type: 'inbox/seeNews' });
+  }, [act, latest, state.inbox.newsSeenId]);
+  const lines = newsLines(state).filter(
+    ({ item }) => filter === 'all' || newsCategory(item) === filter,
+  );
+  return (
+    <>
+      <p className="small muted">
+        {format(t.decisions.newsHint, { days: gameContent.rhythm.inbox.newsKeptDays })}
+      </p>
+      <div className="chips" role="group" aria-label={t.decisions.sections.news}>
+        {NEWS_FILTERS.map((id) => (
+          <Chip key={id} pressed={filter === id} onClick={() => setFilter(id)}>
+            {t.decisions.newsFilters[id]}
+          </Chip>
+        ))}
+      </div>
+      {lines.length === 0 ? (
+        <Empty icon="street">{t.decisions.newsEmpty}</Empty>
+      ) : (
+        <ul className="card feed" data-testid="news">
+          {lines.map(({ item, text }) => {
+            const route = subjectRoute(state, item.subject);
+            return (
+              <li key={item.id} className={item.id > seenAtOpen ? 'unseen' : undefined}>
+                <span className="small muted">
+                  {formatDayYear(item.day)}
+                  {item.subject && ` · ${subjectLabel(item.subject)}`}
+                  {item.id > seenAtOpen && ` · ${t.decisions.unseen}`}
+                </span>
+                <span className="block">{text}</span>
+                {route && (
+                  <button type="button" className="link-button" onClick={() => nav.push(route)}>
+                    {t.decisions.openSubject}
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </>
+  );
+}
+
+type Section = 'pending' | 'mail' | 'news';
+const SECTIONS: readonly Section[] = ['pending', 'mail', 'news'];
+/** The section shown, kept while the game runs (like the other tabs' screens). */
+let lastSection: Section = 'pending';
+
+/** Opens the « Décisions » tab on this section next time (the street's « Tout voir »). */
+export function showDecisionsSection(section: Section): void {
+  lastSection = section;
+}
+
+export function DecisionsTab() {
+  const { snapshot, state } = useGame();
+  const { decisions } = snapshot;
+  const [section, setSection] = useState<Section>(lastSection);
+  const choose = (next: Section) => {
+    lastSection = next;
+    setSection(next);
+  };
+  const counts: Record<Section, number> = {
+    pending: decisions.length,
+    mail: state.inbox.mail.filter((item) => !item.dismissed).length,
+    news: state.inbox.news.filter((item) => item.id > state.inbox.newsSeenId).length,
+  };
+  return (
+    <div className="screen">
+      <ScreenHeader title={t.decisions.heading} />
+      <Segmented
+        label={t.decisions.heading}
+        options={SECTIONS.map((id) => ({
+          value: id,
+          label:
+            counts[id] > 0
+              ? format(t.decisions.sectionLabel, {
+                  label: t.decisions.sections[id],
+                  count: counts[id],
+                })
+              : t.decisions.sections[id],
+        }))}
+        value={section}
+        onChange={choose}
+      />
+      {section === 'pending' &&
+        (decisions.length === 0 ? (
+          <Empty icon="check">{t.decisions.empty}</Empty>
+        ) : (
           <div className="list">
-            {[...notices].reverse().map((notice) => (
-              <NoticeRow key={notice.id} notice={notice} />
+            {decisions.map((decision) => (
+              <DecisionRow key={decisionKey(decision)} decision={decision} />
             ))}
           </div>
-        </>
-      )}
+        ))}
+      {section === 'mail' && <Mail />}
+      {section === 'news' && <News />}
     </div>
   );
 }

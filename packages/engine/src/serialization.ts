@@ -9,6 +9,7 @@ import {
   TIERS,
 } from './content-constants.ts';
 import type { Condition, GameContent, ItemKind } from './content.ts';
+import { NEWS_EVENT_TYPES, type NewsEvent } from './events.ts';
 import { hashFloat, hashNormal } from './random.ts';
 import {
   blankItems,
@@ -60,6 +61,41 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  * the migration from the previous version here, and test it.
  */
 export const MIGRATIONS: MigrationRegistry = {
+  /**
+   * Version 15 to 16: the news start empty; the sellers' answers kept so far
+   * (`offerNotices`) become letters of the mail.
+   */
+  15: (raw) => {
+    const { offerNotices, ...rest } = raw;
+    const notices = Array.isArray(offerNotices) ? (offerNotices as Record<string, unknown>[]) : [];
+    const listings = Array.isArray(raw.listings) ? (raw.listings as Record<string, unknown>[]) : [];
+    const mail = notices.map((notice, index) => {
+      const listing = listings.find((candidate) => candidate.id === notice.listingId);
+      const property = isRecord(listing?.property) ? listing.property : null;
+      return {
+        id: index + 1,
+        day: notice.day,
+        subject: property
+          ? {
+              propertyId: property.id,
+              listingId: notice.listingId,
+              kind: property.kind,
+              rooms: property.rooms,
+              surface: property.surface,
+              lots: Array.isArray(property.lots) ? property.lots.length : 0,
+              cityId: property.cityId,
+              neighbourhoodId: property.neighbourhoodId,
+            }
+          : null,
+        dismissed: notice.dismissed,
+        kind: 'offerReply',
+        listingId: notice.listingId,
+        outcome: notice.outcome,
+        amount: notice.amount,
+      };
+    });
+    return { ...rest, inbox: { news: [], newsSeenId: 0, mail, nextId: mail.length + 1 } };
+  },
   /**
    * Version 1 (milestone 0) had no economy, only a demo die. The player gets
    * the standard starting conditions with the default job.
@@ -854,6 +890,22 @@ const loanOfferSchema = z
   })
   .strict();
 
+const loanRefusalSchema = z.enum([
+  'unknownBank',
+  'creditFrozen',
+  'jobProfile',
+  'noIncomeHistory',
+  'lowTrust',
+  'invalidDuration',
+  'insufficientContribution',
+  'overFinancing',
+  'debtRatio',
+  'noCompany',
+  'companyNotServed',
+  'rentCoverage',
+  'leverage',
+]);
+
 const loanDecisionSchema = z.discriminatedUnion('decision', [
   z.object({ decision: z.literal('accepted'), offer: loanOfferSchema }).strict(),
   z
@@ -869,21 +921,7 @@ const loanDecisionSchema = z.discriminatedUnion('decision', [
   z
     .object({
       decision: z.literal('refused'),
-      reason: z.enum([
-        'unknownBank',
-        'creditFrozen',
-        'jobProfile',
-        'noIncomeHistory',
-        'lowTrust',
-        'invalidDuration',
-        'insufficientContribution',
-        'overFinancing',
-        'debtRatio',
-        'noCompany',
-        'companyNotServed',
-        'rentCoverage',
-        'leverage',
-      ]),
+      reason: loanRefusalSchema,
       debtRatioAfter: z.number().optional(),
     })
     .strict(),
@@ -935,6 +973,124 @@ const noteBase = z.object({
     })
     .strict(),
 });
+
+const catalogInstanceSchema = noteBase
+  .extend({
+    id: z.string(),
+    eventId: z.string(),
+    deadlineDay: day,
+    amounts: z.record(z.string(), cents),
+  })
+  .strict();
+
+const NEWS_TYPES: ReadonlySet<string> = new Set(NEWS_EVENT_TYPES);
+
+const inboxSubjectSchema = z
+  .object({
+    propertyId: z.string(),
+    listingId: z.string().nullable(),
+    kind: z.enum(['apartment', 'house', 'building', 'commercial', 'parking', 'land']),
+    rooms: z.number().int().min(0),
+    surface: z.number().min(0),
+    lots: z.number().int().min(0),
+    cityId: z.string(),
+    neighbourhoodId: z.string(),
+  })
+  .strict();
+
+const mailBase = {
+  id: z.number().int().positive(),
+  day,
+  subject: inboxSubjectSchema.nullable(),
+  dismissed: z.boolean(),
+};
+
+const mailSchema = z.discriminatedUnion('kind', [
+  z
+    .object({
+      ...mailBase,
+      kind: z.literal('offerReply'),
+      listingId: z.string(),
+      outcome: z.enum(['accepted', 'refused', 'counterExpired', 'counterDeclined']),
+      amount: cents.positive(),
+    })
+    .strict(),
+  z
+    .object({
+      ...mailBase,
+      kind: z.literal('loanAnswer'),
+      bankId: z.string(),
+      decision: z.enum(['accepted', 'partial', 'counterOffer', 'refused']),
+      reason: loanRefusalSchema.nullable(),
+      debtRatio: z.number().nullable(),
+      amount: cents.nullable(),
+      ratePercent: z.number().nullable(),
+    })
+    .strict(),
+  z
+    .object({
+      ...mailBase,
+      kind: z.literal('saleReply'),
+      buyerId: z.string().nullable(),
+      outcome: z.enum(['counterAccepted', 'counterRefused', 'expired']),
+      amount: cents.positive(),
+    })
+    .strict(),
+  z
+    .object({ ...mailBase, kind: z.literal('buyout'), amount: cents, accepted: z.boolean() })
+    .strict(),
+  z
+    .object({
+      ...mailBase,
+      kind: z.literal('catalogEvent'),
+      event: catalogInstanceSchema,
+      choiceId: z.string(),
+      auto: z.boolean(),
+    })
+    .strict(),
+  z
+    .object({
+      ...mailBase,
+      kind: z.literal('copro'),
+      results: z.array(
+        z
+          .object({ id: z.string(), passed: z.boolean(), textIndex: z.number().int().min(0) })
+          .strict(),
+      ),
+    })
+    .strict(),
+  z
+    .object({
+      ...mailBase,
+      kind: z.literal('hazard'),
+      hazardId: z.string(),
+      choice: z.enum(['treat', 'postpone', 'eco']),
+      cost: cents.min(0),
+    })
+    .strict(),
+]);
+
+const inboxSchema = z
+  .object({
+    news: z.array(
+      z
+        .object({
+          id: z.number().int().positive(),
+          day,
+          // The news only feed the texts, never the rules: their event is checked loosely.
+          event: z.custom<NewsEvent>(
+            (value) =>
+              isRecord(value) && typeof value.type === 'string' && NEWS_TYPES.has(value.type),
+          ),
+          subject: inboxSubjectSchema.nullable(),
+        })
+        .strict(),
+    ),
+    newsSeenId: z.number().int().min(0),
+    mail: z.array(mailSchema),
+    nextId: z.number().int().positive(),
+  })
+  .strict();
 
 const gameStateSchema = z
   .object({
@@ -1284,18 +1440,7 @@ const gameStateSchema = z
     artisans: z.record(z.string(), z.object({ jobs: z.number().int().min(0) }).strict()),
     worksDone: z.record(z.string(), z.number().int().min(0)),
     favorites: z.array(z.string()),
-    offerNotices: z.array(
-      z
-        .object({
-          id: z.string(),
-          listingId: z.string(),
-          day,
-          amount: cents.positive(),
-          outcome: z.enum(['refused', 'counterExpired']),
-          dismissed: z.boolean(),
-        })
-        .strict(),
-    ),
+    inbox: inboxSchema,
     tutorial: z.object({ enabled: z.boolean(), step: z.number().int().min(0) }).strict(),
     history: z.array(
       z
@@ -1357,16 +1502,7 @@ const gameStateSchema = z
     ),
     catalog: z
       .object({
-        pending: z.array(
-          noteBase
-            .extend({
-              id: z.string(),
-              eventId: z.string(),
-              deadlineDay: day,
-              amounts: z.record(z.string(), cents),
-            })
-            .strict(),
-        ),
+        pending: z.array(catalogInstanceSchema),
         lastDay: z.record(z.string(), day),
         anecdotes: z.array(noteBase.extend({ anecdoteId: z.string() }).strict()),
       })

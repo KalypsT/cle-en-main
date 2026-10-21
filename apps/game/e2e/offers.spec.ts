@@ -10,8 +10,8 @@ import {
   tab,
 } from './helpers.ts';
 
-/** A refused offer is told, kept on the listing and in the decisions until it is closed. */
-test('tells a refused offer, on the listing and in the decisions', async ({ page }) => {
+/** A refused offer is told, kept on the listing and in the mail until it is closed. */
+test('tells a refused offer, on the listing and in the mail', async ({ page }) => {
   test.setTimeout(180_000);
   await openGame(page);
   await newGame(page, { tutorialOn: false });
@@ -34,12 +34,15 @@ test('tells a refused offer, on the listing and in the decisions', async ({ page
   await pause(page);
   await dismissOverlays(page);
 
-  // The decisions keep it until it is closed.
+  // The mail of the decisions keeps it until it is closed; the news tell it too.
   await tab(page, 'decisions');
-  const notice = page.locator('[data-testid^="notice-"]');
-  await expect(notice).toHaveCount(1);
-  await notice.getByRole('button', { name: t.decisions.closeNotice }).click();
-  await expect(notice).toHaveCount(0);
+  await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.mail}`) }).click();
+  const letter = page.getByTestId('mail-offerReply');
+  await expect(letter).toHaveCount(1);
+  await letter.getByRole('button', { name: t.decisions.closeNotice }).click();
+  await expect(letter).toHaveCount(0);
+  await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.news}`) }).click();
+  await expect(page.getByTestId('news')).toContainText(/refuse votre offre/);
 
   // The listing still tells it.
   await tab(page, 'assets');

@@ -7,10 +7,8 @@ import {
   type GameState,
   HOURS_PER_DAY,
   type PendingDecision,
-  toDayNumber,
 } from '@cle/engine';
 import { engine } from '../engine.ts';
-import { describeEvent } from '../texts.ts';
 
 /** Ignore longer frame gaps (tab in background, debugger) instead of fast-forwarding. */
 const MAX_FRAME_MS = 1000;
@@ -19,23 +17,11 @@ const MAX_FRAME_MS = 1000;
  * of catching up hours that make the next frame slower still.
  */
 const MAX_HOURS_PER_FRAME = HOURS_PER_DAY;
-/** News kept for the dashboard. */
-const FEED_LENGTH = 30;
-
-export interface FeedItem {
-  id: number;
-  /** Game day number the news happened on. */
-  day: number;
-  text: string;
-}
 
 export interface SessionSnapshot {
   state: GameState;
   /** 0 when paused, otherwise one of timeSettings.speeds. */
   speed: number;
-  lastEvent: GameEvent | null;
-  /** Latest news, newest first. */
-  feed: FeedItem[];
   /** Pending decisions of `state` (engine.pendingDecisions). */
   decisions: PendingDecision[];
   /** The game paused itself for a decision. */
@@ -82,15 +68,12 @@ export class GameSession {
   private frame: number | null = null;
   private lastFrameAt: number | null = null;
   private pendingMs = 0;
-  private nextFeedId = 1;
 
   constructor(state: GameState, onEvents: EventListener, options: SessionOptions = {}) {
     const decisions = engine.pendingDecisions(state);
     this.snapshot = {
       state,
       speed: options.initialSpeed ?? timeSettings.speeds[0] ?? 1,
-      lastEvent: null,
-      feed: [],
       decisions,
       autoPaused: false,
       accelerated: false,
@@ -208,17 +191,6 @@ export class GameSession {
         changes.speed = 0;
         changes.autoPaused = true;
       }
-    }
-    const shown = events
-      .map((event) => ({ event, text: describeEvent(event, state) }))
-      .filter((item): item is { event: GameEvent; text: string } => item.text !== null)
-      // Calendar ticks are not news.
-      .filter(({ event }) => event.type !== 'dayStarted' && event.type !== 'weekendStarted');
-    if (shown.length > 0) {
-      const day = toDayNumber(state.clock.date);
-      const items = shown.map(({ text }) => ({ id: this.nextFeedId++, day, text })).reverse();
-      changes.feed = [...items, ...this.snapshot.feed].slice(0, FEED_LENGTH);
-      changes.lastEvent = shown.at(-1)?.event ?? this.snapshot.lastEvent;
     }
     this.update(changes);
     if (events.length > 0) for (const listener of this.eventListeners) listener(events, state);

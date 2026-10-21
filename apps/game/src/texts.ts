@@ -8,6 +8,7 @@ import {
   fromDayNumber,
   type GameEvent,
   type GameState,
+  type InboxSubject,
   NO_CHOICE,
   type Property,
   toDayNumber,
@@ -172,7 +173,9 @@ function capitalize(text: string): string {
 }
 
 /** « T2 », « Maison 4 p. »: the short label of a dwelling. */
-export function propertyShortLabel(property: Property): string {
+export function propertyShortLabel(
+  property: Pick<Property, 'kind' | 'rooms' | 'surface'> & { lots: { length: number } },
+): string {
   if (property.kind === 'apartment') return `T${property.rooms}`;
   if (property.kind === 'building') {
     return format(t.listing.lots, { count: property.lots.length });
@@ -333,14 +336,32 @@ export function chronicleText(entry: ChronicleEntry): string {
   return format(templates[entry.kind], values);
 }
 
-/** « T2 · Centre historique » for a listing still online, else a neutral word. */
-function listingLabel(state: GameState | undefined, listingId: string): string {
-  const listing = state?.listings.find((candidate) => candidate.id === listingId);
-  return listing ? propertyLabel(listing.property) : t.listing.thisListing;
+/** « T2 · Centre historique » for what a news or a letter is about, as it was then. */
+export function subjectLabel(subject: InboxSubject): string {
+  const short = propertyShortLabel({ ...subject, lots: { length: subject.lots } });
+  return `${short} · ${neighbourhoodName(subject.cityId, subject.neighbourhoodId)}`;
 }
 
-/** Text for an engine event, or null when the event is not shown to the player. */
-export function describeEvent(event: GameEvent, state?: GameState): string | null {
+/** « T2 · Centre historique » for a listing still online (or as it was), else a neutral word. */
+function listingLabel(
+  state: GameState | undefined,
+  listingId: string,
+  subject: InboxSubject | null,
+): string {
+  const listing = state?.listings.find((candidate) => candidate.id === listingId);
+  if (listing) return propertyLabel(listing.property);
+  return subject ? subjectLabel(subject) : t.listing.thisListing;
+}
+
+/**
+ * Text for an engine event, or null when the event is not shown to the player.
+ * `subject`: what a kept news is about, when its listing is gone.
+ */
+export function describeEvent(
+  event: GameEvent,
+  state?: GameState,
+  subject: InboxSubject | null = null,
+): string | null {
   const { events } = texts;
   switch (event.type) {
     case 'dayStarted':
@@ -390,10 +411,21 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       return format(events.rivalArrived, { rival: rivalName(event.rivalId) });
     case 'listingPublished':
       return events.listingPublished;
-    case 'listingSold':
+    case 'listingSold': {
+      const property = listingLabel(state, event.listingId, subject);
       return event.buyer === 'rival'
-        ? format(events.listingSoldToRival, { rival: rivalName(event.rivalId) })
-        : events.listingSold;
+        ? format(events.listingSoldToRival, { rival: rivalName(event.rivalId), property })
+        : format(events.listingSold, { property });
+    }
+    case 'listingWithdrawn':
+      return format(events.listingWithdrawn, {
+        property: listingLabel(state, event.listingId, subject),
+      });
+    case 'listingPriceDropped':
+      return format(events.listingPriceDropped, {
+        property: listingLabel(state, event.listingId, subject),
+        price: formatEuros(event.askingPrice),
+      });
     case 'visitDone':
       return events.visitDone;
     case 'visitPlanned':
@@ -405,12 +437,12 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
       }
       return format(events.offerRefused, {
         amount: formatMoney(event.amount),
-        property: listingLabel(state, event.listingId),
+        property: listingLabel(state, event.listingId, subject),
       });
     case 'counterOfferExpired':
       return format(events.counterOfferExpired, {
         amount: formatMoney(event.amount),
-        property: listingLabel(state, event.listingId),
+        property: listingLabel(state, event.listingId, subject),
       });
     case 'compromisSigned':
       return format(events.compromisSigned, { price: formatMoney(event.price) });
@@ -463,6 +495,8 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
     }
     case 'tenantLeft':
       return event.reason === 'evicted' ? events.tenantEvicted : events.tenantLeft;
+    case 'leaseRenewed':
+      return format(events.leaseRenewed, { date: formatDayLong(event.termDay) });
     case 'rentRevised':
       return format(events.rentRevised, { rent: formatMoney(event.monthlyRent) });
     case 'tenantLifeEvent':
@@ -594,8 +628,6 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
     case 'agendaCancelled':
     case 'marketRateChanged':
     case 'propertyPricesUpdated':
-    case 'listingPriceDropped':
-    case 'listingWithdrawn':
     case 'visitCancelled':
     case 'offerMade':
     case 'counterOfferDeclined':
@@ -611,7 +643,6 @@ export function describeEvent(event: GameEvent, state?: GameState): string | nul
     case 'saleCounterRefused':
     case 'rentalWithdrawn':
     case 'applicationExpired':
-    case 'leaseRenewed':
     case 'worksTaskStarted':
     case 'worksTaskDone':
     case 'worksHazardResolved':

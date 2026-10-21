@@ -367,8 +367,8 @@ describe('migrations', () => {
     expect(migrated.properties.every((o) => o.valueHistory.length === 0)).toBe(true);
     // Version 14: the history of each property starts empty.
     expect(migrated.properties.every((o) => o.log.length === 0)).toBe(true);
-    // Version 13: no refused offer was ever kept.
-    expect(migrated.offerNotices).toEqual([]);
+    // Version 13: no refused offer was ever kept; version 16: no news nor mail either.
+    expect(migrated.inbox).toEqual({ news: [], newsSeenId: 0, mail: [], nextId: 1 });
     // Version 12: no tenant was ever offered an indemnity.
     expect(migrated.properties.some((o) => o.lease !== null)).toBe(true);
     expect(
@@ -421,5 +421,77 @@ describe('migrations', () => {
         depositReturned: 0,
       },
     ]);
+  });
+
+  it('turns the sellers answers of a version 15 save into letters, the news empty', () => {
+    const property = {
+      id: 'p-7',
+      kind: 'apartment',
+      rooms: 2,
+      surface: 45,
+      lots: [],
+      cityId: 'dole',
+      neighbourhoodId: 'centre',
+    };
+    const raw = {
+      formatVersion: 15,
+      listings: [{ id: 'l-3', property }],
+      offerNotices: [
+        {
+          id: 'notice-9',
+          listingId: 'l-3',
+          day: 21_000,
+          amount: 40_000_00,
+          outcome: 'refused',
+          dismissed: true,
+        },
+        {
+          id: 'notice-12',
+          listingId: 'l-gone',
+          day: 21_004,
+          amount: 61_000_00,
+          outcome: 'counterExpired',
+          dismissed: false,
+        },
+      ],
+    };
+    const migrated = migrateRaw(raw, context, 16);
+    expect(migrated.offerNotices).toBeUndefined();
+    expect(migrated.inbox).toEqual({
+      news: [],
+      newsSeenId: 0,
+      nextId: 3,
+      mail: [
+        {
+          id: 1,
+          day: 21_000,
+          subject: {
+            propertyId: 'p-7',
+            listingId: 'l-3',
+            kind: 'apartment',
+            rooms: 2,
+            surface: 45,
+            lots: 0,
+            cityId: 'dole',
+            neighbourhoodId: 'centre',
+          },
+          dismissed: true,
+          kind: 'offerReply',
+          listingId: 'l-3',
+          outcome: 'refused',
+          amount: 40_000_00,
+        },
+        {
+          id: 2,
+          day: 21_004,
+          subject: null,
+          dismissed: false,
+          kind: 'offerReply',
+          listingId: 'l-gone',
+          outcome: 'counterExpired',
+          amount: 61_000_00,
+        },
+      ],
+    });
   });
 });

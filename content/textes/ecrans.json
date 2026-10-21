@@ -197,6 +197,7 @@
     "counter": "Contre-offre",
     "offerRefused": "Offre refusée",
     "counterExpired": "Contre-offre expirée",
+    "counterDeclined": "Contre-offre déclinée",
     "favorite": "Favori",
     "kindShort": {
       "apartment": "Appartement",
@@ -270,7 +271,8 @@
       "after2012": "après 2012"
     },
     "visitTrip": "Visiter · {duration} + trajet {trip} ({cost})",
-    "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)"
+    "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)",
+    "counterDeclinedText": "Vous avez décliné sa contre-offre de {amount} le {date}."
   },
   "financing": {
     "heading": "Financement simulé",
@@ -567,13 +569,63 @@
     "deadline": "Échéance {when}",
     "noDeadline": "Sans échéance",
     "pauses": "Met le jeu en pause",
-    "recent": "Réponses récentes",
+    "sections": {
+      "pending": "À décider",
+      "mail": "Courrier",
+      "news": "Actualités"
+    },
+    "sectionLabel": "{label} ({count})",
+    "mailHint": "Les réponses reçues et les décisions tranchées restent ici {months} mois, ou jusqu'à ce que vous les fermiez.",
+    "mailEmpty": "Aucun courrier pour l'instant.",
+    "newsHint": "Ce qui s'est passé ces {days} derniers jours, le plus récent en haut.",
+    "newsEmpty": "Rien à signaler pour l'instant.",
+    "newsFilters": {
+      "all": "Tout",
+      "market": "Achats",
+      "rental": "Location",
+      "works": "Travaux",
+      "money": "Argent",
+      "life": "Vie locale",
+      "progress": "Progression"
+    },
+    "unseen": "Nouveau",
+    "auto": "Sans réponse, choix par défaut",
+    "openSubject": "Voir le bien",
+    "mail": {
+      "offerReply": {
+        "accepted": "Offre acceptée : {amount}",
+        "refused": "Offre refusée : {amount}",
+        "counterExpired": "Contre-offre expirée : {amount}",
+        "counterDeclined": "Contre-offre déclinée : {amount}"
+      },
+      "loanAnswer": {
+        "accepted": "{banker} accorde le prêt : {amount} à {rate}",
+        "partial": "{banker} prête moins : {amount} à {rate}",
+        "counterOffer": "{banker} propose une autre durée : {amount} à {rate}",
+        "refused": "{banker} refuse le prêt"
+      },
+      "loanRefusedBecause": "Motif : {reason}",
+      "saleReply": {
+        "counterAccepted": "{buyer} accepte votre contre-offre : {amount}",
+        "counterRefused": "{buyer} refuse votre contre-offre : {amount}",
+        "expired": "L'offre de {buyer} a expiré : {amount}"
+      },
+      "household": "Un acheteur",
+      "buyout": {
+        "accepted": "Départ négocié accepté : {amount}",
+        "refused": "Départ négocié refusé : {amount}"
+      },
+      "catalogEvent": "Événement : {choice}",
+      "copro": "Assemblée générale : {passed} résolution(s) adoptée(s) sur {count}",
+      "coproLine": "{resolution} : {verdict}",
+      "hazard": {
+        "treat": "Imprévu traité : {amount}",
+        "postpone": "Imprévu reporté : {amount} évités",
+        "eco": "Imprévu passé en Éco : {amount}"
+      }
+    },
     "closeNotice": "Fermer",
     "closeAllNotices": "Tout fermer",
-    "notices": {
-      "refused": "Offre refusée : {amount}",
-      "counterExpired": "Contre-offre expirée : {amount}"
-    },
     "kinds": {
       "counterOffer": "Contre-offre du vendeur : {amount}",
       "loanNeeded": "Compromis signé : demandez votre prêt",

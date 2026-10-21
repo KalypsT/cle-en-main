@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 15,
+    "formatVersion": 16,
     "seed": 20261018,
     "rng": [
       3129399367,
@@ -1754,7 +1754,3241 @@
       "dole": 2
     },
     "favorites": [],
-    "offerNotices": [],
+    "inbox": {
+      "news": [
+        {
+          "id": 127,
+          "day": 20930,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "moniqueHat",
+              "day": 20930,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "chapraisMouillere",
+                "cityId": "besancon",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 128,
+          "day": 20931,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "catPhoto",
+              "day": 20931,
+              "textIndex": 1,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 129,
+          "day": 20932,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "collegiale",
+              "day": 20932,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "viotteVesoul",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 130,
+          "day": 20934,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-2819",
+              "eventId": "yvonPapers",
+              "day": 20927,
+              "deadlineDay": 20934,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreSaintLaurent",
+                "cityId": "chalon",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "send": 0,
+                "later": -9900
+              }
+            },
+            "choiceId": "later",
+            "auto": true
+          },
+          "subject": null
+        },
+        {
+          "id": 132,
+          "day": 20935,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "garageSale",
+              "day": 20935,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "palenteSaragosse",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 133,
+          "day": 20936,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "wifiName",
+              "day": 20936,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 134,
+          "day": 20937,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "kevinPodcast",
+              "day": 20937,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "gareArsenal",
+                "cityId": "dijon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 135,
+          "day": 20938,
+          "event": {
+            "type": "offMarketOffered",
+            "listingId": "listing-2951"
+          },
+          "subject": {
+            "propertyId": "property-2950",
+            "listingId": "listing-2951",
+            "kind": "house",
+            "rooms": 4,
+            "surface": 93,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "plumontValFleuri"
+          }
+        },
+        {
+          "id": 136,
+          "day": 20939,
+          "event": {
+            "type": "monthlyStatement",
+            "lines": [
+              {
+                "kind": "salary",
+                "amount": 200000
+              },
+              {
+                "kind": "rent",
+                "amount": 52000
+              },
+              {
+                "kind": "livingCosts",
+                "amount": 135000
+              },
+              {
+                "kind": "propertyCharges",
+                "propertyId": "property-99",
+                "amount": 5900
+              },
+              {
+                "kind": "ownerInsurance",
+                "propertyId": "property-99",
+                "amount": 1004
+              },
+              {
+                "kind": "rentalIncome",
+                "propertyId": "property-99",
+                "amount": 30230
+              },
+              {
+                "kind": "loanPayment",
+                "loanId": "loan-1214",
+                "amount": 27948,
+                "interest": 15280,
+                "capital": 12668
+              }
+            ],
+            "balance": 748453
+          },
+          "subject": null
+        },
+        {
+          "id": 137,
+          "day": 20940,
+          "event": {
+            "type": "bankMeetingHeld",
+            "bankId": "tirelire",
+            "trust": 81.9
+          },
+          "subject": null
+        },
+        {
+          "id": 138,
+          "day": 20944,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "parcel",
+              "day": 20944,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 139,
+          "day": 20953,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-3119",
+              "eventId": "financeCoach",
+              "day": 20953,
+              "deadlineDay": 20956,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "stadeFontaineAuxLoups",
+                "cityId": "chalon",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "pay": -199700,
+                "decline": 0
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 140,
+          "day": 20953,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "accordion",
+              "day": 20953,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 141,
+          "day": 20954,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "yvonSpreadsheet",
+              "day": 20954,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "mesnilsPasteur",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 142,
+          "day": 20956,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-3119",
+              "eventId": "financeCoach",
+              "day": 20953,
+              "deadlineDay": 20956,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "stadeFontaineAuxLoups",
+                "cityId": "chalon",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "pay": -199700,
+                "decline": 0
+              }
+            },
+            "choiceId": "decline",
+            "auto": true
+          },
+          "subject": null
+        },
+        {
+          "id": 144,
+          "day": 20956,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "rain",
+              "day": 20956,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "montrapon",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 145,
+          "day": 20957,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "canal",
+              "day": 20957,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "chapraisMouillere",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 146,
+          "day": 20960,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "accordion",
+              "day": 20960,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 147,
+          "day": 20962,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "dogWalker",
+              "day": 20962,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 148,
+          "day": 20963,
+          "event": {
+            "type": "challengeOffered",
+            "challengeId": "kevinTwoProperties",
+            "deadlineDay": 20968
+          },
+          "subject": null
+        },
+        {
+          "id": 149,
+          "day": 20964,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-3214",
+              "eventId": "lockedOut",
+              "day": 20964,
+              "deadlineDay": 20965,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "go": 0,
+                "locksmith": -22200,
+                "tomorrow": 0
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 150,
+          "day": 20964,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "neighbourCake",
+              "day": 20964,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 151,
+          "day": 20965,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-3214",
+              "eventId": "lockedOut",
+              "day": 20964,
+              "deadlineDay": 20965,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "go": 0,
+                "locksmith": -22200,
+                "tomorrow": 0
+              }
+            },
+            "choiceId": "tomorrow",
+            "auto": true
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 153,
+          "day": 20965,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "parcel",
+              "day": 20965,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 154,
+          "day": 20968,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "dogWalker",
+              "day": 20968,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 155,
+          "day": 20969,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "marathon",
+              "day": 20969,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 156,
+          "day": 20970,
+          "event": {
+            "type": "monthlyStatement",
+            "lines": [
+              {
+                "kind": "salary",
+                "amount": 200000
+              },
+              {
+                "kind": "rent",
+                "amount": 52000
+              },
+              {
+                "kind": "livingCosts",
+                "amount": 135000
+              },
+              {
+                "kind": "propertyCharges",
+                "propertyId": "property-99",
+                "amount": 5900
+              },
+              {
+                "kind": "ownerInsurance",
+                "propertyId": "property-99",
+                "amount": 1004
+              },
+              {
+                "kind": "rentalIncome",
+                "propertyId": "property-99",
+                "amount": 30230
+              },
+              {
+                "kind": "loanPayment",
+                "loanId": "loan-1214",
+                "amount": 27948,
+                "interest": 15237,
+                "capital": 12711
+              }
+            ],
+            "balance": 756831
+          },
+          "subject": null
+        },
+        {
+          "id": 157,
+          "day": 20971,
+          "event": {
+            "type": "bankMeetingHeld",
+            "bankId": "tirelire",
+            "trust": 85.6
+          },
+          "subject": null
+        },
+        {
+          "id": 158,
+          "day": 20973,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "gerardTie",
+              "day": 20973,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "universiteVoltaire",
+                "cityId": "dijon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 159,
+          "day": 20981,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "moniqueCard",
+              "day": 20981,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreSaintLaurent",
+                "cityId": "chalon",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 160,
+          "day": 20982,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-3436",
+              "eventId": "musicFestival",
+              "day": 20982,
+              "deadlineDay": 20985,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreAncien",
+                "cityId": "besancon",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "volunteer": 0,
+                "enjoy": 0
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 161,
+          "day": 20985,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-3436",
+              "eventId": "musicFestival",
+              "day": 20982,
+              "deadlineDay": 20985,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreAncien",
+                "cityId": "besancon",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "volunteer": 0,
+                "enjoy": 0
+              }
+            },
+            "choiceId": "enjoy",
+            "auto": true
+          },
+          "subject": null
+        },
+        {
+          "id": 163,
+          "day": 20987,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "wifiName",
+              "day": 20987,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 164,
+          "day": 20988,
+          "event": {
+            "type": "catalogEventHappened",
+            "event": {
+              "id": "event-3509",
+              "eventId": "housingBoom",
+              "day": 20988,
+              "deadlineDay": 20988,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreAncien",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "_": 0
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 165,
+          "day": 20991,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "bellRinger",
+              "day": 20991,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 166,
+          "day": 20992,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "hortenseSmile",
+              "day": 20992,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "saintJeanDesVignes",
+                "cityId": "chalon",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 167,
+          "day": 20994,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "catPhoto",
+              "day": 20994,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 168,
+          "day": 20998,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "moving",
+              "day": 20998,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 169,
+          "day": 20999,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-3636",
+              "eventId": "smokeDetector",
+              "day": 20999,
+              "deadlineDay": 21001,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "go": 0,
+                "ignore": 0
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 170,
+          "day": 21000,
+          "event": {
+            "type": "monthlyStatement",
+            "lines": [
+              {
+                "kind": "salary",
+                "amount": 200000
+              },
+              {
+                "kind": "rent",
+                "amount": 52000
+              },
+              {
+                "kind": "livingCosts",
+                "amount": 135000
+              },
+              {
+                "kind": "propertyCharges",
+                "propertyId": "property-99",
+                "amount": 5900
+              },
+              {
+                "kind": "ownerInsurance",
+                "propertyId": "property-99",
+                "amount": 1004
+              },
+              {
+                "kind": "rentalIncome",
+                "propertyId": "property-99",
+                "amount": 30230
+              },
+              {
+                "kind": "loanPayment",
+                "loanId": "loan-1214",
+                "amount": 27948,
+                "interest": 15194,
+                "capital": 12754
+              }
+            ],
+            "balance": 765209
+          },
+          "subject": null
+        },
+        {
+          "id": 171,
+          "day": 21000,
+          "event": {
+            "type": "coproMeetingCalled",
+            "propertyId": "property-99",
+            "voteDay": 21014,
+            "resolutions": [
+              {
+                "id": "stairwell",
+                "cost": 19800
+              },
+              {
+                "id": "facadeRenovation",
+                "cost": 85300
+              }
+            ]
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 172,
+          "day": 21001,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-3636",
+              "eventId": "smokeDetector",
+              "day": 20999,
+              "deadlineDay": 21001,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "go": 0,
+                "ignore": 0
+              }
+            },
+            "choiceId": "ignore",
+            "auto": true
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 174,
+          "day": 21001,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "collegiale",
+              "day": 21001,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "champFleuriVerrerie",
+                "cityId": "chalon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 175,
+          "day": 21001,
+          "event": {
+            "type": "bankMeetingHeld",
+            "bankId": "tirelire",
+            "trust": 89.3
+          },
+          "subject": null
+        },
+        {
+          "id": 176,
+          "day": 21003,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "marathon",
+              "day": 21003,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 177,
+          "day": 21005,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "catPhoto",
+              "day": 21005,
+              "textIndex": 1,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 178,
+          "day": 21009,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "rain",
+              "day": 21009,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreAncien",
+                "cityId": "besancon",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 179,
+          "day": 21010,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-3751",
+              "eventId": "cardFraud",
+              "day": 21010,
+              "deadlineDay": 21012,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "presSaintJean",
+                "cityId": "chalon",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "block": 0,
+                "later": -37100
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 180,
+          "day": 21010,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "wifiName",
+              "day": 21010,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 181,
+          "day": 21012,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-3751",
+              "eventId": "cardFraud",
+              "day": 21010,
+              "deadlineDay": 21012,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "presSaintJean",
+                "cityId": "chalon",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "block": 0,
+                "later": -37100
+              }
+            },
+            "choiceId": "later",
+            "auto": true
+          },
+          "subject": null
+        },
+        {
+          "id": 183,
+          "day": 21012,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "accordion",
+              "day": 21012,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 184,
+          "day": 21013,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "hortenseSmile",
+              "day": 21013,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "gareArsenal",
+                "cityId": "dijon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 185,
+          "day": 21014,
+          "event": {
+            "type": "coproMeetingHeld",
+            "propertyId": "property-99",
+            "results": [
+              {
+                "id": "stairwell",
+                "passed": true,
+                "textIndex": 0
+              },
+              {
+                "id": "facadeRenovation",
+                "passed": true,
+                "textIndex": 1
+              }
+            ]
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 187,
+          "day": 21015,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "rain",
+              "day": 21015,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "palenteSaragosse",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 188,
+          "day": 21024,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "catPhoto",
+              "day": 21024,
+              "textIndex": 1,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 189,
+          "day": 21031,
+          "event": {
+            "type": "tenantGaveNotice",
+            "propertyId": "property-99",
+            "leaveDay": 21122,
+            "reason": "departure"
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 190,
+          "day": 21031,
+          "event": {
+            "type": "monthlyStatement",
+            "lines": [
+              {
+                "kind": "salary",
+                "amount": 200000
+              },
+              {
+                "kind": "rent",
+                "amount": 52000
+              },
+              {
+                "kind": "livingCosts",
+                "amount": 135000
+              },
+              {
+                "kind": "propertyCharges",
+                "propertyId": "property-99",
+                "amount": 5900
+              },
+              {
+                "kind": "ownerInsurance",
+                "propertyId": "property-99",
+                "amount": 1004
+              },
+              {
+                "kind": "rentalIncome",
+                "propertyId": "property-99",
+                "amount": 30230
+              },
+              {
+                "kind": "coproCall",
+                "propertyId": "property-99",
+                "amount": 10408
+              },
+              {
+                "kind": "loanPayment",
+                "loanId": "loan-1214",
+                "amount": 27948,
+                "interest": 15152,
+                "capital": 12796
+              }
+            ],
+            "balance": 726079
+          },
+          "subject": null
+        },
+        {
+          "id": 191,
+          "day": 21031,
+          "event": {
+            "type": "achievementEarned",
+            "achievementId": "loyalCustomer"
+          },
+          "subject": null
+        },
+        {
+          "id": 192,
+          "day": 21032,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "birthdayCake",
+              "day": 21032,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 193,
+          "day": 21032,
+          "event": {
+            "type": "challengeOffered",
+            "challengeId": "kevinNewProperty",
+            "deadlineDay": 21037
+          },
+          "subject": null
+        },
+        {
+          "id": 194,
+          "day": 21032,
+          "event": {
+            "type": "bankMeetingHeld",
+            "bankId": "tirelire",
+            "trust": 93
+          },
+          "subject": null
+        },
+        {
+          "id": 195,
+          "day": 21035,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "birthdayCake",
+              "day": 21035,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 196,
+          "day": 21041,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "petanque",
+              "day": 21041,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 197,
+          "day": 21044,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "neighbourCake",
+              "day": 21044,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 198,
+          "day": 21047,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "dogWalker",
+              "day": 21047,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 199,
+          "day": 21049,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "canal",
+              "day": 21049,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "universiteVoltaire",
+                "cityId": "dijon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 200,
+          "day": 21055,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "dogWalker",
+              "day": 21055,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 201,
+          "day": 21058,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "catPhoto",
+              "day": 21058,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 202,
+          "day": 21060,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "petanque",
+              "day": 21060,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "montchapetRepublique",
+                "cityId": "dijon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 203,
+          "day": 21062,
+          "event": {
+            "type": "monthlyStatement",
+            "lines": [
+              {
+                "kind": "salary",
+                "amount": 200000
+              },
+              {
+                "kind": "rent",
+                "amount": 52000
+              },
+              {
+                "kind": "livingCosts",
+                "amount": 135000
+              },
+              {
+                "kind": "propertyCharges",
+                "propertyId": "property-99",
+                "amount": 5900
+              },
+              {
+                "kind": "ownerInsurance",
+                "propertyId": "property-99",
+                "amount": 1004
+              },
+              {
+                "kind": "rentalIncome",
+                "propertyId": "property-99",
+                "amount": 30230
+              },
+              {
+                "kind": "coproCall",
+                "propertyId": "property-99",
+                "amount": 10408
+              },
+              {
+                "kind": "loanPayment",
+                "loanId": "loan-1214",
+                "amount": 27948,
+                "interest": 15109,
+                "capital": 12839
+              }
+            ],
+            "balance": 724049
+          },
+          "subject": null
+        },
+        {
+          "id": 204,
+          "day": 21062,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "gerardPhoto",
+              "day": 21062,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "lacFontaineDOuche",
+                "cityId": "dijon",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 205,
+          "day": 21063,
+          "event": {
+            "type": "bankMeetingHeld",
+            "bankId": "tirelire",
+            "trust": 96.7
+          },
+          "subject": null
+        },
+        {
+          "id": 206,
+          "day": 21063,
+          "event": {
+            "type": "achievementEarned",
+            "achievementId": "regular"
+          },
+          "subject": null
+        },
+        {
+          "id": 207,
+          "day": 21069,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "solarEclipse",
+              "day": 21069,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 208,
+          "day": 21072,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "moniqueCard",
+              "day": 21072,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "viotteVesoul",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 209,
+          "day": 21075,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "garageSale",
+              "day": 21075,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "chapraisMouillere",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 210,
+          "day": 21076,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "djSet",
+              "day": 21076,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 211,
+          "day": 21077,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "gerardTie",
+              "day": 21077,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreAncien",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 212,
+          "day": 21079,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "yvonSpreadsheet",
+              "day": 21079,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "azans",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 213,
+          "day": 21083,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-4640",
+              "eventId": "lateOnce",
+              "day": 21083,
+              "deadlineDay": 21086,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "accept": 0,
+                "reminder": 0
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 214,
+          "day": 21086,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-4640",
+              "eventId": "lateOnce",
+              "day": 21083,
+              "deadlineDay": 21086,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              },
+              "amounts": {
+                "accept": 0,
+                "reminder": 0
+              }
+            },
+            "choiceId": "accept",
+            "auto": true
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 216,
+          "day": 21086,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "petanque",
+              "day": 21086,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "chapraisMouillere",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 217,
+          "day": 21087,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "parcel",
+              "day": 21087,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 218,
+          "day": 21088,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "martinotArgue",
+              "day": 21088,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "chapraisMouillere",
+                "cityId": "besancon",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 219,
+          "day": 21089,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "pasteur",
+              "day": 21089,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 220,
+          "day": 21090,
+          "event": {
+            "type": "catalogEventStarted",
+            "event": {
+              "id": "event-4711",
+              "eventId": "solarRoof",
+              "day": 21090,
+              "deadlineDay": 21095,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "for": -60600,
+                "against": 0
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 221,
+          "day": 21090,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "plants",
+              "day": 21090,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 222,
+          "day": 21091,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "petanque",
+              "day": 21091,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "saintJeanDesVignes",
+                "cityId": "chalon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 223,
+          "day": 21092,
+          "event": {
+            "type": "monthlyStatement",
+            "lines": [
+              {
+                "kind": "salary",
+                "amount": 200000
+              },
+              {
+                "kind": "rent",
+                "amount": 52000
+              },
+              {
+                "kind": "livingCosts",
+                "amount": 135000
+              },
+              {
+                "kind": "propertyCharges",
+                "propertyId": "property-99",
+                "amount": 5900
+              },
+              {
+                "kind": "ownerInsurance",
+                "propertyId": "property-99",
+                "amount": 1004
+              },
+              {
+                "kind": "rentalIncome",
+                "propertyId": "property-99",
+                "amount": 30230
+              },
+              {
+                "kind": "coproCall",
+                "propertyId": "property-99",
+                "amount": 10408
+              },
+              {
+                "kind": "loanPayment",
+                "loanId": "loan-1214",
+                "amount": 27948,
+                "interest": 15065,
+                "capital": 12883
+              }
+            ],
+            "balance": 722019
+          },
+          "subject": null
+        },
+        {
+          "id": 224,
+          "day": 21093,
+          "event": {
+            "type": "bankMeetingHeld",
+            "bankId": "tirelire",
+            "trust": 100
+          },
+          "subject": null
+        },
+        {
+          "id": 225,
+          "day": 21094,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "rugby",
+              "day": 21094,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "gresillesStalingrad",
+                "cityId": "dijon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 226,
+          "day": 21095,
+          "event": {
+            "type": "catalogEventResolved",
+            "event": {
+              "id": "event-4711",
+              "eventId": "solarRoof",
+              "day": 21090,
+              "deadlineDay": 21095,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              },
+              "amounts": {
+                "for": -60600,
+                "against": 0
+              }
+            },
+            "choiceId": "against",
+            "auto": true
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 228,
+          "day": 21095,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "neighbourCake",
+              "day": 21095,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        },
+        {
+          "id": 229,
+          "day": 21096,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "moniqueCard",
+              "day": 21096,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "plumontValFleuri",
+                "cityId": "dole",
+                "rivalId": "martinot"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 230,
+          "day": 21100,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "moniqueCard",
+              "day": 21100,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "saintCosmeBellevue",
+                "cityId": "chalon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 231,
+          "day": 21104,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "rain",
+              "day": 21104,
+              "textIndex": 0,
+              "propertyId": null,
+              "vars": {
+                "tenant": null,
+                "artisanId": null,
+                "neighbourhoodId": "palenteSaragosse",
+                "cityId": "besancon",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": null
+        },
+        {
+          "id": 232,
+          "day": 21106,
+          "event": {
+            "type": "propertyTaxCharged",
+            "amount": 35100
+          },
+          "subject": null
+        },
+        {
+          "id": 233,
+          "day": 21109,
+          "event": {
+            "type": "anecdote",
+            "anecdote": {
+              "anecdoteId": "djSet",
+              "day": 21109,
+              "textIndex": 0,
+              "propertyId": "property-99",
+              "vars": {
+                "tenant": "Lucas",
+                "artisanId": null,
+                "neighbourhoodId": "centreHistorique",
+                "cityId": "dole",
+                "rivalId": "delaporte"
+              }
+            }
+          },
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          }
+        }
+      ],
+      "newsSeenId": 0,
+      "mail": [
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-733",
+            "eventId": "hortenseAudit",
+            "day": 20751,
+            "deadlineDay": 20756,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "mesnilsPasteur",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "send": 0,
+              "ignore": 0
+            }
+          },
+          "choiceId": "ignore",
+          "auto": true,
+          "id": 10,
+          "day": 20756,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "offerReply",
+          "listingId": "listing-100",
+          "outcome": "accepted",
+          "amount": 4600000,
+          "id": 16,
+          "day": 20760,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": "listing-100",
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "loanAnswer",
+          "bankId": "tirelire",
+          "decision": "accepted",
+          "reason": null,
+          "debtRatio": null,
+          "amount": 4600000,
+          "ratePercent": 4.03,
+          "id": 22,
+          "day": 20765,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": "listing-100",
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-1236",
+            "eventId": "artisanLate",
+            "day": 20791,
+            "deadlineDay": 20793,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": null,
+              "artisanId": "compagnonsDeLaLoue",
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "bonus": -42900,
+              "insist": 0,
+              "patient": 0
+            }
+          },
+          "choiceId": "patient",
+          "auto": true,
+          "id": 37,
+          "day": 20793,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "hazard",
+          "hazardId": "wiringOutOfCode",
+          "choice": "treat",
+          "cost": 176400,
+          "id": 38,
+          "day": 20794,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-1414",
+            "eventId": "apprentice",
+            "day": 20805,
+            "deadlineDay": 20808,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": null,
+              "artisanId": "fenetresSurDole",
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "accept": 0,
+              "refuse": 0
+            }
+          },
+          "choiceId": "refuse",
+          "auto": true,
+          "id": 53,
+          "day": 20808,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-1553",
+            "eventId": "kevinAfterwork",
+            "day": 20816,
+            "deadlineDay": 20819,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "azans",
+              "cityId": "dole",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "go": 0,
+              "decline": 0
+            }
+          },
+          "choiceId": "decline",
+          "auto": true,
+          "id": 61,
+          "day": 20819,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-1658",
+            "eventId": "notaryDinner",
+            "day": 20826,
+            "deadlineDay": 20830,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "go": 0,
+              "decline": 0
+            }
+          },
+          "choiceId": "decline",
+          "auto": true,
+          "id": 73,
+          "day": 20830,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-2639",
+            "eventId": "weddingInvite",
+            "day": 20911,
+            "deadlineDay": 20916,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "go": 0,
+              "gift": -11300,
+              "decline": 0
+            }
+          },
+          "choiceId": "decline",
+          "auto": true,
+          "id": 114,
+          "day": 20916,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-2652",
+            "eventId": "roommateBrother",
+            "day": 20912,
+            "deadlineDay": 20916,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "accept": 0,
+              "refuse": 0
+            }
+          },
+          "choiceId": "accept",
+          "auto": true,
+          "id": 116,
+          "day": 20916,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-2671",
+            "eventId": "bikeRoom",
+            "day": 20914,
+            "deadlineDay": 20919,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "for": -13700,
+              "against": 0
+            }
+          },
+          "choiceId": "against",
+          "auto": true,
+          "id": 120,
+          "day": 20919,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-2722",
+            "eventId": "insulationGrant",
+            "day": 20918,
+            "deadlineDay": 20925,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "apply": 66100,
+              "skip": 0
+            }
+          },
+          "choiceId": "skip",
+          "auto": true,
+          "id": 124,
+          "day": 20925,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-2819",
+            "eventId": "yvonPapers",
+            "day": 20927,
+            "deadlineDay": 20934,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "centreSaintLaurent",
+              "cityId": "chalon",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "send": 0,
+              "later": -9900
+            }
+          },
+          "choiceId": "later",
+          "auto": true,
+          "id": 131,
+          "day": 20934,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-3119",
+            "eventId": "financeCoach",
+            "day": 20953,
+            "deadlineDay": 20956,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "stadeFontaineAuxLoups",
+              "cityId": "chalon",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "pay": -199700,
+              "decline": 0
+            }
+          },
+          "choiceId": "decline",
+          "auto": true,
+          "id": 143,
+          "day": 20956,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-3214",
+            "eventId": "lockedOut",
+            "day": 20964,
+            "deadlineDay": 20965,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "go": 0,
+              "locksmith": -22200,
+              "tomorrow": 0
+            }
+          },
+          "choiceId": "tomorrow",
+          "auto": true,
+          "id": 152,
+          "day": 20965,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-3436",
+            "eventId": "musicFestival",
+            "day": 20982,
+            "deadlineDay": 20985,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "centreAncien",
+              "cityId": "besancon",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "volunteer": 0,
+              "enjoy": 0
+            }
+          },
+          "choiceId": "enjoy",
+          "auto": true,
+          "id": 162,
+          "day": 20985,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-3636",
+            "eventId": "smokeDetector",
+            "day": 20999,
+            "deadlineDay": 21001,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "go": 0,
+              "ignore": 0
+            }
+          },
+          "choiceId": "ignore",
+          "auto": true,
+          "id": 173,
+          "day": 21001,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-3751",
+            "eventId": "cardFraud",
+            "day": 21010,
+            "deadlineDay": 21012,
+            "textIndex": 0,
+            "propertyId": null,
+            "vars": {
+              "tenant": null,
+              "artisanId": null,
+              "neighbourhoodId": "presSaintJean",
+              "cityId": "chalon",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "block": 0,
+              "later": -37100
+            }
+          },
+          "choiceId": "later",
+          "auto": true,
+          "id": 182,
+          "day": 21012,
+          "subject": null,
+          "dismissed": false
+        },
+        {
+          "kind": "copro",
+          "results": [
+            {
+              "id": "stairwell",
+              "passed": true,
+              "textIndex": 0
+            },
+            {
+              "id": "facadeRenovation",
+              "passed": true,
+              "textIndex": 1
+            }
+          ],
+          "id": 186,
+          "day": 21014,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-4640",
+            "eventId": "lateOnce",
+            "day": 21083,
+            "deadlineDay": 21086,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "martinot"
+            },
+            "amounts": {
+              "accept": 0,
+              "reminder": 0
+            }
+          },
+          "choiceId": "accept",
+          "auto": true,
+          "id": 215,
+          "day": 21086,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        },
+        {
+          "kind": "catalogEvent",
+          "event": {
+            "id": "event-4711",
+            "eventId": "solarRoof",
+            "day": 21090,
+            "deadlineDay": 21095,
+            "textIndex": 0,
+            "propertyId": "property-99",
+            "vars": {
+              "tenant": "Lucas",
+              "artisanId": null,
+              "neighbourhoodId": "centreHistorique",
+              "cityId": "dole",
+              "rivalId": "delaporte"
+            },
+            "amounts": {
+              "for": -60600,
+              "against": 0
+            }
+          },
+          "choiceId": "against",
+          "auto": true,
+          "id": 227,
+          "day": 21095,
+          "subject": {
+            "propertyId": "property-99",
+            "listingId": null,
+            "kind": "apartment",
+            "rooms": 1,
+            "surface": 27,
+            "lots": 0,
+            "cityId": "dole",
+            "neighbourhoodId": "centreHistorique"
+          },
+          "dismissed": false
+        }
+      ],
+      "nextId": 234
+    },
     "tutorial": {
       "enabled": true,
       "step": 0

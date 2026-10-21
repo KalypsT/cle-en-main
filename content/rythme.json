@@ -13,6 +13,12 @@
     "anecdotesKept": 6,
     "anecdoteBubbleDays": 3
   },
+  "inbox": {
+    "newsKept": 150,
+    "newsKeptDays": 180,
+    "mailKept": 80,
+    "mailKeptDays": 365
+  },
   "rewindPoints": 6,
   "journalEntries": 20000
 }

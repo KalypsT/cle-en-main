@@ -9,6 +9,7 @@ import {
   pause,
   t,
   tab,
+  ui,
 } from './helpers.ts';
 
 const MILESTONE = 'retours-jalon-8';
@@ -104,4 +105,37 @@ test('sells a let flat at a discount, or pays the tenant to leave', async ({ pag
   await buyout.getByTestId('buyout-amount').fill('5000');
   await buyout.getByRole('button', { name: /Proposer/ }).click();
   await expect(page.getByText(/Préavis donné/)).toBeVisible();
+});
+
+/** The « Décisions » tab keeps the mail and the news in the save (docs/04, section 4.10). */
+test('keeps the mail and the news of the decisions across a reload', async ({ page }) => {
+  await openGame(page);
+  await importState(page, ownerGame(24 * 200));
+  await tab(page, 'decisions');
+  await capture(page, '08-decisions', MILESTONE);
+
+  await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.mail}`) }).click();
+  const letters = page.locator('[data-testid^="mail-"]');
+  await expect(letters.first()).toBeVisible();
+  await capture(page, '09-courrier', MILESTONE);
+
+  await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.news}`) }).click();
+  const news = page.getByTestId('news').locator('li');
+  await expect(news.first()).toBeVisible();
+  await capture(page, '10-actualites', MILESTONE);
+  // A filter keeps one family only.
+  const all = await news.count();
+  await page.getByRole('button', { name: t.decisions.newsFilters.progress }).click();
+  await expect.poll(() => news.count()).toBeLessThan(all);
+
+  // Saved with the game: still there once it is loaded again.
+  await tab(page, 'menu');
+  await page.getByRole('button', { name: t.menu.save }).click();
+  await page.reload();
+  await page.getByRole('button', { name: ui.title.continue }).click();
+  await page.getByTestId('slot-1').getByRole('button', { name: ui.slots.load }).click();
+  await pause(page);
+  await tab(page, 'decisions');
+  await page.getByRole('button', { name: new RegExp(`^${t.decisions.sections.mail}`) }).click();
+  await expect(letters.first()).toBeVisible();
 });
