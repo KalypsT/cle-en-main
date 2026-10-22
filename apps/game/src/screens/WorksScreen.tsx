@@ -497,7 +497,7 @@ function Running({ owned }: { owned: OwnedProperty }) {
                   <span className="strong">
                     {task.artisanId ? artisanName(task.artisanId) : texts.you}
                   </span>
-                  <Badge tone={task.status === 'done' ? 'teal' : undefined}>
+                  <Badge tone={task.status === 'done' ? 'accent' : undefined}>
                     {texts.taskStatus[task.status]}
                   </Badge>
                 </span>

@@ -38,7 +38,7 @@ export function StatisticsScreen() {
     {
       title: t.statistics.netWorth,
       series: [
-        { label: t.statistics.netWorth, color: '#0f6f68', values: history.map((p) => p.netWorth) },
+        { label: t.statistics.netWorth, color: '#2b5c8a', values: history.map((p) => p.netWorth) },
       ],
     },
     {

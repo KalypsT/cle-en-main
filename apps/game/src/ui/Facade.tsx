@@ -65,7 +65,7 @@ export function Facade({
         <FacadeShape
           spec={spec}
           highlightFloor={building?.highlightFloor ?? null}
-          accent={owned ? 'var(--teal)' : null}
+          accent={owned ? 'var(--accent)' : null}
           scaffolding={building?.scaffolding ?? false}
         />
       </g>
@@ -85,7 +85,7 @@ function PlotFacade({
 }) {
   const viewHeight = 150;
   const ground = viewHeight - 14;
-  const accent = owned ? 'var(--teal)' : '#8b7355';
+  const accent = owned ? 'var(--accent)' : '#8b7355';
   return (
     <svg
       className="facade"
@@ -118,7 +118,7 @@ function PlotFacade({
 
 /** Small picture for list rows. */
 export function KindThumb({ property, owned = false }: { property: Property; owned?: boolean }) {
-  const wall = owned ? '#0f6f68' : WALLS[pickIndex(property.id, 1, WALLS.length)];
+  const wall = owned ? '#2b5c8a' : WALLS[pickIndex(property.id, 1, WALLS.length)];
   const roof = ROOFS[pickIndex(property.id, 3, ROOFS.length)];
   if (property.kind === 'land' || property.kind === 'parking') {
     return (

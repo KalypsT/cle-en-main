@@ -91,7 +91,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
   return (
     <>
       <div className="row wrap">
-        {summary && <Badge tone="teal">{t.assets.status[summary.status]}</Badge>}
+        {summary && <Badge tone="accent">{t.assets.status[summary.status]}</Badge>}
         <span className="small muted">
           {format(t.property.bought, {
             price: formatEuros(owned.purchasePrice),
@@ -228,7 +228,7 @@ export function ValueChart({
       title={texts.chart}
       xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
       series={[
-        { label: texts.value, color: '#0f6f68', values: history.map((p) => p.value) },
+        { label: texts.value, color: '#2b5c8a', values: history.map((p) => p.value) },
         {
           label: texts.price,
           color: '#8a7f6a',

@@ -14,11 +14,11 @@
   --muted: #6e6658;
   --faint: #9a917f;
 
-  /* Accent and the player's properties: teal. */
-  --teal: #0f6f68;
-  --teal-strong: #0a5751;
-  --teal-soft: #dcefeb;
-  --on-teal: #fffdf8;
+  /* Accent and the player's properties: shutter blue. */
+  --accent: #2b5c8a;
+  --accent-strong: #1f4870;
+  --accent-soft: #dfe8f2;
+  --on-accent: #fffdf8;
   /* Alert: amber. Negative: brick red. Positive: green. */
   --amber: #a35a06;
   --amber-soft: #fcefd3;
@@ -28,7 +28,7 @@
   --green-soft: #e1f0dd;
   --amber-line: #efd9a8;
   --brick-line: #eec2b6;
-  --teal-line: #b9ddd6;
+  --accent-line: #bccfe3;
   --translucent: rgb(255 253 248 / 94%);
   --sky: #dfe9ee;
   --pavement: #cfc8b8;
@@ -75,10 +75,10 @@
   --text: #ecebe6;
   --muted: #aaa496;
   --faint: #7d786c;
-  --teal: #3fb3a8;
-  --teal-strong: #79d3c9;
-  --teal-soft: #16322f;
-  --on-teal: #0d1513;
+  --accent: #7fb0e0;
+  --accent-strong: #a9cbee;
+  --accent-soft: #172636;
+  --on-accent: #0c1520;
   --amber: #f0b45a;
   --amber-soft: #392c15;
   --brick: #f0806a;
@@ -87,7 +87,7 @@
   --green-soft: #1a301d;
   --amber-line: #5a4520;
   --brick-line: #5c3027;
-  --teal-line: #275a54;
+  --accent-line: #2c4766;
   --translucent: rgb(29 31 36 / 94%);
   --sky: #2b3450;
   --pavement: #3a3a40;
@@ -139,7 +139,7 @@ select {
 }
 
 :focus-visible {
-  outline: 3px solid var(--teal);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -208,7 +208,7 @@ select {
 }
 
 .accent {
-  color: var(--teal);
+  color: var(--accent);
 }
 
 /* ---------- Layout ---------- */
@@ -311,9 +311,9 @@ select {
   border-color: var(--brick-line);
 }
 
-.card.tinted-teal {
-  background: var(--teal-soft);
-  border-color: var(--teal-line);
+.card.tinted-accent {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
 }
 
 .card-heading {
@@ -449,13 +449,13 @@ select {
 }
 
 .button.primary {
-  border-color: var(--teal);
-  background: var(--teal);
-  color: var(--on-teal);
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .button.primary:active {
-  background: var(--teal-strong);
+  background: var(--accent-strong);
 }
 
 .button.danger {
@@ -483,7 +483,7 @@ select {
   padding: 0 4px;
   border: 0;
   background: none;
-  color: var(--teal);
+  color: var(--accent);
   font-weight: 700;
   cursor: pointer;
 }
@@ -513,7 +513,7 @@ select {
   padding: 8px;
   border: 0;
   background: none;
-  color: var(--teal);
+  color: var(--accent);
   font-size: 0.8rem;
   font-weight: 800;
   cursor: pointer;
@@ -562,8 +562,8 @@ select {
 }
 
 .segmented button[aria-pressed='true'] {
-  background: var(--teal);
-  color: var(--on-teal);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .chips {
@@ -589,9 +589,9 @@ select {
 }
 
 .chip[aria-pressed='true'] {
-  border-color: var(--teal);
-  background: var(--teal-soft);
-  color: var(--teal-strong);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 
 /* ---------- Badges ---------- */
@@ -610,9 +610,9 @@ select {
   color: var(--text);
 }
 
-.badge.teal {
-  background: var(--teal-soft);
-  color: var(--teal-strong);
+.badge.accent {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
 }
 
 .badge.amber {
@@ -670,7 +670,7 @@ select {
 .range {
   width: 100%;
   min-height: var(--tap);
-  accent-color: var(--teal);
+  accent-color: var(--accent);
 }
 
 .switch {
@@ -685,7 +685,7 @@ select {
 .switch input {
   width: 22px;
   height: 22px;
-  accent-color: var(--teal);
+  accent-color: var(--accent);
 }
 
 .option-card {
@@ -702,8 +702,8 @@ select {
 }
 
 .option-card[aria-pressed='true'] {
-  border-color: var(--teal);
-  background: var(--teal-soft);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .option-card:disabled {
@@ -764,14 +764,14 @@ select {
 }
 
 .speed button[aria-pressed='true'] {
-  background: var(--teal);
-  color: var(--on-teal);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 /* A paused clock is seen at a glance (the pause icon still says it). */
 .speed button.pause[aria-pressed='true'] {
   background: var(--brick);
-  color: var(--on-teal);
+  color: var(--on-accent);
 }
 
 .status-tiles {
@@ -796,7 +796,7 @@ select {
 .freetime-bar span {
   display: block;
   height: 100%;
-  background: var(--teal);
+  background: var(--accent);
 }
 
 .decisions-button {
@@ -875,7 +875,7 @@ select {
 }
 
 .tab-bar button[aria-current='page'] {
-  color: var(--teal);
+  color: var(--accent);
 }
 
 .tab-bar .counter {
@@ -1012,7 +1012,7 @@ select {
   gap: 12px;
   margin: var(--gap) var(--gap) 0;
   padding: 12px;
-  border: 1px solid var(--teal-line);
+  border: 1px solid var(--accent-line);
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -1121,7 +1121,7 @@ select {
 }
 
 .state-dots i[data-on='true'] {
-  background: var(--teal);
+  background: var(--accent);
 }
 
 .state-dots[data-level='low'] i[data-on='true'] {
@@ -1228,7 +1228,7 @@ select {
 /* News not seen yet when the section opened (« Décisions » > Actualités). */
 .feed li.unseen {
   padding-left: 8px;
-  border-left: 3px solid var(--teal);
+  border-left: 3px solid var(--accent);
 }
 
 .feed .link-button {
@@ -1258,8 +1258,9 @@ select {
 }
 
 .title-logo {
-  width: 96px;
-  height: 96px;
+  display: block;
+  width: min(90vw, 360px);
+  height: auto;
 }
 
 .game-title {
@@ -1463,8 +1464,8 @@ select {
   transform: translateX(-50%);
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--teal);
-  color: var(--on-teal);
+  background: var(--accent);
+  color: var(--on-accent);
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
@@ -1516,9 +1517,9 @@ select {
 }
 
 .street-bubble.mine {
-  border-color: var(--teal);
-  background: var(--teal);
-  color: var(--on-teal);
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .street-bubble.alert {
@@ -1801,11 +1802,11 @@ select {
 }
 
 .section-mine {
-  stroke: var(--teal);
+  stroke: var(--accent);
 }
 
 .section-tag {
-  fill: var(--teal-strong);
+  fill: var(--accent-strong);
   font-size: 10px;
   font-weight: 800;
   paint-order: stroke;
@@ -1891,7 +1892,7 @@ select {
 .state-bar span {
   display: block;
   height: 100%;
-  background: var(--teal);
+  background: var(--accent);
 }
 
 .volume {
@@ -1903,7 +1904,7 @@ select {
 .volume input {
   width: 100%;
   min-height: var(--tap);
-  accent-color: var(--teal);
+  accent-color: var(--accent);
 }
 
 /* Milestone 6: events, progression, reviews and overlays. */
@@ -1941,7 +1942,7 @@ select {
 .meter > span {
   display: block;
   height: 100%;
-  background: var(--teal);
+  background: var(--accent);
 }
 
 .achievement {
@@ -1955,8 +1956,8 @@ select {
 }
 
 .achievement.earned {
-  border-color: var(--teal-line);
-  background: var(--teal-soft);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
   opacity: 1;
 }
 
@@ -2009,7 +2010,7 @@ select {
 
 .celebration-title {
   margin: 0;
-  color: var(--teal-strong);
+  color: var(--accent-strong);
 }
 
 .confetti {
@@ -2030,7 +2031,7 @@ select {
 }
 
 .confetti span:nth-child(3n) {
-  background: var(--teal);
+  background: var(--accent);
 }
 
 .confetti span:nth-child(3n + 1) {
@@ -2064,7 +2065,7 @@ select {
   stroke-dasharray: 5 5;
 }
 .region-road.base {
-  stroke: var(--teal);
+  stroke: var(--accent);
   stroke-width: 2.5;
 }
 .region-minutes {
@@ -2082,8 +2083,8 @@ select {
   stroke-width: 2;
 }
 .region-city.base circle {
-  fill: var(--teal);
-  stroke: var(--teal-strong);
+  fill: var(--accent);
+  stroke: var(--accent-strong);
 }
 .region-city.selected circle {
   stroke: var(--amber);
@@ -2112,5 +2113,5 @@ select {
 .works-pick {
   margin: 2px 0 8px 10px;
   padding-left: 12px;
-  border-left: 3px solid var(--teal);
+  border-left: 3px solid var(--accent);
 }

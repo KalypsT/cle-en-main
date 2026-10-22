@@ -43,7 +43,7 @@ export function AgendaScreen() {
             key={day.day}
             title={formatDayLong(day.day)}
             aside={
-              <Badge tone={day.kind === 'work' ? undefined : 'teal'}>
+              <Badge tone={day.kind === 'work' ? undefined : 'accent'}>
                 {day.holiday && day.kind === 'schoolHoliday'
                   ? day.holiday
                   : t.agenda.kinds[day.kind]}

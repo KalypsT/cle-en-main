@@ -30,9 +30,9 @@ const memory: { neighbourhoodId: string | null; scroll: Record<string, number> }
 };
 
 function cssAccent(): number {
-  const value = getComputedStyle(document.documentElement).getPropertyValue('--teal').trim();
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
   const match = /^#([0-9a-f]{6})$/i.exec(value);
-  return match?.[1] ? parseInt(match[1], 16) : 0x0f6f68;
+  return match?.[1] ? parseInt(match[1], 16) : 0x2b5c8a;
 }
 
 function qualityLevel(choice: 'auto' | 'high' | 'economy'): QualityLevel | 'auto' {
@@ -367,7 +367,7 @@ export function StreetWorld({ active }: { active: boolean }) {
                       <FacadeShape
                         spec={spec}
                         highlightFloor={building.highlightFloor}
-                        accent={building.role === 'owned' ? 'var(--teal)' : null}
+                        accent={building.role === 'owned' ? 'var(--accent)' : null}
                         scaffolding={building.scaffolding}
                       />
                     </svg>

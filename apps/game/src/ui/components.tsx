@@ -38,7 +38,7 @@ export function Card({
 }: {
   title?: ReactNode | undefined;
   aside?: ReactNode | undefined;
-  tint?: 'amber' | 'brick' | 'teal' | undefined;
+  tint?: 'amber' | 'brick' | 'accent' | undefined;
   children?: ReactNode | undefined;
   testId?: string | undefined;
 }) {
@@ -105,7 +105,7 @@ export function Badge({
   icon,
   children,
 }: {
-  tone?: 'teal' | 'amber' | 'brick' | 'green' | undefined;
+  tone?: 'accent' | 'amber' | 'brick' | 'green' | undefined;
   icon?: IconName | undefined;
   children: ReactNode;
 }) {

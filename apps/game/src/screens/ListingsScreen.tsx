@@ -56,7 +56,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
           {listing.offer?.counter ? (
             <Badge tone="amber">{t.listings.counter}</Badge>
           ) : listing.offer ? (
-            <Badge tone="teal">{t.listings.offerPending}</Badge>
+            <Badge tone="accent">{t.listings.offerPending}</Badge>
           ) : reply ? (
             <Badge tone="brick">
               {
@@ -75,7 +75,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
           ) : planned ? (
             <Badge icon="clock">{t.listings.visitPlanned}</Badge>
           ) : null}
-          {view?.isNew && <Badge tone="teal">{t.listings.new}</Badge>}
+          {view?.isNew && <Badge tone="accent">{t.listings.new}</Badge>}
           {favorite && (
             <Badge tone="amber" icon="star">
               {t.listings.favorite}

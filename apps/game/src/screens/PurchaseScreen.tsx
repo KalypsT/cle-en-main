@@ -125,7 +125,7 @@ export function PurchaseScreen({ id }: { id: string }) {
 
       <Card
         title={t.purchase.applications}
-        aside={purchase.cash && <Badge tone="teal">{t.purchase.cash}</Badge>}
+        aside={purchase.cash && <Badge tone="accent">{t.purchase.cash}</Badge>}
       >
         {purchase.applications.length === 0 && (
           <p className="small muted">{t.purchase.noApplication}</p>
