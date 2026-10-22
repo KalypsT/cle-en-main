@@ -25,10 +25,10 @@ import {
 import { KindThumb } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
 
-const STATUS_TONE: Record<PropertyStatus, 'teal' | 'amber' | 'green' | undefined> = {
-  home: 'teal',
+const STATUS_TONE: Record<PropertyStatus, 'accent' | 'amber' | 'green' | undefined> = {
+  home: 'accent',
   works: 'amber',
-  sold: 'teal',
+  sold: 'accent',
   forSale: 'amber',
   let: 'green',
   listedForRent: 'amber',
@@ -80,7 +80,7 @@ export function AssetsTab() {
             series={[
               {
                 label: t.assets.curveNetWorth,
-                color: '#0f6f68',
+                color: '#2b5c8a',
                 values: history.map((p) => p.netWorth),
               },
               {

@@ -48,7 +48,7 @@ export function BankerScreen({ id }: { id: string }) {
             title={texts.trustCurve}
             xLabels={[formatShortDate(first.date), formatShortDate(last.date)]}
             formatTick={(value) => String(Math.round(value))}
-            series={[{ label: texts.trust, color: '#0f6f68', values: points.map((p) => p.trust) }]}
+            series={[{ label: texts.trust, color: '#2b5c8a', values: points.map((p) => p.trust) }]}
           />
         ) : (
           <p className="small muted">{texts.trustSoon}</p>

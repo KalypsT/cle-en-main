@@ -65,7 +65,7 @@ function Titles() {
             <Card
               key={title.id}
               title={title.name}
-              tint={held !== null ? 'teal' : undefined}
+              tint={held !== null ? 'accent' : undefined}
               aside={
                 held !== null ? (
                   <Badge tone="green" icon="check">

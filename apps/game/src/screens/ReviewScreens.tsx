@@ -71,7 +71,7 @@ export function MonthlyReviewContent({ date }: { date?: CalendarDate | undefined
         <Card title={t.review.newAchievements}>
           <div className="row wrap">
             {review.titles.map((id) => (
-              <Badge key={id} tone="teal" icon="trophy">
+              <Badge key={id} tone="accent" icon="trophy">
                 {titleName(id)}
               </Badge>
             ))}
@@ -119,7 +119,7 @@ export function YearReviewContent({ year }: { year?: number | undefined }) {
   return (
     <div className="stack" data-testid="year-review">
       <h2 className="h2 display">{format(t.review.yearHeading, { year: review.year })}</h2>
-      <Card title={t.review.yvon} tint="teal">
+      <Card title={t.review.yvon} tint="accent">
         <p className="event-text">{format(pick(yvon.greetings), { annee: review.year })}</p>
         <ul className="advice">
           {review.advice.map((advice, index) => (
@@ -164,7 +164,7 @@ export function YearReviewContent({ year }: { year?: number | undefined }) {
         <Card title={t.review.yearAchievements}>
           <div className="row wrap">
             {review.titles.map((id) => (
-              <Badge key={id} tone="teal" icon="trophy">
+              <Badge key={id} tone="accent" icon="trophy">
                 {titleName(id)}
               </Badge>
             ))}

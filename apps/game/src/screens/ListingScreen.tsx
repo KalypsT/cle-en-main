@@ -247,7 +247,7 @@ function ListingBody({ listing }: { listing: Listing }) {
         </Card>
       )}
       {offer && !offer.counter && (
-        <Card tint="teal">
+        <Card tint="accent">
           <p className="strong" data-testid="offer-status">
             {format(t.listing.offerSent, {
               amount: formatEuros(offer.amount),

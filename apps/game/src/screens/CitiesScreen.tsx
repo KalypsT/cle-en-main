@@ -129,7 +129,7 @@ export function CitiesScreen() {
       {selected && (
         <Card
           title={selected.name}
-          aside={selected.isBase ? <Badge tone="teal">{t.cities.base}</Badge> : undefined}
+          aside={selected.isBase ? <Badge tone="accent">{t.cities.base}</Badge> : undefined}
           testId={`city-sheet-${selected.cityId}`}
         >
           <p className="small">{selected.profile}</p>

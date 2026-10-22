@@ -32,8 +32,8 @@ import {
 type ColorBy = 'price' | 'rent' | 'plain';
 type Point = readonly [number, number];
 
-/** Shades from light to deep teal, for the five neighbourhoods ranked. */
-const SHADES = ['#eef6f3', '#d6ece6', '#b9ddd4', '#93cabd', '#6db5a5'];
+/** Shades from light to deep blue, for the five neighbourhoods ranked. */
+const SHADES = ['#eef3f8', '#d7e3ef', '#b9cfe4', '#93b4d4', '#6d97c2'];
 const MARGIN = 250;
 /** Pins closer than this on the screen (px) are shown as one cluster. */
 const CLUSTER_PX = 40;
@@ -356,7 +356,7 @@ export function MapTab() {
                     cx={cluster.x}
                     cy={cluster.y}
                     r={(favorite ? 9 : 7) * pixel}
-                    fill={favorite ? '#a35a06' : '#0f6f68'}
+                    fill={favorite ? '#a35a06' : '#2b5c8a'}
                     stroke="#fffdf8"
                     strokeWidth={2 * pixel}
                   />
@@ -386,7 +386,7 @@ export function MapTab() {
                   cx={cluster.x}
                   cy={cluster.y}
                   r={14 * pixel}
-                  fill={favorite ? '#a35a06' : '#0f6f68'}
+                  fill={favorite ? '#a35a06' : '#2b5c8a'}
                   stroke="#fffdf8"
                   strokeWidth={2 * pixel}
                 />
@@ -467,7 +467,7 @@ export function MapTab() {
       </div>
       <div className="legend">
         <span>
-          <i style={{ background: '#0f6f68', borderRadius: '50%' }} />
+          <i style={{ background: '#2b5c8a', borderRadius: '50%' }} />
           {t.map.legendListings}
         </span>
         <span>
@@ -590,7 +590,7 @@ const MapLayers = memo(function MapLayers({
               key={i}
               d={path(outline, true)}
               fill={fill(n.id)}
-              stroke={selected === n.id ? '#0a5751' : '#a99f8a'}
+              stroke={selected === n.id ? '#1f4870' : '#a99f8a'}
               strokeWidth={(selected === n.id ? 3 : 1.2) * lineUnit}
             />
           ))}

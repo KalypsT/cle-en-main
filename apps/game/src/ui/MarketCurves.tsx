@@ -7,12 +7,12 @@ import { LineChart } from './LineChart.tsx';
 
 /** One colour per neighbourhood (up to eight in a city). */
 const COLORS = [
-  '#0f6f68',
+  '#2b5c8a',
   '#a35a06',
   '#5b4a8a',
   '#a33a2a',
   '#3f7d3a',
-  '#2f5f8a',
+  '#0f6f68',
   '#8a7f6a',
   '#b0407a',
 ];
@@ -32,7 +32,7 @@ export function RateCurve() {
         formatTick={(value) => formatPercent(Math.round(value * 100) / 100)}
         fromZero={false}
         series={[
-          { label: t.statistics.rate, color: '#0f6f68', values: points.map((p) => p.ratePercent) },
+          { label: t.statistics.rate, color: '#2b5c8a', values: points.map((p) => p.ratePercent) },
         ]}
       />
     </Card>
@@ -61,7 +61,7 @@ export function NeighbourhoodPrices({ cityId, title }: { cityId: string; title?:
           const base = first.priceIndex[cityId]?.[neighbourhood.id] ?? 1;
           return {
             label: neighbourhood.name,
-            color: COLORS[i % COLORS.length] ?? '#0f6f68',
+            color: COLORS[i % COLORS.length] ?? '#2b5c8a',
             values: points.map(
               (point) => ((point.priceIndex[cityId]?.[neighbourhood.id] ?? base) / base) * 100,
             ),

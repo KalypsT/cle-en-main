@@ -26,7 +26,7 @@ for (const { file, size, maskable } of targets) {
   // Maskable icons need a full-bleed background with the artwork inside the 80 % safe zone.
   const inner = maskable ? Math.round(size * 0.8) : size;
   await page.setContent(
-    `<body style="margin:0;display:grid;place-items:center;width:${size}px;height:${size}px;background:${maskable ? '#1f6f6b' : 'transparent'}">
+    `<body style="margin:0;display:grid;place-items:center;width:${size}px;height:${size}px;background:${maskable ? '#2b5c8a' : 'transparent'}">
        <img src="${dataUrl}" width="${inner}" height="${inner}">
      </body>`,
   );

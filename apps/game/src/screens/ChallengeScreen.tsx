@@ -14,7 +14,7 @@ export function ChallengeCard() {
     <Card
       title={format(t.challenge.from, { giver: giverName(challenge.id) })}
       aside={
-        <Badge tone={view.accepted ? 'teal' : 'amber'} icon="clock">
+        <Badge tone={view.accepted ? 'accent' : 'amber'} icon="clock">
           {view.accepted
             ? format(t.challenge.until, { date: formatDayLong(view.deadlineDay) })
             : format(t.challenge.answerBy, {

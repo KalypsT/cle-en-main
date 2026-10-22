@@ -10,12 +10,14 @@
 | Rôle | Intention |
 |---|---|
 | Fond | Ivoire chaud |
-| Accent, biens du joueur | Vert sarcelle (réglable) |
+| Accent, biens du joueur | Bleu volet (réglable) : `#2b5c8a`, `#7fb0e0` en thème sombre |
 | Alerte | Ambre |
 | Négatif | Rouge brique |
 | Positif | Vert |
 
-Les couleurs ne portent jamais l'information seules : toujours une icône ou un texte. Valeurs exactes définies au jalon 4.
+Les couleurs ne portent jamais l'information seules : toujours une icône ou un texte. Valeurs exactes définies au jalon 4 (`apps/game/src/styles.css`, variables `--accent`, `--amber`, `--brick`, `--green`).
+
+**Icône de l'application** : une clé couchée dont la tête est une maison, avec une serrure ambrée, ivoire sur fond bleu volet. Elle est dessinée en SVG (`apps/game/public/icons/icon.svg`), comme le reste du jeu.
 
 ## 5.3 Les façades, générées par modules
 

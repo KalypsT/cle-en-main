@@ -4,9 +4,9 @@ import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import uiTexts from '../../content/textes/interface.json' with { type: 'json' };
 
-// Warm ivory background and teal accent (docs/05-direction-artistique.md).
+// Warm ivory background and shutter-blue accent (docs/05-direction-artistique.md).
 const BACKGROUND_COLOR = '#f7f1e3';
-const THEME_COLOR = '#1f6f6b';
+const THEME_COLOR = '#2b5c8a';
 
 /** Injects the game name, from content/, into index.html. */
 function htmlTexts(): Plugin {

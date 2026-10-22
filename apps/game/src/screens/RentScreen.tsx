@@ -214,7 +214,7 @@ function Candidates({ owned }: { owned: OwnedProperty }) {
     <Card
       title={t.rent.candidates}
       aside={
-        <Badge tone="teal">
+        <Badge tone="accent">
           {format(t.common.perMonth, { amount: formatEuros(rental.monthlyRent) })}
         </Badge>
       }
