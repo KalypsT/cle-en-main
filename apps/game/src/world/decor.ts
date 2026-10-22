@@ -226,10 +226,9 @@ export function landmarkOf(cityId: string, neighbourhoodId: string): Landmark | 
 const LANDMARK_COLOR = 0x7c7ea0;
 const LANDMARK_SHADE = 0x5f6182;
 
-function drawLandmark(g: Graphics, landmark: Landmark, width: number): void {
+function drawLandmark(g: Graphics, landmark: Landmark, sx: number): void {
   const fill = { color: LANDMARK_COLOR, alpha: 0.75 };
   const dark = { color: LANDMARK_SHADE, alpha: 0.75 };
-  const sx = width * 0.55;
   switch (landmark) {
     case 'collegiale':
       g.rect(sx, GROUND_Y - 250, 34, 250).fill(fill);
@@ -286,7 +285,7 @@ export function drawSkyline(
   g: Graphics,
   width: number,
   seed: number,
-  landmark: Landmark | null,
+  landmark: { kind: Landmark; x: number } | null,
 ): { x: number; w: number; h: number }[] {
   const random = decorRandom(seed);
   const fill = { color: 0x8d8fae, alpha: 0.55 };
@@ -306,7 +305,7 @@ export function drawSkyline(
     g.fill(fill);
     x += w - 4;
   }
-  if (landmark) drawLandmark(g, landmark, width);
+  if (landmark) drawLandmark(g, landmark.kind, landmark.x);
   return blocks;
 }
 
