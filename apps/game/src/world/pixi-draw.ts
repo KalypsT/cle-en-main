@@ -57,6 +57,22 @@ export function gradientTexture(): Texture {
   return Texture.from(canvas);
 }
 
+/** A vertical fade (transparent at the top, white at the bottom), for the haze. */
+export function fadeTexture(): Texture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 64;
+  const context = canvas.getContext('2d');
+  if (context) {
+    const gradient = context.createLinearGradient(0, 0, 0, 64);
+    gradient.addColorStop(0, 'rgba(255,255,255,0)');
+    gradient.addColorStop(1, 'rgba(255,255,255,1)');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 1, 64);
+  }
+  return Texture.from(canvas);
+}
+
 const css = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
 
 /** Repaints the sky gradient into the texture's canvas (the middle colour at `middleAt`). */

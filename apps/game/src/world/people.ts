@@ -226,6 +226,14 @@ export function createPassant(context: PassantContext): Walker {
     }
   }
   if (extra) view.addChildAt(extra, 0);
+  // A soft shadow on the pavement, under the walker and what they walk with.
+  const shadowWidth =
+    accessory === 'bike' ? 15 : accessory === 'dog' || accessory === 'stroller' ? 18 : 7;
+  const shadowX = accessory === 'dog' || accessory === 'stroller' ? 9 : 0;
+  view.addChildAt(
+    new Graphics().ellipse(shadowX, 0.5, shadowWidth, 1.8).fill({ color: 0x000000, alpha: 0.16 }),
+    0,
+  );
 
   const speed = accessory === 'bike' ? 55 + random() * 20 : (child ? 22 : 16) + random() * 12;
   const walker: Walker = {
@@ -276,6 +284,8 @@ export function createCar(random: () => number, glow: Texture, dir: 1 | -1): Car
   const small = random() < 0.5;
   const length = small ? 54 : 66;
   const g = new Graphics()
+    .ellipse(length / 2, -1, length / 2 + 3, 3.5)
+    .fill({ color: 0x000000, alpha: 0.2 })
     .roundRect(0, -16, length, 12, 4)
     .fill(color)
     .poly([10, -16, 18, -27, length - 20, -27, length - 10, -16])

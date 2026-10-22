@@ -5,6 +5,7 @@ import {
   drawGround,
   drawLamp,
   drawPlanter,
+  drawFarSkyline,
   drawSkyline,
   drawSkylineLights,
   landmarkOf,
@@ -14,7 +15,7 @@ import {
   forSalePanel,
   GARLAND_COLORS,
 } from './decor.ts';
-import { mix } from './facade.ts';
+import { mix, shade } from './facade.ts';
 import { blendLight, type Light, lightOf, litShare } from './light.ts';
 import { type Crowd, crowdOf } from './crowd.ts';
 import {
@@ -29,6 +30,7 @@ import { barShapes, facadeShapes, paneShapes } from './shapes.ts';
 import {
   decorRandom,
   drawShapes,
+  fadeTexture,
   glowTexture,
   gradientTexture,
   hashString,
@@ -110,6 +112,8 @@ interface StreetLayers {
 }
 
 const MARGIN = 80;
+/** Clouds in the sky: half of them near, half far. */
+const CLOUDS = 8;
 /** Curtains of the lit windows, and the goods in the shop windows. */
 const CURTAINS = [0xc9714a, 0xd9b26a, 0x8f6aa8, 0x6f9a8a, 0xe8d8c0];
 const GOODS = [0xc95d4a, 0xf2c14e, 0x6fc3b8, 0x8a5a32, 0xf2f2ee, 0x3f6f9a];
@@ -134,6 +138,10 @@ export class StreetScene {
    * The light tints all but the lit windows and the halos.
    */
   private readonly scene = new Container();
+  /** The farthest roofs, in the haze: tinted with the sky's colours. */
+  private readonly farSkyline = new Graphics();
+  /** Haze at the foot of the town, in the horizon's colour. */
+  private readonly haze = new Sprite();
   private readonly skyline = new Graphics();
   /** Lit windows of the town behind, at night. */
   private readonly skylineLights = new Graphics();
@@ -211,13 +219,16 @@ export class StreetScene {
     this.glow = glowTexture();
     this.skyTexture = gradientTexture();
     this.sky.texture = this.skyTexture;
+    this.haze.texture = fadeTexture();
     this.orbHalo.texture = this.glow;
     this.orbHalo.anchor.set(0.5);
     this.orbHalo.blendMode = 'add';
     this.weather = new WeatherLayer(this.glow);
     this.scene.addChild(
+      this.farSkyline,
       this.skyline,
       this.skylineLights,
+      this.haze,
       this.back,
       this.windowLights,
       this.front,
@@ -424,16 +435,21 @@ export class StreetScene {
       this.stars.addChild(star);
     }
     this.clouds.removeChildren().forEach((child) => child.destroy());
-    for (let i = 0; i < 4; i++) {
+    // Puffy clouds with a flat, shaded base; the last ones far away, smaller and slower.
+    for (let i = 0; i < CLOUDS; i++) {
       const cloud = new Graphics();
-      const w = 50 + random() * 50;
-      cloud
-        .ellipse(0, 0, w, 11)
-        .fill(0xffffff)
-        .ellipse(w * 0.3, -9, w * 0.45, 12)
-        .fill(0xffffff);
+      const w = 40 + random() * 55;
+      const puffs = 3 + Math.floor(random() * 2);
+      // The shaded underside first, the white puffs over it.
+      cloud.ellipse(0, w * 0.02, w * 0.7, w * 0.14).fill(0xdde3ec);
+      for (let p = 0; p < puffs; p++) {
+        const r = w * (0.24 + random() * 0.14);
+        const cx = -w * 0.55 + ((p + 0.5) * w * 1.1) / puffs + (random() - 0.5) * 6;
+        cloud.circle(cx, -r * 0.55 - w * 0.03, r);
+      }
+      cloud.fill(0xffffff);
+      if (i >= CLOUDS / 2) cloud.scale.set(0.6);
       cloud.position.set(random() * this.width, 40 + random() * this.height * 0.3);
-      cloud.alpha = 0.6;
       this.clouds.addChild(cloud);
     }
   }
@@ -455,7 +471,11 @@ export class StreetScene {
       landmarkOf(data.cityId, data.neighbourhoodId),
     );
     drawSkylineLights(this.skylineLights.clear(), blocks, data.seed + 11);
+    drawFarSkyline(this.farSkyline.clear(), data.layout.width + 400, data.seed + 13);
     this.skyline.x = -200;
+    this.haze.position.set(-400, GROUND_Y - 120);
+    this.haze.width = data.layout.width + 800;
+    this.haze.height = 120;
     this.drawSkyDecor();
     const snowing = (street: LaidStreet) => street.street.weather === 'snow';
 
@@ -929,6 +949,7 @@ export class StreetScene {
     this.lastCameraX = this.cameraX;
     this.scene.x = -this.cameraX;
     this.skyline.x = -200 + (this.cameraX / this.scale) * 0.7;
+    this.farSkyline.x = -200 + (this.cameraX / this.scale) * 0.85;
     if (Math.abs(cameraDx) > 0) this.updateTarget();
 
     // Light: ease towards the target.
@@ -941,6 +962,10 @@ export class StreetScene {
     // People and cars a little lighter than the walls: they stay readable at night.
     this.actors.tint = mix(this.light.tint, 0xffffff, 0.3);
     this.skylineLights.x = this.skyline.x;
+    // The distance takes the colour of the sky behind it.
+    this.farSkyline.tint = shade(mix(this.light.skyMiddle, this.light.skyBottom, 0.55), -0.1);
+    this.haze.tint = this.light.skyBottom;
+    this.haze.alpha = this.light.night ? 0.2 : 0.38;
     this.skylineLights.alpha = Math.max(0, (this.light.glow - 0.3) / 0.7) * 0.8;
     const { skyTop, skyMiddle, skyBottom } = this.light;
     const skyKey = `${skyTop}-${skyMiddle}-${skyBottom}`;
@@ -1004,16 +1029,21 @@ export class StreetScene {
     for (const bird of this.flyers) bird.update(dt, still);
     if (!still) this.arrive(dt, cameraDx);
     for (const worker of this.workers) worker.update(dt, still);
+    // A few clouds in fair weather, a full sky otherwise.
+    const cloudy = this.currentWeather === 'sun' ? 3 : CLOUDS;
     for (const [i, cloud] of this.clouds.children.entries()) {
-      if (!still) cloud.x += (4 + i) * dt - cameraDx * 0.1;
+      const far = i >= CLOUDS / 2;
+      cloud.visible = (i % (CLOUDS / 2)) * 2 + (far ? 1 : 0) < cloudy;
+      if (!still) cloud.x += (far ? 2 + i * 0.5 : 4 + i) * dt - cameraDx * (far ? 0.05 : 0.1);
       if (cloud.x > this.width + 120) cloud.x = -120;
       if (cloud.x < -140) cloud.x = this.width + 100;
-      cloud.alpha = this.currentWeather === 'sun' ? 0.45 : 0.75;
-      // Low sun: the clouds take its colour (not under a grey sky).
+      // Opaque (overlapping puffs would show through), blended into the sky by their colour:
+      // the low sun's in fair weather, the sky's for the far ones and under a grey sky.
       const sunny = this.currentWeather === 'sun' || this.currentWeather === 'clouds';
-      cloud.tint = this.light.night
+      const lit = this.light.night
         ? 0x3a4466
-        : mix(this.light.tint, this.light.orbGlow, sunny ? 1 - this.light.orb : 0);
+        : mix(this.light.tint, this.light.orbGlow, sunny ? (1 - this.light.orb) * 0.7 : 0);
+      cloud.tint = mix(lit, this.light.skyTop, (far ? 0.35 : 0.12) + (sunny ? 0 : 0.2));
     }
     if (!still) this.weather.update(dt, cameraDx);
   }

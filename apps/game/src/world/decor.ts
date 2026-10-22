@@ -40,7 +40,10 @@ export function drawGround(
   for (let x = left; x < left + width; x += 22) {
     g.rect(x, GROUND_Y + 2, 1, SIDEWALK - 4).fill({ color: KERB, alpha: 0.35 });
   }
+  // The buildings' shade at their foot, then the kerb and its lit edge.
+  g.rect(left, GROUND_Y, width, 4).fill({ color: 0x000000, alpha: 0.06 });
   g.rect(left, GROUND_Y + SIDEWALK - 4, width, 4).fill(KERB);
+  g.rect(left, GROUND_Y + SIDEWALK - 4, width, 1).fill({ color: 0xffffff, alpha: 0.35 });
   if (street.street.quay) {
     g.rect(left, GROUND_Y + SIDEWALK, width, 8).fill(QUAY);
     g.rect(left, GROUND_Y + SIDEWALK + 8, width, ROAD + 40).fill(WATER);
@@ -51,6 +54,14 @@ export function drawGround(
     }
   } else {
     g.rect(left, GROUND_Y + SIDEWALK, width, ROAD).fill(options.snow ? 0x8b8e96 : ROAD_COLOR);
+    // The gutter under the kerb, and manhole covers now and then.
+    g.rect(left, GROUND_Y + SIDEWALK, width, 3).fill({ color: 0x000000, alpha: 0.12 });
+    for (let x = left + 70; x < left + width; x += 230) {
+      g.ellipse(x, GROUND_Y + SIDEWALK + ROAD * 0.78, 9, 2.6).fill({
+        color: 0x000000,
+        alpha: 0.18,
+      });
+    }
     for (let x = left + 10; x < left + width; x += 46) {
       g.rect(x, GROUND_Y + SIDEWALK + ROAD / 2 - 1.5, 24, 3).fill({ color: 0xe8e4da, alpha: 0.8 });
     }
@@ -278,23 +289,50 @@ export function drawSkyline(
   landmark: Landmark | null,
 ): { x: number; w: number; h: number }[] {
   const random = decorRandom(seed);
-  const color = 0x8d8fae;
+  const fill = { color: 0x8d8fae, alpha: 0.55 };
   const blocks: { x: number; w: number; h: number }[] = [];
   let x = -40;
   while (x < width + 40) {
     const w = 40 + random() * 60;
     const h = 60 + random() * 90;
     blocks.push({ x, w, h });
-    g.rect(x, GROUND_Y - h, w, h).fill({ color, alpha: 0.55 });
-    if (random() < 0.4)
-      g.poly([x, GROUND_Y - h, x + w / 2, GROUND_Y - h - 22, x + w, GROUND_Y - h]).fill({
-        color,
-        alpha: 0.55,
-      });
+    const top = GROUND_Y - h;
+    g.rect(x, top, w, h);
+    // Roofs: flat, gabled or hipped, some with a chimney.
+    const roof = random();
+    if (roof < 0.35) g.poly([x, top, x + w / 2, top - 22, x + w, top]);
+    else if (roof < 0.6) g.poly([x, top, x + w * 0.2, top - 16, x + w * 0.8, top - 16, x + w, top]);
+    if (random() < 0.4) g.rect(x + w * (0.2 + random() * 0.5), top - 20, 6, 20);
+    g.fill(fill);
     x += w - 4;
   }
   if (landmark) drawLandmark(g, landmark, width);
   return blocks;
+}
+
+/**
+ * The farthest roofs and trees, drawn in white: the scene tints them with the
+ * colour of the sky (the haze of the distance).
+ */
+export function drawFarSkyline(g: Graphics, width: number, seed: number): void {
+  const random = decorRandom(seed);
+  let x = -60;
+  while (x < width + 60) {
+    const w = 30 + random() * 70;
+    const h = 110 + random() * 80;
+    const top = GROUND_Y - h;
+    if (random() < 0.3) {
+      // A clump of trees.
+      for (let i = 0; i < 3; i++)
+        g.circle(x + w * (0.25 + i * 0.25), top + 14 + random() * 8, 14 + random() * 8);
+      g.rect(x, top + 18, w, h - 18);
+    } else {
+      g.rect(x, top, w, h);
+      if (random() < 0.5) g.poly([x - 2, top, x + w / 2, top - 18, x + w + 2, top]);
+    }
+    g.fill(0xffffff);
+    x += w - 6;
+  }
 }
 
 /** Windows lit at night in the town behind the street: a few dots per block. */
