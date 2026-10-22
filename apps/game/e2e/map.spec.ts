@@ -22,6 +22,8 @@ test('zooms the city map, gathers pins and keeps the view', async ({ page }) => 
   // The buttons zoom, the whole-city button comes back.
   await page.getByRole('button', { name: t.map.zoomIn, exact: true }).click();
   await expect.poll(zoom).toBeCloseTo(2, 1);
+  // Single listings show their price, coloured by the verdict.
+  await expect(page.locator('[data-testid^="map-tag-"]').first()).toBeVisible();
   await page.getByRole('button', { name: t.map.zoomIn, exact: true }).click();
   await expect.poll(zoom).toBeCloseTo(4, 1);
 

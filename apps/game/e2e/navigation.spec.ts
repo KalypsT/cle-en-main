@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { newGame, openGame, pause, streetReady, t, tab } from './helpers.ts';
+import { newGame, openFilters, openGame, pause, streetReady, t, tab } from './helpers.ts';
 
 /** The tabs keep their screens, and the listings keep their filters. */
 test('keeps the listings screen and its filters across tabs and listings', async ({ page }) => {
@@ -13,6 +13,7 @@ test('keeps the listings screen and its filters across tabs and listings', async
   await page.getByRole('button', { name: t.assets.seeListings }).click();
   const heading = page.getByRole('heading', { name: /Annonces/ });
   await expect(heading).toBeVisible();
+  await openFilters(page);
   const kind = page.getByRole('button', { name: t.listings.kindShort.apartment, exact: true });
   await kind.click();
   await expect(kind).toHaveAttribute('aria-pressed', 'true');

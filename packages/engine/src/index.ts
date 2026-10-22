@@ -48,6 +48,8 @@ export {
 export {
   type CashFlowOutlook,
   type CashForecast,
+  type DealKind,
+  type DealVerdict,
   decisionKey,
   type FinancingInput,
   type FinancingSimulation,

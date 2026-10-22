@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { capture, newGame, openGame, openMenuEntry, pause, t } from './helpers.ts';
+import { capture, newGame, openFilters, openGame, openMenuEntry, pause, t } from './helpers.ts';
 
 const MILESTONE = 'jalon-8';
 
@@ -25,6 +25,7 @@ test('creates the SCI and filters the listings by the new kinds', async ({ page 
     .getByTestId('city-sheet-dole')
     .getByRole('button', { name: t.cities.seeListings })
     .click();
+  await openFilters(page);
   for (const kind of ['commercial', 'parking', 'land'] as const) {
     await expect(
       page.getByRole('button', { name: t.listings.kindShort[kind], exact: true }),

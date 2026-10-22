@@ -328,5 +328,9 @@
       "building": 10
     },
     "coOwnershipChargesPerM2": 2.2
+  },
+  "verdict": {
+    "bargainShare": 0.08,
+    "expensiveShare": 0.08
   }
 }

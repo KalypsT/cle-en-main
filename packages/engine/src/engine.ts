@@ -153,6 +153,7 @@ import { worksCatalog, worksEstimate, worksPlan } from './systems/works-view.ts'
 import { believedView } from './systems/dwelling.ts';
 import {
   cashForecast,
+  dealVerdict,
   type FinancingInput,
   listingView,
   mapPosition,
@@ -826,6 +827,8 @@ export function createEngine(content: GameContent) {
         ? cashFlowOutlook(content, state, listing.property, listing.askingPrice, price)
         : null;
     },
+    /** « Bonne affaire », « Au prix » or « Trop cher »: the asking price against the estimate. */
+    dealVerdict: (state: GameState, listingId: string) => dealVerdict(content, state, listingId),
     /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */
     listingView: (state: GameState, listingId: string) => listingView(content, state, listingId),
     /** Sheets of the region map: every city, the base first. */

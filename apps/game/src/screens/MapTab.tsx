@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import type { Listing } from '@cle/engine';
+import type { DealKind, Listing } from '@cle/engine';
 import {
   memo,
   type PointerEvent as ReactPointerEvent,
@@ -35,8 +35,14 @@ type Point = readonly [number, number];
 /** Shades from light to deep blue, for the five neighbourhoods ranked. */
 const SHADES = ['#eef3f8', '#d7e3ef', '#b9cfe4', '#93b4d4', '#6d97c2'];
 const MARGIN = 250;
-/** Pins closer than this on the screen (px) are shown as one cluster. */
-const CLUSTER_PX = 40;
+/** Pins closer than this on the screen (px) are shown as one cluster (a price tag is wide). */
+const CLUSTER_PX = 52;
+/** Colour of a listing's price tag, by verdict (game feel, lot 3). */
+const TAG_COLORS: Record<DealKind, string> = {
+  bargain: 'var(--green)',
+  fair: 'var(--accent)',
+  expensive: 'var(--brick)',
+};
 /** A finger that moved less than this (px) is a tap, not a drag. */
 const TAP_SLOP = 6;
 const ZOOM_STEP = 2;
@@ -341,27 +347,53 @@ export function MapTab() {
             const [first] = cluster.items;
             if (cluster.items.length === 1 && first) {
               const favorite = state.favorites.includes(first.id);
+              const kind = engine.dealVerdict(state, first.id)?.kind ?? 'fair';
+              const label = formatKilo(first.askingPrice);
+              // A price tag over the point, its tip on it; the verdict gives its colour.
+              const w = (label.length * 6.6 + 14) * pixel;
+              const h = 20 * pixel;
+              const tip = 5 * pixel;
+              const x = cluster.x;
+              const y = cluster.y;
               return (
                 <g
                   key={first.id}
                   className="map-pin"
                   role="button"
+                  data-testid={`map-tag-${kind}`}
                   aria-label={format(t.map.pinLabel, {
                     title: propertyLabel(first.property),
                     price: formatEuros(first.askingPrice),
                   })}
                   onClick={() => setPin({ kind: 'listing', id: first.id })}
                 >
-                  <circle
-                    cx={cluster.x}
-                    cy={cluster.y}
-                    r={(favorite ? 9 : 7) * pixel}
-                    fill={favorite ? '#a35a06' : '#2b5c8a'}
-                    stroke="#fffdf8"
+                  <path
+                    d={`M${x - w / 2} ${y - tip - h} h${w} v${h} h${-(w / 2 - tip)} l${-tip} ${tip} l${-tip} ${-tip} h${-(w / 2 - tip)}z`}
+                    fill={favorite ? '#fcefd3' : '#fffdf8'}
+                    stroke={TAG_COLORS[kind]}
                     strokeWidth={2 * pixel}
+                    strokeLinejoin="round"
                   />
+                  <text
+                    x={x}
+                    y={y - tip - h / 2}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize={11.5 * pixel}
+                    fontWeight={800}
+                    fill={TAG_COLORS[kind]}
+                    pointerEvents="none"
+                  >
+                    {label}
+                  </text>
                   {/* A wider invisible target for fingers. */}
-                  <circle cx={cluster.x} cy={cluster.y} r={16 * pixel} fill="transparent" />
+                  <rect
+                    x={x - w / 2 - 6 * pixel}
+                    y={y - tip - h - 8 * pixel}
+                    width={w + 12 * pixel}
+                    height={h + tip + 16 * pixel}
+                    fill="transparent"
+                  />
                 </g>
               );
             }
@@ -411,7 +443,7 @@ export function MapTab() {
             const x = sx(point.x);
             const y = sy(point.y);
             if (!visible(x, y)) return null;
-            const s = 9 * pixel;
+            const s = 11 * pixel;
             return (
               <g
                 key={owned.property.id}
@@ -422,10 +454,11 @@ export function MapTab() {
               >
                 <path
                   d={`M${x - s} ${y} L${x} ${y - s * 1.1} L${x + s} ${y} L${x + s * 0.75} ${y} L${x + s * 0.75} ${y + s} L${x - s * 0.75} ${y + s} L${x - s * 0.75} ${y}z`}
-                  fill="#24262b"
+                  fill="var(--accent)"
                   stroke="#fffdf8"
                   strokeWidth={2 * pixel}
                 />
+                <circle cx={x} cy={y - s * 0.1} r={2.6 * pixel} fill="#f0b45a" />
                 <circle cx={x} cy={y} r={16 * pixel} fill="transparent" />
               </g>
             );
@@ -466,16 +499,21 @@ export function MapTab() {
         </div>
       </div>
       <div className="legend">
+        {(['bargain', 'fair', 'expensive'] as const).map((kind) => (
+          <span key={kind}>
+            <i className="legend-tag" style={{ borderColor: TAG_COLORS[kind] }} />
+            {t.listings.verdict[kind]}
+          </span>
+        ))}
         <span>
-          <i style={{ background: '#2b5c8a', borderRadius: '50%' }} />
-          {t.map.legendListings}
-        </span>
-        <span>
-          <i style={{ background: '#a35a06', borderRadius: '50%' }} />
+          <i
+            className="legend-tag"
+            style={{ background: '#fcefd3', borderColor: 'var(--accent)' }}
+          />
           {t.map.legendFavorite}
         </span>
         <span>
-          <i style={{ background: '#24262b' }} />
+          <i style={{ background: 'var(--accent)' }} />
           {t.map.legendOwned}
         </span>
       </div>

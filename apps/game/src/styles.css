@@ -1374,6 +1374,150 @@ button.status-stat {
   }
 }
 
+/* A card that folds: its whole heading opens and closes it. */
+.card-fold {
+  width: 100%;
+  min-height: var(--tap);
+  margin: -6px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card-chevron {
+  display: inline-grid;
+  color: var(--muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+}
+
+.card-fold[aria-expanded='true'] .card-chevron {
+  transform: rotate(-90deg);
+}
+
+.card[id] {
+  scroll-margin-top: calc(var(--status-bottom, 90px) + 12px);
+}
+
+/* The listing at a glance: price, cash-flow, energy (game feel, lot 3). */
+.deal-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.deal-pill {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 2px;
+  min-height: 84px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.deal-pill-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.deal-pill-value {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.deal-pill-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.deal-pill.positive {
+  border-top-color: var(--green);
+  background: color-mix(in srgb, var(--green-soft) 55%, var(--surface));
+}
+
+.deal-pill.positive .deal-pill-value {
+  color: var(--green);
+}
+
+.deal-pill.negative {
+  border-top-color: var(--brick);
+  background: color-mix(in srgb, var(--brick-soft) 55%, var(--surface));
+}
+
+.deal-pill.negative .deal-pill-value {
+  color: var(--brick);
+}
+
+.deal-pill.warning {
+  border-top-color: var(--amber);
+}
+
+/* The listings' filters, folded behind one button (game feel, lot 3). */
+.filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filters-toggle.active {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.filters-chevron {
+  display: inline-grid;
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+}
+
+.filters-toggle[aria-expanded='true'] .filters-chevron {
+  transform: rotate(-90deg);
+}
+
+.filters-panel {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* A row's picture: the building as the street draws it. */
+.facade-thumb {
+  display: block;
+  border-radius: 8px;
+}
+
 /* ---------- Domain widgets ---------- */
 
 .dpe {
@@ -1540,6 +1684,13 @@ button.status-stat {
   margin-right: 6px;
   border-radius: 3px;
   vertical-align: -1px;
+}
+
+/* A listing's price tag on the map, by verdict. */
+.legend i.legend-tag {
+  width: 16px;
+  border: 2px solid;
+  background: #fffdf8;
 }
 
 .chart {

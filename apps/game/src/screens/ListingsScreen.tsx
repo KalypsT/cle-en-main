@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import type { Listing, ListingView, PropertyKind } from '@cle/engine';
+import type { DealKind, Listing, ListingView, PropertyKind } from '@cle/engine';
 import { useMemo } from 'react';
 import { engine } from '../engine.ts';
 import {
@@ -21,17 +21,48 @@ import {
 } from '../texts.ts';
 import { outlookTone } from '../ui/CashFlowOutlook.tsx';
 import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
-import { KindThumb } from '../ui/Facade.tsx';
+import { FacadeThumb } from '../ui/Facade.tsx';
+import { Icon } from '../ui/Icon.tsx';
 
 type Sort = ListingSort;
 const KINDS: PropertyKind[] = ['apartment', 'house', 'building', 'commercial', 'parking', 'land'];
 /** Budget filters, in euros (presentation steps, not gameplay values). */
 const BUDGETS = [60_000, 90_000, 120_000, 180_000];
 
+const VERDICT_TONES: Record<DealKind, 'green' | 'brick' | undefined> = {
+  bargain: 'green',
+  fair: undefined,
+  expensive: 'brick',
+};
+
+/** « Bonne affaire », « Au prix », « Trop cher », and whether the flat would pay for itself. */
+export function VerdictBadges({ listingId }: { listingId: string }) {
+  const { state } = useGame();
+  const verdict = engine.dealVerdict(state, listingId);
+  const outlook = engine.cashFlowOutlook(state, listingId);
+  return (
+    <>
+      {verdict && (
+        <Badge tone={VERDICT_TONES[verdict.kind]} testId={`verdict-${verdict.kind}`}>
+          {t.listings.verdict[verdict.kind]}
+        </Badge>
+      )}
+      {outlook?.tone === 'positive' && (
+        <Badge tone="green" icon="check" testId="pays-for-itself">
+          {t.listings.paysForItself}
+        </Badge>
+      )}
+    </>
+  );
+}
+
 export function ListingRow({ listing, view }: { listing: Listing; view: ListingView | null }) {
   const { state } = useGame();
   const nav = useNav();
   const { property } = listing;
+  // Its building in the street, read once: the picture does not change with the hours.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const place = useMemo(() => engine.building(state, property.id), [property]);
   const planned = state.agenda.some(
     (item) => item.kind === 'visit' && item.listingId === listing.id,
   );
@@ -40,7 +71,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
   const outlook = engine.cashFlowOutlook(state, listing.id);
   return (
     <ListRow
-      thumb={<KindThumb property={property} />}
+      thumb={<FacadeThumb property={property} place={place} />}
       testId={`listing-${listing.id}`}
       title={propertyLabel(property)}
       subtitle={
@@ -53,6 +84,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
       }
       extra={
         <>
+          <VerdictBadges listingId={listing.id} />
           {listing.offer?.counter ? (
             <Badge tone="amber">{t.listings.counter}</Badge>
           ) : listing.offer ? (
@@ -117,12 +149,19 @@ export function ListingsScreen({ route }: { route: Extract<Route, { name: 'listi
     sort: 'recent',
   };
   const { area, kind, budget, favorites, sort } = filters;
+  const bargains = filters.bargains ?? false;
+  const open = route.filtersOpen ?? false;
+  const active = [area !== null, kind !== null, budget !== null, favorites, bargains].filter(
+    Boolean,
+  ).length;
   const change = (patch: Partial<ListingFilters>) =>
     nav.replace({ ...route, filters: { ...filters, ...patch } });
   const setArea = (value: string | null) => change({ area: value });
   const setKind = (value: PropertyKind | null) => change({ kind: value });
   const setBudget = (value: number | null) => change({ budget: value });
   const setFavorites = (value: boolean) => change({ favorites: value });
+  const setBargains = (value: boolean) => change({ bargains: value });
+  const toggle = () => nav.replace({ ...route, filters, filtersOpen: !open });
   const setSort = (value: Sort) => change({ sort: value });
 
   const rows = useMemo(() => {
@@ -132,6 +171,7 @@ export function ListingsScreen({ route }: { route: Extract<Route, { name: 'listi
       .filter((listing) => !kind || listing.property.kind === kind)
       .filter((listing) => budget === null || listing.askingPrice <= budget * 100)
       .filter((listing) => !favorites || state.favorites.includes(listing.id))
+      .filter((listing) => !bargains || engine.dealVerdict(state, listing.id)?.kind === 'bargain')
       .map((listing) => ({ listing, view: engine.listingView(state, listing.id) }));
     const key: Record<Sort, (row: (typeof filtered)[number]) => number> = {
       recent: (row) => -row.listing.publishedDay,
@@ -142,7 +182,18 @@ export function ListingsScreen({ route }: { route: Extract<Route, { name: 'listi
     return filtered.sort((a, b) => key[sort](a) - key[sort](b));
     // The list follows the listings and favourites, not every hour of the clock.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.listings, state.favorites, state.market, cityId, area, kind, budget, favorites, sort]);
+  }, [
+    state.listings,
+    state.favorites,
+    state.market,
+    cityId,
+    area,
+    kind,
+    budget,
+    favorites,
+    bargains,
+    sort,
+  ]);
 
   return (
     <div className="screen">
@@ -150,39 +201,61 @@ export function ListingsScreen({ route }: { route: Extract<Route, { name: 'listi
         title={format(t.listings.heading, { city: cityName(cityId) })}
         onBack={nav.pop}
       />
-      <div className="chips" role="group" aria-label={t.listings.filters}>
-        <Chip pressed={area === null} onClick={() => setArea(null)}>
-          {t.listings.allNeighbourhoods}
-        </Chip>
-        {neighbourhoods.map((n) => (
-          <Chip key={n.id} pressed={area === n.id} onClick={() => setArea(n.id)}>
-            {n.name}
-          </Chip>
-        ))}
-      </div>
-      <div className="chips">
-        <Chip pressed={favorites} onClick={() => setFavorites(!favorites)}>
-          {t.listings.favoritesOnly}
-        </Chip>
-        <Chip pressed={kind === null} onClick={() => setKind(null)}>
-          {t.listings.allKinds}
-        </Chip>
-        {KINDS.map((value) => (
-          <Chip key={value} pressed={kind === value} onClick={() => setKind(value)}>
-            {t.listings.kindShort[value]}
-          </Chip>
-        ))}
-      </div>
-      <div className="chips">
-        <Chip pressed={budget === null} onClick={() => setBudget(null)}>
-          {t.listings.anyBudget}
-        </Chip>
-        {BUDGETS.map((value) => (
-          <Chip key={value} pressed={budget === value} onClick={() => setBudget(value)}>
-            {format(t.listings.budgetMax, { amount: formatEuros(value * 100) })}
-          </Chip>
-        ))}
-      </div>
+      <button
+        type="button"
+        className={`filters-toggle${active > 0 ? ' active' : ''}`}
+        aria-expanded={open}
+        data-testid="filters-toggle"
+        onClick={toggle}
+      >
+        <Icon name="settings" size={18} />
+        {active > 0 ? format(t.listings.filtersCount, { count: active }) : t.listings.filters}
+        <span className="filters-chevron" aria-hidden="true">
+          <Icon name="chevron" size={16} />
+        </span>
+      </button>
+      {open && (
+        <div className="filters-panel" role="group" aria-label={t.listings.filters}>
+          <div className="chips">
+            <Chip pressed={area === null} onClick={() => setArea(null)}>
+              {t.listings.allNeighbourhoods}
+            </Chip>
+            {neighbourhoods.map((n) => (
+              <Chip key={n.id} pressed={area === n.id} onClick={() => setArea(n.id)}>
+                {n.name}
+              </Chip>
+            ))}
+          </div>
+          <div className="chips">
+            <Chip pressed={bargains} onClick={() => setBargains(!bargains)}>
+              {t.listings.bargainsOnly}
+            </Chip>
+            <Chip pressed={favorites} onClick={() => setFavorites(!favorites)}>
+              {t.listings.favoritesOnly}
+            </Chip>
+          </div>
+          <div className="chips">
+            <Chip pressed={kind === null} onClick={() => setKind(null)}>
+              {t.listings.allKinds}
+            </Chip>
+            {KINDS.map((value) => (
+              <Chip key={value} pressed={kind === value} onClick={() => setKind(value)}>
+                {t.listings.kindShort[value]}
+              </Chip>
+            ))}
+          </div>
+          <div className="chips">
+            <Chip pressed={budget === null} onClick={() => setBudget(null)}>
+              {t.listings.anyBudget}
+            </Chip>
+            {BUDGETS.map((value) => (
+              <Chip key={value} pressed={budget === value} onClick={() => setBudget(value)}>
+                {format(t.listings.budgetMax, { amount: formatEuros(value * 100) })}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      )}
       <Segmented<Sort>
         label={t.listings.sort}
         value={sort}

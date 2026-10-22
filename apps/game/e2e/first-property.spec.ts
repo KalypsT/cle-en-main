@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  openFilters,
   capture,
   fill,
   newGame,
@@ -42,11 +43,17 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   await capture(page, '03-carte');
   await page.getByRole('button', { name: /annonce\(s\)$/ }).click();
   // « ≤ 90 000 € » (the thousands separator is a narrow no-break space).
+  await openFilters(page);
   await page.getByRole('button', { name: /^≤ 90\D000/ }).click();
   await page.getByRole('button', { name: t.listings.sortYield }).click();
   await capture(page, '04-annonces');
+  // Each listing says what the player's estimate thinks of its price.
+  await expect(
+    page.locator('[data-testid^="listing-"] [data-testid^="verdict-"]').first(),
+  ).toBeVisible();
   await page.locator('[data-testid^="listing-"]').first().click();
   await expect(bubble).toContainText(tutorial.steps[2]?.text ?? '');
+  await expect(page.getByTestId('deal-summary')).toBeVisible();
   await expect(page.locator('[data-tutorial="visit"]')).toHaveClass(/halo/);
   await capture(page, '05-fiche-annonce');
 

@@ -254,6 +254,58 @@ describe('cash-flow outlook (progression, step 3)', () => {
   });
 });
 
+describe('deal verdict (game feel, lot 3)', () => {
+  it('compares the asking price with the estimate the player can make', () => {
+    const state = newGame();
+    const { bargainShare, expensiveShare } = content.market.verdict;
+    let kinds = 0;
+    for (const listing of state.listings) {
+      const verdict = engine.dealVerdict(state, listing.id);
+      if (!verdict) throw new Error('No verdict');
+      const estimate = engine.estimate(state, listing.id)?.estimate ?? 0;
+      expect(verdict.priceGap).toBeCloseTo(listing.askingPrice / estimate - 1, 10);
+      const expected =
+        verdict.priceGap <= -bargainShare
+          ? 'bargain'
+          : verdict.priceGap >= expensiveShare
+            ? 'expensive'
+            : 'fair';
+      expect(verdict.kind).toBe(expected);
+      kinds |= verdict.kind === 'bargain' ? 1 : verdict.kind === 'fair' ? 2 : 4;
+    }
+    // The market of a new game offers some of each.
+    expect(kinds).toBe(7);
+    expect(engine.dealVerdict(state, 'nope')).toBeNull();
+  });
+
+  it('follows the asking price and never looks at hidden defects', () => {
+    const state = newGame();
+    const listing = affordableListing(state);
+    const estimate = engine.estimate(state, listing.id)?.estimate ?? 0;
+    const at = (askingPrice: number) =>
+      engine.dealVerdict(
+        {
+          ...state,
+          listings: state.listings.map((l) => (l.id === listing.id ? { ...l, askingPrice } : l)),
+        },
+        listing.id,
+      )?.kind;
+    expect(at(Math.round(estimate * 0.85))).toBe('bargain');
+    expect(at(estimate)).toBe('fair');
+    expect(at(Math.round(estimate * 1.15))).toBe('expensive');
+    // Hidden defects stay secret: a listing that has some reads like one that has none.
+    const flawed = state.listings.find((l) => l.property.defects.some((d) => !d.revealed));
+    if (!flawed) throw new Error('No listing with a hidden defect');
+    const flawless = {
+      ...state,
+      listings: state.listings.map((l) =>
+        l.id === flawed.id ? { ...l, property: { ...l.property, defects: [] } } : l,
+      ),
+    };
+    expect(engine.dealVerdict(flawless, flawed.id)).toEqual(engine.dealVerdict(state, flawed.id));
+  });
+});
+
 describe('cash forecast', () => {
   it('follows the monthly flows of the household', () => {
     const state = newGame();

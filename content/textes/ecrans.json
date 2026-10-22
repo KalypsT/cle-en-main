@@ -177,6 +177,14 @@
     "count": "{count} annonce(s)",
     "empty": "Aucune annonce ne correspond à ces filtres.",
     "filters": "Filtres",
+    "filtersCount": "Filtres ({count})",
+    "bargainsOnly": "Bonnes affaires",
+    "verdict": {
+      "bargain": "Bonne affaire",
+      "fair": "Au prix",
+      "expensive": "Trop cher"
+    },
+    "paysForItself": "Se paie tout seul",
     "allNeighbourhoods": "Tous les quartiers",
     "allKinds": "Tous",
     "favoritesOnly": "Favoris",
@@ -209,6 +217,20 @@
     }
   },
   "listing": {
+    "summary": {
+      "price": "Prix",
+      "cashFlow": "Cash-flow",
+      "dpe": "Énergie",
+      "under": "{value} % sous votre estimation",
+      "over": "{value} % au-dessus de votre estimation",
+      "equal": "Au niveau de votre estimation",
+      "costs": "Coûte chaque mois",
+      "balanced": "Ni gain ni perte",
+      "dpeOk": "Louable",
+      "dpeBan": "Interdit à la location en {year}",
+      "dpeBanned": "Interdit à la location",
+      "indecent": "Logement indécent"
+    },
     "heading": "Annonce",
     "addFavorite": "Ajouter aux favoris",
     "removeFavorite": "Retirer des favoris",
@@ -723,7 +745,6 @@
   "map": {
     "heading": "Carte de {city}",
     "listingsCount": "{count} annonce(s)",
-    "legendListings": "Annonces",
     "legendOwned": "Mes biens",
     "legendFavorite": "Favoris",
     "colorBy": "Couleur des quartiers",

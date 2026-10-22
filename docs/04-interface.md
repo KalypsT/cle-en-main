@@ -63,6 +63,11 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 > - **Financement simulé** : sa durée par défaut passe de 20 à 25 ans, comme le cash-flow prévu.
 > - **Bilan annuel** : un nouveau conseil d'Yvon nomme le bien loué qui coûte le plus chaque mois (−30 € ou moins), avec son montant. Format de sauvegarde **v20** (ce conseil s'ajoute aux types possibles ; rien à convertir).
 
+> **Plaisir de jeu, lot 3 : chasser la bonne affaire** (2026-10-22, point ouvert n° 17 ; verdict au chapitre 3.3) :
+> - **Liste des annonces** : les filtres (quartier, bonnes affaires, favoris, type, budget) se replient derrière un bouton « Filtres », qui devient « Filtres (n) » quand n filtres sont actifs ; le tri reste visible. Le panneau ouvert est gardé avec les filtres (le temps de la session). Chaque ligne montre la **façade du bâtiment** telle que la rue la dessine, et les badges **Bonne affaire**, **Au prix** ou **Trop cher**, et **Se paie tout seul**. Nouveau filtre : « Bonnes affaires ».
+> - **Fiche annonce** : sous le titre, trois pastilles résument l'annonce : **Prix** (le verdict et l'écart avec l'estimation), **Cash-flow** (le montant par mois et « Se paie tout seul », « Ni gain ni perte » ou « Coûte chaque mois »), **Énergie** (la lettre du DPE et « Louable », « Interdit à la location en 2034 »…). Les détails se replient : estimation, DPE, cash-flow prévu, état des pièces, diagnostic ; toucher une pastille ouvre sa partie et l'amène à l'écran. Le vendeur, le financement et les offres restent dépliés.
+> - **Carte** : une annonce seule est une **étiquette de prix** (« 85 k€ ») dont la pointe tombe sur le bien, bordée de vert (bonne affaire), de bleu volet (au prix) ou de rouge brique (trop cher), sur fond ambré si elle est en favori ; les groupes restent des pastilles numérotées (écart de regroupement porté de 40 à 52 px, les étiquettes étant plus larges). Les biens du joueur sont des maisons bleu volet à serrure ambrée. La légende suit.
+
 ## 4.6 Interactions clés
 
 - **Rue** : toucher une bulle (« À vendre », « Panne », « Travaux 25 % ») ouvre la fiche concernée ; toucher un bâtiment ouvre sa coupe.
