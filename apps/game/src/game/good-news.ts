@@ -15,6 +15,7 @@ import {
   characterMood,
   faceOf,
   type Mood,
+  RIVAL_CHARACTERS,
 } from '../ui/Avatar.tsx';
 import type { IconName } from '../ui/Icon.tsx';
 
@@ -97,6 +98,32 @@ export function goodNewsOf(event: GameEvent, state: GameState): GoodNews | null 
     default:
       return null;
   }
+}
+
+const RIVAL_BEATEN = 'rivalBeaten.';
+
+/** How many times the player beat each rival to a property (`rivalBeaten.<id>` counters). */
+export function rivalsBeaten(state: GameState): Record<string, number> {
+  const beaten: Record<string, number> = {};
+  for (const [key, count] of Object.entries(state.progress.counters)) {
+    if (key.startsWith(RIVAL_BEATEN)) beaten[key.slice(RIVAL_BEATEN.length)] = count;
+  }
+  return beaten;
+}
+
+/**
+ * The rivals who just lost a property to the player (a compromis signed on
+ * what they wanted): they make a face (docs/02, 2.10, « Mme Delaporte en larmes »).
+ */
+export function rivalNews(before: Record<string, number>, state: GameState): GoodNews[] {
+  const texts: Record<string, string> = t.goodNews.rivalBeaten;
+  const after = rivalsBeaten(state);
+  return Object.entries(after)
+    .filter(([id, count]) => count > (before[id] ?? 0) && texts[id])
+    .map(([id]) => {
+      const face = character(RIVAL_CHARACTERS[id] ?? '', 'upset');
+      return { kind: 'news', text: texts[id] ?? '', icon: 'person', ...(face ? { face } : {}) };
+    });
 }
 
 /** The toast on screen and the news waiting for it. */

@@ -190,6 +190,45 @@ export function drawVan(g: Graphics, x: number, color: number): void {
   g.circle(x + 56, y + 23, 2).fill(0x9a9da3);
 }
 
+/**
+ * A tenant moving in: a removal truck parked along the pavement, and
+ * cardboard boxes stacked by the door (docs/05, 5.6).
+ */
+export function drawMovingTruck(g: Graphics, x: number, doorX: number): void {
+  // Parked with its wheels on the kerb: the cars of the road pass in front of it.
+  const y = GROUND_Y + SIDEWALK - 29;
+  // The box, its orange band, the cab and its window.
+  g.roundRect(x, y - 6, 66, 32, 3).fill(0xf4efe4);
+  g.rect(x, y + 12, 66, 5).fill(0xe0782f);
+  g.rect(x + 63, y - 4, 2, 28).fill(0xd9d2c3);
+  g.poly([x + 66, y + 4, x + 80, y + 7, x + 84, y + 26, x + 66, y + 26]).fill(0xe0782f);
+  g.poly([x + 68, y + 6, x + 78, y + 9, x + 80, y + 15, x + 68, y + 15]).fill(0x9fb7c6);
+  g.circle(x + 16, y + 27, 5.5).fill(0x2b2d31);
+  g.circle(x + 70, y + 27, 5.5).fill(0x2b2d31);
+  g.circle(x + 16, y + 27, 2).fill(0x9a9da3);
+  g.circle(x + 70, y + 27, 2).fill(0x9a9da3);
+  // Boxes by the door, taped, and a lamp sticking out of the top one.
+  const box = (bx: number, by: number, w: number, h: number) => {
+    g.rect(bx, by, w, h).fill(0xc79a5f);
+    g.rect(bx, by, w, 1.6).fill(shade(0xc79a5f, -0.15));
+    g.rect(bx + w / 2 - 1, by, 2, h).fill(0xe8d7b0);
+  };
+  box(doorX - 22, GROUND_Y + 4, 13, 11);
+  box(doorX - 20, GROUND_Y - 6, 10, 10);
+  box(doorX - 38, GROUND_Y + 6, 12, 9);
+  g.rect(doorX - 16, GROUND_Y - 13, 1.4, 8).fill(0x5a4a3a);
+  g.poly([
+    doorX - 20,
+    GROUND_Y - 13,
+    doorX - 11,
+    GROUND_Y - 13,
+    doorX - 13,
+    GROUND_Y - 18,
+    doorX - 18,
+    GROUND_Y - 18,
+  ]).fill(0xf2c14e);
+}
+
 /** Planters on the far pavement. */
 export function drawPlanter(g: Graphics, x: number, season: Season): void {
   const y = GROUND_Y + SIDEWALK + ROAD + 12;

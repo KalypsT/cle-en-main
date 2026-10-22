@@ -441,3 +441,22 @@ export function faceOf(name: string): AvatarParts {
     accessory: next(ACCESSORIES.length),
   });
 }
+
+/** Hair styles long enough to show behind a passer-by's head. */
+const LONG_HAIR: ReadonlySet<HairStyle> = new Set(['long', 'bun', 'ponytail', 'bob']);
+
+/** The colours of an avatar, for the player walking down the street (docs/05, 5.5). */
+export function avatarLook(parts: AvatarParts): {
+  skin: number;
+  hair: number;
+  top: number;
+  longHair: boolean;
+} {
+  const color = (hex: string) => parseInt(hex.slice(1), 16);
+  return {
+    skin: color(pick(SKINS, parts.skin)),
+    hair: color(pick(HAIR_COLORS, AVATAR_CONTROLS.hairColor.get(parts))),
+    top: color(pick(OUTFITS, parts.outfit).body),
+    longHair: LONG_HAIR.has(pick(HAIR_STYLES, AVATAR_CONTROLS.hair.get(parts))),
+  };
+}

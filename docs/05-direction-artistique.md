@@ -71,6 +71,12 @@ Passants (certains s'arrêtent quelques secondes ; jamais les cyclistes), voitur
 
 **Les bons moments (plaisir de jeu, lot 1)** : la remise des clés à l'acte (la clé de l'icône entre dans une serrure en laiton, tourne, un éclat jaillit), la trésorerie qui défile avec la différence qui monte ou descend, le médaillon doré d'un succès, la carte d'une bonne nouvelle qui descend sous la barre d'état. Tout s'arrête quand le téléphone demande moins d'animations.
 
+**La rue du joueur (plaisir de jeu, lot 2)** :
+- un **camion de déménagement** (caisse crème à bande orange) se gare, roues sur la bordure, devant le bien dont le locataire emménage, le jour de l'entrée et le lendemain ; des cartons scotchés et une lampe attendent près de la porte ;
+- l'**avatar du joueur** passe dans la rue chaque matin, une fois par jour de jeu : il sort de chez lui quand sa résidence principale est dans la vue, sinon il arrive par un côté. Il porte le teint, la couleur des cheveux et la tenue de son avatar, un sac (un parapluie sous la pluie), et un petit triangle bleu volet au-dessus de la tête. Pas de promenade si le téléphone demande moins d'animations ;
+- le **fanion** du toit ondule doucement (immobile si le téléphone demande moins d'animations), les **pièces d'or** des loyers montent au-dessus des biens loués.
+- Fluidité mesurée (processeur ×4 plus lent, rendu logiciel, nouvelle partie) : 26 à 28 images par seconde en qualité « Économie » contre 29 avant le lot, le recadrage dessinant des façades plus grandes ; 10 en « Automatique », inchangé.
+
 L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-equilibrage.md](08-equilibrage.md) et [09-feuille-de-route.md](09-feuille-de-route.md)).
 
 ## 5.7 Typographie

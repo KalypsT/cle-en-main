@@ -139,6 +139,14 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   const mine = page.getByText(t.street.myProperty);
   await expect(mine).toBeVisible();
   await capture(page, '09-rue-mon-bien', 'jalon-5');
+  // Its flag on the roof, and « Mes biens » brings it back to the middle of the view.
+  await expect(page.locator('.street-building', { has: mine }).locator('.street-flag')).toHaveCount(
+    1,
+  );
+  const myProperties = page.getByTestId('street-next-owned');
+  await expect(myProperties).toHaveText(fill(t.street.myProperties, { count: 1 }));
+  await myProperties.click();
+  await expect(mine).toBeInViewport();
   await page.locator('.street-building', { has: mine }).locator('.street-hit').click();
   await expect(page.getByTestId('unit-player')).toBeVisible();
   await capture(page, '10-coupe-mon-bien', 'jalon-5');

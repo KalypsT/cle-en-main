@@ -1,10 +1,13 @@
 import { expect, type Page, test } from '@playwright/test';
+import { type GameState, toDayNumber } from '@cle/engine';
 import {
   capture,
   clockStamp,
   importGameAt,
+  importState,
   newGame,
   openGame,
+  ownerGame,
   pause,
   speed,
   streetReady,
@@ -181,4 +184,37 @@ test('keeps the crowd of the street steady and holds the moment at high speed', 
   await expect.poll(() => clockStamp(page), { timeout: 10_000 }).not.toBe(before);
   await page.waitForTimeout(1_000);
   await expect(street).toHaveAttribute('data-moment', moment ?? '');
+});
+
+/** The eve of the 1st of a month (not January's: the year's review), the flat let for a while. */
+function eveOfMonth(state: GameState) {
+  const lease = state.properties[0]?.lease;
+  const { year, month, day } = state.clock.date;
+  const tomorrow = new Date(Date.UTC(year, month - 1, day + 1));
+  return (
+    lease !== undefined &&
+    lease !== null &&
+    toDayNumber(state.clock.date) > lease.startDay + 3 &&
+    state.clock.hour === 22 &&
+    tomorrow.getUTCDate() === 1 &&
+    tomorrow.getUTCMonth() !== 0
+  );
+}
+
+test("raises the month's rents above the let flat once the review is closed", async ({ page }) => {
+  test.setTimeout(120_000);
+  const eve = ownerGame(24 * 150, eveOfMonth);
+  await openGame(page);
+  await importState(page, eve);
+  await streetReady(page);
+  await speed(page, 1);
+  const review = page.getByTestId('overlay-month');
+  await expect(review).toBeVisible({ timeout: 20_000 });
+  // Not yet: the rents wait behind the review.
+  await expect(page.getByTestId('street-rent')).toHaveCount(0);
+  await review.getByRole('button', { name: t.review.continue }).dispatchEvent('click');
+  const rent = page.getByTestId('street-rent').first();
+  await expect(rent).toBeVisible();
+  await expect(rent).toContainText('+');
+  await capture(page, '01-loyers-du-mois', 'mon-empire');
 });

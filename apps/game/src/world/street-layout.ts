@@ -96,7 +96,15 @@ export function streetAt(layout: StreetLayout, worldX: number): number {
   return best;
 }
 
-/** Scale of the scene for a view height (the panorama is shorter). */
-export function sceneScale(height: number): number {
-  return Math.max(0.55, Math.min(1.25, height / DESIGN_HEIGHT));
+/**
+ * Height of the scene a phone held upright shows: the top of the sky is cut
+ * (the street's chips stand there), so the façades come bigger.
+ */
+const PORTRAIT_VIEW_HEIGHT = 470;
+
+/** Scale of the scene for a view (the panorama is shorter; a portrait view zooms in). */
+export function sceneScale(height: number, width = Infinity): number {
+  const portrait = width < height;
+  const shown = portrait ? PORTRAIT_VIEW_HEIGHT : DESIGN_HEIGHT;
+  return Math.max(0.55, Math.min(portrait ? 1.45 : 1.25, height / shown));
 }

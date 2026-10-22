@@ -100,6 +100,7 @@
     "neighbourhood": "Quartier",
     "previousStreet": "Rue précédente",
     "nextStreet": "Rue suivante",
+    "myProperties": "Mes biens · {count}",
     "scene": "{street}, {moment}, {weather}",
     "openSection": "{name}, {street} : voir la coupe",
     "buildingNames": {
@@ -1077,7 +1078,12 @@
   "goodNews": {
     "many": "{count} bonnes nouvelles",
     "loanGranted": "{banker} vous accorde {amount} à {rate}. Reste à accepter l'offre !",
-    "loanProposal": "{banker} vous fait une proposition : {amount} à {rate}."
+    "loanProposal": "{banker} vous fait une proposition : {amount} à {rate}.",
+    "rivalBeaten": {
+      "delaporte": "Monique Delaporte voulait ce bien aussi. Elle ne vous dit plus bonjour.",
+      "martinot": "Les frères Martinot lorgnaient ce bien. Ils grommellent en chœur.",
+      "horizon": "La SCI Horizon Patrimoine visait ce bien. Son service communication « prend acte »."
+    }
   },
   "celebration": {
     "title": "Nouveau titre !",

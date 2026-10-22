@@ -117,6 +117,13 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Thème** : Clair, Sombre, Automatique (sombre pendant la nuit du jeu ; à ×4 et au-delà, il garde le moment où le temps s'est accéléré, voir 05, 5.4), Selon le téléphone (par défaut).
 - **Réglages de la rue** : qualité graphique (Automatique, Haute, Économie) et compteur d'images par seconde, pour vérifier la fluidité sur le téléphone.
 
+> **Plaisir de jeu, lot 2 : la rue devient « mon empire »** (2026-10-22, point ouvert n° 17) :
+> - **Cadrage en portrait** : un téléphone tenu droit montre la scène sur 470 unités de haut au lieu de 560 (le haut du ciel, où se tiennent les pastilles du quartier et de la rue, est coupé) : les façades sont environ 20 % plus grandes, la chaussée et les jardinières restent visibles au-dessus du tiroir. Le panorama et le grand écran ne changent pas. Quand la taille de la vue change (à l'ouverture, en tournant le téléphone), le même point de la rue reste au milieu : la rue s'ouvre bien centrée sur le premier bien du joueur.
+> - **Les biens du joueur** : un fanion bleu volet à pastille dorée flotte sur le toit de chacun de ses bâtiments ; la plaque « Mon bien » (ou « Chez moi ») porte une clé. Les bulles de ces bâtiments se tiennent au-dessus du fanion.
+> - **« Mes biens · n »** : une pastille sous celles du quartier et de la rue, visible dès que le joueur possède un bien dans la ville regardée : chaque toucher mène au bien suivant (quartier compris), dans l'ordre des quartiers.
+> - **Les loyers du mois** : le 1er, chaque bien loué fait monter une pièce d'or et son loyer (« +450 € »), l'un après l'autre, une fois le bilan du mois (ou de l'année) refermé et la rue à l'écran.
+> - **Bonnes nouvelles** : quand le joueur signe le compromis d'un bien qu'un rival visait, ce rival fait la tête : Monique Delaporte (portrait contrarié), les frères Martinot, la SCI Horizon (textes dans `content/textes/ecrans.json`, `goodNews.rivalBeaten`).
+
 ## 4.10 Rythme et progression (jalon 6)
 
 - **Barre d'état** : quand l'accélération automatique joue, l'horloge passe à ×4 sans changer le bouton choisi (×1), et l'heure porte la mention « accéléré ».

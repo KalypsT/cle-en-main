@@ -1217,7 +1217,7 @@ button.status-stat {
 /* A quiet note at the top, once: the game works offline. */
 .pwa-chip {
   position: fixed;
-  top: calc(env(safe-area-inset-top) + 8px);
+  top: calc(var(--status-bottom, env(safe-area-inset-top)) + 8px);
   left: 50%;
   z-index: 60;
   display: flex;
@@ -1804,8 +1804,12 @@ button.status-stat {
 .street-mine {
   position: absolute;
   left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   transform: translateX(-50%);
-  padding: 1px 8px;
+  padding: 2px 8px 2px 6px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
   border-radius: 999px;
   background: var(--accent);
   color: var(--on-accent);
@@ -1813,6 +1817,106 @@ button.status-stat {
   font-weight: 800;
   white-space: nowrap;
   pointer-events: none;
+}
+
+/* The player's flag on the roof, waving a little (docs/04, 4.9). */
+.street-flag {
+  position: absolute;
+  top: -26px;
+  left: 18%;
+  pointer-events: none;
+}
+
+.street-flag svg {
+  display: block;
+  overflow: visible;
+}
+
+.street-flag-cloth {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: flag-wave 2.4s ease-in-out infinite;
+}
+
+@keyframes flag-wave {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(-6deg) scaleX(0.9);
+  }
+}
+
+/* The month's rents rise above the let buildings, one after the other. */
+.street-rent {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 3px;
+  border: 1px solid #e0ad3c;
+  border-radius: 999px;
+  background: #fff6dc;
+  color: #2e6a33;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgb(120 80 10 / 25%);
+  pointer-events: none;
+  translate: -50% 0;
+  animation: rent-rise 3s ease-out both;
+}
+
+.street-coin {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fde7a6, #e0ad3c 60%, #b98522);
+  color: #5a3d06;
+  font-size: 0.7rem;
+}
+
+@keyframes rent-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-34px);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-44px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .street-rent {
+    animation: none;
+    top: -28px;
+  }
+}
+
+/* The bubbles of the player's buildings stand above the flag. */
+.street-flag ~ .street-bubbles {
+  bottom: calc(100% + 30px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .street-flag-cloth {
+    animation: none;
+  }
 }
 
 .street-bubbles {
@@ -1915,6 +2019,18 @@ button.status-stat {
 
 .street-name {
   padding: 0 2px;
+}
+
+/* « Mes biens »: from one of the player's buildings to the next. */
+.street-owned {
+  gap: 6px;
+  padding: 0 14px 0 12px;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .street-name button {

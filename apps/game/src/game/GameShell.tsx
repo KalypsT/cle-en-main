@@ -55,6 +55,8 @@ import {
   goodNewsOf,
   type GoodNewsQueue,
   queueGoodNews,
+  rivalNews,
+  rivalsBeaten,
 } from './good-news.ts';
 import { GoodNewsToasts } from './GoodNewsToasts.tsx';
 import { ScrollMemory } from './scroll-memory.ts';
@@ -210,53 +212,58 @@ export function GameShell({
   const overlay = overlays[0];
   const [goodNews, setGoodNews] = useState<GoodNewsQueue>({ shown: null, waiting: [] });
   const nextGoodNews = useCallback(() => setGoodNews(dismissGoodNews), []);
+  // The rivals the player had beaten, to tell when one more loses a property.
+  const beaten = useRef<Record<string, number>>({});
   const resumeSpeed = useRef<number | null>(null);
   const celebrating = overlay !== undefined && FESTIVE.has(overlay.kind);
   useEffect(
     () => audio.setMusic(celebrating ? 'celebration' : music.slotByMoment[ambience.moment]),
     [audio, celebrating, ambience.moment],
   );
-  useEffect(
-    () =>
-      session.onEvents((events, state) => {
-        for (const event of events) {
-          const effect = effectOf(event);
-          if (effect) {
-            audio.effect(effect);
-            if (loadSettings().vibration) vibrateFor(effect);
-          }
+  useEffect(() => {
+    beaten.current = rivalsBeaten(session.getSnapshot().state);
+    return session.onEvents((events, state) => {
+      for (const event of events) {
+        const effect = effectOf(event);
+        if (effect) {
+          audio.effect(effect);
+          if (loadSettings().vibration) vibrateFor(effect);
         }
-        const good = events
-          .map((event) => goodNewsOf(event, state))
-          .filter((news): news is GoodNews => news !== null);
-        if (good.length > 0) {
-          setGoodNews((queue) => queueGoodNews(queue, good));
-        }
-        // A refused offer is told at once, wherever the player is.
-        const bad = events.filter(
-          (event) =>
-            (event.type === 'offerAnswered' && event.answer === 'refused') ||
-            event.type === 'counterOfferExpired',
+      }
+      const good = events
+        .map((event) => goodNewsOf(event, state))
+        .filter((news): news is GoodNews => news !== null);
+      if (events.some((event) => event.type === 'compromisSigned')) {
+        good.push(...rivalNews(beaten.current, state));
+        beaten.current = rivalsBeaten(state);
+      }
+      if (good.length > 0) {
+        setGoodNews((queue) => queueGoodNews(queue, good));
+      }
+      // A refused offer is told at once, wherever the player is.
+      const bad = events.filter(
+        (event) =>
+          (event.type === 'offerAnswered' && event.answer === 'refused') ||
+          event.type === 'counterOfferExpired',
+      );
+      if (bad.length > 0) {
+        notify(
+          bad
+            .map((event) => describeEvent(event, state))
+            .filter(Boolean)
+            .join(' '),
         );
-        if (bad.length > 0) {
-          notify(
-            bad
-              .map((event) => describeEvent(event, state))
-              .filter(Boolean)
-              .join(' '),
-          );
-        }
-        const fresh = overlaysOf(events, state, settings.monthlyReview);
-        if (fresh.length === 0) return;
-        // The clock waits while a review or a celebration is open, then goes on at its speed.
-        if (resumeSpeed.current === null) {
-          resumeSpeed.current = session.getSnapshot().speed;
-          session.setSpeed(0);
-        }
-        setOverlays((queue) => [...queue, ...fresh]);
-      }),
-    [session, audio, notify, settings.monthlyReview],
-  );
+      }
+      const fresh = overlaysOf(events, state, settings.monthlyReview);
+      if (fresh.length === 0) return;
+      // The clock waits while a review or a celebration is open, then goes on at its speed.
+      if (resumeSpeed.current === null) {
+        resumeSpeed.current = session.getSnapshot().speed;
+        session.setSpeed(0);
+      }
+      setOverlays((queue) => [...queue, ...fresh]);
+    });
+  }, [session, audio, notify, settings.monthlyReview]);
   const closeOverlay = useCallback(() => {
     setOverlays((queue) => queue.slice(1));
     if (overlays.length <= 1 && resumeSpeed.current !== null) {
@@ -410,7 +417,7 @@ export function GameShell({
           {/* The news wait while a review or a scene is open over the game. */}
           <GoodNewsToasts shown={overlay ? null : goodNews.shown} onDismiss={nextGoodNews} />
           <div className="street-stage" hidden={!showStreet}>
-            <StreetWorld active={showStreet} />
+            <StreetWorld active={showStreet} held={overlay !== undefined} />
           </div>
           <main className="content" key={`${tab}-${stack.length}`}>
             {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} wide={wide} />}
