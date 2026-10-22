@@ -1,4 +1,4 @@
-import { music } from '@cle/content';
+import { gameContent, music } from '@cle/content';
 import { FORMAT_VERSION } from '@cle/engine';
 import { useEffect, useState } from 'react';
 import { exportJournal } from '../storage/files.ts';
@@ -53,7 +53,7 @@ export function SettingsScreen() {
         />
         <Switch
           label={t.settings.autoSpeed}
-          hint={t.settings.autoSpeedHint}
+          hint={format(t.settings.autoSpeedHint, { speed: gameContent.rhythm.autoSpeed.speed })}
           checked={settings.autoSpeed}
           onChange={(autoSpeed) => setSettings({ ...settings, autoSpeed })}
         />

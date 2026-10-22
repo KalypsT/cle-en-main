@@ -124,6 +124,7 @@ export const uiTextsSchema = z
         worksHazard: text,
         worksCompleted: text,
         worksFundReturned: text,
+        renovationAidPaid: text,
         coproMeetingCalled: text,
         coproMeetingHeld: text,
         diagnosisDone: text,

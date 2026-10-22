@@ -39,6 +39,7 @@ export const contentRegistry: Readonly<Record<string, z.ZodType>> = {
   'evenements/locataires.json': eventsFileSchema,
   'evenements/marche.json': eventsFileSchema,
   'evenements/ville.json': eventsFileSchema,
+  'evenements/vie.json': eventsFileSchema,
   'modes.json': modesFileSchema,
   'progression.json': progressionRulesSchema,
   'rythme.json': rhythmRulesSchema,

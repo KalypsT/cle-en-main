@@ -54,6 +54,13 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 > - **Bilan annuel** : la ligne de l'IFI.
 > - À faire avec l'écran de chantier (plus tard) : confier des postes au maître d'œuvre.
 
+> **Progression, étape 3 : le cash-flow prévu** (2026-10-21, point ouvert n° 16). Le joueur voit avant d'acheter si un bien se paiera tout seul :
+> - **Fiche annonce** : une carte « Cash-flow prévu » (requête `cashFlowOutlook` du moteur) donne le solde mensuel du bien financé par la banque du compte sur **25 ans**, apport limité aux frais, loué nu au loyer de marché, avant impôt, sans vacance ni incident ; le « ? » détaille loyer, charges récupérées, charges du propriétaire, mensualité. En vert à +30 € ou plus, en rouge à −30 € ou moins, neutre entre les deux (`cashFlowEuros` et `outlookYears` de `content/textes/yvon.json`). Une phrase d'Yvon Tableur l'accompagne ; quand le bien coûterait de l'argent, il donne le **prix auquel il se paierait tout seul** (arrondi au millier d'euros inférieur).
+> - **Offre** : le même calcul au montant saisi, mis à jour en direct, avec la phrase d'Yvon.
+> - **Liste des annonces** : le cash-flow prévu au prix affiché sous le rendement brut de chaque annonce (dans une partie d'essai, après deux mois, 207 annonces sur 287 coûteraient de l'argent au prix affiché).
+> - **Financement simulé** : sa durée par défaut passe de 20 à 25 ans, comme le cash-flow prévu.
+> - **Bilan annuel** : un nouveau conseil d'Yvon nomme le bien loué qui coûte le plus chaque mois (−30 € ou moins), avec son montant. Format de sauvegarde **v20** (ce conseil s'ajoute aux types possibles ; rien à convertir).
+
 ## 4.6 Interactions clés
 
 - **Rue** : toucher une bulle (« À vendre », « Panne », « Travaux 25 % ») ouvre la fiche concernée ; toucher un bâtiment ouvre sa coupe.

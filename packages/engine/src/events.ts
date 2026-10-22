@@ -276,6 +276,14 @@ export type GameEvent =
       dpeAfter: DpeLabel;
     }
   | { type: 'worksFundReturned'; propertyId: string; amount: Cents }
+  /** Energy renovation aid paid at the end of the works (progression, step 2). */
+  | {
+      type: 'renovationAidPaid';
+      propertyId: string;
+      amount: Cents;
+      dpeBefore: DpeLabel;
+      dpeAfter: DpeLabel;
+    }
   | {
       type: 'coproMeetingCalled';
       propertyId: string;
@@ -408,6 +416,7 @@ export const NEWS_EVENT_TYPES = [
   'worksHazard',
   'worksCompleted',
   'worksFundReturned',
+  'renovationAidPaid',
   'coproMeetingCalled',
   'coproMeetingHeld',
   'propertyTaxCharged',

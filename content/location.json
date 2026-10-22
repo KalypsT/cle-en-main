@@ -1,6 +1,7 @@
 {
   "smallApartmentMaxRooms": 2,
   "priceIndexElasticity": 0.5,
+  "marketRentFactor": 1.1,
   "dataRentsIncludeCharges": true,
   "stateRentFactors": [0.8, 0.87, 0.94, 1, 1.05],
   "indecentBelowState": 1.8,

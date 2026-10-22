@@ -42,6 +42,7 @@ import bankEventsJson from './evenements/banque.json' with { type: 'json' };
 import coproEventsJson from './evenements/copropriete.json' with { type: 'json' };
 import cityEventsJson from './evenements/ville.json' with { type: 'json' };
 import franceEventsJson from './evenements/france.json' with { type: 'json' };
+import lifeEventsJson from './evenements/vie.json' with { type: 'json' };
 import { checkReferences, type GameContent } from './references.ts';
 import { cityDataSchema } from './schemas/city.ts';
 import { decisionRulesSchema } from './schemas/decisions.ts';
@@ -196,6 +197,7 @@ export const gameContent: GameContent = {
     coproEventsJson,
     cityEventsJson,
     franceEventsJson,
+    lifeEventsJson,
   ].flatMap((file) => eventsFileSchema.parse(file).events),
   anecdotes: anecdotesFileSchema.parse(anecdotesJson).anecdotes,
   yvon: yvonTextsSchema.parse(yvonJson),

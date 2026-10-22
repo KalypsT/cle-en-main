@@ -62,6 +62,11 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  */
 export const MIGRATIONS: MigrationRegistry = {
   /**
+   * Version 19 to 20: Yvon's yearly advice may now name a property that costs money each
+   * month (progression, step 3); nothing to convert.
+   */
+  19: (raw) => raw,
+  /**
    * Version 18 to 19: the market curves start empty; the current leases start counting
    * their rents and unpaid months; the tenants gone before keep a departure without them.
    */

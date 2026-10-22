@@ -119,13 +119,21 @@ export class GameSession {
     this.update({ speed, autoPaused: false, accelerated: false });
   }
 
-  /** Speed the clock really runs at: the automatic acceleration only lifts ×1. */
+  /**
+   * Speed the clock really runs at: the automatic acceleration lifts any slower speed the
+   * player chose (×1, ×2, ×4) while nothing waits for him (progression, step 4).
+   */
   private effectiveSpeed(): number {
     const { speed, state } = this.snapshot;
+    const fast = gameContent.rhythm.autoSpeed.speed;
     const accelerate =
-      speed === 1 && this.autoSpeed() && this.calm && state.clock.elapsedHours >= this.quietUntil;
+      speed > 0 &&
+      speed < fast &&
+      this.autoSpeed() &&
+      this.calm &&
+      state.clock.elapsedHours >= this.quietUntil;
     if (accelerate !== this.snapshot.accelerated) this.update({ accelerated: accelerate });
-    return accelerate ? gameContent.rhythm.autoSpeed.speed : speed;
+    return accelerate ? fast : speed;
   }
 
   dispatch(action: GameAction): DispatchResult {

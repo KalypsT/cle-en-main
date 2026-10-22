@@ -562,6 +562,12 @@ export function describeEvent(
       });
     case 'worksFundReturned':
       return format(events.worksFundReturned, { amount: formatMoney(event.amount) });
+    case 'renovationAidPaid':
+      return format(events.renovationAidPaid, {
+        amount: formatMoney(event.amount),
+        before: event.dpeBefore,
+        after: event.dpeAfter,
+      });
     case 'coproMeetingCalled':
       return format(events.coproMeetingCalled, {
         date: formatGameDate(fromDayNumber(event.voteDay)),

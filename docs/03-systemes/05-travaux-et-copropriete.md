@@ -114,9 +114,19 @@ C'est le cœur ludique de la gestion. Pas de mini-jeux : la richesse vient des c
 - **Logement occupé** : les petits travaux sont possibles avec un locataire en place (baisse temporaire de sa satisfaction). Les gros travaux exigent un logement vide.
 - **Fin de chantier** : nouvel état des postes, nouveau DPE, nouvelle valeur estimée, nouvelle fourchette de loyer.
 
+> **Progression, étape 2 : l'aide à la rénovation énergétique** (2026-10-21, point ouvert n° 16 ; inspirée de MaPrimeRénov', `renovationAid` de `content/travaux.json`). À la fin d'un chantier ordinaire qui fait **gagner au moins une classe de DPE**, l'État rembourse une part de ce que les **artisans** ont facturé pour les postes énergétiques (chauffage, isolation, fenêtres, ventilation, toiture, façade), dépassements compris :
+>
+> | Classes gagnées | Part remboursée |
+> |---|---|
+> | 1 | 15 % |
+> | 2 | 30 % |
+> | 3 ou plus | 40 % |
+>
+> Plafond : **10 000 €** par chantier. Les postes faits soi-même (pas d'artisan certifié) et les transformations n'y ont pas droit. L'aide arrive sur le compte avec une actualité (« Aide à la rénovation énergétique versée ») et vient en déduction des travaux pris en compte par l'impôt. Exemple : isolation, fenêtres et chauffage d'un 60 m² classé F (18 240 €) le passent en C : 7 296 € d'aide. Simplifications assumées : ni conditions de ressources, ni dossier à monter, ni délai de versement. Les bots ne comptent pas l'aide dans leurs calculs d'achat : elle s'ajoute à leurs résultats sans changer leurs choix.
+
 ## Ce qui n'est pas inclus
 
-- **Aucune aide à la rénovation** (prime, crédit d'impôt) : le jeu reste simple.
+- ~~Aucune aide à la rénovation~~ : remplacé par une aide unique, simple, à l'étape 2 de la progression (ci-dessous). Les crédits d'impôt et les conditions de ressources restent hors du jeu.
 - Au **jalon 8** : un **maître d'œuvre** pour déléguer les gros chantiers, la **division** d'une maison en appartements, l'**aménagement des combles**.
 
 > **Jalon 8, le maître d'œuvre** (`content/travaux.json`, `projectManager`) : on lui confie des postes (action `works/delegate`) ; il demande les devis aux artisans les plus fiables du carnet, les signe, traite les imprévus aussitôt (« traiter ») et ne prend aucun temps libre ; ses honoraires valent **10 %** du chantier. L'écran de chantier (ajouté après le jalon 8) propose de lui confier les postes choisis.

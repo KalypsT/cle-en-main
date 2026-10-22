@@ -64,7 +64,9 @@ Chaque métier change trois choses : le **salaire**, le **temps libre** et la **
 
 ## Le train de vie
 
-- Chaque mois, le personnage paie ses **dépenses de vie** (hors loyer) : elles suivent son revenu, si bien que l'**épargne de salaire reste faible** (environ 100 à 250 € par mois selon le métier).
+- Chaque mois, le personnage paie ses **dépenses de vie** (hors loyer) : elles suivent son revenu, si bien que l'**épargne de salaire reste modeste** (environ 230 à 500 € par mois selon le métier).
+
+> **Progression, étape 1** (2026-10-21, point ouvert n° 16) : dépenses de vie de 1 250 € pour 2 000 € de revenu (1 350 € auparavant), et 75 % de chaque euro de revenu en plus (90 % auparavant). L'épargne passe de 130 à 230 € par mois pour un fonctionnaire, de 240 à 505 € pour un développeur : avec 100 à 250 €, un deuxième bien arrivait rarement avant plusieurs années.
 - On s'enrichit donc en investissant, pas en attendant : l'apport de départ compte vraiment.
 - Sans emploi, les dépenses de vie tombent à un minimum (valeur indicative : 900 €/mois).
 - Valeurs dans `content/train-de-vie.json`.

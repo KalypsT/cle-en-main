@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { EVENT_FAMILIES } from '@cle/content';
 import { content as gameContent, newGame, quietContent, sampleOwned } from '../../test/helpers.ts';
 import { toDayNumber } from '../calendar.ts';
 import type { CatalogEvent, GameContent } from '../content.ts';
@@ -47,7 +48,7 @@ describe('catalogue of events (docs/03-systemes/07)', () => {
     expect(gameContent.events.length).toBeGreaterThan(100);
     expect(gameContent.anecdotes.length).toBeGreaterThanOrEqual(50);
     const families = new Set(gameContent.events.map((event) => event.family));
-    expect(families.size).toBe(7);
+    expect(families.size).toBe(EVENT_FAMILIES.length);
   });
 
   it('fires an event on a let property, then applies the chosen effects', () => {

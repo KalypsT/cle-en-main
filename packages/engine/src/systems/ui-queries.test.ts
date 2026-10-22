@@ -223,6 +223,37 @@ describe('financing simulation', () => {
   });
 });
 
+describe('cash-flow outlook (progression, step 3)', () => {
+  it('finances the listing with the account bank and finds the price that pays for itself', () => {
+    const state = newGame();
+    const listing = affordableListing(state);
+    const outlook = engine.cashFlowOutlook(state, listing.id);
+    if (!outlook) throw new Error('No outlook');
+    const years = content.yvon.thresholds.outlookYears;
+    const sim = engine.simulateFinancing(state, listing.id, {
+      bankId: content.start.accountBankId,
+      durationYears: years,
+    });
+    expect(outlook.monthly).toBe(sim?.netEffort);
+    const margin = content.yvon.thresholds.cashFlowEuros * 100;
+    expect(outlook.tone).toBe(
+      outlook.monthly >= margin ? 'positive' : outlook.monthly <= -margin ? 'negative' : 'balanced',
+    );
+    // At the break-even price the flat pays for itself; 2 000 € more and it no longer does.
+    const breakEven = outlook.breakEvenPrice;
+    if (breakEven === null) throw new Error('No break-even price');
+    expect(breakEven % 1_000_00).toBe(0);
+    expect(engine.cashFlowOutlook(state, listing.id, breakEven)?.monthly).toBeGreaterThanOrEqual(0);
+    expect(engine.cashFlowOutlook(state, listing.id, breakEven + 2_000_00)?.monthly).toBeLessThan(
+      0,
+    );
+    // A lower offer costs less each month.
+    const lower = engine.cashFlowOutlook(state, listing.id, listing.askingPrice - 10_000_00);
+    expect(lower?.monthly).toBeGreaterThan(outlook.monthly);
+    expect(engine.cashFlowOutlook(state, 'nope')).toBeNull();
+  });
+});
+
 describe('cash forecast', () => {
   it('follows the monthly flows of the household', () => {
     const state = newGame();

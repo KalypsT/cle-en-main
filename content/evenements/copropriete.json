@@ -502,6 +502,31 @@
       ],
       "deadlineDays": 4,
       "defaultChoice": "nothing"
+    },
+    {
+      "id": "chargesRefund",
+      "family": "copro",
+      "target": "copro",
+      "kind": "opportunity",
+      "conditions": {
+        "months": [3, 4, 5, 6]
+      },
+      "chancePerMonth": 0.06,
+      "cooldownDays": 330,
+      "pause": false,
+      "texts": [
+        "Régularisation des charges de l'immeuble de {bien} : le syndic avait vu trop large, il vous rend {montant}.",
+        "Bonne nouvelle à l'assemblée de {bien} : le contrat de chauffage renégocié laisse un trop-perçu de {montant}."
+      ],
+      "effects": [
+        {
+          "type": "money",
+          "euros": {
+            "min": 80,
+            "max": 350
+          }
+        }
+      ]
     }
   ]
 }

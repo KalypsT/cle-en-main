@@ -71,7 +71,7 @@
     "cashAlert": "Trésorerie : passage sous zéro prévu {when} ({amount}).",
     "overdraft": "Découvert : {amount}. Les agios courent chaque jour.",
     "bankrupt": "Faillite : votre patrimoine net est resté négatif.",
-    "autoSpeed": "accéléré",
+    "autoSpeed": "accéléré ×{speed}",
     "autoSpeedHint": "Accélération automatique : rien ne presse."
   },
   "tabs": {
@@ -274,6 +274,18 @@
     "visitTripDone": "Visiter · {duration} (déjà à {city} aujourd'hui)",
     "counterDeclinedText": "Vous avez décliné sa contre-offre de {amount} le {date}.",
     "neighbourhoodTrend": "Prix du quartier : {change} en {months} mois"
+  },
+  "outlook": {
+    "heading": "Cash-flow prévu",
+    "label": "Chaque mois, avec un crédit de {years} ans",
+    "perMonth": "{amount} / mois",
+    "hint": "Banque du compte, apport limité aux frais, location nue au loyer de marché ; avant impôt, sans vacance ni incident.",
+    "positive": "Yvon Tableur : « Ce bien se paierait tout seul : il vous laisserait {amount} par mois, avant impôt. »",
+    "balanced": "Yvon Tableur : « Ni gain ni perte chaque mois : c'est la valeur du bien qui fera le travail. »",
+    "negative": "Yvon Tableur : « À ce prix, ce bien vous coûterait {amount} par mois. Il se paierait tout seul à {price} ou moins. »",
+    "negativeNoPrice": "Yvon Tableur : « Même pour une bouchée de pain, ses charges dépasseraient le loyer. »",
+    "offer": "Cash-flow prévu à ce prix : {amount} / mois",
+    "badge": "{amount} / mois"
   },
   "financing": {
     "heading": "Financement simulé",
@@ -792,7 +804,7 @@
     "soundHint": "Le son démarre au premier toucher de l'écran.",
     "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
     "autoSpeed": "Accélération automatique",
-    "autoSpeedHint": "Quand rien ne presse, le temps passe en ×4, puis revient en ×1 à la prochaine décision.",
+    "autoSpeedHint": "Quand rien ne presse, le temps passe en ×{speed}, puis revient à la vitesse choisie à la prochaine décision.",
     "monthlyReview": "Afficher le bilan chaque mois",
     "monthlyReviewHint": "Le bilan annuel avec Yvon Tableur s'affiche toujours.",
     "rewind": "Revenir en arrière",
@@ -850,7 +862,8 @@
       "bank": "Banque",
       "copro": "Copropriété",
       "city": "Ville",
-      "france": "France"
+      "france": "France",
+      "life": "Vie perso"
     },
     "deadline": "Sans réponse {when}, ce choix s'appliquera : « {choice} ».",
     "freeTime": "{duration} de temps libre",

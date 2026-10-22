@@ -81,13 +81,13 @@ describe('household', () => {
     expect(next.player.balance - state.player.balance).toBe(savings);
   });
 
-  it('keeps salary savings small for every job', () => {
+  it('keeps salary savings modest for every job', () => {
     for (const job of content.jobs) {
       const { player } = newGame({ jobId: job.id });
       const savings =
         expectedSalary(content, player) - player.monthlyRent - livingCosts(content, player);
-      expect(savings, job.id).toBeGreaterThanOrEqual(toCents(100));
-      expect(savings, job.id).toBeLessThanOrEqual(toCents(250));
+      expect(savings, job.id).toBeGreaterThanOrEqual(toCents(200));
+      expect(savings, job.id).toBeLessThanOrEqual(toCents(550));
     }
   });
 

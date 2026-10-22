@@ -46,6 +46,7 @@ export {
   type StreetView,
 } from './systems/world.ts';
 export {
+  type CashFlowOutlook,
   type CashForecast,
   decisionKey,
   type FinancingInput,

@@ -1340,6 +1340,54 @@
       ],
       "deadlineDays": 2,
       "defaultChoice": "ignore"
+    },
+    {
+      "id": "tenantRepaints",
+      "family": "tenants",
+      "target": "lease",
+      "kind": "opportunity",
+      "conditions": {
+        "satisfaction": {
+          "min": 60,
+          "max": 100
+        }
+      },
+      "chancePerMonth": 0.02,
+      "cooldownDays": 1095,
+      "pause": false,
+      "texts": [
+        "{locataire} demande s'il peut repeindre le salon de {bien} à ses frais, « dans un blanc cassé très sage »."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter",
+          "effects": [
+            {
+              "type": "item",
+              "item": "walls",
+              "delta": 1
+            },
+            {
+              "type": "satisfaction",
+              "delta": 3
+            }
+          ],
+          "outcome": "Le salon a pris un coup de frais, et vous n'avez pas sorti un euro."
+        },
+        {
+          "id": "decline",
+          "label": "Refuser poliment",
+          "effects": [
+            {
+              "type": "satisfaction",
+              "delta": -2
+            }
+          ]
+        }
+      ],
+      "deadlineDays": 5,
+      "defaultChoice": "accept"
     }
   ]
 }

@@ -25,7 +25,9 @@ test('starts, creates a game, saves it and loads it back', async ({ page }) => {
   await page.getByTestId('slot-1').getByRole('button', { name: ui.slots.load }).click();
   await pause(page);
   await expect(page.getByTestId('game-date')).toHaveText(savedDate ?? '');
-  await expect(time).toHaveText(savedTime ?? '');
+  // The hour only: a decision may have paused the game (« · En pause ») before the save, and
+  // that pause belongs to the session, not to the save.
+  await expect(time).toHaveText(new RegExp(`^${(savedTime ?? '').split(' · ')[0]}`));
   await expect(page.getByTestId('balance')).toHaveText(savedBalance ?? '');
   await expect(page.getByText(fill(t.street.hello, { name: 'Thibaud' }))).toBeVisible();
 });

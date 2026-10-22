@@ -320,6 +320,19 @@ export const worksRulesSchema = z
     hazardDecisionDays: z.number().int().min(0),
     /** Tenant satisfaction lost per day of works in an occupied home. */
     occupiedSatisfactionPerDay: z.number().min(0),
+    /**
+     * Energy renovation aid, inspired by MaPrimeRénov' (progression, step 2): when ordinary works
+     * gain DPE classes, a share of the artisans' bills for the energy items is paid back.
+     */
+    renovationAid: z
+      .object({
+        /** Share by DPE classes gained; the highest step reached applies. */
+        steps: z
+          .array(z.object({ minClassesGained: z.number().int().min(1), share }).strict())
+          .min(1),
+        maxEuros: euros,
+      })
+      .strict(),
     /** Daily cap on free time spent doing works oneself. */
     diyDailyMaxMinutes: z.number().int().min(1),
     copro: z

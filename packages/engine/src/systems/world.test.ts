@@ -271,8 +271,10 @@ describe('cross-section', () => {
 
   it('spreads the rooms of a house over its floors', () => {
     const state = newGame();
-    const listing = state.listings.find((l) => l.property.kind === 'house');
-    if (!listing) return;
+    const listing = state.listings.find(
+      (l) => l.property.kind === 'house' && l.property.cityId === CITY,
+    );
+    if (!listing) throw new Error('no house');
     const section = engine.section(
       state,
       CITY,

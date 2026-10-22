@@ -181,4 +181,28 @@ describe('progression (docs/02, sections 2.8 to 2.10)', () => {
     expect(monthly?.groups.length).toBeGreaterThan(0);
     expect(monthly?.net).toBe(monthly?.groups.reduce((sum, group) => sum + group.amount, 0));
   });
+
+  it('names the let property that costs money each month at the yearly review', () => {
+    const engine = createEngine(quietContent());
+    const start = engine.createGame({
+      seed: 4,
+      startDate: { year: 2026, month: 12, day: 30 },
+      startHour: 8,
+    });
+    // A property tax of 12 000 € a year: about 1 000 € a month against a rent of 520 €.
+    const owned = sampleOwned(0, { property: { annualPropertyTax: 12_000_00 } });
+    const net = engine.cashFlow({ ...start, properties: [owned] }, owned.property.id)?.net ?? 0;
+    expect(net).toBeLessThan(-content.yvon.thresholds.cashFlowEuros * 100);
+    const { state } = engine.advanceHours(
+      { ...start, properties: [owned], player: { ...start.player, balance: 50_000_00 } },
+      48,
+    );
+    const advice = state.lastYearReview?.advice.find((a) => a.kind === 'negativeCashFlow');
+    expect(advice).toEqual({
+      kind: 'negativeCashFlow',
+      propertyId: owned.property.id,
+      amount: expect.any(Number),
+    });
+    expect(advice?.amount).toBeGreaterThan(0);
+  });
 });

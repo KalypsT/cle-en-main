@@ -1,0 +1,105 @@
+{
+  "events": [
+    {
+      "id": "yearEndBonus",
+      "family": "life",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": { "months": [12], "employed": true },
+      "chancePerMonth": 0.35,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "Bonne surprise sur la fiche de paie : une prime de fin d'année de {montant}.",
+        "Votre employeur a eu une bonne année et le partage : {montant} de prime."
+      ],
+      "effects": [{ "type": "money", "euros": { "min": 300, "max": 900 } }]
+    },
+    {
+      "id": "profitSharing",
+      "family": "life",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": { "months": [5], "employed": true },
+      "chancePerMonth": 0.25,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "L'intéressement tombe enfin : {montant} sur votre compte.",
+        "Prime de participation versée : {montant}. Le comité d'entreprise a même offert les croissants."
+      ],
+      "effects": [{ "type": "money", "euros": { "min": 400, "max": 1200 } }]
+    },
+    {
+      "id": "sideGig",
+      "family": "life",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": { "employed": true },
+      "chancePerMonth": 0.04,
+      "cooldownDays": 120,
+      "pause": false,
+      "texts": [
+        "Un ami vous propose un extra ce week-end, bien payé et déclaré.",
+        "Une ancienne collègue cherche quelqu'un pour un coup de main ponctuel : 5 heures, payées correctement."
+      ],
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Accepter (5 h, +{montant})",
+          "effects": [
+            { "type": "freeTime", "minutes": 300 },
+            { "type": "money", "euros": { "min": 300, "max": 700 } }
+          ],
+          "outcome": "Journée longue, mais le virement est arrivé."
+        },
+        { "id": "decline", "label": "Décliner", "effects": [] }
+      ],
+      "deadlineDays": 4,
+      "defaultChoice": "decline"
+    },
+    {
+      "id": "taxOverpaid",
+      "family": "life",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": { "months": [8, 9], "employed": true },
+      "chancePerMonth": 0.15,
+      "cooldownDays": 300,
+      "pause": false,
+      "texts": [
+        "Le fisc s'est montré un peu trop gourmand sur le prélèvement à la source : il vous rend {montant}."
+      ],
+      "effects": [{ "type": "money", "euros": { "min": 100, "max": 450 } }]
+    },
+    {
+      "id": "inheritance",
+      "family": "life",
+      "target": "none",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.004,
+      "cooldownDays": 3650,
+      "pause": true,
+      "texts": [
+        "Une grand-tante que vous aviez à peine connue vous lègue {montant}. Elle avait, paraît-il, « toujours cru en vous »."
+      ],
+      "effects": [{ "type": "money", "euros": { "min": 3000, "max": 8000 } }]
+    },
+    {
+      "id": "insuranceRefund",
+      "family": "life",
+      "target": "owned",
+      "kind": "opportunity",
+      "conditions": {},
+      "chancePerMonth": 0.015,
+      "cooldownDays": 730,
+      "pause": false,
+      "texts": [
+        "L'assureur de {bien} rembourse enfin un vieux sinistre que vous aviez oublié : {montant}.",
+        "Trop-perçu sur l'assurance de {bien} : {montant} reviennent sur votre compte."
+      ],
+      "effects": [{ "type": "money", "euros": { "min": 150, "max": 450 } }]
+    }
+  ]
+}

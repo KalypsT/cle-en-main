@@ -83,6 +83,7 @@ export const ADVICE_KINDS = [
   'renegotiate',
   'noProperty',
   'firstYear',
+  'negativeCashFlow',
 ] as const satisfies readonly AdviceKind[];
 
 /** Kinds of chronicle entries (state.ts). */

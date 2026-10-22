@@ -16,7 +16,7 @@ import { letBanDay } from './renting.ts';
 import { offMarketChancePerMonth, progressMarginPercent } from './reputation.ts';
 import { estimateRegimes } from './taxes.ts';
 import { tripBetween } from './travel.ts';
-import { pendingDecisions } from './ui-queries.ts';
+import { pendingDecisions, propertyCashFlow } from './ui-queries.ts';
 
 const HOURS_PER_DAY = 24;
 const DAYS_PER_YEAR = 365;
@@ -178,6 +178,22 @@ export function buildYearReview(ctx: SystemContext, regime: readonly Advice[]): 
     if (ban !== null && ban > today && ban - today <= thresholds.dpeBanYears * DAYS_PER_YEAR) {
       advice.push({ kind: 'dpeBan', propertyId: owned.property.id, year: fromDayNumber(ban).year });
     }
+  }
+  // The let property that costs the most each month, if any (progression, step 3).
+  let costliest: { propertyId: string; net: Cents } | null = null;
+  for (const owned of state.properties) {
+    if (owned.property.id === home || !owned.lease) continue;
+    const net = propertyCashFlow(content, state, owned).net;
+    if (net <= -toCents(thresholds.cashFlowEuros) && (!costliest || net < costliest.net)) {
+      costliest = { propertyId: owned.property.id, net };
+    }
+  }
+  if (costliest) {
+    advice.push({
+      kind: 'negativeCashFlow',
+      propertyId: costliest.propertyId,
+      amount: -costliest.net,
+    });
   }
   const payments = monthlyLoanPayments(state);
   if (payments > 0 && state.player.balance < payments * thresholds.reserveMonths) {

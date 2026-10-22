@@ -381,8 +381,11 @@ const pct = (value: number) => percentFormat.format(value);
 const num = (value: number) => (Number.isFinite(value) ? numberFormat.format(value) : '> 10');
 const money = (value: number) => moneyFormat.format(value);
 
-/** The savings of a do-nothing player at the best saving rate of docs/03-systemes/01. */
-const INACTIVE_CEILING_MONTHLY_SAVINGS = 250;
+/**
+ * The savings of a do-nothing player at the best saving rate of docs/03-systemes/01, with the
+ * bonuses and windfalls of the « Vie perso » events (about 100 € a month on average).
+ */
+const INACTIVE_CEILING_MONTHLY_SAVINGS = 650;
 
 /**
  * Milestone 7 (docs/09): « une expansion à Dijon est viable mais demande un vrai effort ».
@@ -873,7 +876,7 @@ export function formatReport(report: Report, title: string): string {
     '',
     '## Rythme et progression',
     '',
-    'Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×4 quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).',
+    `Densité de décisions : nouvelles entrées de la boîte de décisions (événements à choix et défis compris) et annonces au moins 5 % sous l’estimation que le bot pourrait financer, rapportées au temps réel d’une partie jouée à ×1 avec l’accélération automatique (×${gameContent.rhythm.autoSpeed.speed} quand rien d’urgent n’attend, ×1 pendant quelques heures après chaque nouvelle décision). Moyennes par an de jeu ; titres : part des parties qui l’obtiennent et médiane des années (sur ces parties).`,
     '',
     table(
       [

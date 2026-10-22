@@ -543,4 +543,10 @@ describe('migrations', () => {
     expect(migrated.properties[0]?.log).toEqual([upgraded]);
     expect(migrated.soldProperties[0]?.log).toEqual([upgraded]);
   });
+
+  it('keeps a version 19 save as it is: the new advice only adds a kind', () => {
+    const review = { year: 2027, advice: [{ kind: 'vacancy', propertyId: 'p-1' }] };
+    const raw = { formatVersion: 19, reviews: { years: [review] } };
+    expect(migrateRaw(raw, context, 20)).toEqual({ ...raw, formatVersion: 20 });
+  });
 });

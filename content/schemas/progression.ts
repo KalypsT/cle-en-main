@@ -275,6 +275,8 @@ export const ADVICE_KINDS = [
   'renegotiate',
   'noProperty',
   'firstYear',
+  /** A let property that costs money every month (progression, step 3). */
+  'negativeCashFlow',
 ] as const;
 
 export type AdviceKind = (typeof ADVICE_KINDS)[number];
@@ -297,6 +299,10 @@ export const yvonTextsSchema = z
         dpeBanYears: z.number().int().min(1),
         regimeSavingEuros: euros,
         renegotiatePoints: z.number().min(0),
+        /** Monthly cash flow within ± this amount: « balanced » (progression, step 3). */
+        cashFlowEuros: euros,
+        /** Loan length of the cash-flow outlook shown on a listing, with the account bank. */
+        outlookYears: z.number().int().min(1),
       })
       .strict(),
   })

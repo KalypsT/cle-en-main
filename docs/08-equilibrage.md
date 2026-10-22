@@ -155,6 +155,41 @@ Pour un joueur raisonnable en mode Classique, au départ de Dole :
 >
 > Les cibles atteintes et manquées sont les mêmes qu'au jalon 7 (Bailleur, Investisseur aguerri et Levier toujours manqués) ; le seuil d'Investisseur aguerri abaissé à 150 k€ ne suffit pas (5 % des parties du Chasseur à Dijon en 10 ans, 74 % en 25 ans).
 
+> **Progression, étape 1** (2026-10-21, point ouvert n° 16 ; `packages/bots/rapports/progression-etape-1.md` : 100 parties de 10 ans par bot, à comparer à la série de contrôle du jalon 8). Après une partie humaine de 2 ans (développeur, Classique) restée à un seul bien, trois réglages de contenu : épargne de salaire de 230 à 505 € par mois (chapitre 3.1), loyers de marché ×1,1 (chapitre 3.4), incidents et événements fâcheux −25 % en Classique et −50 % en Serein (chapitre 2.5).
+>
+> | Repère (10 ans) | Jalon 8 | Étape 1 |
+> |---|---|---|
+> | Chasseur, médiane | 88,1 k€, faillites 1 % | 137,1 k€, faillites 3 % |
+> | Chasseur, titre Bailleur | 9,9 ans (53 % des parties) | **3,3 ans (83 %) : cible de 2 à 4 ans atteinte** |
+> | Prudent, 1er achat et médiane | 36e mois, 71,0 k€, 1 bien | 7e mois, 122,7 k€, 2 biens |
+> | Levier maximal | 77 % de faillites, D9 29,9 k€ | 40 % de faillites, D9 122,1 k€ (médiane du Prudent 122,7 k€) |
+> | Promoteur | 44,8 k€, titre dans 15 % des parties | 176,2 k€, titre dans 63 % des parties |
+> | Marchand de biens / Inactif | 37,2 k€ / 32,8 k€ | 52,4 k€ / 50,4 k€ |
+> | Rénovateur premium | 27,8 k€, faillites 5 % | 49,1 k€, faillites 11 % |
+> | Chasseur à Dijon | 98 % du Chasseur, 1er achat à Dijon au 66e mois, 43 % y achètent | 87 % du Chasseur, au 23e mois, 75 % y achètent |
+> | Densité de décisions | Chasseur 47,4 s, Prudent 33,1 s | Chasseur 45,2 s, Prudent 31,0 s (28,2 s pour le métier le plus dense) |
+>
+> Le plafond du test anti-idle suit la nouvelle épargne la plus forte : **apport plus 550 € par mois** (au lieu de 250). Nouveaux écarts, à trancher avant les étapes suivantes : l'expansion à Dijon n'est plus « un vrai effort » et un peu moins viable (87 % contre 90 %) ; les faillites du Levier tombent juste à la limite de 40 % ; le Prudent devient un peu trop dense en décisions pour un métier ; le Marchand de biens ne dépasse presque plus l'Inactif.
+>
+> **Dijon recalé** : flux d'annonces de Dijon de 0,25 à 0,1 après l'étape 1 (100 parties : 0,15 donnait 58 % des parties qui y achètent, au 20e mois ; 0,1 donnait 38 %, au 38e mois), puis à **0,08** après l'étape 2, dont les bonnes nouvelles relançaient les achats à Dijon (53,7 % des parties sur 300 à 0,1). Mesure finale (`packages/bots/rapports/progression-dijon.md` : 300 parties de 10 ans du Chasseur et du Chasseur à Dijon) : 95 % de la médiane du Chasseur, faillites 2,3 % contre 1,7 %, premier achat à Dijon au 32e mois dans 44 % des parties : les deux cibles du jalon 7 sont atteintes.
+>
+> **Progression, étape 2** (`packages/bots/rapports/progression-etape-2.md` : 100 parties de 10 ans par bot, flux de Dijon encore à 0,1) : dix bonnes nouvelles et l'aide à la rénovation énergétique (chapitres 3.5 et 3.7).
+>
+> | Repère (10 ans) | Étape 1 | Étape 2 |
+> |---|---|---|
+> | Chasseur, médiane | 137,1 k€, faillites 3 % | 170,7 k€, faillites 0 % |
+> | Chasseur, titre Bailleur | 3,3 ans (83 %) | 2,5 ans (93 %) ; 2,2 ans sur 300 parties |
+> | Prudent | 122,7 k€ | 128,1 k€ |
+> | Levier maximal | 40 % de faillites, D9 122,1 k€ | 37 % de faillites, D9 149,4 k€ (au-dessus des 128,1 k€ du Prudent : « peut progresser vite » atteint) |
+> | Marchand de biens / Inactif | 52,4 k€ / 50,4 k€ | 64,4 k€ / 56,1 k€ |
+> | Rénovateur premium | 49,1 k€, faillites 11 % | 61,8 k€, faillites 9 % |
+> | Promoteur | 176,2 k€, titre dans 63 % des parties | 214,9 k€, titre dans 68 % des parties |
+> | Densité de décisions | Chasseur 45,2 s, Prudent 31,0 s | Chasseur 39,9 s, Prudent 27,6 s |
+>
+> L'Inactif touche lui aussi les primes, l'intéressement et parfois un héritage : le plafond du test anti-idle passe à **apport plus 650 € par mois** (84,5 k€ pour le métier le plus favorable, au-dessus de l'ancien plafond de 81 k€). Écarts restants : faillites du Levier à 37 % (cible : plus de 40 %) ; le Prudent devient un peu trop dense en décisions (27,6 s : les nouveaux choix « un extra » et « le locataire repeint ») ; Investisseur aguerri toujours manqué (écart connu).
+
+> **Progression, étape 4** (`packages/bots/rapports/progression-etape-4.md` : 100 parties de 10 ans du Chasseur et du Prudent) : accélération automatique à ×8 au lieu de ×4. Le temps réel passe de 0,7 à **0,5 heure par année de jeu** pour le Chasseur (0,8 à 0,6 pour le Prudent). La densité de décisions, mesurée en secondes réelles, se resserre d'autant : **Chasseur 28,1 s** (39,9 s à l'étape 2), Prudent 20,6 s (27,6 s), sous la cible de 30 à 60 s. Variante essayée : 24 heures de jeu à la vitesse choisie après chaque nouvelle décision (au lieu de 18) : Chasseur 32 s, Prudent 24,4 s, 0,6 heure par an. **À trancher par Thibaud** : garder ×8 et 18 heures (plus rapide, décisions plus rapprochées, cible à revoir), ou passer à 24 heures (densité du Chasseur dans la cible).
+
 ## 8.3 Les leviers de difficulté
 
 Tous sont des paramètres de contenu :
@@ -187,7 +222,7 @@ Risque classique : une fois riche, tout devient facile (effet boule de neige). C
 > **Lecture des cibles au jalon 1c** :
 > - le « joueur raisonnable » de la section 8.1 est le **Chasseur** ; le Prudent, qui « progresse lentement », est donné pour information ;
 > - les titres n'existent pas encore (jalon 6) : « Bailleur » se mesure à 3 biens loués en même temps, « Investisseur aguerri » à 250 k€ nets sans la condition des 2 villes ; Magnat et Baron dépassent l'horizon de 10 ans ;
-> - « l'Inactif ne s'enrichit jamais » : pour chaque métier, sa médiane reste sous l'apport plus 250 € d'épargne par mois (le haut de la fourchette du chapitre 3.1) ;
+> - « l'Inactif ne s'enrichit jamais » : pour chaque métier, sa médiane reste sous l'apport plus 250 € d'épargne par mois (le haut de la fourchette du chapitre 3.1 ; 550 € depuis l'étape 1 de la progression) ;
 > - « le Naïf stagne ou perd » : sa médiane ne dépasse pas celle de l'Inactif ;
 > - la densité de décisions est mesurée depuis le jalon 6 (voir le rapport ci-dessous).
 >

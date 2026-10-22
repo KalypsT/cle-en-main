@@ -86,10 +86,9 @@ test('shows the version of the game and looks for an update', async ({ page }) =
 
 test('sells a let flat at a discount, or pays the tenant to leave', async ({ page }) => {
   await openGame(page);
-  await importState(
-    page,
-    ownerGame(24 * 120, (s) => s.properties.some((o) => o.lease !== null)),
-  );
+  const owner = ownerGame(24 * 120, (s) => s.properties.some((o) => o.lease !== null));
+  // The game stops at any hour: give the free time the talk with the tenant takes.
+  await importState(page, { ...owner, player: { ...owner.player, freeTimeMinutes: 600 } });
   await tab(page, 'assets');
   await page.locator('[data-testid^="property-"]').first().click();
 

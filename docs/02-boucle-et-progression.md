@@ -24,10 +24,12 @@
 
 - Vitesses : **pause, ×1, ×2, ×4**.
 - À **×1**, une journée de jeu dure **environ 20 secondes**. Un mois dure environ 10 minutes, une année environ 2 heures.
-- **Accélération automatique** (activée par défaut, désactivable) : quand aucune décision n'est en attente et que rien n'est prévu, le temps passe en ×4, puis revient en ×1 au prochain événement.
+- **Accélération automatique** (activée par défaut, désactivable) : quand aucune décision n'est en attente et que rien n'est prévu, le temps passe en ×8 (×4 avant l'étape 4 de la progression), puis revient à la vitesse choisie au prochain événement.
 - **Pause automatique** pour les décisions importantes : offre reçue, incident grave, enchère, assemblée de copropriété.
 
 > **Jalon 6** : l'accélération automatique (réglage activé par défaut) ne s'applique qu'à la vitesse ×1. Le moteur dit si la partie est « calme » (`pace`) : aucune décision dont l'échéance tombe dans le jour qui vient, rien dans l'agenda dans les 24 heures. Les décisions durables (logement vide, avertissement DPE, renégociation possible, devis qui expire, alerte de trésorerie) ne retiennent jamais l'accélération. Toute **nouvelle** décision ramène le temps à ×1 pendant 18 heures de jeu (4 au départ, relevé après mesure des bots : voir le chapitre 08). Valeurs dans `content/rythme.json`. La pause automatique s'étend aux défis proposés, aux incidents graves (chauffe-eau, fuite, chauffage : `content/decisions.json`) et aux événements du catalogue marqués `pause`. Les bilans et la célébration d'un titre arrêtent aussi l'horloge tant qu'ils sont ouverts.
+
+> **Progression, étape 4** (2026-10-21, point ouvert n° 16) : l'accélération automatique passe à **×8** (`autoSpeed.speed` de `content/rythme.json`) et s'applique à **toute vitesse plus lente choisie par le joueur** (×1, ×2 ou ×4), plus seulement à ×1 : une journée calme dure 2,5 secondes. Les règles du calme ne changent pas (aucune décision proche, rien à l'agenda, 18 heures de jeu à la vitesse choisie après chaque nouvelle décision). La barre d'état affiche « accéléré ×8 ». Les vitesses que le joueur choisit restent pause, ×1, ×2 et ×4.
 
 ## 2.4 La boucle principale
 
@@ -48,13 +50,16 @@ Choisis à la création, ils règlent la faillite, le retour en arrière et, rai
 
 | | Serein | Classique (par défaut) | Exigeant |
 |---|---|---|---|
-| Imprévus de chantier et incidents | −30 % | normal | +20 % |
+| Incidents et événements fâcheux | −50 % | −25 % | +20 % |
+| Imprévus de chantier | −30 % | normal | +20 % |
 | Rivaux | plus lents | normaux | plus vifs |
 | Confiance des banquiers | monte plus vite | normale | monte plus lentement |
 | Faillite | seulement des saisies | nouveau départ | fin de partie |
 | Retours en arrière | illimités | 3 par partie | aucun |
 
 > **Jalon 6** : table dans `content/modes.json`. Serein : imprévus et incidents ×0,7, rivaux ×0,75, gains de confiance ×1,3 ; Exigeant : ×1,2, ×1,25 et ×0,75. Les coefficients s'appliquent aux incidents des locataires, aux imprévus de chantier, aux événements « fâcheux » du catalogue, à l'agressivité des rivaux et aux seuls gains de confiance des banquiers (jamais aux pertes). « Seulement des saisies » en Serein : les ventes forcées ont lieu, mais la faillite devient un nouveau départ qui garde **toute** la réputation (choix de Thibaud).
+
+> **Progression, étape 1** (2026-10-21, point ouvert n° 16) : les incidents des locataires et les événements « fâcheux » du catalogue deviennent moins fréquents (coefficient d'incidents de Serein 0,7 → 0,5, de Classique 1 → 0,75) ; Exigeant garde 1,2, soit son niveau d'avant. Les imprévus de chantier ne changent pas. L'épargne plus forte (chapitre 3.1) et les loyers +10 % (chapitre 3.4) valent pour les trois modes : Exigeant reste plus dur par ses autres coefficients.
 
 ## 2.6 La faillite
 

@@ -161,6 +161,7 @@ import {
   pendingDecisions,
   propertyCashFlow,
   simulateFinancing,
+  cashFlowOutlook,
 } from './systems/ui-queries.ts';
 import {
   answerSaleOffer,
@@ -813,6 +814,16 @@ export function createEngine(content: GameContent) {
             id: purchase.id,
             holder: purchase.holder,
           })
+        : null;
+    },
+    /**
+     * « Cash-flow prévu » of a listing at its asking price or at `price` (an offer): financing
+     * with the account bank, minimum contribution, bare let at the market rent (progression, step 3).
+     */
+    cashFlowOutlook: (state: GameState, listingId: string, price?: Cents) => {
+      const listing = state.listings.find((candidate) => candidate.id === listingId);
+      return listing
+        ? cashFlowOutlook(content, state, listing.property, listing.askingPrice, price)
         : null;
     },
     /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */

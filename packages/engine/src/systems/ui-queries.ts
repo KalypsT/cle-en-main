@@ -8,7 +8,7 @@ import {
   type DecisionKind,
   type GameContent,
 } from '../content.ts';
-import { annuityPayment, type Cents } from '../money.ts';
+import { annuityPayment, type Cents, toCents } from '../money.ts';
 import { hashFloat } from '../random.ts';
 import type { GameState, Holder, OwnedProperty, Property } from '../state.ts';
 import {
@@ -467,6 +467,52 @@ export function simulateFinancing(
   };
 }
 
+/** Rounding of the price at which a listing would pay for itself. */
+const BREAK_EVEN_STEP = 1_000_00;
+
+/**
+ * « Cash-flow prévu » of a listing (progression, step 3): its financing with the account bank
+ * over the usual length, the contribution at its minimum (the fees), let bare at the market
+ * rent; and the highest price at which it would pay for itself.
+ */
+export interface CashFlowOutlook {
+  /** Monthly flows of that financing, before income tax. */
+  simulation: FinancingSimulation;
+  /** Rent and charges in, minus the owner's costs and the loan, per month. */
+  monthly: Cents;
+  tone: 'positive' | 'balanced' | 'negative';
+  /** Highest price (rounded down) at which the monthly cash flow is not negative; null: none. */
+  breakEvenPrice: Cents | null;
+}
+
+export function cashFlowOutlook(
+  content: GameContent,
+  state: GameState,
+  property: Property,
+  askingPrice: Cents,
+  price: Cents = askingPrice,
+): CashFlowOutlook | null {
+  const thresholds = content.yvon.thresholds;
+  const simulation = simulateFinancing(content, state, property, askingPrice, {
+    bankId: content.start.accountBankId,
+    durationYears: thresholds.outlookYears,
+    price,
+  });
+  if (!simulation || simulation.price <= 0) return null;
+  const monthly = simulation.netEffort;
+  const margin = toCents(thresholds.cashFlowEuros);
+  const tone = monthly >= margin ? 'positive' : monthly <= -margin ? 'negative' : 'balanced';
+  // The payment is proportional to the loan, and the loan almost to the price.
+  const income = simulation.rent + simulation.recoverableCharges - simulation.ownerCosts;
+  let breakEvenPrice: Cents | null = null;
+  if (income > 0 && simulation.monthlyPayment > 0) {
+    const affordableLoan = (simulation.loanAmount * income) / simulation.monthlyPayment;
+    const exact = (affordableLoan * simulation.price) / simulation.loanAmount;
+    breakEvenPrice = Math.floor(exact / BREAK_EVEN_STEP) * BREAK_EVEN_STEP;
+  }
+  return { simulation, monthly, tone, breakEvenPrice };
+}
+
 /** Balance expected over the next days from the flows already known (docs/02, 2.6). */
 export interface CashForecast {
   days: number;
@@ -691,6 +737,7 @@ export function neighbourhoodMarkets(
       pricePerM2: Math.round(neighbourhood.sales.apartment.pricePerM2.median * priceIndex * 100),
       rentPerM2: Math.round(
         neighbourhood.rentPerM2.smallApartment *
+          content.renting.marketRentFactor *
           priceIndex ** content.renting.priceIndexElasticity *
           100,
       ),

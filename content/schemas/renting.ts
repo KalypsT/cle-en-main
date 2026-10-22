@@ -186,6 +186,11 @@ export const rentingRulesSchema = z
     smallApartmentMaxRooms: z.number().int().min(1),
     /** Rents follow property prices with this elasticity (d log rent / d log price index). */
     priceIndexElasticity: z.number().min(0),
+    /**
+     * Game coefficient on every market rent: a deliberate step away from the data, so that a
+     * financed rental can pay its way (docs/03-systemes/04).
+     */
+    marketRentFactor: z.number().positive(),
     /** The city's rents per m² include charges: the recoverable charges are taken out. */
     dataRentsIncludeCharges: z.boolean(),
     /** Rent factor by the dwelling's weighted state (1 to 5, interpolated). */
