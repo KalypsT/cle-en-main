@@ -260,8 +260,15 @@ export function createPassant(context: PassantContext): Walker {
 
 const CAR_COLORS = [0xd9a03a, 0xb23d27, 0x3f6f9a, 0xf2f2ee, 0x4a4f57, 0x5d8a5a, 0x2b2d31, 0x9aa5b0];
 
+export interface Car extends Walker {
+  lights: Sprite;
+  length: number;
+  /** Speed on a free road; `speed` drops behind a slower car. */
+  cruise: number;
+}
+
 /** A car on the road, with headlights that light up in the evening. */
-export function createCar(random: () => number, glow: Texture): Walker & { lights: Sprite } {
+export function createCar(random: () => number, glow: Texture, dir: 1 | -1): Car {
   const view = new Container();
   const color = pickOf(CAR_COLORS, random);
   const small = random() < 0.5;
@@ -297,15 +304,17 @@ export function createCar(random: () => number, glow: Texture): Walker & { light
   lights.tint = 0xfff1c4;
   lights.blendMode = 'add';
   view.addChild(lights);
-  const dir: 1 | -1 = random() < 0.5 ? 1 : -1;
-  const car = {
+  const cruise = 60 + random() * 40;
+  const car: Car = {
     view,
     lights,
+    length,
+    cruise,
     x: 0,
     // Two lanes: towards the right on the far lane, left on the near one.
     y: GROUND_Y + SIDEWALK + (dir === 1 ? ROAD * 0.5 : ROAD - 2),
     dir,
-    speed: 60 + random() * 40,
+    speed: cruise,
     update(dt: number, still: boolean) {
       if (!still) car.x += car.dir * car.speed * dt;
       view.position.set(car.x, car.y);

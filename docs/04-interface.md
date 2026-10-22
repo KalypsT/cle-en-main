@@ -103,7 +103,7 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Toucher un bâtiment** ouvre sa **coupe** : les logements étage par étage, le logement du joueur (ou l'annonce) cerclé de sa couleur avec ses pièces, leur usure et les artisans au travail ; toucher le logement ouvre sa fiche. La liste des pièces et de leur état suit le dessin.
 - **Le tableau de bord du jalon 4 n'est pas perdu** : il devient un **tiroir** sous la rue. Fermé, il montre le bonjour, le patrimoine net et le solde du mois ; ouvert (toucher la poignée), les opportunités, les décisions et les nouvelles. Sur grand écran, il reste ouvert dans la colonne de droite, la rue à gauche.
 - **Panorama** : téléphone tourné, la Rue passe en plein écran avec une barre d'état réduite (date, heure, vitesse) ; les autres écrans demandent de revenir en portrait.
-- **Thème** : Clair, Sombre, Automatique (sombre pendant la nuit du jeu), Selon le téléphone (par défaut).
+- **Thème** : Clair, Sombre, Automatique (sombre pendant la nuit du jeu ; à ×4 et au-delà, il garde le moment où le temps s'est accéléré, voir 05, 5.4), Selon le téléphone (par défaut).
 - **Réglages de la rue** : qualité graphique (Automatique, Haute, Économie) et compteur d'images par seconde, pour vérifier la fluidité sur le téléphone.
 
 ## 4.10 Rythme et progression (jalon 6)

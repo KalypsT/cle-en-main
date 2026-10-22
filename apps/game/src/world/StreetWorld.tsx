@@ -1,12 +1,12 @@
 import { gameContent } from '@cle/content';
-import { type Bubble, type StreetBuilding, toDayNumber } from '@cle/engine';
+import { type Bubble, type StreetBuilding, toDayNumber, type Weather } from '@cle/engine';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { anecdoteText, format, t } from '../texts.ts';
 import { Icon, type IconName } from '../ui/Icon.tsx';
 import { FacadeShape } from './FacadeShape.tsx';
-import { type FrameStats, type QualityLevel, StreetScene } from './StreetScene.ts';
+import { type FrameStats, type QualityLevel, type SceneData, StreetScene } from './StreetScene.ts';
 import {
   DESIGN_HEIGHT,
   GROUND_Y,
@@ -87,7 +87,7 @@ function buildingName(building: StreetBuilding): string {
 }
 
 export function StreetWorld({ active }: { active: boolean }) {
-  const { state, settings, audio, notify } = useGame();
+  const { state, settings, audio, notify, ambience: shownAmbience } = useGame();
   const nav = useNav();
   const cityId = nav.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
@@ -105,15 +105,32 @@ export function StreetWorld({ active }: { active: boolean }) {
   // Recomputed only when what the street shows changes: not at every hour of the clock.
   const { clock, listings, properties, purchases, rivals, seed } = state;
   const day = toDayNumber(clock.date);
+  // A new object at each render: kept while its values stay the same.
+  const { hour, moment, season, christmas, bells } = shownAmbience.ambience;
   const ambience = useMemo(
-    () => engine.ambience(state, cityId),
+    () => ({ ...shownAmbience.ambience }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [day, clock.hour, seed, cityId],
+    [hour, moment, season, christmas, bells, shownAmbience.ambience.weather],
   );
-  const streets = useMemo(
+  const liveStreets = useMemo(
     () => engine.streets(state, cityId, neighbourhoodId),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [listings, properties, purchases, rivals, seed, day, ambience.moment, cityId, neighbourhoodId],
+  );
+  // At high speed, each street keeps the weather it had (rain would come and go every second).
+  const [heldWeather, setHeldWeather] = useState<Record<string, Weather> | null>(null);
+  if (shownAmbience.still && heldWeather === null)
+    setHeldWeather(Object.fromEntries(liveStreets.map((street) => [street.id, street.weather])));
+  else if (!shownAmbience.still && heldWeather !== null) setHeldWeather(null);
+  const streets = useMemo(
+    () =>
+      heldWeather
+        ? liveStreets.map((street) => ({
+            ...street,
+            weather: heldWeather[street.id] ?? street.weather,
+          }))
+        : liveStreets,
+    [liveStreets, heldWeather],
   );
   const layout = useMemo(() => layoutStreets(streets, cityId), [streets, cityId]);
   const scrollKey = `${cityId}/${neighbourhoodId}`;
@@ -176,27 +193,39 @@ export function StreetWorld({ active }: { active: boolean }) {
     return () => observer.disconnect();
   }, []);
 
+  // The latest data, given to the scene at the next frame.
+  const sceneData = useRef<Omit<SceneData, 'accent'> | null>(null);
+  const sceneFrame = useRef<number | null>(null);
   useEffect(() => {
     // Hidden street: nothing to draw; the data is given again when it shows.
     if (!active) return;
+    sceneData.current = {
+      layout,
+      hour: ambience.hour,
+      moment: ambience.moment,
+      season: ambience.season,
+      christmas: ambience.christmas,
+      shopNames: t.street.shops,
+      forSaleText: t.street.forSaleSign,
+      cityId,
+      neighbourhoodId,
+      seed: state.seed,
+    };
     // Next frame: the theme (and so the accent colour) is applied by App after this effect.
-    const frame = requestAnimationFrame(() =>
-      sceneRef.current?.setData({
-        layout,
-        hour: ambience.hour,
-        moment: ambience.moment,
-        season: ambience.season,
-        christmas: ambience.christmas,
-        accent: cssAccent(),
-        shopNames: t.street.shops,
-        forSaleText: t.street.forSaleSign,
-        cityId,
-        neighbourhoodId,
-        seed: state.seed,
-      }),
-    );
-    return () => cancelAnimationFrame(frame);
+    // One frame at a time, never cancelled: when the hours go by faster than the frames, a
+    // cancelled frame would leave the scene without its data.
+    sceneFrame.current ??= requestAnimationFrame(() => {
+      sceneFrame.current = null;
+      if (sceneData.current)
+        sceneRef.current?.setData({ ...sceneData.current, accent: cssAccent() });
+    });
   }, [active, layout, ambience, cityId, neighbourhoodId, state.seed, settings.theme]);
+  useEffect(
+    () => () => {
+      if (sceneFrame.current !== null) cancelAnimationFrame(sceneFrame.current);
+    },
+    [],
+  );
 
   // A new property (just bought): show its neighbourhood and centre it.
   const ownedIds = state.properties.map((owned) => owned.property.id).join(',');

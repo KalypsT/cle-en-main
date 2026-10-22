@@ -1,6 +1,7 @@
 import type { GameAction, GameEvent, GameState, PropertyKind } from '@cle/engine';
 import { createContext, useContext } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
+import type { ShownAmbience } from './ambience.ts';
 import type { GameSession, SessionSnapshot } from '../session/game-session.ts';
 import type { Settings } from '../settings.ts';
 import type { Checkpoint } from '../storage/saves.ts';
@@ -76,6 +77,8 @@ export interface GameContextValue {
   session: GameSession;
   snapshot: SessionSnapshot;
   state: GameState;
+  /** The ambience of the city on screen, held still at high speed (see useShownAmbience). */
+  ambience: ShownAmbience;
   settings: Settings;
   setSettings: (settings: Settings) => void;
   /** Dispatches an action; on refusal, shows its text and returns null. */

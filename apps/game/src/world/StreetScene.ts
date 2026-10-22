@@ -14,7 +14,15 @@ import {
   GARLAND_COLORS,
 } from './decor.ts';
 import { blendLight, type Light, lightOf, litShare } from './light.ts';
-import { createBird, createCar, createPassant, createWorker, type Walker } from './people.ts';
+import { type Crowd, crowdOf } from './crowd.ts';
+import {
+  type Car,
+  createBird,
+  createCar,
+  createPassant,
+  createWorker,
+  type Walker,
+} from './people.ts';
 import { barShapes, facadeShapes, paneShapes } from './shapes.ts';
 import {
   decorRandom,
@@ -74,20 +82,28 @@ export interface FrameStats {
   p95: number;
   quality: QualityLevel;
   renderer: string;
+  /** Actors in the scene, for the end-to-end test that they stay few. */
+  actors: Crowd;
 }
 
 interface StreetLayers {
   laid: LaidStreet;
-  base: Container;
+  /** Ground, walls and panes. */
+  back: Container;
+  /** Shutters, window bars, balconies, trees, lamps, signs and workers. */
+  front: Container;
+  /** Lit windows and shop windows, between the two. */
   lights: Graphics;
+  /** Christmas garlands, over everything. */
+  sparkles: Graphics;
   lampGlows: Sprite[];
   garland: { x: number; y: number; color: number }[];
 }
 
-/** Base people per street view, by moment. */
-const PEOPLE = { morning: 7, day: 11, evening: 8, night: 3 } as const;
-const CARS = { morning: 2, day: 3, evening: 2, night: 1 } as const;
 const MARGIN = 80;
+/** Cars keep this gap with the one ahead, and slow down from SAFE_GAP. */
+const MIN_GAP = 14;
+const SAFE_GAP = 50;
 const FRAME_SAMPLES = 120;
 /** Frames needed before judging the speed (a slow phone gives few per second). */
 const MIN_SAMPLES = 20;
@@ -99,10 +115,16 @@ export class StreetScene {
   private readonly orb = new Graphics();
   private readonly stars = new Graphics();
   private readonly clouds = new Container();
+  /**
+   * The street in world units, scaled to the view, from back to front: town silhouette,
+   * walls, lit windows, what stands before the walls, passers-by and cars, then the halos.
+   * The light tints all but the lit windows and the halos.
+   */
+  private readonly scene = new Container();
   private readonly skyline = new Graphics();
-  /** Everything tinted by the light: the street and its people. */
-  private readonly lit = new Container();
-  private readonly world = new Container();
+  private readonly back = new Container();
+  private readonly windowLights = new Container();
+  private readonly front = new Container();
   private readonly actors = new Container();
   private readonly glows = new Container();
   private readonly birds = new Container();
@@ -111,10 +133,15 @@ export class StreetScene {
   private skyTexture!: Texture;
   private streets: StreetLayers[] = [];
   private people: Walker[] = [];
-  private cars: (Walker & { lights: Sprite })[] = [];
+  private cars: Car[] = [];
   private flyers: Walker[] = [];
-  /** Actors of an earlier moment or weather: they leave the view and are not replaced. */
-  private stale = new WeakSet<Walker>();
+  /**
+   * How many actors the view holds. Those who leave it are gone; new ones, dressed for the
+   * current moment and weather, come in from the sides when there is room.
+   */
+  private crowd: Crowd = { people: 0, cars: 0, birds: 0 };
+  /** Seconds before the next arrival of each kind. */
+  private readonly arrivals = { people: 0, cars: 0, birds: 0 };
   private workers: Walker[] = [];
   private data: SceneData | null = null;
   private staticKey = '';
@@ -170,16 +197,15 @@ export class StreetScene {
     this.skyTexture = gradientTexture();
     this.sky.texture = this.skyTexture;
     this.weather = new WeatherLayer(this.glow);
-    this.lit.addChild(this.skyline, this.world, this.actors);
-    this.root.addChild(
-      this.sky,
-      this.stars,
-      this.orb,
-      this.clouds,
-      this.birds,
-      this.lit,
+    this.scene.addChild(
+      this.skyline,
+      this.back,
+      this.windowLights,
+      this.front,
+      this.actors,
       this.glows,
     );
+    this.root.addChild(this.sky, this.stars, this.orb, this.clouds, this.birds, this.scene);
     app.stage.addChild(this.root, this.weather.view);
     app.ticker.maxFPS = QUALITY[this.quality].maxFps;
     app.ticker.add(() => this.frame(app.ticker.deltaMS));
@@ -211,6 +237,7 @@ export class StreetScene {
       QUALITY[level].resolution,
     );
     this.app.renderer.resize(this.width, this.height);
+    this.updateCrowd();
     this.resetActors();
     this.configureWeather();
   }
@@ -225,19 +252,18 @@ export class StreetScene {
     this.sky.height = this.height;
     this.weather.resize(this.width, this.height);
     // Ground at the bottom of the view whatever its height.
-    const offsetY = this.height - DESIGN_HEIGHT * this.scale;
-    for (const layer of [this.lit, this.glows]) {
-      layer.scale.set(this.scale);
-      layer.y = offsetY;
-    }
+    this.scene.scale.set(this.scale);
+    this.scene.y = this.height - DESIGN_HEIGHT * this.scale;
     this.drawSkyDecor();
     this.configureWeather();
+    this.updateCrowd();
   }
 
   setData(data: SceneData): void {
     const previous = this.data;
     this.data = data;
-    this.random = decorRandom(data.seed);
+    // Seeded once: drawn again at each hour, the passers-by would come back as clones.
+    if (previous?.seed !== data.seed) this.random = decorRandom(data.seed);
     // Only what the static drawing shows: a new bubble or works percentage redraws nothing.
     const buildingKey = (laid: LaidStreet['buildings'][number]) => {
       const b = laid.building;
@@ -283,6 +309,7 @@ export class StreetScene {
       this.renewActors();
     }
     this.updateTarget();
+    this.updateCrowd();
   }
 
   /** Frame time statistics, for the FPS counter and the end-to-end test. */
@@ -294,6 +321,7 @@ export class StreetScene {
       p95: Math.round(sorted[Math.floor(sorted.length * 0.95)] ?? 0),
       quality: this.quality,
       renderer: this.app?.renderer.name ?? 'none',
+      actors: { people: this.people.length, cars: this.cars.length, birds: this.flyers.length },
     };
   }
 
@@ -328,6 +356,22 @@ export class StreetScene {
       this.configureWeather();
       this.renewActors();
     }
+    this.updateCrowd();
+  }
+
+  private updateCrowd(): void {
+    const data = this.data;
+    if (!data) return;
+    const quality = QUALITY[this.quality];
+    this.crowd = crowdOf({
+      moment: data.moment,
+      season: data.season,
+      weather: this.currentWeather,
+      street: this.currentStreet()?.street ?? null,
+      viewWidth: this.width / this.scale,
+      quality: quality.people,
+      birds: quality.birds,
+    });
   }
 
   private configureWeather(): void {
@@ -363,8 +407,10 @@ export class StreetScene {
   private buildStatic(): void {
     const data = this.data;
     if (!data || !this.app) return;
-    this.world.removeChildren().forEach((child) => child.destroy({ children: true }));
-    this.glows.removeChildren().forEach((child) => child.destroy());
+    for (const layer of [this.back, this.windowLights, this.front, this.glows])
+      layer.removeChildren().forEach((child) => child.destroy({ children: true }));
+    // Its own generator: the workers look the same each time the street is drawn again.
+    const random = decorRandom(data.seed + 3);
     this.workers = [];
     this.streets = [];
     this.skyline.clear();
@@ -379,7 +425,7 @@ export class StreetScene {
     const snowing = (street: LaidStreet) => street.street.weather === 'snow';
 
     data.layout.streets.forEach((laid, index) => {
-      const base = new Container();
+      const back = new Container();
       const ground = new Graphics();
       const snow = snowing(laid);
       drawGround(ground, laid, {
@@ -403,13 +449,14 @@ export class StreetScene {
         for (let x = laid.x + 60; x < laid.x + laid.width; x += 210)
           drawPlanter(ground, x, data.season);
       }
-      base.addChild(ground);
+      back.addChild(ground);
 
       const front = new Graphics();
       const buildings = new Graphics();
       // Shop signs and the agencies' panels, over the façades.
       const labels = new Container();
       const garland: StreetLayers['garland'] = [];
+      const workers: Walker[] = [];
       let lastSign = -1;
       for (const item of laid.buildings) {
         const { building, spec } = item;
@@ -505,9 +552,9 @@ export class StreetScene {
             item.x + spec.width / 2 - 35,
             building.role === 'owned' ? data.accent : 0x8a5a32,
           );
-          const worker = createWorker(this.random);
+          const worker = createWorker(random);
           worker.view.position.set(item.x + spec.width * 0.3, GROUND_Y - spec.groundHeight - 2);
-          this.workers.push(worker);
+          workers.push(worker);
         }
         if (data.christmas) {
           const y = GROUND_Y - spec.wallHeight + 6;
@@ -528,13 +575,19 @@ export class StreetScene {
           drawTree(front, item.treeX, data.season, hashString(building.id), snow);
       }
       for (const x of laid.lamps) drawLamp(front, x, data.christmas);
-      base.addChild(buildings, front, labels);
-      for (const worker of this.workers) base.addChild(worker.view);
-      this.world.addChild(base);
+      back.addChild(buildings);
+      const frontLayer = new Container();
+      frontLayer.addChild(front, labels);
+      for (const worker of workers) frontLayer.addChild(worker.view);
+      this.workers.push(...workers);
+      this.back.addChild(back);
+      this.front.addChild(frontLayer);
 
       const lights = new Graphics();
       lights.blendMode = 'add';
-      this.glows.addChild(lights);
+      this.windowLights.addChild(lights);
+      const sparkles = new Graphics();
+      this.glows.addChild(sparkles);
       const lampGlows = laid.lamps.map((x) => {
         const sprite = new Sprite(this.glow);
         sprite.anchor.set(0.5);
@@ -546,7 +599,15 @@ export class StreetScene {
         this.glows.addChild(sprite);
         return sprite;
       });
-      this.streets.push({ laid, base, lights, lampGlows, garland });
+      this.streets.push({
+        laid,
+        back,
+        front: frontLayer,
+        lights,
+        sparkles,
+        lampGlows,
+        garland,
+      });
     });
     this.workers.forEach((worker) => worker.update(0, false));
   }
@@ -562,6 +623,7 @@ export class StreetScene {
     const glow = this.light.glow;
     for (const layer of this.streets) {
       const g = layer.lights.clear();
+      const sparkles = layer.sparkles.clear();
       if (glow <= 0.02) continue;
       for (const item of layer.laid.buildings) {
         const { spec, building } = item;
@@ -574,19 +636,25 @@ export class StreetScene {
           }
         }
         if (spec.shop && data.hour >= 7 && data.hour < 20) {
-          g.rect(
-            item.x + 9,
-            GROUND_Y - spec.groundHeight + 19,
-            spec.width - 18,
-            spec.groundHeight - 24,
-          ).fill({ color: 0xffe2a0, alpha: 0.7 * glow });
+          // The two shop windows (see facadeShapes), not the pillar between them.
+          const y = GROUND_Y - spec.groundHeight + 19;
+          const w = spec.width / 2 - 14;
+          for (const x of [9, spec.width / 2 + 5]) {
+            g.rect(item.x + x, y, w, spec.groundHeight - 24).fill({
+              color: 0xffe2a0,
+              alpha: 0.7 * glow,
+            });
+          }
         }
       }
       for (const light of layer.garland)
-        g.circle(light.x, light.y, 1.6).fill({ color: light.color, alpha: Math.max(0.5, glow) });
+        sparkles
+          .circle(light.x, light.y, 1.6)
+          .fill({ color: light.color, alpha: Math.max(0.5, glow) });
     }
   }
 
+  /** Fills the view at once (a new street, season or quality): nobody comes from the sides. */
   private resetActors(): void {
     if (!this.data || !this.app) return;
     for (const walker of [...this.people, ...this.cars, ...this.flyers])
@@ -594,89 +662,154 @@ export class StreetScene {
     this.people = [];
     this.cars = [];
     this.flyers = [];
-    this.addActors(true);
+    this.updateCrowd();
+    const { left, right } = this.view();
+    const span = right - left;
+    for (let i = 0; i < this.crowd.people; i++)
+      this.addPassant(left + this.random() * span, this.random() < 0.5 ? 1 : -1);
+    // Spread out along the road, one lane each way.
+    for (let i = 0; i < this.crowd.cars; i++) {
+      const x = left + ((i + 0.2 + this.random() * 0.6) * span) / this.crowd.cars;
+      this.addCar(x, i % 2 === 0 ? 1 : -1);
+    }
+    for (let i = 0; i < this.crowd.birds; i++)
+      this.addBird(this.random() * this.width, this.random() < 0.5 ? 1 : -1);
+    Object.assign(this.arrivals, { people: 0, cars: 0, birds: 0 });
   }
 
   /**
-   * The moment or the weather changed: the actors on screen walk on and leave, the new ones
-   * come in from the sides (no one pops in or out in view).
+   * The moment or the weather changed: the actors on screen walk on and leave, and the ones
+   * who come in from the sides are dressed for the new one (no one pops in or out in view).
    */
   private renewActors(): void {
     if (!this.data || !this.app) return;
     // Nobody walks with reduced motion: the new ones would never come in.
-    if (this.reducedMotion) {
-      this.resetActors();
-      return;
-    }
-    for (const walker of [...this.people, ...this.cars, ...this.flyers]) this.stale.add(walker);
-    this.addActors(false);
+    if (this.reducedMotion) this.resetActors();
+    else this.updateCrowd();
   }
 
-  /** Passers-by, cars and birds of the current moment and weather; `anywhere` in view or outside. */
-  private addActors(anywhere: boolean): void {
+  /** The visible part of the street, in world units. */
+  private view(): { left: number; right: number } {
+    return {
+      left: this.cameraX / this.scale,
+      right: (this.cameraX + this.width) / this.scale,
+    };
+  }
+
+  private addPassant(x: number, dir: 1 | -1): void {
     const data = this.data;
     if (!data) return;
-    const quality = QUALITY[this.quality];
-    const weatherFactor =
-      this.currentWeather === 'rain' || this.currentWeather === 'snow' ? 0.6 : 1;
-    const people = Math.max(1, Math.round(PEOPLE[data.moment] * quality.people * weatherFactor));
-    const night = data.moment === 'night';
-    const street = this.currentStreet();
-    for (let i = 0; i < people; i++) {
-      const walker = createPassant({
-        season: data.season,
-        weather: this.currentWeather,
-        night,
-        random: this.random,
-      });
-      this.placeInView(walker, anywhere);
-      walker.view.scale.x = walker.dir;
-      this.people.push(walker);
-      this.actors.addChild(walker.view);
+    const walker = createPassant({
+      season: data.season,
+      weather: this.currentWeather,
+      night: data.moment === 'night',
+      random: this.random,
+    });
+    walker.x = x;
+    walker.dir = dir;
+    walker.update(0, true);
+    this.people.push(walker);
+    this.actors.addChild(walker.view);
+    this.sortActors();
+  }
+
+  private addCar(x: number, dir: 1 | -1): void {
+    const car = createCar(this.random, this.glow, dir);
+    car.x = x;
+    car.update(0, true);
+    this.cars.push(car);
+    this.actors.addChild(car.view);
+    this.sortActors();
+  }
+
+  /** A bird, in view coordinates (the sky does not scroll with the street). */
+  private addBird(x: number, dir: 1 | -1, y?: number): void {
+    const bird = createBird(this.random);
+    bird.x = x;
+    bird.dir = dir;
+    if (y !== undefined) bird.y = y;
+    this.flyers.push(bird);
+    this.birds.addChild(bird.view);
+  }
+
+  /** By depth: the far lane first, the people on the pavement in front of the buildings. */
+  private sortActors(): void {
+    this.actors.children.sort((a, b) => a.y - b.y);
+  }
+
+  /**
+   * Brings in new actors from the sides while the view holds fewer than its crowd, one at a
+   * time; when the player slides the street, they come from the side it slides towards.
+   */
+  private arrive(dt: number, cameraDx: number): void {
+    const { left, right } = this.view();
+    const arrivals = this.arrivals;
+    arrivals.people -= dt;
+    arrivals.cars -= dt;
+    arrivals.birds -= dt;
+    const missing = this.crowd.people - this.people.length;
+    if (missing > 0 && arrivals.people <= 0) {
+      arrivals.people = (0.5 + this.random() * 1.5) / missing;
+      const dir = this.random() < 0.5 ? 1 : -1;
+      const side = Math.abs(cameraDx) > 1 ? Math.sign(cameraDx) : -dir;
+      this.addPassant(side < 0 ? left - MARGIN / 2 : right + MARGIN / 2, dir);
     }
-    if (!street?.street.quay) {
-      for (let i = 0; i < CARS[data.moment]; i++) {
-        const car = createCar(this.random, this.glow);
-        this.placeInView(car, anywhere);
-        this.cars.push(car);
-        this.actors.addChild(car.view);
+    if (this.cars.length < this.crowd.cars && arrivals.cars <= 0) {
+      const dir = this.random() < 0.5 ? 1 : -1;
+      const x = dir === 1 ? left - MARGIN * 1.5 : right + MARGIN * 1.5;
+      // Wait until the lane is clear at the entry.
+      const clear = this.cars.every((car) => car.dir !== dir || Math.abs(car.x - x) > SAFE_GAP * 2);
+      if (clear) {
+        this.addCar(x, dir);
+        arrivals.cars = 1.5 + this.random() * 3;
+      } else {
+        arrivals.cars = 0.4;
       }
     }
-    // Sort by depth: the far lane first, people on the pavement in front of the buildings.
-    this.actors.children.sort((a, b) => a.y - b.y);
-    if (
-      quality.birds &&
-      !night &&
-      this.currentWeather !== 'rain' &&
-      this.currentWeather !== 'snow'
-    ) {
-      for (let i = 0; i < 3; i++) {
-        const bird = createBird(this.random);
-        bird.x = anywhere ? this.random() * this.width : -30 - this.random() * 200;
-        this.flyers.push(bird);
-        this.birds.addChild(bird.view);
+    const birds = this.crowd.birds - this.flyers.length;
+    if (birds > 0 && arrivals.birds <= 0) {
+      // A small flock crosses the sky now and then.
+      arrivals.birds = 3 + this.random() * 8;
+      const dir = this.random() < 0.5 ? 1 : -1;
+      const y = 50 + this.random() * Math.min(160, this.height * 0.3);
+      const flock = Math.min(birds, 1 + Math.floor(this.random() * 3));
+      for (let i = 0; i < flock; i++) {
+        const x = dir === 1 ? -20 - i * 16 : this.width + 20 + i * 16;
+        this.addBird(x, dir, y + (this.random() - 0.5) * 18);
       }
     }
   }
 
-  /** Removes the stale actors that went out of view, and destroys them. */
-  private dropStale<T extends Walker>(actors: T[], gone: (actor: T) => boolean): T[] {
+  /** Each car keeps its distance with the one ahead in its lane. */
+  private drive(dt: number): void {
+    for (const car of this.cars) {
+      let gap = Infinity;
+      let leader: Car | null = null;
+      for (const other of this.cars) {
+        if (other === car || other.dir !== car.dir) continue;
+        const ahead = (other.x - car.x) * car.dir;
+        if (ahead <= 0) continue;
+        const space = ahead - (other.length + car.length) / 2;
+        if (space < gap) {
+          gap = space;
+          leader = other;
+        }
+      }
+      const target =
+        leader && gap < SAFE_GAP
+          ? Math.min(car.cruise, Math.max(0, leader.speed + (gap - MIN_GAP) * 2))
+          : car.cruise;
+      car.speed += (target - car.speed) * Math.min(1, dt * 4);
+    }
+  }
+
+  /** Destroys the actors gone out of view (with a margin). */
+  private dropGone<T extends Walker>(actors: T[], gone: (actor: T) => boolean): T[] {
     return actors.filter((actor) => {
-      if (!this.stale.has(actor) || !gone(actor)) return true;
+      if (!gone(actor)) return true;
       actor.view.destroy({ children: true });
       return false;
     });
-  }
-
-  /** Puts a walker in the visible part of the street (or just outside it). */
-  private placeInView(walker: Walker, anywhere: boolean): void {
-    const left = this.cameraX / this.scale;
-    const right = (this.cameraX + this.width) / this.scale;
-    walker.x = anywhere
-      ? left - MARGIN + this.random() * (right - left + MARGIN * 2)
-      : walker.dir === 1
-        ? left - MARGIN / 2
-        : right + MARGIN / 2;
   }
 
   private frame(deltaMS: number): void {
@@ -688,9 +821,7 @@ export class StreetScene {
     this.cameraX = this.camera();
     const cameraDx = this.cameraX - this.lastCameraX;
     this.lastCameraX = this.cameraX;
-    const worldX = -this.cameraX;
-    this.lit.x = worldX;
-    this.glows.x = worldX;
+    this.scene.x = -this.cameraX;
     this.skyline.x = -200 + (this.cameraX / this.scale) * 0.7;
     if (Math.abs(cameraDx) > 0) this.updateTarget();
 
@@ -700,7 +831,8 @@ export class StreetScene {
       ...blendLight(this.light, this.target, Math.min(1, dt * 1.5)),
       night: this.target.night,
     };
-    this.lit.tint = this.light.tint;
+    for (const layer of [this.skyline, this.back, this.front, this.actors])
+      layer.tint = this.light.tint;
     const skyKey = `${this.light.skyTop}-${this.light.skyBottom}`;
     if (skyKey !== this.skyKey) {
       this.skyKey = skyKey;
@@ -713,12 +845,15 @@ export class StreetScene {
     const still = this.reducedMotion;
 
     // Show only the streets in view.
-    const left = this.cameraX / this.scale - MARGIN;
-    const right = (this.cameraX + this.width) / this.scale + MARGIN;
+    const view = this.view();
+    const left = view.left - MARGIN;
+    const right = view.right + MARGIN;
     for (const layer of this.streets) {
       const visible = layer.laid.x + layer.laid.width > left - 400 && layer.laid.x < right + 400;
-      layer.base.visible = visible;
+      layer.back.visible = visible;
+      layer.front.visible = visible;
       layer.lights.visible = visible;
+      layer.sparkles.visible = visible;
       for (const sprite of layer.lampGlows) {
         // Street lamps only light up from dusk.
         const lamp = Math.max(0, (glowAlpha - 0.4) / 0.6);
@@ -727,26 +862,19 @@ export class StreetScene {
       }
     }
 
-    const outOfView = (walker: Walker, margin: number) =>
-      walker.x < left - margin || walker.x > right + margin;
-    this.people = this.dropStale(this.people, (walker) => outOfView(walker, MARGIN));
-    this.cars = this.dropStale(this.cars, (car) => outOfView(car, MARGIN * 2));
-    this.flyers = this.dropStale(this.flyers, (bird) => bird.x < -40 || bird.x > this.width + 40);
-    for (const walker of this.people) {
-      walker.update(dt, still);
-      // A stale one that left is destroyed on the next frame; it must not come back.
-      if (outOfView(walker, MARGIN) && !this.stale.has(walker)) this.respawn(walker);
-    }
+    const outOfView = (actor: Walker, margin: number) =>
+      actor.x < view.left - margin || actor.x > view.right + margin;
+    this.people = this.dropGone(this.people, (walker) => outOfView(walker, MARGIN));
+    this.cars = this.dropGone(this.cars, (car) => outOfView(car, MARGIN * 2));
+    this.flyers = this.dropGone(this.flyers, (bird) => bird.x < -60 || bird.x > this.width + 60);
+    for (const walker of this.people) walker.update(dt, still);
+    this.drive(dt);
     for (const car of this.cars) {
       car.update(dt, still);
       car.lights.alpha = glowAlpha * 0.8;
-      if (outOfView(car, MARGIN * 2) && !this.stale.has(car)) this.respawn(car);
     }
-    for (const bird of this.flyers) {
-      bird.update(dt, still);
-      if (bird.x < -40) bird.x = this.width + 30;
-      if (bird.x > this.width + 40) bird.x = -30;
-    }
+    for (const bird of this.flyers) bird.update(dt, still);
+    if (!still) this.arrive(dt, cameraDx);
     for (const worker of this.workers) worker.update(dt, still);
     for (const [i, cloud] of this.clouds.children.entries()) {
       if (!still) cloud.x += (4 + i) * dt - cameraDx * 0.1;
@@ -756,12 +884,6 @@ export class StreetScene {
       cloud.tint = this.light.night ? 0x3a4466 : this.light.tint;
     }
     if (!still) this.weather.update(dt, cameraDx);
-  }
-
-  private respawn(walker: Walker): void {
-    walker.dir = this.random() < 0.5 ? 1 : -1;
-    this.placeInView(walker, false);
-    walker.view.scale.x = walker.dir;
   }
 
   private drawOrb(): void {

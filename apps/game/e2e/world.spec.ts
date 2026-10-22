@@ -1,5 +1,16 @@
-import { expect, test } from '@playwright/test';
-import { capture, importGameAt, newGame, openGame, pause, streetReady, t, tab } from './helpers.ts';
+import { expect, type Page, test } from '@playwright/test';
+import {
+  capture,
+  clockStamp,
+  importGameAt,
+  newGame,
+  openGame,
+  pause,
+  speed,
+  streetReady,
+  t,
+  tab,
+} from './helpers.ts';
 
 const MILESTONE = 'jalon-5';
 
@@ -113,4 +124,61 @@ test('measures the frame rate of the street', async ({ page, browserName }, test
   console.log(`Fluidité de la rue (processeur ×4 plus lent) : ${JSON.stringify(stats)}`);
   expect(stats).not.toBeNull();
   expect(stats?.fps ?? 0).toBeGreaterThan(0);
+});
+
+interface Actors {
+  people: number;
+  cars: number;
+  birds: number;
+}
+
+async function streetActors(page: Page): Promise<Actors | null> {
+  return page.evaluate(() => {
+    const read = (window as { __streetStats?: () => { actors: Actors } | null }).__streetStats;
+    return read?.()?.actors ?? null;
+  });
+}
+
+/**
+ * The passers-by of a new moment of the day come in as the others leave: the street never
+ * fills up, however many moments go by (here about forty a second at ×1, the test clock).
+ * At ×4 and faster, the street keeps its moment of the day.
+ */
+test('keeps the crowd of the street steady and holds the moment at high speed', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  // Without the automatic acceleration, ×1 stays ×1 and the moments go by.
+  await page.addInitScript(() =>
+    localStorage.setItem('cle-en-main.settings', JSON.stringify({ autoSpeed: false })),
+  );
+  await openGame(page);
+  await newGame(page, { tutorialOn: false });
+  await streetReady(page);
+  await speed(page, 1);
+  let most = { people: 0, cars: 0, birds: 0 };
+  for (let i = 0; i < 10; i++) {
+    await page.waitForTimeout(1_000);
+    const actors = await streetActors(page);
+    expect(actors).not.toBeNull();
+    if (!actors) return;
+    most = {
+      people: Math.max(most.people, actors.people),
+      cars: Math.max(most.cars, actors.cars),
+      birds: Math.max(most.birds, actors.birds),
+    };
+  }
+  console.log(`Acteurs de la rue, au plus : ${JSON.stringify(most)}`);
+  expect(most.people).toBeLessThanOrEqual(20);
+  expect(most.cars).toBeLessThanOrEqual(6);
+  expect(most.birds).toBeLessThanOrEqual(8);
+
+  const street = page.getByTestId('street');
+  await speed(page, 4);
+  await page.waitForTimeout(300);
+  const moment = await street.getAttribute('data-moment');
+  const before = await clockStamp(page);
+  await expect.poll(() => clockStamp(page), { timeout: 10_000 }).not.toBe(before);
+  await page.waitForTimeout(1_000);
+  await expect(street).toHaveAttribute('data-moment', moment ?? '');
 });

@@ -39,6 +39,7 @@ Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : 
 - **Météo** : soleil, nuages, pluie, neige, brouillard sur la Saône et le Doubs.
 - **Saisons** : fleurs au printemps, terrasses en été, feuilles en automne, neige et décorations de Noël en hiver.
 - **Réalisation (jalon 5)** : heures des moments, dates des saisons et de Noël, probabilités de la météo par saison et durée d'un temps (1 à 3 jours) dans `content/monde.json`. La météo est calculée par le moteur, sans rien stocker ; le brouillard ne reste que sur les quais, hors du milieu de la journée. Les fenêtres s'allument selon l'heure (réveil, retour du travail, coucher), les lampadaires à partir du soir.
+- **Ambiance figée en vitesse rapide** : à ×4 et au-delà (accélération automatique comprise ; `stillAmbienceSpeed` dans `content/temps.json`), une journée dure 5 secondes ou moins et le jour, la nuit, la pluie et la musique défileraient en clignotant. La rue, le thème « Automatique » et la musique gardent alors le moment, l'heure des fenêtres et la météo de chaque rue qu'ils avaient quand le temps s'est accéléré ; ils rejoignent l'heure du jeu, en douceur, dès que le temps ralentit (pause comprise). Les cloches ne sonnent pas pendant ce temps.
 
 ## 5.5 Les personnages
 
@@ -53,6 +54,11 @@ Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : 
 ## 5.6 Les animations
 
 Passants (certains s'arrêtent quelques secondes ; jamais les cyclistes), voitures (une voie par sens, distance gardée entre elles), oiseaux, fumée des cheminées, échafaudages et poussière de chantier, camion de l'artisan qui se gare, panneau « À vendre » qui apparaît, fenêtres qui s'allument, et une **scène de célébration** à chaque nouveau titre.
+
+**Réalisation (retours de jeu du 22 octobre 2026)** :
+- **Foule de la rue** : la vue compte un nombre de passants, de voitures et d'oiseaux qui dépend du moment et de la saison (soirs d'été animés, nuits d'hiver vides), de la météo, de la rue (les commerces attirent du monde, les pavillons moins, les quais n'ont pas de voitures et attirent les promeneurs au soleil), de la largeur de la vue (le panorama en montre plus) et de la qualité graphique. Qui sort de la vue disparaît ; un nouveau venu, habillé pour le moment et la météo du moment, entre par un côté (celui vers lequel on fait glisser la rue, si on la fait glisser) tant que la vue n'est pas pleine. Les oiseaux traversent le ciel par petits groupes.
+- **Voitures** : une voie par sens ; chacune ralentit derrière une plus lente et garde ses distances ; une voiture n'entre que si sa voie est libre.
+- **Lumières** : de l'arrière vers l'avant, les façades, les fenêtres et vitrines allumées, ce qui se tient devant les façades (volets, croisillons, balcons, arbres, lampadaires, enseignes, ouvriers), puis les passants et les voitures, et enfin le halo des lampadaires et les guirlandes.
 
 L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-equilibrage.md](08-equilibrage.md) et [09-feuille-de-route.md](09-feuille-de-route.md)).
 
