@@ -16,7 +16,14 @@ const WARM = [0xc95d4a, 0x3f6f9a, 0x5d8a5a, 0x8a5a8a, 0xd9a03a, 0x4a4f63, 0x2f6f
 const SUMMER = [0xf2c14e, 0x6fc3b8, 0xe35d6a, 0xffffff, 0x8fb3e0, 0xf29b6a, 0xa8d18a];
 const TROUSERS = [0x2f3a4f, 0x4a4f57, 0x6a5a4a, 0x2b2d31, 0x5a6f8a, 0xc9b48c];
 
-type Accessory = 'none' | 'umbrella' | 'dog' | 'stroller' | 'baguette' | 'bag' | 'bike';
+type Accessory =
+  'none' | 'umbrella' | 'dog' | 'stroller' | 'baguette' | 'bag' | 'bike' | 'cane' | 'phone';
+/** Who walks by: the walk, the clothes and the accessories follow. */
+type Figure = 'adult' | 'child' | 'elder' | 'teen' | 'jogger';
+
+const GREYS = [0x9a9a9a, 0xd4d4d0, 0xbcbcb8];
+const MUTED = [0x6a5a4a, 0x4a4f63, 0x7a6a5a, 0x5a6a5a, 0x8a7a6a];
+const SPORT = [0xe35d6a, 0x2f9fd0, 0xf2c14e, 0x6fc3b8, 0x9a6fd0];
 
 function pickOf<T>(list: readonly T[], random: () => number): T {
   return list[Math.floor(random() * list.length) % list.length] as T;
@@ -36,6 +43,8 @@ export interface PassantContext {
   weather: Weather;
   night: boolean;
   random: () => number;
+  /** Walking with somebody: never stops alone. */
+  together?: boolean;
 }
 
 /** A passer-by on the pavement. */
@@ -45,32 +54,56 @@ export function createPassant(context: PassantContext): Walker {
   const view = new Container();
   const body = new Container();
   view.addChild(body);
+  const figureRoll = random();
+  const figure: Figure =
+    figureRoll < 0.1
+      ? 'child'
+      : figureRoll < 0.22
+        ? 'elder'
+        : figureRoll < 0.32
+          ? 'teen'
+          : figureRoll < 0.38 && !raining && !context.night
+            ? 'jogger'
+            : 'adult';
+  const child = figure === 'child';
+  const elder = figure === 'elder';
+  const jogger = figure === 'jogger';
   const skin = pickOf(SKINS, random);
-  const hair = pickOf(HAIRS, random);
-  const top = season === 'summer' ? pickOf(SUMMER, random) : pickOf(WARM, random);
-  const bottom = pickOf(TROUSERS, random);
-  const coat = season === 'winter' || (season === 'autumn' && random() < 0.6);
-  const skirt = random() < 0.3;
-  const child = random() < 0.12;
-  const scale = child ? 0.7 : 0.92 + random() * 0.16;
+  const hair = elder ? pickOf(GREYS, random) : pickOf(HAIRS, random);
+  const top = jogger
+    ? pickOf(SPORT, random)
+    : elder
+      ? pickOf(MUTED, random)
+      : season === 'summer'
+        ? pickOf(SUMMER, random)
+        : pickOf(WARM, random);
+  const bottom = jogger ? 0x2b2d31 : pickOf(TROUSERS, random);
+  const coat = !jogger && (season === 'winter' || (season === 'autumn' && random() < 0.6));
+  const skirt = !jogger && random() < 0.3;
+  const scale = child ? 0.7 : figure === 'teen' ? 0.88 + random() * 0.08 : 0.92 + random() * 0.16;
 
   let accessory: Accessory = 'none';
   const roll = random();
-  if (raining && weather === 'rain' && roll < 0.65) accessory = 'umbrella';
+  if (jogger) accessory = 'none';
+  else if (raining && weather === 'rain' && roll < 0.65) accessory = 'umbrella';
+  else if (elder)
+    accessory = roll < 0.6 ? 'cane' : roll < 0.75 ? 'bag' : roll < 0.85 ? 'dog' : 'none';
+  else if (figure === 'teen') accessory = roll < 0.55 ? 'phone' : roll < 0.7 ? 'bike' : 'none';
   else if (!child) {
     if (roll < 0.12) accessory = 'dog';
     else if (roll < 0.2) accessory = 'stroller';
     else if (roll < 0.32) accessory = 'baguette';
     else if (roll < 0.45) accessory = 'bag';
     else if (roll < 0.52 && !raining && !context.night) accessory = 'bike';
+    else if (roll < 0.58) accessory = 'phone';
   }
+  if (accessory === 'bike' && (raining || context.night)) accessory = 'none';
 
   const leg = (x: number) => {
-    const g = new Graphics()
-      .rect(-1.6, 0, 3.2, 11)
-      .fill(skirt && !coat ? skin : bottom)
-      .rect(-1.8, 10, 4.2, 2.2)
-      .fill(0x2b2522);
+    const g = new Graphics();
+    if (jogger) g.rect(-1.6, 0, 3.2, 5).fill(bottom).rect(-1.6, 5, 3.2, 6).fill(skin);
+    else g.rect(-1.6, 0, 3.2, 11).fill(skirt && !coat ? skin : bottom);
+    g.rect(-1.8, 10, 4.2, 2.2).fill(jogger ? 0xf2f2ee : 0x2b2522);
     g.position.set(x, -12);
     return g;
   };
@@ -83,7 +116,7 @@ export function createPassant(context: PassantContext): Walker {
     g.position.set(x, -23);
     return g;
   };
-  const sleeve = season === 'summer' && !coat ? skin : coat ? shade(top, -0.15) : top;
+  const sleeve = (season === 'summer' || jogger) && !coat ? skin : coat ? shade(top, -0.15) : top;
   const legBack = leg(-1.2);
   const legFront = leg(1.4);
   const armBack = arm(-0.5, shade(sleeve, -0.12));
@@ -105,8 +138,31 @@ export function createPassant(context: PassantContext): Walker {
     .moveTo(0 + 5.9 * Math.cos(Math.PI * 1.02), -29.8 + 5.9 * Math.sin(Math.PI * 1.02))
     .arc(0, -29.8, 5.9, Math.PI * 1.02, Math.PI * 1.98)
     .fill(hair);
-  if (longHair) head.roundRect(-6, -31, 4, 9, 2).fill(hair);
-  if (season === 'winter' && random() < 0.5) {
+  if (longHair) {
+    // Loose, or gathered in a bun or a ponytail.
+    const style = random();
+    if (style < 0.5) head.roundRect(-6, -31, 4, 9, 2).fill(hair);
+    else if (style < 0.75) head.circle(-4.5, -34, 2.6).fill(hair);
+    else head.roundRect(-8.5, -32, 3.5, 7, 1.6).fill(hair);
+  }
+  const hatRoll = random();
+  if (jogger) {
+    head.rect(-5.8, -32, 11.6, 1.8).fill(pickOf(SPORT, random));
+  } else if (figure === 'teen' && hatRoll < 0.35) {
+    // A hood down on the back.
+    head.roundRect(-8, -28, 5, 6, 2).fill(shade(top, -0.1));
+  } else if (hatRoll < (elder ? 0.45 : 0.12) && season !== 'winter') {
+    const color = pickOf([0x2b2d31, 0x5a4a3a, 0x3f4f6a, 0x8a3a3a], random);
+    if (elder || hatRoll < 0.05) {
+      // A beret.
+      head.ellipse(0, -34.5, 6.4, 2.4).fill(color).circle(0, -36.6, 0.9).fill(color);
+    } else {
+      // A cap and its peak, looking ahead.
+      head.moveTo(-5.9, -31.5).arc(0, -31.5, 5.9, Math.PI, 0).fill(color);
+      head.rect(3, -32.2, 5, 1.4).fill(color);
+    }
+  }
+  if (season === 'winter' && !jogger && random() < 0.5) {
     head
       .moveTo(0 + 6 * Math.cos(Math.PI), -31 + 6 * Math.sin(Math.PI))
       .arc(0, -31, 6, Math.PI, 0)
@@ -123,6 +179,7 @@ export function createPassant(context: PassantContext): Walker {
 
   let extra: Container | null = null;
   let dogLegs: Graphics[] = [];
+  let dogTail: Graphics | null = null;
   let pedal: Graphics | null = null;
   switch (accessory) {
     case 'umbrella': {
@@ -137,6 +194,24 @@ export function createPassant(context: PassantContext): Walker {
       armFront.rotation = -2.4;
       break;
     }
+    case 'cane':
+      body.addChild(
+        new Graphics().moveTo(3.5, -13).lineTo(7, 0).stroke({ color: 0x5a3f2c, width: 1.2 }),
+      );
+      armFront.rotation = -0.3;
+      // A little bent forward.
+      body.rotation = 0.06;
+      break;
+    case 'phone':
+      armFront.rotation = -1.4;
+      armFront.addChild(
+        new Graphics()
+          .roundRect(-1.4, 9.5, 2.8, 4.4, 0.6)
+          .fill(0x2b2d31)
+          .rect(-1, 10, 2, 3.4)
+          .fill(0xbfe3ff),
+      );
+      break;
     case 'baguette':
       body.addChild(new Graphics().roundRect(-7, -22, 16, 2.6, 1.3).fill(0xd9a35a));
       break;
@@ -156,16 +231,17 @@ export function createPassant(context: PassantContext): Walker {
         return g;
       });
       dog.addChild(...dogLegs);
+      dogTail = new Graphics().rect(-4, -0.7, 4, 1.4).fill(fur);
+      dogTail.position.set(-7, -9.5);
       dog.addChild(
+        dogTail,
         new Graphics()
           .roundRect(-7, -10, 15, 6, 3)
           .fill(fur)
           .circle(9, -11, 3.4)
           .fill(fur)
           .circle(10.6, -11.5, 0.6)
-          .fill(0x1c1c1c)
-          .rect(-9, -10, 3, 1.4)
-          .fill(fur),
+          .fill(0x1c1c1c),
       );
       dog.position.set(20, 0);
       const leash = new Graphics()
@@ -235,7 +311,17 @@ export function createPassant(context: PassantContext): Walker {
     0,
   );
 
-  const speed = accessory === 'bike' ? 55 + random() * 20 : (child ? 22 : 16) + random() * 12;
+  const speed =
+    accessory === 'bike'
+      ? 55 + random() * 20
+      : jogger
+        ? 50 + random() * 15
+        : elder
+          ? 9 + random() * 4
+          : (child ? 22 : 16) + random() * 12;
+  // Some walkers stop now and then a few seconds (never the cyclists nor the joggers).
+  const stopper = !context.together && accessory !== 'bike' && !jogger && random() < 0.6;
+  let stopped = 0;
   const walker: Walker = {
     view,
     x: 0,
@@ -243,26 +329,36 @@ export function createPassant(context: PassantContext): Walker {
     dir: random() < 0.5 ? 1 : -1,
     speed,
     update(dt, still) {
-      if (!still) walker.x += walker.dir * walker.speed * dt;
-      phase += still ? 0 : dt * walker.speed * 0.32;
-      const swing = Math.sin(phase);
+      time += dt;
+      if (stopper && !still && stopped <= 0 && random() < dt / 20) stopped = 2 + random() * 4;
+      const resting = still || stopped > 0;
+      if (stopped > 0) stopped -= dt;
+      if (!resting) walker.x += walker.dir * walker.speed * dt;
+      // Joggers' strides are long: their legs swing slower than their speed.
+      phase += resting ? 0 : dt * walker.speed * (jogger ? 0.2 : elder ? 0.45 : 0.32);
+      // Standing: the legs and arms come back, the walker breathes.
+      const swing = resting ? 0 : Math.sin(phase);
+      const stride = jogger ? 0.8 : elder ? 0.3 : 0.5;
       if (pedal) {
         pedal.rotation = swing * 0.8;
       } else {
-        legBack.rotation = swing * 0.5;
-        legFront.rotation = -swing * 0.5;
-        body.y = -Math.abs(Math.cos(phase)) * 0.8;
+        legBack.rotation = swing * stride;
+        legFront.rotation = -swing * stride;
+        body.y = resting
+          ? Math.sin(time * 2) * 0.25
+          : -Math.abs(Math.cos(phase)) * (jogger ? 2.4 : 0.8);
       }
-      if (accessory !== 'umbrella' && accessory !== 'stroller' && accessory !== 'bike') {
-        armFront.rotation = swing * 0.45;
-      }
-      armBack.rotation = -swing * 0.45;
-      dogLegs.forEach((g, i) => (g.rotation = Math.sin(phase * 1.8 + i * 1.6) * 0.6));
+      const free = ['none', 'baguette', 'bag', 'dog'].includes(accessory);
+      if (free) armFront.rotation = jogger ? -0.9 + swing * 0.7 : swing * 0.45;
+      armBack.rotation = jogger ? -0.9 - swing * 0.7 : -swing * 0.45;
+      dogLegs.forEach((g, i) => (g.rotation = resting ? 0 : Math.sin(phase * 1.8 + i * 1.6) * 0.6));
+      if (dogTail) dogTail.rotation = -0.5 + Math.sin(time * (resting ? 9 : 5)) * 0.4;
       view.position.set(walker.x, walker.y);
       view.scale.x = walker.dir;
     },
   };
   let phase = random() * Math.PI * 2;
+  let time = random() * 10;
   return walker;
 }
 

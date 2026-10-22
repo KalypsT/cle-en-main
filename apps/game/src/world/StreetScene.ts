@@ -830,14 +830,15 @@ export class StreetScene {
     };
   }
 
-  private addPassant(x: number, dir: 1 | -1): void {
+  private addPassant(x: number, dir: 1 | -1, together = false): Walker | null {
     const data = this.data;
-    if (!data) return;
+    if (!data) return null;
     const walker = createPassant({
       season: data.season,
       weather: this.currentWeather,
       night: data.moment === 'night',
       random: this.random,
+      together,
     });
     walker.x = x;
     walker.dir = dir;
@@ -845,6 +846,7 @@ export class StreetScene {
     this.people.push(walker);
     this.actors.addChild(walker.view);
     this.sortActors();
+    return walker;
   }
 
   private addCar(x: number, dir: 1 | -1): void {
@@ -886,7 +888,19 @@ export class StreetScene {
       arrivals.people = (0.5 + this.random() * 1.5) / missing;
       const dir = this.random() < 0.5 ? 1 : -1;
       const side = Math.abs(cameraDx) > 1 ? Math.sign(cameraDx) : -dir;
-      this.addPassant(side < 0 ? left - MARGIN / 2 : right + MARGIN / 2, dir);
+      const x = side < 0 ? left - MARGIN / 2 : right + MARGIN / 2;
+      if (missing >= 2 && this.random() < 0.15) {
+        // Two people walking together, side by side and at the same pace.
+        const first = this.addPassant(x, dir, true);
+        const second = this.addPassant(x - dir * 15, dir, true);
+        if (first && second) {
+          second.speed = first.speed = Math.min(first.speed, second.speed, 30);
+          second.y = first.y + (this.random() < 0.5 ? -3 : 3);
+          this.sortActors();
+        }
+      } else {
+        this.addPassant(x, dir);
+      }
     }
     if (this.cars.length < this.crowd.cars && arrivals.cars <= 0) {
       const dir = this.random() < 0.5 ? 1 : -1;
