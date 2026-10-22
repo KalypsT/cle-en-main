@@ -6,6 +6,7 @@ import {
   drawLamp,
   drawPlanter,
   drawSkyline,
+  drawSkylineLights,
   landmarkOf,
   drawTerrace,
   drawTree,
@@ -13,6 +14,7 @@ import {
   forSalePanel,
   GARLAND_COLORS,
 } from './decor.ts';
+import { mix } from './facade.ts';
 import { blendLight, type Light, lightOf, litShare } from './light.ts';
 import { type Crowd, crowdOf } from './crowd.ts';
 import {
@@ -36,6 +38,8 @@ import {
   DESIGN_HEIGHT,
   GROUND_Y,
   type LaidStreet,
+  ROAD,
+  SIDEWALK,
   sceneScale,
   type StreetLayout,
   streetAt,
@@ -94,6 +98,11 @@ interface StreetLayers {
   front: Container;
   /** Lit windows and shop windows, between the two. */
   lights: Graphics;
+  /** Soft halos around the lit windows and their light on the pavement (added light). */
+  halos: Graphics;
+  /** Pools of light under the lamps, and their reflections on a wet road. */
+  pools: Sprite[];
+  reflections: Sprite[];
   /** Christmas garlands, over everything. */
   sparkles: Graphics;
   lampGlows: Sprite[];
@@ -101,6 +110,9 @@ interface StreetLayers {
 }
 
 const MARGIN = 80;
+/** Curtains of the lit windows, and the goods in the shop windows. */
+const CURTAINS = [0xc9714a, 0xd9b26a, 0x8f6aa8, 0x6f9a8a, 0xe8d8c0];
+const GOODS = [0xc95d4a, 0xf2c14e, 0x6fc3b8, 0x8a5a32, 0xf2f2ee, 0x3f6f9a];
 /** Cars keep this gap with the one ahead, and slow down from SAFE_GAP. */
 const MIN_GAP = 14;
 const SAFE_GAP = 50;
@@ -113,7 +125,8 @@ export class StreetScene {
   private readonly root = new Container();
   private readonly sky = new Sprite();
   private readonly orb = new Graphics();
-  private readonly stars = new Graphics();
+  private readonly orbHalo = new Sprite();
+  private readonly stars = new Container();
   private readonly clouds = new Container();
   /**
    * The street in world units, scaled to the view, from back to front: town silhouette,
@@ -122,6 +135,8 @@ export class StreetScene {
    */
   private readonly scene = new Container();
   private readonly skyline = new Graphics();
+  /** Lit windows of the town behind, at night. */
+  private readonly skylineLights = new Graphics();
   private readonly back = new Container();
   private readonly windowLights = new Container();
   private readonly front = new Container();
@@ -196,16 +211,28 @@ export class StreetScene {
     this.glow = glowTexture();
     this.skyTexture = gradientTexture();
     this.sky.texture = this.skyTexture;
+    this.orbHalo.texture = this.glow;
+    this.orbHalo.anchor.set(0.5);
+    this.orbHalo.blendMode = 'add';
     this.weather = new WeatherLayer(this.glow);
     this.scene.addChild(
       this.skyline,
+      this.skylineLights,
       this.back,
       this.windowLights,
       this.front,
       this.actors,
       this.glows,
     );
-    this.root.addChild(this.sky, this.stars, this.orb, this.clouds, this.birds, this.scene);
+    this.root.addChild(
+      this.sky,
+      this.stars,
+      this.orbHalo,
+      this.orb,
+      this.clouds,
+      this.birds,
+      this.scene,
+    );
     app.stage.addChild(this.root, this.weather.view);
     app.ticker.maxFPS = QUALITY[this.quality].maxFps;
     app.ticker.add(() => this.frame(app.ticker.deltaMS));
@@ -249,7 +276,8 @@ export class StreetScene {
     if (!this.app) return;
     this.app.renderer.resize(this.width, this.height);
     this.sky.width = this.width;
-    this.sky.height = this.height;
+    // Down to the ground line, so that the horizon's colour shows behind the roofs.
+    this.sky.height = this.height - (DESIGN_HEIGHT - GROUND_Y) * this.scale;
     this.weather.resize(this.width, this.height);
     // Ground at the bottom of the view whatever its height.
     this.scene.scale.set(this.scale);
@@ -383,11 +411,17 @@ export class StreetScene {
   private drawSkyDecor(): void {
     if (!this.data) return;
     const random = decorRandom(this.data.seed + 7);
-    this.stars.clear();
-    for (let i = 0; i < 40; i++) {
-      this.stars
-        .circle(random() * this.width, random() * this.height * 0.5, random() < 0.2 ? 1.4 : 0.8)
-        .fill(0xffffff);
+    this.stars.removeChildren().forEach((child) => child.destroy());
+    for (let i = 0; i < 46; i++) {
+      const star = new Sprite(this.glow);
+      const size = random() < 0.2 ? 5 : 3;
+      star.anchor.set(0.5);
+      star.width = size;
+      star.height = size;
+      star.position.set(random() * this.width, random() * this.height * 0.5);
+      // Its twinkle's phase.
+      star.rotation = random() * Math.PI * 2;
+      this.stars.addChild(star);
     }
     this.clouds.removeChildren().forEach((child) => child.destroy());
     for (let i = 0; i < 4; i++) {
@@ -414,12 +448,13 @@ export class StreetScene {
     this.workers = [];
     this.streets = [];
     this.skyline.clear();
-    drawSkyline(
+    const blocks = drawSkyline(
       this.skyline,
       data.layout.width + 400,
       data.seed,
       landmarkOf(data.cityId, data.neighbourhoodId),
     );
+    drawSkylineLights(this.skylineLights.clear(), blocks, data.seed + 11);
     this.skyline.x = -200;
     this.drawSkyDecor();
     const snowing = (street: LaidStreet) => street.street.weather === 'snow';
@@ -583,27 +618,39 @@ export class StreetScene {
       this.back.addChild(back);
       this.front.addChild(frontLayer);
 
+      const halos = new Graphics();
+      halos.blendMode = 'add';
       const lights = new Graphics();
-      lights.blendMode = 'add';
-      this.windowLights.addChild(lights);
-      const sparkles = new Graphics();
-      this.glows.addChild(sparkles);
-      const lampGlows = laid.lamps.map((x) => {
+      const glowSprite = (x: number, y: number, width: number, height: number) => {
         const sprite = new Sprite(this.glow);
         sprite.anchor.set(0.5);
         sprite.tint = 0xffd98a;
         sprite.blendMode = 'add';
-        sprite.width = 120;
-        sprite.height = 120;
-        sprite.position.set(x, GROUND_Y - 75);
-        this.glows.addChild(sprite);
+        sprite.width = width;
+        sprite.height = height;
+        sprite.position.set(x, y);
         return sprite;
-      });
+      };
+      const pools = laid.lamps.map((x) => glowSprite(x, GROUND_Y + 11, 130, 24));
+      const reflections = laid.street.quay
+        ? []
+        : laid.lamps.map((x) => glowSprite(x, GROUND_Y + SIDEWALK + ROAD * 0.6, 16, 62));
+      this.windowLights.addChild(halos, ...pools, ...reflections, lights);
+      const sparkles = new Graphics();
+      // The lamp's halo, and its bright bulb.
+      const lampGlows = laid.lamps.flatMap((x) => [
+        glowSprite(x, GROUND_Y - 75, 120, 120),
+        glowSprite(x, GROUND_Y - 75, 22, 22),
+      ]);
+      this.glows.addChild(sparkles, ...lampGlows);
       this.streets.push({
         laid,
         back,
         front: frontLayer,
         lights,
+        halos,
+        pools,
+        reflections,
         sparkles,
         lampGlows,
         garland,
@@ -612,7 +659,11 @@ export class StreetScene {
     this.workers.forEach((worker) => worker.update(0, false));
   }
 
-  /** Lit windows and garlands, redrawn when the hour or the glow changes. */
+  /**
+   * Lit windows (warm, some with curtains or somebody at home, a television's blue late in
+   * the evening), shop windows with their goods and their light on the pavement, and the
+   * garlands; redrawn when the hour or the glow changes.
+   */
   private drawLights(): void {
     const data = this.data;
     if (!data) return;
@@ -621,29 +672,84 @@ export class StreetScene {
     if (key === this.lightsKey) return;
     this.lightsKey = key;
     const glow = this.light.glow;
+    const alpha = Math.min(1, glow * 1.1);
+    const open = data.hour >= 7 && data.hour < 20;
     for (const layer of this.streets) {
       const g = layer.lights.clear();
+      const halos = layer.halos.clear();
       const sparkles = layer.sparkles.clear();
       if (glow <= 0.02) continue;
       for (const item of layer.laid.buildings) {
         const { spec, building } = item;
-        for (const win of spec.windows) {
+        spec.windows.forEach((win, index) => {
           const mine = building.role === 'owned' && building.highlightFloor === win.floor;
-          if (!(mine && share > 0.1) && win.light >= share) continue;
-          const warm = win.light < share * 0.3 ? 0xfff0c0 : 0xffd27a;
-          for (const shape of paneShapes(spec, win, warm)) {
-            drawShapes(g, [{ ...shape, alpha: 0.95 * glow }], item.x, GROUND_Y);
+          if (!(mine && share > 0.1) && win.light >= share) return;
+          const look = hashString(`${building.id}#${index}`) % 20;
+          const tv = look === 0 && data.hour >= 19;
+          const color = tv ? 0x8fb4ea : win.light < share * 0.3 ? 0xffd88a : 0xf5b95a;
+          const x = item.x + win.x;
+          const y = GROUND_Y + win.y;
+          halos
+            .rect(x - 4, y - 4, win.w + 8, win.h + 8)
+            .fill({ color: tv ? 0x8fb4ea : 0xffc46a, alpha: 0.14 * glow });
+          drawShapes(
+            g,
+            paneShapes(spec, win, color).map((shape) => ({ ...shape, alpha })),
+            item.x,
+            GROUND_Y,
+          );
+          // The ceiling light: the upper part of the room is brighter.
+          g.rect(x, y, win.w, win.h * 0.45).fill({
+            color: tv ? 0xc4d8ff : 0xffe6ae,
+            alpha: alpha * 0.8,
+          });
+          if (look >= 12) {
+            const curtain = CURTAINS[look % CURTAINS.length] ?? 0xc9714a;
+            // Two drapes held back at mid-height.
+            const w = win.w * 0.26;
+            const r = x + win.w;
+            const { h } = win;
+            g.poly([x, y, x + w, y, x + w * 0.4, y + h * 0.6, x + w * 0.8, y + h, x, y + h])
+              .poly([r, y, r - w, y, r - w * 0.4, y + h * 0.6, r - w * 0.8, y + h, r, y + h])
+              .fill({ color: curtain, alpha: alpha * 0.9 });
+          } else if (look >= 9 && win.h >= 14) {
+            // Somebody at home, seen from the street.
+            const cx = x + win.w * (look === 9 ? 0.35 : 0.62);
+            g.circle(cx, y + win.h * 0.5, win.w * 0.13)
+              .roundRect(cx - win.w * 0.22, y + win.h * 0.64, win.w * 0.44, win.h * 0.36, 2)
+              .fill({ color: 0x5a3f2c, alpha: alpha * 0.75 });
           }
-        }
-        if (spec.shop && data.hour >= 7 && data.hour < 20) {
+        });
+        if (spec.shop) {
           // The two shop windows (see facadeShapes), not the pillar between them.
           const y = GROUND_Y - spec.groundHeight + 19;
+          const h = spec.groundHeight - 24;
           const w = spec.width / 2 - 14;
-          for (const x of [9, spec.width / 2 + 5]) {
-            g.rect(item.x + x, y, w, spec.groundHeight - 24).fill({
-              color: 0xffe2a0,
-              alpha: 0.7 * glow,
-            });
+          for (const dx of [9, spec.width / 2 + 5]) {
+            const x = item.x + dx;
+            // Closed at night: only a dim light stays on.
+            g.rect(x, y, w, h).fill({ color: 0xffe0a0, alpha: (open ? 0.85 : 0.3) * glow });
+            for (const shelf of [0.42, 0.78]) {
+              const sy = y + h * shelf;
+              g.rect(x + 2, sy, w - 4, 1.2).fill({ color: 0x8a6a4a, alpha: glow });
+              for (let gx = x + 4, i = 0; gx < x + w - 5; gx += 6, i++) {
+                const goods = GOODS[(hashString(building.id) + i) % GOODS.length] ?? 0xf2c14e;
+                g.rect(gx, sy - 4, 4, 4).fill({ color: goods, alpha: glow * 0.9 });
+              }
+            }
+            if (open)
+              halos
+                .poly([
+                  x,
+                  GROUND_Y,
+                  x + w,
+                  GROUND_Y,
+                  x + w + 8,
+                  GROUND_Y + SIDEWALK - 4,
+                  x - 8,
+                  GROUND_Y + SIDEWALK - 4,
+                ])
+                .fill({ color: 0xffd38a, alpha: 0.2 * glow });
           }
         }
       }
@@ -831,14 +937,23 @@ export class StreetScene {
       ...blendLight(this.light, this.target, Math.min(1, dt * 1.5)),
       night: this.target.night,
     };
-    for (const layer of [this.skyline, this.back, this.front, this.actors])
-      layer.tint = this.light.tint;
-    const skyKey = `${this.light.skyTop}-${this.light.skyBottom}`;
+    for (const layer of [this.skyline, this.back, this.front]) layer.tint = this.light.tint;
+    // People and cars a little lighter than the walls: they stay readable at night.
+    this.actors.tint = mix(this.light.tint, 0xffffff, 0.3);
+    this.skylineLights.x = this.skyline.x;
+    this.skylineLights.alpha = Math.max(0, (this.light.glow - 0.3) / 0.7) * 0.8;
+    const { skyTop, skyMiddle, skyBottom } = this.light;
+    const skyKey = `${skyTop}-${skyMiddle}-${skyBottom}`;
     if (skyKey !== this.skyKey) {
       this.skyKey = skyKey;
-      paintGradient(this.skyTexture, this.light.skyTop, this.light.skyBottom);
+      paintGradient(this.skyTexture, skyTop, skyMiddle, skyBottom);
     }
-    this.stars.alpha = this.light.night ? 1 : 0;
+    this.stars.visible = this.light.night;
+    if (this.light.night) {
+      for (const star of this.stars.children)
+        star.alpha =
+          0.55 + 0.45 * Math.sin(this.time * (1.2 + (star.rotation % 1.5)) + star.rotation);
+    }
     this.drawOrb();
     this.drawLights();
     const glowAlpha = this.light.glow;
@@ -848,17 +963,28 @@ export class StreetScene {
     const view = this.view();
     const left = view.left - MARGIN;
     const right = view.right + MARGIN;
+    // Street lamps only light up from dusk.
+    const lamp = Math.max(0, (glowAlpha - 0.4) / 0.6);
     for (const layer of this.streets) {
       const visible = layer.laid.x + layer.laid.width > left - 400 && layer.laid.x < right + 400;
       layer.back.visible = visible;
       layer.front.visible = visible;
       layer.lights.visible = visible;
+      layer.halos.visible = visible;
       layer.sparkles.visible = visible;
       for (const sprite of layer.lampGlows) {
-        // Street lamps only light up from dusk.
-        const lamp = Math.max(0, (glowAlpha - 0.4) / 0.6);
         sprite.visible = visible && lamp > 0.02;
         sprite.alpha = lamp * (0.85 + Math.sin(this.time * 2 + sprite.x) * 0.03);
+      }
+      for (const sprite of layer.pools) {
+        sprite.visible = visible && lamp > 0.02;
+        sprite.alpha = lamp * 0.5;
+      }
+      // A wet road mirrors the lamps.
+      const wet = data.layout.streets[layer.laid.index]?.street.weather === 'rain';
+      for (const sprite of layer.reflections) {
+        sprite.visible = visible && wet && lamp > 0.02;
+        sprite.alpha = lamp * (0.32 + Math.sin(this.time * 3 + sprite.x) * 0.04);
       }
     }
 
@@ -872,6 +998,8 @@ export class StreetScene {
     for (const car of this.cars) {
       car.update(dt, still);
       car.lights.alpha = glowAlpha * 0.8;
+      const braking = car.speed < car.cruise * 0.75;
+      car.tail.alpha = Math.max(glowAlpha * 0.7, braking ? 0.9 : 0);
     }
     for (const bird of this.flyers) bird.update(dt, still);
     if (!still) this.arrive(dt, cameraDx);
@@ -881,7 +1009,11 @@ export class StreetScene {
       if (cloud.x > this.width + 120) cloud.x = -120;
       if (cloud.x < -140) cloud.x = this.width + 100;
       cloud.alpha = this.currentWeather === 'sun' ? 0.45 : 0.75;
-      cloud.tint = this.light.night ? 0x3a4466 : this.light.tint;
+      // Low sun: the clouds take its colour (not under a grey sky).
+      const sunny = this.currentWeather === 'sun' || this.currentWeather === 'clouds';
+      cloud.tint = this.light.night
+        ? 0x3a4466
+        : mix(this.light.tint, this.light.orbGlow, sunny ? 1 - this.light.orb : 0);
     }
     if (!still) this.weather.update(dt, cameraDx);
   }
@@ -890,7 +1022,15 @@ export class StreetScene {
     const g = this.orb.clear();
     const y = this.height * (0.62 - this.light.orb * 0.5);
     const x = this.width * 0.78;
-    if (this.currentWeather !== 'sun' && this.currentWeather !== 'clouds') return;
+    const shown = this.currentWeather === 'sun' || this.currentWeather === 'clouds';
+    // A wide soft halo, warmer and larger when the sun is low.
+    const halo = this.orbHalo;
+    halo.visible = shown;
+    halo.position.set(x, y);
+    halo.tint = this.light.orbGlow;
+    halo.width = halo.height = this.light.night ? 110 : 150 + (1 - this.light.orb) * 170;
+    halo.alpha = this.light.night ? 0.22 : 0.3 + (1 - this.light.orb) * 0.35;
+    if (!shown) return;
     if (this.light.night) {
       g.circle(x, y, 26).fill({ color: 0xf6f1dc, alpha: 0.08 });
       g.circle(x, y, 15).fill(0xf3eed8);
