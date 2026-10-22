@@ -19,6 +19,8 @@ Les couleurs ne portent jamais l'information seules : toujours une icône ou un 
 
 **Icône de l'application** : une clé couchée dont la tête est une maison, avec une serrure ambrée, ivoire sur fond bleu volet. Elle est dessinée en SVG (`apps/game/public/icons/icon.svg`), comme le reste du jeu.
 
+**Logo de l'écran titre** : une clé en laiton dont la tête est une maison, attachée par une ficelle à une étiquette crème bordée de bleu volet qui porte « Clé en main ! ». C'est la **seule image générée par IA** du jeu (ChatGPT, sur un croquis de la forme de la clé), exception voulue par Thibaud à la règle du 5.1, qui vaut pour le monde. Le détourage et l'ombre sont retouchés à la main ; le logo est servi en WebP (`apps/game/public/logo/`, 480 et 960 px de large).
+
 ## 5.3 Les façades, générées par modules
 
 Le code assemble étages, fenêtres, toits, volets, portes, balcons et commerces en rez-de-chaussée selon l'**époque** du bien et la **ville** :

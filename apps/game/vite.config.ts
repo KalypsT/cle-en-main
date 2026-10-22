@@ -73,7 +73,7 @@ export default defineConfig({
       },
       workbox: {
         // Music loops (content/musique.json) are precached too: the game works offline.
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,mp3,ogg}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,mp3,ogg}'],
         maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         cleanupOutdatedCaches: true,
       },
