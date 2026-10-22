@@ -46,6 +46,7 @@ import {
   type StreetLayout,
   streetAt,
 } from './street-layout.ts';
+import { createPigeon, drawCat, type Pigeon, Puffs } from './street-life.ts';
 import { WeatherLayer } from './weather-fx.ts';
 
 /*
@@ -109,11 +110,17 @@ interface StreetLayers {
   sparkles: Graphics;
   lampGlows: Sprite[];
   garland: { x: number; y: number; color: number }[];
+  /** Tops of the chimneys that smoke in the cold, and the feet of the works. */
+  chimneys: { x: number; y: number }[];
+  works: { x: number; w: number }[];
+  /** Tails of the cats on the sills. */
+  cats: Graphics[];
 }
 
 const MARGIN = 80;
 /** Clouds in the sky: half of them near, half far. */
 const CLOUDS = 8;
+const CAT_COLORS = [0x2b2522, 0xd9822b, 0x8a8f9a, 0xf2f2ee];
 /** Curtains of the lit windows, and the goods in the shop windows. */
 const CURTAINS = [0xc9714a, 0xd9b26a, 0x8f6aa8, 0x6f9a8a, 0xe8d8c0];
 const GOODS = [0xc95d4a, 0xf2c14e, 0x6fc3b8, 0x8a5a32, 0xf2f2ee, 0x3f6f9a];
@@ -164,8 +171,14 @@ export class StreetScene {
    */
   private crowd: Crowd = { people: 0, cars: 0, birds: 0 };
   /** Seconds before the next arrival of each kind. */
-  private readonly arrivals = { people: 0, cars: 0, birds: 0 };
+  private readonly arrivals = { people: 0, cars: 0, birds: 0, pigeons: 4 };
   private workers: Walker[] = [];
+  private pigeons: Pigeon[] = [];
+  /** Seconds before the pigeons on a ledge fly off by themselves. */
+  private pigeonsLeave = Infinity;
+  /** Pigeons on the ledges, over the façades. */
+  private readonly ledges = new Container();
+  private puffs!: Puffs;
   private data: SceneData | null = null;
   private staticKey = '';
   private lightsKey = '';
@@ -220,6 +233,7 @@ export class StreetScene {
     this.skyTexture = gradientTexture();
     this.sky.texture = this.skyTexture;
     this.haze.texture = fadeTexture();
+    this.puffs = new Puffs(this.glow);
     this.orbHalo.texture = this.glow;
     this.orbHalo.anchor.set(0.5);
     this.orbHalo.blendMode = 'add';
@@ -232,6 +246,8 @@ export class StreetScene {
       this.back,
       this.windowLights,
       this.front,
+      this.ledges,
+      this.puffs.view,
       this.actors,
       this.glows,
     );
@@ -462,6 +478,7 @@ export class StreetScene {
     // Its own generator: the workers look the same each time the street is drawn again.
     const random = decorRandom(data.seed + 3);
     this.workers = [];
+    this.puffs.clear();
     this.streets = [];
     this.skyline.clear();
     // The town behind scrolls slower than the street (0.7 and 0.85 of its pace, see frame()):
@@ -520,6 +537,10 @@ export class StreetScene {
       const labels = new Container();
       const garland: StreetLayers['garland'] = [];
       const workers: Walker[] = [];
+      const chimneys: StreetLayers['chimneys'] = [];
+      const works: StreetLayers['works'] = [];
+      const cats: Graphics[] = [];
+      const catSpots: { x: number; y: number; color: number }[] = [];
       let lastSign = -1;
       for (const item of laid.buildings) {
         const { building, spec } = item;
@@ -636,12 +657,30 @@ export class StreetScene {
         }
         if (item.treeX !== null)
           drawTree(front, item.treeX, data.season, hashString(building.id), snow);
+        const hash = hashString(`life#${building.id}`);
+        if (spec.chimney && hash % 10 < 6) {
+          const height = spec.roof.shape === 'flat' ? 14 : spec.roof.height * 0.8;
+          chimneys.push({
+            x: item.x + spec.chimney.x + 4.5,
+            y: GROUND_Y - spec.wallHeight - height - 7,
+          });
+        }
+        if (building.scaffolding) works.push({ x: item.x, w: spec.width });
+        // A cat on a first-floor sill, here and there.
+        const sill = spec.windows.find((win) => win.floor === 1);
+        if (sill && hash % 7 === 0 && !building.scaffolding)
+          catSpots.push({
+            x: item.x + sill.x + sill.w - 4,
+            y: GROUND_Y + sill.y + sill.h + 1,
+            color: CAT_COLORS[(hash >> 4) % CAT_COLORS.length] ?? 0x2b2522,
+          });
       }
       for (const x of laid.lamps) drawLamp(front, x, data.christmas);
       back.addChild(buildings);
       const frontLayer = new Container();
       frontLayer.addChild(front, labels);
       for (const worker of workers) frontLayer.addChild(worker.view);
+      for (const spot of catSpots) cats.push(drawCat(frontLayer, spot.x, spot.y, spot.color));
       this.workers.push(...workers);
       this.back.addChild(back);
       this.front.addChild(frontLayer);
@@ -682,6 +721,9 @@ export class StreetScene {
         sparkles,
         lampGlows,
         garland,
+        chimneys,
+        works,
+        cats,
       });
     });
     this.workers.forEach((worker) => worker.update(0, false));
@@ -793,9 +835,12 @@ export class StreetScene {
     if (!this.data || !this.app) return;
     for (const walker of [...this.people, ...this.cars, ...this.flyers])
       walker.view.destroy({ children: true });
+    for (const pigeon of this.pigeons) pigeon.view.destroy({ children: true });
     this.people = [];
     this.cars = [];
     this.flyers = [];
+    this.pigeons = [];
+    this.pigeonsLeave = Infinity;
     this.updateCrowd();
     const { left, right } = this.view();
     const span = right - left;
@@ -914,6 +959,31 @@ export class StreetScene {
         arrivals.cars = 0.4;
       }
     }
+    arrivals.pigeons -= dt;
+    if (this.crowd.birds > 0 && this.pigeons.length === 0 && arrivals.pigeons <= 0) {
+      // A few pigeons come down on a ledge or a roof's edge, or on the pavement where nobody
+      // walks (they hop aside when people come, then leave).
+      arrivals.pigeons = 2;
+      const ledge = this.random() < 0.65 ? this.ledgeIn(left, right) : null;
+      const x = ledge?.x ?? left + 50 + this.random() * Math.max(0, right - left - 100);
+      const clear = ledge !== null || this.people.every((person) => Math.abs(person.x - x) > 70);
+      const flock = 2 + Math.floor(this.random() * 3);
+      if (clear) {
+        arrivals.pigeons = 15 + this.random() * 25;
+        this.pigeonsLeave = ledge ? 20 + this.random() * 20 : Infinity;
+      }
+      for (let i = 0; i < (clear ? flock : 0); i++) {
+        const spot = ledge
+          ? { x: ledge.x + (this.random() - 0.5) * ledge.spread, y: ledge.y }
+          : { x: x + (this.random() - 0.5) * 40, y: GROUND_Y + 8 + this.random() * 10 };
+        const pigeon = createPigeon(this.random, spot.x, spot.y, spot.y - 180 - this.random() * 60);
+        pigeon.update(0, true);
+        this.pigeons.push(pigeon);
+        // On a ledge they stand among the façades, not with the passers-by.
+        (ledge ? this.ledges : this.actors).addChild(pigeon.view);
+      }
+      this.sortActors();
+    }
     const birds = this.crowd.birds - this.flyers.length;
     if (birds > 0 && arrivals.birds <= 0) {
       // A small flock crosses the sky now and then.
@@ -952,7 +1022,7 @@ export class StreetScene {
   }
 
   /** Destroys the actors gone out of view (with a margin). */
-  private dropGone<T extends Walker>(actors: T[], gone: (actor: T) => boolean): T[] {
+  private dropGone<T extends { view: Container }>(actors: T[], gone: (actor: T) => boolean): T[] {
     return actors.filter((actor) => {
       if (!gone(actor)) return true;
       actor.view.destroy({ children: true });
@@ -1055,6 +1125,7 @@ export class StreetScene {
     for (const bird of this.flyers) bird.update(dt, still);
     if (!still) this.arrive(dt, cameraDx);
     for (const worker of this.workers) worker.update(dt, still);
+    this.updateLife(dt, still, view);
     // A few clouds in fair weather, a full sky otherwise.
     const cloudy = this.currentWeather === 'sun' || !QUALITY[this.quality].distance ? 3 : CLOUDS;
     for (const [i, cloud] of this.clouds.children.entries()) {
@@ -1072,6 +1143,85 @@ export class StreetScene {
       cloud.tint = mix(lit, this.light.skyTop, (far ? 0.35 : 0.12) + (sunny ? 0 : 0.2));
     }
     if (!still) this.weather.update(dt, cameraDx);
+  }
+
+  /** A ledge in view where pigeons can stand: a cornice or a roof's edge. */
+  private ledgeIn(left: number, right: number): { x: number; y: number; spread: number } | null {
+    const street = this.currentStreet();
+    if (!street) return null;
+    const ledges = street.buildings.filter(
+      (item) => item.x > left + 10 && item.x + item.spec.width < right - 10,
+    );
+    const item = ledges[Math.floor(this.random() * ledges.length)];
+    if (!item) return null;
+    const { spec } = item;
+    const flat = spec.roof.shape === 'flat';
+    return {
+      x: item.x + spec.width * (0.3 + this.random() * 0.4),
+      y: GROUND_Y - spec.wallHeight - (flat ? spec.roof.height : 0) + (flat ? 0 : 1),
+      spread: Math.min(40, spec.width * 0.4),
+    };
+  }
+
+  /** Smoke, dust, cats and pigeons. */
+  private updateLife(dt: number, still: boolean, view: { left: number; right: number }): void {
+    const data = this.data;
+    if (!data) return;
+    const cold =
+      data.season === 'winter' ||
+      this.currentWeather === 'snow' ||
+      (data.season === 'autumn' && data.moment !== 'day');
+    const working = data.moment === 'morning' || data.moment === 'day';
+    for (const layer of this.streets) {
+      if (!layer.back.visible) continue;
+      for (const [i, tail] of layer.cats.entries())
+        tail.rotation = still ? 0.2 : 0.25 * Math.sin(this.time * 1.3 + i * 2);
+      if (still) continue;
+      const near = (x: number) => x > view.left - 40 && x < view.right + 40;
+      if (cold) {
+        for (const chimney of layer.chimneys) {
+          if (near(chimney.x) && this.random() < dt * 2)
+            this.puffs.emit('smoke', chimney.x, chimney.y, this.random);
+        }
+      }
+      if (working) {
+        for (const work of layer.works) {
+          if (near(work.x + work.w / 2) && this.random() < dt * 1.5)
+            this.puffs.emit('dust', work.x + this.random() * work.w, GROUND_Y - 2, this.random);
+        }
+      }
+    }
+    this.puffs.update(still ? 0 : dt);
+    this.puffs.view.tint = this.light.tint;
+    this.ledges.tint = this.actors.tint;
+    if (!still) this.pigeonsLeave -= dt;
+    if (this.pigeonsLeave <= 0) {
+      this.pigeonsLeave = Infinity;
+      const away = this.random() < 0.5 ? 1 : -1;
+      for (const pigeon of this.pigeons) pigeon.leave(away);
+    }
+
+    // Pigeons fly off when somebody comes near, and are gone once out of sight.
+    for (const pigeon of this.pigeons) {
+      pigeon.update(dt, still);
+      if (pigeon.state !== 'pecking') continue;
+      // Somebody walking towards it, close.
+      const walker = this.people.find((person) => {
+        const ahead = (pigeon.x - person.x) * person.dir;
+        return ahead > -4 && ahead < 16 && Math.abs(person.y - pigeon.y) < 12;
+      });
+      if (walker) {
+        const away = pigeon.x >= walker.x ? 1 : -1;
+        for (const other of this.pigeons) if (Math.abs(other.x - pigeon.x) < 50) other.scare(away);
+      }
+    }
+    this.pigeons = this.dropGone(
+      this.pigeons,
+      (pigeon) =>
+        pigeon.y < GROUND_Y - 420 ||
+        pigeon.x < view.left - MARGIN * 2 ||
+        pigeon.x > view.right + MARGIN * 2,
+    );
   }
 
   private drawOrb(): void {
