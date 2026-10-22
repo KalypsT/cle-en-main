@@ -3,7 +3,6 @@ import type { GameAction, GameEvent } from '@cle/engine';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
 import type { EffectName } from '../audio/effects.ts';
-import { engine } from '../engine.ts';
 import type { GameSession } from '../session/game-session.ts';
 import { saveSettings, type Settings } from '../settings.ts';
 import { describeEvent, t, texts } from '../texts.ts';
@@ -17,6 +16,7 @@ import {
   type TabId,
   type TrackedScreen,
 } from './context.tsx';
+import { useShownAmbience } from './ambience.ts';
 import { StatusBar } from './StatusBar.tsx';
 import { TutorialBubble, tutorialReaction } from './Tutorial.tsx';
 import { AssetsTab } from '../screens/AssetsTab.tsx';
@@ -184,7 +184,8 @@ export function GameShell({
     [session, raise],
   );
 
-  const ambience = engine.ambience(snapshot.state, viewCityId);
+  const shownAmbience = useShownAmbience(snapshot, viewCityId);
+  const { ambience } = shownAmbience;
   const night = ambience.moment === 'night';
   useEffect(() => onNight(night), [night, onNight]);
   const [overlays, setOverlays] = useState<Overlay[]>(() =>
@@ -342,6 +343,7 @@ export function GameShell({
       session,
       snapshot,
       state: snapshot.state,
+      ambience: shownAmbience,
       settings,
       setSettings: (next) => {
         saveSettings(next);
@@ -359,6 +361,7 @@ export function GameShell({
     [
       session,
       snapshot,
+      shownAmbience,
       settings,
       onSettings,
       act,

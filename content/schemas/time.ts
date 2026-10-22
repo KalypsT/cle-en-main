@@ -8,6 +8,11 @@ export const timeSettingsSchema = z
     realSecondsPerGameDay: z.number().positive(),
     /** Available speed multipliers, pause excluded. */
     speeds: z.array(z.number().int().positive()).min(1),
+    /**
+     * From this speed (the automatic acceleration included), the street, the theme and the
+     * music keep the moment of day and the weather they had: day and night would flash by.
+     */
+    stillAmbienceSpeed: z.number().int().positive(),
   })
   .strict();
 
