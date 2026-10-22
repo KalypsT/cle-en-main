@@ -59,9 +59,9 @@ export type QualityLevel = 0 | 1 | 2;
 
 /** What each graphics level allows (2: high … 0: economy). */
 const QUALITY = [
-  { resolution: 1, people: 0.45, particles: 0.35, maxFps: 30, birds: false },
-  { resolution: 1.5, people: 0.75, particles: 0.65, maxFps: 60, birds: true },
-  { resolution: 2, people: 1, particles: 1, maxFps: 60, birds: true },
+  { resolution: 1, people: 0.45, particles: 0.35, maxFps: 30, birds: false, distance: false },
+  { resolution: 1.5, people: 0.75, particles: 0.65, maxFps: 60, birds: true, distance: true },
+  { resolution: 2, people: 1, particles: 1, maxFps: 60, birds: true, distance: true },
 ] as const;
 
 export interface SceneData {
@@ -464,14 +464,22 @@ export class StreetScene {
     this.workers = [];
     this.streets = [];
     this.skyline.clear();
+    // The town behind scrolls slower than the street (0.7 and 0.85 of its pace, see frame()):
+    // only the part that can come into view is drawn.
+    const reach = (pace: number) => data.layout.width * (1 - pace) + 2000;
+    const kind = landmarkOf(data.cityId, data.neighbourhoodId);
+    // The landmark stands behind the start of the first street, where the player arrives
+    // (in the middle of the view when the street is there).
+    const first = data.layout.streets[0];
+    const anchor = first ? Math.min(first.x + first.width / 2, first.x + 600) : 0;
     const blocks = drawSkyline(
       this.skyline,
-      data.layout.width + 400,
+      reach(0.7),
       data.seed,
-      landmarkOf(data.cityId, data.neighbourhoodId),
+      kind ? { kind, x: 200 + anchor * 0.3 + 140 } : null,
     );
     drawSkylineLights(this.skylineLights.clear(), blocks, data.seed + 11);
-    drawFarSkyline(this.farSkyline.clear(), data.layout.width + 400, data.seed + 13);
+    drawFarSkyline(this.farSkyline.clear(), reach(0.85), data.seed + 13);
     this.skyline.x = -200;
     this.haze.position.set(-400, GROUND_Y - 120);
     this.haze.width = data.layout.width + 800;
@@ -980,6 +988,10 @@ export class StreetScene {
     this.farSkyline.tint = shade(mix(this.light.skyMiddle, this.light.skyBottom, 0.55), -0.1);
     this.haze.tint = this.light.skyBottom;
     this.haze.alpha = this.light.night ? 0.2 : 0.38;
+    // The far town and the haze are costly to paint on slow phones.
+    const distance = QUALITY[this.quality].distance;
+    this.farSkyline.visible = distance;
+    this.haze.visible = distance;
     this.skylineLights.alpha = Math.max(0, (this.light.glow - 0.3) / 0.7) * 0.8;
     const { skyTop, skyMiddle, skyBottom } = this.light;
     const skyKey = `${skyTop}-${skyMiddle}-${skyBottom}`;
@@ -1044,7 +1056,7 @@ export class StreetScene {
     if (!still) this.arrive(dt, cameraDx);
     for (const worker of this.workers) worker.update(dt, still);
     // A few clouds in fair weather, a full sky otherwise.
-    const cloudy = this.currentWeather === 'sun' ? 3 : CLOUDS;
+    const cloudy = this.currentWeather === 'sun' || !QUALITY[this.quality].distance ? 3 : CLOUDS;
     for (const [i, cloud] of this.clouds.children.entries()) {
       const far = i >= CLOUDS / 2;
       cloud.visible = (i % (CLOUDS / 2)) * 2 + (far ? 1 : 0) < cloudy;
