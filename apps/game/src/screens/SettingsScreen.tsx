@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { exportJournal } from '../storage/files.ts';
 import { type JournalEntry, readJournal, type SlotId } from '../storage/saves.ts';
 import { QUALITIES, THEMES, type Volumes } from '../settings.ts';
+import { canVibrate } from '../audio/haptics.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { BUILD } from '../build-info.ts';
 import { applyUpdate, checkForUpdate, useUpdates } from '../pwa-updates.ts';
@@ -134,6 +135,14 @@ export function SettingsScreen() {
           );
         })}
         <p className="small muted">{t.settings.soundHint}</p>
+        {canVibrate() && (
+          <Switch
+            label={t.settings.vibration}
+            hint={t.settings.vibrationHint}
+            checked={settings.vibration}
+            onChange={(vibration) => setSettings({ ...settings, vibration })}
+          />
+        )}
         {Object.values(music.slots).every((tracks) => tracks.length === 0) && (
           <p className="small muted">{t.settings.noMusic}</p>
         )}

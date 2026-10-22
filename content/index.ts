@@ -103,7 +103,7 @@ export type { Rival, RivalsFile } from './schemas/rivals.ts';
 export type { LivingCosts, Start } from './schemas/start.ts';
 export type { TimeSettings } from './schemas/time.ts';
 export type { UiTexts } from './schemas/ui-texts.ts';
-export type { Tutorial, TutorialTrigger } from './schemas/screens.ts';
+export type { Tutorial, TutorialTarget, TutorialTrigger } from './schemas/screens.ts';
 export { TUTORIAL_TRIGGERS } from './schemas/screens.ts';
 export type {
   Artisan,

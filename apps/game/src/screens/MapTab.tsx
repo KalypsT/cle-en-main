@@ -506,7 +506,12 @@ export function MapTab() {
           </button>
         </Card>
       )}
-      <button type="button" className="button block" onClick={() => nav.push({ name: 'listings' })}>
+      <button
+        type="button"
+        className="button block"
+        data-tutorial="listings"
+        onClick={() => nav.push({ name: 'listings' })}
+      >
         {format(t.map.listingsCount, { count: listings.length })}
       </button>
       <p className="tiny muted">{t.map.attribution}</p>

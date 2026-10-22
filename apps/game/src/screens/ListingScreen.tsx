@@ -323,6 +323,7 @@ function ListingBody({ listing }: { listing: Listing }) {
         <button
           type="button"
           className="button"
+          data-tutorial="visit"
           disabled={listing.visited || planned !== undefined}
           onClick={() => act({ type: 'market/visit', listingId: listing.id })}
         >
@@ -335,6 +336,7 @@ function ListingBody({ listing }: { listing: Listing }) {
         <button
           type="button"
           className="button primary"
+          data-tutorial="offer"
           disabled={offer !== null || offersLeft <= 0}
           onClick={() => setOffering(true)}
         >

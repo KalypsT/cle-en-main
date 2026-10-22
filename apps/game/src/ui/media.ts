@@ -18,3 +18,8 @@ export function useMediaQuery(query: string): boolean {
   }, [query]);
   return matches;
 }
+
+/** The player asked the phone for fewer animations (docs/04, 4.10). */
+export function useReducedMotion(): boolean {
+  return useMediaQuery('(prefers-reduced-motion: reduce)');
+}

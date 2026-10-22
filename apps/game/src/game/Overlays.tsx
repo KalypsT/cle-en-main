@@ -1,15 +1,18 @@
 import { gameContent } from '@cle/content';
-import { fromDayNumber } from '@cle/engine';
+import { type Cents, fromDayNumber } from '@cle/engine';
 import { type ReactNode, useId } from 'react';
 import { MonthlyReviewContent, YearReviewContent } from '../screens/ReviewScreens.tsx';
 import { format, formatDecimal, formatEuros, formatGameDate, t } from '../texts.ts';
 import { useGame } from './context.tsx';
+import { KeysScene } from './KeysScene.tsx';
 
 /** What may come over the game: the reviews, a title's celebration, a fresh start, the end. */
 export type Overlay =
   | { kind: 'month' }
   | { kind: 'year' }
   | { kind: 'title'; titleId: string }
+  /** The keys handed over at the deed: the whole scene for the first purchase. */
+  | { kind: 'keys'; propertyId: string; price: Cents; first: boolean }
   | { kind: 'freshStart' }
   | { kind: 'gameOver' };
 
@@ -63,11 +66,13 @@ export function OverlayView({
   onClose,
   onQuit,
   onShowChronicle,
+  onShowProperty,
 }: {
   overlay: Overlay;
   onClose: () => void;
   onQuit: () => void;
   onShowChronicle: () => void;
+  onShowProperty: (propertyId: string) => void;
 }) {
   const { state } = useGame();
   switch (overlay.kind) {
@@ -106,6 +111,19 @@ export function OverlayView({
         </Frame>
       );
     }
+    case 'keys':
+      return (
+        <KeysScene
+          propertyId={overlay.propertyId}
+          price={overlay.price}
+          first={overlay.first}
+          onClose={onClose}
+          onShowProperty={() => {
+            onClose();
+            onShowProperty(overlay.propertyId);
+          }}
+        />
+      );
     case 'freshStart':
       return (
         <Frame title={t.fresh.heading} testId="overlay-fresh">

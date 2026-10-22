@@ -139,6 +139,7 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
               <button
                 type="button"
                 className="link-button"
+                data-tutorial="listings"
                 onClick={() => nav.push({ name: 'listings' })}
               >
                 {format(t.common.seeAll, { count: cityListings.length })}

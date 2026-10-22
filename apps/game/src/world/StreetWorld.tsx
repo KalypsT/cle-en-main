@@ -5,6 +5,7 @@ import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { anecdoteText, format, t } from '../texts.ts';
 import { Icon, type IconName } from '../ui/Icon.tsx';
+import { useReducedMotion } from '../ui/media.ts';
 import { FacadeShape } from './FacadeShape.tsx';
 import { type FrameStats, type QualityLevel, type SceneData, StreetScene } from './StreetScene.ts';
 import {
@@ -37,19 +38,6 @@ function cssAccent(): number {
 
 function qualityLevel(choice: 'auto' | 'high' | 'economy'): QualityLevel | 'auto' {
   return choice === 'auto' ? 'auto' : choice === 'high' ? 2 : 0;
-}
-
-function useReducedMotion(): boolean {
-  const query = '(prefers-reduced-motion: reduce)';
-  const [reduced, setReduced] = useState(() => window.matchMedia?.(query).matches ?? false);
-  useEffect(() => {
-    const media = window.matchMedia?.(query);
-    if (!media) return;
-    const listener = () => setReduced(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, []);
-  return reduced;
 }
 
 export function bubbleLabel(bubble: Bubble): string {

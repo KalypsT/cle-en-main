@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import {
   capture,
+  fill,
   newGame,
   openGame,
   pause,
@@ -25,6 +26,14 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   // Gérard welcomes the player, then waits for a listing to be opened.
   const bubble = page.getByTestId('tutorial');
   await expect(bubble).toContainText(tutorial.steps[0]?.text ?? '');
+  // The bubble points at the pause, folds into a chip and opens again.
+  await expect(page.locator('[data-tutorial="pause"]')).toHaveClass(/halo/);
+  await bubble.getByRole('button', { name: tutorial.fold }).click();
+  await expect(bubble).not.toContainText(tutorial.steps[0]?.text ?? '');
+  await bubble
+    .getByRole('button', { name: fill(tutorial.unfold, { name: tutorial.speakers.gerard.name }) })
+    .click();
+  await expect(bubble).toContainText(tutorial.steps[0]?.text ?? '');
   await bubble.getByRole('button', { name: tutorial.ok }).click();
   await expect(bubble).toContainText(tutorial.steps[1]?.text ?? '');
 
@@ -38,6 +47,7 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   await capture(page, '04-annonces');
   await page.locator('[data-testid^="listing-"]').first().click();
   await expect(bubble).toContainText(tutorial.steps[2]?.text ?? '');
+  await expect(page.locator('[data-tutorial="visit"]')).toHaveClass(/halo/);
   await capture(page, '05-fiche-annonce');
 
   // Visit, then simulate the financing.

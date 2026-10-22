@@ -24,6 +24,8 @@ Toujours visible en haut de l'écran :
 - temps libre restant aujourd'hui ;
 - badge du nombre de décisions en attente.
 
+> **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) : la barre tient sur **deux lignes courtes**, sans cases : date et heure à gauche, vitesse à droite ; puis la trésorerie (icône €, toucher ouvre le Patrimoine) et le temps libre (icône d'horloge, petite jauge). Environ 80 px au lieu de 135. Le bouton des décisions disparaît : leur nombre reste sur l'onglet Décisions. Quand la trésorerie change, le montant **défile** vers sa nouvelle valeur, s'éclaire en vert ou en rouge, et la différence (« +450 € ») passe sous le montant (rien de tout cela si le téléphone demande moins d'animations).
+
 ## 4.4 La navigation
 
 **5 onglets** en bas de l'écran : **Rue · Carte · Décisions · Patrimoine · Menu**.
@@ -68,11 +70,20 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Chaque montant important** peut être expliqué en un toucher (« pourquoi ce taux ? », « d'où vient cet impôt ? »).
 - **Notifications** : discrètes pour l'information, pause automatique pour les décisions importantes.
 
+> **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) :
+> - **Bonnes nouvelles** : une carte sous la barre d'état, bordée de vert, qui n'arrête pas le temps et part seule au bout de 4 secondes environ (ou au toucher) : offre acceptée, prêt accordé ou proposé (avec le montant et le taux), compromis signé, locataire qui emménage, chantier terminé, aide à la rénovation, vente conclue, bien vendu, crédit remboursé, transformation terminée, bien hors marché proposé, défi réussi. Celui qui l'apporte y figure quand il a un visage : le banquier (souriant, sauf Hortense Rigueur), le locataire, le donneur du défi. Arrivées ensemble (en vitesse rapide), elles sont regroupées : « 3 bonnes nouvelles ». Elles attendent qu'un bilan ou une scène soit fermé. Les refus gardent leur notification d'avant.
+> - **Succès débloqué** : la même carte, dorée, avec un médaillon de trophée, le nom du succès et sa description.
+> - **Remise des clés** : à la signature de l'acte, une scène au-dessus du jeu : la clé à tête de maison entre dans une serrure en laiton et tourne, puis « Vous êtes propriétaire ! », la façade du bien, son prix, « Voir mon bien » et « Continuer ». Complète (confettis, musique de célébration) pour le premier achat ; courte ensuite (« Une clé de plus au trousseau »), elle se ferme seule au bout de 3,6 secondes. Elle passe avant la célébration d'un nouveau titre.
+> - **Vibrations** (réglage « Vibrations », activé par défaut, affiché seulement si le téléphone sait vibrer, donc pas sur iPhone) : un coup bref au tampon du notaire, deux petits à l'arrivée des loyers.
+> - **Mode hors ligne** : la note « Le jeu est prêt à fonctionner hors ligne » ne s'affiche qu'une fois par appareil, en petite pastille verte en haut de l'écran.
+
 ## 4.7 Le didacticiel
 
 - Pendant le **premier mois à Dole**, **Gérard Prudhomme** (La Tirelire Comtoise) accompagne pas à pas vers le premier achat : repérer une annonce, visiter, simuler le financement, faire une offre, signer le compromis.
 - Puis **Yvon Tableur** présente le premier bilan.
 - Désactivable, et il ne bloque jamais le joueur.
+
+> **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) : la bulle ne pousse plus le haut de chaque écran. Elle **flotte en bas**, au-dessus des onglets (et au-dessus du tiroir de la Rue ou des boutons « Visiter / Faire une offre » de l'annonce). Un chevron la **replie** en pastille au visage de Gérard, à droite ; elle se rouvre d'un toucher, et d'elle-même à l'étape suivante. Chaque étape peut **désigner un bouton** (`target` dans `content/textes/didacticiel.json`) : il porte un halo bleu qui pulse (un contour fixe si le téléphone demande moins d'animations), comme l'onglet qui y mène. Pause, annonces, Visiter, Simuler le financement, Faire une offre, Demander un prêt, Accepter l'offre de prêt.
 
 ## 4.8 Les sauvegardes
 

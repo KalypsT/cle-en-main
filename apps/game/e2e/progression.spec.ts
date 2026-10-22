@@ -85,7 +85,9 @@ test('reviews the year with Yvon Tableur and shows the progression', async ({ pa
   await capture(page, '07-statistiques', MILESTONE);
 });
 
-test('celebrates a new title on the deed', async ({ page }) => {
+test('hands over the keys, celebrates a new title, then tells the achievement', async ({
+  page,
+}) => {
   test.setTimeout(120_000);
   await openGame(page);
   const before = ownerGame(24 * 120, (s) => {
@@ -100,12 +102,29 @@ test('celebrates a new title on the deed', async ({ page }) => {
   expect(before.purchases).toHaveLength(1);
   await importState(page, before);
   await speed(page, 1);
+
+  // First the keys: the whole scene for a first purchase.
+  const keys = page.getByTestId('overlay-keys');
+  await expect(keys).toBeVisible({ timeout: 20_000 });
+  await expect(keys).toContainText(t.celebration.keys.firstTitle);
+  await page.waitForTimeout(1_800);
+  await capture(page, '01-remise-des-cles', 'moments');
+  await keys.getByRole('button', { name: t.celebration.keys.continue }).click();
+
   const celebration = page.getByTestId('overlay-title');
-  await expect(celebration).toBeVisible({ timeout: 20_000 });
+  await expect(celebration).toBeVisible();
   const title = gameContent.titles.find((candidate) => candidate.id === 'firstInvestor');
   await expect(celebration).toContainText(title?.name ?? '');
   await capture(page, '08-nouveau-titre', MILESTONE);
   await dismissOverlays(page);
+
+  // The news waited behind the scenes: the first achievement comes now.
+  const achievement = gameContent.achievements.find((candidate) => candidate.id === 'firstStone');
+  const toast = page.getByTestId('achievement-toast');
+  await expect(toast).toContainText(achievement?.name ?? '');
+  await capture(page, '02-succes', 'moments');
+  // It goes away by itself, the clock never stopped for it.
+  await expect(toast).toBeHidden({ timeout: 15_000 });
 });
 
 test('answers an event of the catalogue', async ({ page }) => {

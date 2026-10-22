@@ -62,7 +62,6 @@
   "status": {
     "balance": "Trésorerie",
     "freeTime": "Temps libre",
-    "decisions": "Décisions en attente",
     "speedControls": "Vitesse du temps",
     "pause": "Pause",
     "speed": "×{speed}",
@@ -802,6 +801,8 @@
     },
     "volume": "{label} : {percent} %",
     "soundHint": "Le son démarre au premier toucher de l'écran.",
+    "vibration": "Vibrations",
+    "vibrationHint": "Le téléphone vibre au coup de tampon du notaire et à l'arrivée des loyers.",
     "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
     "autoSpeed": "Accélération automatique",
     "autoSpeedHint": "Quand rien ne presse, le temps passe en ×{speed}, puis revient à la vitesse choisie à la prochaine décision.",
@@ -1073,11 +1074,26 @@
     "pastMonthHint": "Bilan d'un mois passé : la réputation est celle du jour du bilan.",
     "years": "Années"
   },
+  "goodNews": {
+    "many": "{count} bonnes nouvelles",
+    "loanGranted": "{banker} vous accorde {amount} à {rate}. Reste à accepter l'offre !",
+    "loanProposal": "{banker} vous fait une proposition : {amount} à {rate}."
+  },
   "celebration": {
     "title": "Nouveau titre !",
     "perk": "Avantage : {perk}",
     "continue": "Merci !",
-    "achievement": "Succès débloqué"
+    "achievement": "Succès débloqué",
+    "keys": {
+      "kicker": "Remise des clés",
+      "firstTitle": "Vous êtes propriétaire !",
+      "title": "Une clé de plus au trousseau",
+      "firstText": "Votre premier bien : {property}. Le notaire range son tampon, Gérard vous serre la main. Bienvenue chez vous… enfin, chez vos futurs locataires.",
+      "text": "{property} est à vous.",
+      "price": "Acheté {price}",
+      "see": "Voir mon bien",
+      "continue": "Continuer"
+    }
   },
   "rewind": {
     "heading": "Revenir en arrière",

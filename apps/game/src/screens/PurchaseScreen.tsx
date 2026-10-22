@@ -137,6 +137,7 @@ export function PurchaseScreen({ id }: { id: string }) {
           <button
             type="button"
             className="button primary block"
+            data-tutorial="loan"
             onClick={() => setRequesting(true)}
             disabled={today >= purchase.loanDeadlineDay}
           >
@@ -221,6 +222,7 @@ function ApplicationRow({
         <button
           type="button"
           className="button primary"
+          data-tutorial="acceptLoan"
           onClick={() =>
             act({
               type: 'purchase/acceptLoan',
