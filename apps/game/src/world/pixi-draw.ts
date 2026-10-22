@@ -57,14 +57,23 @@ export function gradientTexture(): Texture {
   return Texture.from(canvas);
 }
 
-/** Repaints the sky gradient into the texture's canvas. */
-export function paintGradient(texture: Texture, top: number, bottom: number): void {
+const css = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
+
+/** Repaints the sky gradient into the texture's canvas (the middle colour at `middleAt`). */
+export function paintGradient(
+  texture: Texture,
+  top: number,
+  middle: number,
+  bottom: number,
+  middleAt = 0.55,
+): void {
   const canvas = texture.source.resource as HTMLCanvasElement;
   const context = canvas.getContext('2d');
   if (!context) return;
   const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, `#${top.toString(16).padStart(6, '0')}`);
-  gradient.addColorStop(1, `#${bottom.toString(16).padStart(6, '0')}`);
+  gradient.addColorStop(0, css(top));
+  gradient.addColorStop(middleAt, css(middle));
+  gradient.addColorStop(1, css(bottom));
   context.fillStyle = gradient;
   context.fillRect(0, 0, canvas.width, canvas.height);
   texture.source.update();

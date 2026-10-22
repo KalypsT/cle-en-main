@@ -262,6 +262,8 @@ const CAR_COLORS = [0xd9a03a, 0xb23d27, 0x3f6f9a, 0xf2f2ee, 0x4a4f57, 0x5d8a5a, 
 
 export interface Car extends Walker {
   lights: Sprite;
+  /** Red rear lights: on at dusk, brighter when braking. */
+  tail: Sprite;
   length: number;
   /** Speed on a free road; `speed` drops behind a slower car. */
   cruise: number;
@@ -304,10 +306,19 @@ export function createCar(random: () => number, glow: Texture, dir: 1 | -1): Car
   lights.tint = 0xfff1c4;
   lights.blendMode = 'add';
   view.addChild(lights);
+  const tail = new Sprite(glow);
+  tail.anchor.set(0.5);
+  tail.width = 16;
+  tail.height = 10;
+  tail.position.set(-length / 2 + 1, -11.5);
+  tail.tint = 0xff3b2f;
+  tail.blendMode = 'add';
+  view.addChild(tail);
   const cruise = 60 + random() * 40;
   const car: Car = {
     view,
     lights,
+    tail,
     length,
     cruise,
     x: 0,

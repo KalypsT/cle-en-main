@@ -9,7 +9,12 @@ import { mix } from './facade.ts';
 
 export interface Light {
   skyTop: number;
+  /** Middle of the sky, over the roofs: the dusk's mauve, the day's blue. */
+  skyMiddle: number;
+  /** Down at the horizon: the dawn's peach, the sunset's orange. */
   skyBottom: number;
+  /** Halo around the sun or the moon. */
+  orbGlow: number;
   /** Tint of the buildings and the street (white: daylight). */
   tint: number;
   /** 0 … 1: how much the windows, lamps and headlights glow. */
@@ -22,25 +27,40 @@ export interface Light {
 
 const MOMENTS: Record<Moment, Light> = {
   morning: {
-    skyTop: 0x9cc3e6,
-    skyBottom: 0xf7d9b4,
+    skyTop: 0x8fbde6,
+    skyMiddle: 0xc6dbeb,
+    skyBottom: 0xf8d2a6,
+    orbGlow: 0xffd9a0,
     tint: 0xfff1e0,
     glow: 0.3,
     night: false,
     orb: 0.35,
   },
-  day: { skyTop: 0x78b2e3, skyBottom: 0xdcecf6, tint: 0xffffff, glow: 0, night: false, orb: 0.85 },
+  day: {
+    skyTop: 0x5fa4e0,
+    skyMiddle: 0x9ccaee,
+    skyBottom: 0xe2eff7,
+    orbGlow: 0xfff3c4,
+    tint: 0xffffff,
+    glow: 0,
+    night: false,
+    orb: 0.85,
+  },
   evening: {
-    skyTop: 0x4d4f8c,
-    skyBottom: 0xe99a72,
+    skyTop: 0x3b4384,
+    skyMiddle: 0x9a6f9e,
+    skyBottom: 0xf3a46c,
+    orbGlow: 0xff9a5c,
     tint: 0xe0c9cf,
     glow: 0.75,
     night: false,
     orb: 0.18,
   },
   night: {
-    skyTop: 0x0e1836,
-    skyBottom: 0x2b3563,
+    skyTop: 0x0b1430,
+    skyMiddle: 0x1a2550,
+    skyBottom: 0x34406f,
+    orbGlow: 0xb9c8f0,
     tint: 0x6e7596,
     glow: 1,
     night: true,
@@ -68,7 +88,9 @@ export function lightOf(moment: Moment, weather: Weather): Light {
   return {
     ...base,
     skyTop: mix(base.skyTop, grey, overcast),
+    skyMiddle: mix(base.skyMiddle, grey, overcast * 0.9),
     skyBottom: mix(base.skyBottom, grey, overcast * 0.8),
+    orbGlow: mix(base.orbGlow, grey, overcast * 0.6),
     tint: mix(base.tint, base.night ? 0x5c6070 : 0xd4d8dc, overcast * 0.5),
     // Grey days need the lights a bit sooner.
     glow: Math.min(1, base.glow + overcast * 0.15),
@@ -79,7 +101,9 @@ export function lightOf(moment: Moment, weather: Weather): Light {
 export function blendLight(a: Light, b: Light, t: number): Light {
   return {
     skyTop: mix(a.skyTop, b.skyTop, t),
+    skyMiddle: mix(a.skyMiddle, b.skyMiddle, t),
     skyBottom: mix(a.skyBottom, b.skyBottom, t),
+    orbGlow: mix(a.orbGlow, b.orbGlow, t),
     tint: mix(a.tint, b.tint, t),
     glow: a.glow + (b.glow - a.glow) * t,
     night: t < 0.5 ? a.night : b.night,

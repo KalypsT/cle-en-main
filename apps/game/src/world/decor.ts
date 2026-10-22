@@ -276,13 +276,15 @@ export function drawSkyline(
   width: number,
   seed: number,
   landmark: Landmark | null,
-): void {
+): { x: number; w: number; h: number }[] {
   const random = decorRandom(seed);
   const color = 0x8d8fae;
+  const blocks: { x: number; w: number; h: number }[] = [];
   let x = -40;
   while (x < width + 40) {
     const w = 40 + random() * 60;
     const h = 60 + random() * 90;
+    blocks.push({ x, w, h });
     g.rect(x, GROUND_Y - h, w, h).fill({ color, alpha: 0.55 });
     if (random() < 0.4)
       g.poly([x, GROUND_Y - h, x + w / 2, GROUND_Y - h - 22, x + w, GROUND_Y - h]).fill({
@@ -292,6 +294,24 @@ export function drawSkyline(
     x += w - 4;
   }
   if (landmark) drawLandmark(g, landmark, width);
+  return blocks;
+}
+
+/** Windows lit at night in the town behind the street: a few dots per block. */
+export function drawSkylineLights(
+  g: Graphics,
+  blocks: readonly { x: number; w: number; h: number }[],
+  seed: number,
+): void {
+  const random = decorRandom(seed);
+  for (const block of blocks) {
+    const count = Math.floor(random() * 4);
+    for (let i = 0; i < count; i++) {
+      const x = block.x + 6 + random() * (block.w - 12);
+      const y = GROUND_Y - block.h + 8 + random() * (block.h - 16);
+      g.rect(x, y, 2.5, 3).fill(random() < 0.8 ? 0xffd27a : 0xfff0c0);
+    }
+  }
 }
 
 export const GARLAND_COLORS = [0xf6d36b, 0xe35d6a, 0x6fc3b8, 0xf2f2f2];
