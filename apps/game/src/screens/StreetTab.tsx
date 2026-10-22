@@ -4,7 +4,7 @@ import { useGame, useNav } from '../game/context.tsx';
 import { newsLines } from '../inbox.ts';
 import { cityName, format, formatEuros, formatSigned, jobName, t, tone } from '../texts.ts';
 import { Avatar } from '../ui/Avatar.tsx';
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Empty, SectionTitle, Tile } from '../ui/components.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { DecisionRow, showDecisionsSection } from './DecisionsTab.tsx';
@@ -38,8 +38,24 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
     .slice(0, OPPORTUNITIES);
   const news = newsLines(state);
 
+  // The street stops above the closed drawer (styles.css, --drawer-peek): its real height
+  // depends on the texts and the screen, so the road and the pavement are never hidden.
+  const drawer = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const element = drawer.current;
+    if (!element || expanded) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => {
+      const height = element.offsetHeight;
+      if (height > 0) root.style.setProperty('--drawer-peek', `${height}px`);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [expanded]);
+
   return (
     <section
+      ref={drawer}
       className={`street-drawer${expanded ? ' open' : ''}${inline ? ' inline' : ''}`}
       aria-label={t.street.dashboard}
       data-testid="street-drawer"
@@ -70,13 +86,17 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
               city: cityName(player.baseCityId),
             })}
           </p>
-          <button
-            type="button"
-            className="link-button"
-            onClick={() => nav.push({ name: 'cities' })}
-          >
-            {format(t.cities.viewing, { city: cityName(cityId) })} · {t.cities.switch}
-          </button>
+          {/* Closed, the drawer stays low (the road shows above it): the link only when
+              looking at another city than the player's own. */}
+          {(expanded || cityId !== player.baseCityId) && (
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => nav.push({ name: 'cities' })}
+            >
+              {format(t.cities.viewing, { city: cityName(cityId) })} · {t.cities.switch}
+            </button>
+          )}
         </div>
         {!expanded && (
           <div className="drawer-figures">
