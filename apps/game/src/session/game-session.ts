@@ -65,6 +65,11 @@ export class GameSession {
   private quietUntil: number;
   /** Decisions already shown: only new ones pause the game. */
   private seenDecisions: Set<string>;
+  /**
+   * After an automatic pause: the speed to go back to once the decisions that
+   * paused the game are settled. Forgotten as soon as the speed is set otherwise.
+   */
+  private resume: { speed: number; keys: Set<string> } | null = null;
   private frame: number | null = null;
   private lastFrameAt: number | null = null;
   private pendingMs = 0;
@@ -114,6 +119,7 @@ export class GameSession {
   }
 
   setSpeed(speed: number): void {
+    this.resume = null;
     this.pendingMs = 0;
     this.quietUntil = this.snapshot.state.clock.elapsedHours;
     this.update({ speed, autoPaused: false, accelerated: false });
@@ -194,10 +200,23 @@ export class GameSession {
         this.quietUntil = state.clock.elapsedHours + gameContent.rhythm.autoSpeed.quietHours;
         changes.accelerated = false;
       }
-      if (ticking && this.autoPause() && fresh.some((decision) => decision.autoPause)) {
+      const pausing = fresh.filter((decision) => decision.autoPause).map(decisionKey);
+      if (ticking && this.autoPause() && pausing.length > 0) {
         this.pendingMs = 0;
+        this.resume = { speed: this.snapshot.speed, keys: new Set(pausing) };
         changes.speed = 0;
         changes.autoPaused = true;
+      } else if (this.resume && this.snapshot.autoPaused) {
+        // A decision that pauses, come while the game waits, is waited for too.
+        for (const key of pausing) this.resume.keys.add(key);
+        if (state.player.bankruptDay !== null || state.gameOver !== null) {
+          this.resume = null;
+        } else if (!decisions.some((decision) => this.resume?.keys.has(decisionKey(decision)))) {
+          // Everything that paused the game is settled: the clock goes on at its speed.
+          changes.speed = this.resume.speed;
+          changes.autoPaused = false;
+          this.resume = null;
+        }
       }
     }
     this.update(changes);

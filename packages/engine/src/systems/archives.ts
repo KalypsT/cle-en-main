@@ -164,6 +164,7 @@ function logEntry(event: GameEvent, day: number): PropertyLogEntry | null {
     case 'procedureStarted':
       return { kind: 'procedure', day, evictionDay: event.evictionDay, cost: event.cost };
     case 'rentRevised':
+    case 'rentAdjusted':
       return { kind: 'rentRevised', day, monthlyRent: event.monthlyRent };
     case 'leaseRenewed':
       return { kind: 'leaseRenewed', day, termDay: event.termDay };

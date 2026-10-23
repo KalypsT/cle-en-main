@@ -220,6 +220,8 @@ export type GameEvent =
     }
   | { type: 'leaseRenewed'; propertyId: string; termDay: number }
   | { type: 'rentRevised'; propertyId: string; monthlyRent: Cents }
+  /** The rent changed during the lease after an event (an agreement with the tenant). */
+  | { type: 'rentAdjusted'; propertyId: string; monthlyRent: Cents; previousRent: Cents }
   | { type: 'tenantLifeEvent'; propertyId: string; eventId: string }
   | { type: 'incidentReported'; propertyId: string; kindId: string }
   | { type: 'incidentRepaired'; propertyId: string; kindId: string; cost: Cents }
@@ -402,6 +404,7 @@ export const NEWS_EVENT_TYPES = [
   'tenantLeft',
   'leaseRenewed',
   'rentRevised',
+  'rentAdjusted',
   'tenantLifeEvent',
   'incidentReported',
   'incidentRepaired',

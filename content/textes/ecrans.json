@@ -510,7 +510,7 @@
       "reminderSettled": "Relance : le locataire a payé",
       "reminderFailed": "Relance restée sans effet",
       "procedure": "Procédure d'expulsion engagée : {cost}, expulsion prévue le {date}",
-      "rentRevised": "Loyer révisé : {rent} / mois",
+      "rentRevised": "Nouveau loyer : {rent} / mois",
       "leaseRenewed": "Bail reconduit jusqu'au {date}",
       "dpeWarning": "Alerte DPE : location interdite à partir du {date}",
       "worksCompleted": "Chantier terminé : {cost} au total, imprévus compris",

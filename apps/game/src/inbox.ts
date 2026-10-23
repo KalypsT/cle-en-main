@@ -45,6 +45,7 @@ const NEWS_CATEGORIES: Record<NewsEventType, Exclude<NewsCategory, 'all'>> = {
   tenantLeft: 'rental',
   leaseRenewed: 'rental',
   rentRevised: 'rental',
+  rentAdjusted: 'rental',
   tenantLifeEvent: 'rental',
   incidentReported: 'rental',
   incidentRepaired: 'rental',

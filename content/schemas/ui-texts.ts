@@ -104,6 +104,7 @@ export const uiTextsSchema = z
         leaseRenewed: text,
         tenantEvicted: text,
         rentRevised: text,
+        rentAdjusted: text,
         incidentReported: text,
         incidentRepaired: text,
         rentMissed: text,
