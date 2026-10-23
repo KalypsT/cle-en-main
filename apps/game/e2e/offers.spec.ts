@@ -31,8 +31,12 @@ test('tells a refused offer, on the listing and in the mail', async ({ page }) =
   await page.getByRole('button', { name: t.listing.send }).click();
   await expect(page.getByTestId('offer-status')).toBeVisible();
   await runClock(page, '');
-  await expect(page.getByTestId('last-reply')).toBeVisible({ timeout: 60_000 });
-  await expect(page.locator('.notice')).toContainText(/refuse votre offre/);
+  // Told at once, wherever the player is. On a slow machine, one frame may run the clock from
+  // the answer to the listing's end: the listing then tells it is gone.
+  await expect(page.locator('.notice')).toContainText(/refuse votre offre/, { timeout: 60_000 });
+  await expect(
+    page.getByTestId('last-reply').or(page.getByText(t.listing.gone, { exact: true })),
+  ).toBeVisible();
   await pause(page);
   await dismissOverlays(page);
 

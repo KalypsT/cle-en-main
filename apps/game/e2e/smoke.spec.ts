@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 import { clockStamp, fill, newGame, openGame, pause, runClock, t, tab, ui } from './helpers.ts';
 
 test('starts, creates a game, saves it and loads it back', async ({ page }) => {
+  // About forty steps, each slowed down while the street is drawn in software on CI.
+  test.setTimeout(120_000);
   await openGame(page);
   await newGame(page, { name: 'Thibaud' });
   await expect(page.getByText(fill(t.street.hello, { name: 'Thibaud' }))).toBeVisible();

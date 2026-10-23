@@ -151,9 +151,13 @@ test('keeps the crowd of the street steady and holds the moment at high speed', 
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  // Without the automatic acceleration, ×1 stays ×1 and the moments go by.
+  // Without the automatic acceleration, ×1 stays ×1 and the moments go by. Neither the review
+  // of the 1st nor a decision pauses the clock: paused, the street shows the hour again.
   await page.addInitScript(() =>
-    localStorage.setItem('cle-en-main.settings', JSON.stringify({ autoSpeed: false })),
+    localStorage.setItem(
+      'cle-en-main.settings',
+      JSON.stringify({ autoSpeed: false, autoPause: false, monthlyReview: false }),
+    ),
   );
   await openGame(page);
   await newGame(page, { tutorialOn: false });

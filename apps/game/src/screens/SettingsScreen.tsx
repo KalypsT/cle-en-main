@@ -158,13 +158,13 @@ export function SettingsScreen() {
           {format(t.settings.exportJournal, { count: journal?.length ?? 0 })}
         </button>
       </Card>
-      <VersionCard onBeforeUpdate={() => save()} />
+      <VersionCard />
     </div>
   );
 }
 
 /** The version of the game, and its update when the phone found a new one. */
-function VersionCard({ onBeforeUpdate }: { onBeforeUpdate: () => void }) {
+function VersionCard() {
   const texts = t.settings;
   const { available, check } = useUpdates();
   const date = formatBuildDate(Date.parse(BUILD.date));
@@ -181,14 +181,7 @@ function VersionCard({ onBeforeUpdate }: { onBeforeUpdate: () => void }) {
       {available ? (
         <>
           <p className="small">{texts.updateAvailable}</p>
-          <button
-            type="button"
-            className="button primary block"
-            onClick={() => {
-              onBeforeUpdate();
-              applyUpdate();
-            }}
-          >
+          <button type="button" className="button primary block" onClick={applyUpdate}>
             {texts.update}
           </button>
         </>
