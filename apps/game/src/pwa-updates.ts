@@ -15,6 +15,8 @@ interface UpdateState {
 let state: UpdateState = { available: false, check: 'idle' };
 let registration: ServiceWorkerRegistration | null = null;
 let apply: (() => Promise<void>) | null = null;
+/** Saves the game being played; awaited before the reload that brings the new version. */
+let saveBeforeReload: (() => Promise<void>) | null = null;
 const listeners = new Set<() => void>();
 
 function set(next: Partial<UpdateState>) {
@@ -43,9 +45,26 @@ export async function checkForUpdate(): Promise<void> {
   }
 }
 
-/** Reloads the page on the new version (the game is saved as the page is left). */
+/**
+ * Reloads the page on the new version, once the game being played is saved: the save
+ * made as the page is left (pagehide) does not reach IndexedDB before a reload.
+ */
 export function applyUpdate(): void {
-  void apply?.();
+  void (async () => {
+    try {
+      await saveBeforeReload?.();
+    } finally {
+      await apply?.();
+    }
+  })();
+}
+
+/** Registers the save of the game being played before an update; returns its removal. */
+export function saveBeforeUpdate(save: () => Promise<void>): () => void {
+  saveBeforeReload = save;
+  return () => {
+    if (saveBeforeReload === save) saveBeforeReload = null;
+  };
 }
 
 export function useUpdates(): UpdateState {

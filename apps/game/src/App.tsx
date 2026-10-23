@@ -5,6 +5,7 @@ import { AudioMixer } from './audio/mixer.ts';
 import { engine } from './engine.ts';
 import { GameShell } from './game/GameShell.tsx';
 import { PwaStatus } from './PwaStatus.tsx';
+import { saveBeforeUpdate } from './pwa-updates.ts';
 import { CreateGameScreen, type NewGameChoices } from './screens/CreateGameScreen.tsx';
 import { SlotsScreen } from './screens/SlotsScreen.tsx';
 import { TitleScreen } from './screens/TitleScreen.tsx';
@@ -179,9 +180,12 @@ export function App() {
     };
     document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('pagehide', store);
+    // An update reloads the page: the save is awaited first.
+    const forgetUpdateSave = saveBeforeUpdate(() => save(slot, session.getSnapshot().state, true));
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('pagehide', store);
+      forgetUpdateSave();
     };
   }, [screen, save]);
 
