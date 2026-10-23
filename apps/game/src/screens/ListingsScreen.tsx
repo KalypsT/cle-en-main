@@ -21,7 +21,7 @@ import {
 } from '../texts.ts';
 import { outlookTone } from '../ui/CashFlowOutlook.tsx';
 import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
-import { FacadeThumb } from '../ui/Facade.tsx';
+import { PropertyThumb } from '../ui/Facade.tsx';
 import { Icon } from '../ui/Icon.tsx';
 
 type Sort = ListingSort;
@@ -60,9 +60,6 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
   const { state } = useGame();
   const nav = useNav();
   const { property } = listing;
-  // Its building in the street, read once: the picture does not change with the hours.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const place = useMemo(() => engine.building(state, property.id), [property]);
   const planned = state.agenda.some(
     (item) => item.kind === 'visit' && item.listingId === listing.id,
   );
@@ -71,7 +68,7 @@ export function ListingRow({ listing, view }: { listing: Listing; view: ListingV
   const outlook = engine.cashFlowOutlook(state, listing.id);
   return (
     <ListRow
-      thumb={<FacadeThumb property={property} place={place} />}
+      thumb={<PropertyThumb property={property} />}
       testId={`listing-${listing.id}`}
       title={propertyLabel(property)}
       subtitle={

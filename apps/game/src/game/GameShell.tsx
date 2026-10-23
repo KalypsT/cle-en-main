@@ -29,6 +29,7 @@ import { MenuTab } from '../screens/MenuTab.tsx';
 import { PropertyScreen } from '../screens/PropertyScreen.tsx';
 import { PurchaseScreen } from '../screens/PurchaseScreen.tsx';
 import { SaleScreen } from '../screens/SaleScreen.tsx';
+import { WorksReportScreen } from '../screens/WorksReportScreen.tsx';
 import { WorksScreen } from '../screens/WorksScreen.tsx';
 import { RentScreen } from '../screens/RentScreen.tsx';
 import { SettingsScreen } from '../screens/SettingsScreen.tsx';
@@ -122,7 +123,7 @@ function effectOf(event: GameEvent): EffectName | null {
 }
 
 /** Overlays that play the celebration music (docs/05, 5.8). */
-const FESTIVE: ReadonlySet<Overlay['kind']> = new Set(['month', 'year', 'title', 'keys']);
+const FESTIVE: ReadonlySet<Overlay['kind']> = new Set(['month', 'year', 'title', 'keys', 'works']);
 
 /** What an engine event brings over the game (reviews, titles, fresh start, end). */
 function overlaysOf(events: GameEvent[], state: GameState, monthly: boolean): Overlay[] {
@@ -135,6 +136,10 @@ function overlaysOf(events: GameEvent[], state: GameState, monthly: boolean): Ov
         price: event.price,
         first: (state.progress.counters.purchases ?? 0) <= 1,
       });
+    } else if (event.type === 'worksCompleted') {
+      // Only when the before was recorded: works begun before save format 21 have no picture.
+      const owned = state.properties.find((o) => o.property.id === event.propertyId);
+      if (owned?.lastWorks) overlays.push({ kind: 'works', propertyId: event.propertyId });
     } else if (event.type === 'yearStarted') overlays.push({ kind: 'year' });
     else if (event.type === 'monthStarted' && event.month !== 1 && monthly) {
       overlays.push({ kind: 'month' });
@@ -490,6 +495,8 @@ function RouteScreen({ route }: { route: Route }) {
       return <PropertyScreen id={route.id} initialTab={route.tab} />;
     case 'rent':
       return <RentScreen id={route.id} />;
+    case 'worksReport':
+      return <WorksReportScreen id={route.id} />;
     case 'works':
       return <WorksScreen id={route.id} />;
     case 'sale':

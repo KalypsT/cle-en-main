@@ -14,7 +14,7 @@ import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { cityName, format, formatEuros, formatKilo, propertyLabel, t } from '../texts.ts';
 import { BottomSheet, Card, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
-import { KindThumb } from '../ui/Facade.tsx';
+import { PropertyThumb } from '../ui/Facade.tsx';
 import { ListingRow } from './ListingsScreen.tsx';
 import {
   baseWidth,
@@ -577,7 +577,7 @@ export function MapTab() {
       {pinnedOwned && (
         <BottomSheet title={propertyLabel(pinnedOwned.property)} onClose={() => setPin(null)}>
           <ListRow
-            thumb={<KindThumb property={pinnedOwned.property} owned />}
+            thumb={<PropertyThumb property={pinnedOwned.property} owned />}
             title={propertyLabel(pinnedOwned.property)}
             onClick={() => {
               setPin(null);

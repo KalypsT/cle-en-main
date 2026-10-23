@@ -32,6 +32,7 @@ import {
   Segmented,
 } from '../ui/components.tsx';
 import { DpeCard } from '../ui/DpeCard.tsx';
+import { LastWorksCard } from '../ui/WorksBeforeAfter.tsx';
 import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
@@ -116,6 +117,10 @@ function Overview({ owned }: { owned: OwnedProperty }) {
       )}
       <CoproMeetingCard owned={owned} />
       <DpeCard property={property} id={property.id} />
+      <LastWorksCard
+        owned={owned}
+        onOpen={() => nav.push({ name: 'worksReport', id: property.id })}
+      />
       <Transformations owned={owned} />
       <Card title={t.property.actions}>
         <div className="stack">

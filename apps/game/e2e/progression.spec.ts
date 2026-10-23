@@ -118,10 +118,18 @@ test('hands over the keys, celebrates a new title, then tells the achievement', 
   await capture(page, '08-nouveau-titre', MILESTONE);
   await dismissOverlays(page);
 
-  // The news waited behind the scenes: the first achievement comes now.
-  const achievement = gameContent.achievements.find((candidate) => candidate.id === 'firstStone');
+  // The news waited behind the scenes: the achievements of the purchase come now, one toast
+  // after the other (which one is on screen depends on how fast the machine is).
   const toast = page.getByTestId('achievement-toast');
-  await expect(toast).toContainText(achievement?.name ?? '');
+  await expect(toast).toContainText(t.celebration.achievement);
+  await expect(toast).toContainText(
+    new RegExp(
+      ['firstStone', 'bargainHunter']
+        .map((id) => gameContent.achievements.find((candidate) => candidate.id === id)?.name)
+        .filter(Boolean)
+        .join('|'),
+    ),
+  );
   await capture(page, '02-succes', 'moments');
   // It goes away by itself, the clock never stopped for it.
   await expect(toast).toBeHidden({ timeout: 15_000 });

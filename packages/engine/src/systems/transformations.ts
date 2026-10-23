@@ -179,6 +179,7 @@ export function startTransformation(
     transformation: { kind, total: quote.total, endDay, overrun },
     hazard: null,
     dpeBefore: owned.property.dpe,
+    before: null,
     paid: 0,
   };
   payTransformation(ctx, owned, deposit);
@@ -291,6 +292,7 @@ function shareOwnership(
     },
     quotes: [],
     works: null,
+    lastWorks: null,
     // What is left of the works envelope goes with the first flat (and its loan).
     worksFund: i === 0 ? owned.worksFund : null,
     worksForCapitalGains: share(owned.worksForCapitalGains, flat),

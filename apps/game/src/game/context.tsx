@@ -36,6 +36,7 @@ export type Route =
     }
   | { name: 'listing'; id: string }
   | { name: 'purchase'; id: string }
+  | { name: 'worksReport'; id: string }
   | { name: 'property'; id: string; tab?: PropertyTab }
   | { name: 'rent'; id: string }
   | { name: 'works'; id: string }

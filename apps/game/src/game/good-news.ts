@@ -68,7 +68,10 @@ export function goodNewsOf(event: GameEvent, state: GameState): GoodNews | null 
     case 'tenantMovedIn':
       return news('person', { parts: faceOf(event.tenantName), mood: 'happy' });
     case 'worksCompleted':
-      return news('wrench');
+      // With the before recorded, the end of the works has its own scene (before and after).
+      return state.properties.some((o) => o.property.id === event.propertyId && o.lastWorks)
+        ? null
+        : news('wrench');
     case 'renovationAidPaid':
     case 'propertySold':
       return news('euro');

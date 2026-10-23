@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 20,
+    "formatVersion": 21,
     "seed": 20261018,
     "rng": [
       2720554145,
@@ -914,6 +914,218 @@
         },
         "quotes": [],
         "works": null,
+        "lastWorks": {
+          "day": 20820,
+          "cost": 181155,
+          "before": {
+            "dpe": "E",
+            "value": 4441800,
+            "rent": 0,
+            "facadeState": 2,
+            "newWindows": false,
+            "items": [
+              {
+                "id": "entry.floors",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "entry.walls",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "entry.joinery",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "living.floors",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "living.walls",
+                "state": 3,
+                "tier": "eco"
+              },
+              {
+                "id": "living.joinery",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "kitchen.floors",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "kitchen.walls",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "kitchen.kitchen",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "bathroom.floors",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "bathroom.walls",
+                "state": 1,
+                "tier": "standard"
+              },
+              {
+                "id": "bathroom.bathroom",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "electricity",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "plumbing",
+                "state": 1,
+                "tier": "standard"
+              },
+              {
+                "id": "heating",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "insulation",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "windows",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "ventilation",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "commonParts",
+                "state": 1,
+                "tier": "standard"
+              }
+            ]
+          },
+          "after": {
+            "dpe": "E",
+            "value": 4610400,
+            "rent": 28800,
+            "facadeState": 2,
+            "newWindows": false,
+            "items": [
+              {
+                "id": "entry.floors",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "entry.walls",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "entry.joinery",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "living.floors",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "living.walls",
+                "state": 3,
+                "tier": "eco"
+              },
+              {
+                "id": "living.joinery",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "kitchen.floors",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "kitchen.walls",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "kitchen.kitchen",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "bathroom.floors",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "bathroom.walls",
+                "state": 1,
+                "tier": "standard"
+              },
+              {
+                "id": "bathroom.bathroom",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "electricity",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "plumbing",
+                "state": 5,
+                "tier": "eco"
+              },
+              {
+                "id": "heating",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "insulation",
+                "state": 2,
+                "tier": "standard"
+              },
+              {
+                "id": "windows",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "ventilation",
+                "state": 3,
+                "tier": "standard"
+              },
+              {
+                "id": "commonParts",
+                "state": 1,
+                "tier": "standard"
+              }
+            ]
+          }
+        },
         "worksFund": null,
         "worksForCapitalGains": 97695,
         "coproMeeting": null,

@@ -1,7 +1,8 @@
-import type { Property, SectionRoom, SectionUnit, SpaceKind } from '@cle/engine';
+import type { Property, SectionRoom, SectionUnit, SpaceKind, Tier } from '@cle/engine';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { format, formatDecimal, spaceName, t, tradeName } from '../texts.ts';
+import { avatarLook, faceOf } from '../ui/Avatar.tsx';
 import { Card, ScreenHeader } from '../ui/components.tsx';
 import { bubbleLabel } from '../world/StreetWorld.tsx';
 
@@ -29,14 +30,75 @@ const ROOM_COLORS: Record<SpaceKind, string> = {
 const NEIGHBOUR_COLORS = ['#e9ddd0', '#dfe4dc', '#e6dde6', '#f0e4d2', '#dde3ea'];
 const NEIGHBOUR_ROOMS: (SpaceKind | 'neighbour')[] = ['neighbour', 'living', 'bedroom', 'kitchen'];
 
-/** A neighbour at home. */
-function Resident({ x, y }: { x: number; y: number }) {
+/** The colours of somebody who lives there (a neighbour's are fixed). */
+interface Look {
+  skin: string;
+  hair: string;
+  top: string;
+}
+
+const NEIGHBOUR_LOOK: Look = { skin: '#e8bf9a', hair: '#5a3a24', top: '#c95d4a' };
+
+const css = (color: number) => `#${color.toString(16).padStart(6, '0')}`;
+
+/** Someone at home, with their own colours. */
+function Resident({ x, y, look = NEIGHBOUR_LOOK }: { x: number; y: number; look?: Look }) {
   return (
     <g>
       <rect x={x - 4} y={y - 12} width="8" height="12" rx="2" fill="#4a4f63" />
-      <rect x={x - 5} y={y - 24} width="10" height="13" rx="3" fill="#c95d4a" />
-      <circle cx={x} cy={y - 29} r="5" fill="#e8bf9a" />
-      <path d={`M${x - 5.5} ${y - 30} a5.5 5.5 0 0 1 11 0 z`} fill="#5a3a24" />
+      <rect x={x - 5} y={y - 24} width="10" height="13" rx="3" fill={look.top} />
+      <circle cx={x} cy={y - 29} r="5" fill={look.skin} />
+      <path d={`M${x - 5.5} ${y - 30} a5.5 5.5 0 0 1 11 0 z`} fill={look.hair} />
+    </g>
+  );
+}
+
+/** What the floor is made of, by the range of the fittings: lino, boards or parquet. */
+const FLOORS: Record<Tier, { base: string; line: string }> = {
+  eco: { base: '#b9b4a8', line: '#a39e92' },
+  standard: { base: '#c9a77d', line: '#b8956b' },
+  premium: { base: '#a9743f', line: '#8f5f31' },
+};
+
+/** The floor strip of a room: lino plain, boards striped, parquet in a herringbone. */
+function Floor({ x, y, w, tier }: { x: number; y: number; w: number; tier: Tier }) {
+  const { base, line } = FLOORS[tier];
+  const step = tier === 'premium' ? 6 : 12;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height="4" fill={base} />
+      {tier !== 'eco' &&
+        Array.from({ length: Math.floor(w / step) }, (_, i) => (
+          <path
+            key={i}
+            d={
+              tier === 'premium'
+                ? `M${x + i * step} ${y + (i % 2 === 0 ? 0 : 4)} l${step} ${i % 2 === 0 ? 4 : -4}`
+                : `M${x + i * step} ${y} v4`
+            }
+            stroke={line}
+            strokeWidth="0.8"
+          />
+        ))}
+    </g>
+  );
+}
+
+/** A framed picture on the wall of a well fitted room, and a rug on its floor. */
+function Decor({ kind, x, y, w }: { kind: SpaceKind; x: number; y: number; w: number }) {
+  if (kind === 'wc' || kind === 'garden') return null;
+  const cx = x + w / 2;
+  return (
+    <g>
+      {kind !== 'bathroom' && (
+        <g>
+          <rect x={cx - 14} y={y - 66} width="22" height="16" fill="#fffdf8" stroke="#8a6a4a" />
+          <path d={`M${cx - 12} ${y - 53} l6 -7 l5 5 l4 -4 l5 6z`} fill="#6fa6c9" />
+        </g>
+      )}
+      {(kind === 'living' || kind === 'bedroom' || kind === 'entry') && (
+        <rect x={cx - 28} y={y - 2} width="56" height="2" rx="1" fill="#b5694c" opacity="0.8" />
+      )}
     </g>
   );
 }
@@ -53,18 +115,28 @@ function Furniture({
   x,
   y,
   w,
+  tier = 'standard',
 }: {
   kind: SpaceKind | 'neighbour';
   x: number;
   y: number;
   w: number;
+  tier?: Tier;
 }) {
   const cx = x + w / 2;
+  const plain = tier === 'eco';
   switch (kind) {
     case 'bedroom':
       return (
         <g>
-          <rect x={cx - 22} y={y - 14} width="44" height="12" rx="3" fill="#8fb0d6" />
+          <rect
+            x={cx - 22}
+            y={y - 14}
+            width="44"
+            height="12"
+            rx="3"
+            fill={plain ? '#b8b4aa' : tier === 'premium' ? '#5d7fae' : '#8fb0d6'}
+          />
           <rect x={cx - 24} y={y - 20} width="10" height="18" rx="3" fill="#f6efe2" />
           <rect x={cx - 22} y={y - 2} width="3" height="2" fill="#6b5a4a" />
         </g>
@@ -72,7 +144,14 @@ function Furniture({
     case 'living':
       return (
         <g>
-          <rect x={cx - 24} y={y - 16} width="36" height="14" rx="5" fill="#c97a5a" />
+          <rect
+            x={cx - 24}
+            y={y - 16}
+            width="36"
+            height="14"
+            rx="5"
+            fill={plain ? '#a7a39a' : tier === 'premium' ? '#8f4a35' : '#c97a5a'}
+          />
           <rect x={cx - 26} y={y - 20} width="7" height="18" rx="3" fill="#b5694c" />
           <rect x={cx + 18} y={y - 34} width="2" height="32" fill="#6b5a4a" />
           <path d={`M${cx + 13} ${y - 34} h12 l-3 -7 h-6 z`} fill="#f2c14e" />
@@ -213,19 +292,38 @@ function Wear({
   );
 }
 
+/** The warm light of the lamps of a room in the evening, spilling over its walls. */
+function Lamplight({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
+  return (
+    <ellipse
+      cx={x + w * 0.62}
+      cy={y + h * 0.45}
+      rx={w * 0.55}
+      ry={h * 0.6}
+      fill="url(#section-lamp)"
+    />
+  );
+}
+
 function Rooms({
   unit,
   x,
   y,
   w,
   h,
+  night,
+  look,
 }: {
   unit: SectionUnit;
   x: number;
   y: number;
   w: number;
   h: number;
+  night: boolean;
+  look: Look | null;
 }) {
+  // The household stands in the living room, or in the first room there is.
+  const living = unit.rooms.find((room) => room.kind === 'living') ?? unit.rooms[0];
   const total = unit.rooms.reduce((sum, room) => sum + Math.max(4, room.surface), 0);
   const widths = unit.rooms.map((room) => (Math.max(4, room.surface) / total) * w);
   const starts = widths.map((_, i) => x + widths.slice(0, i).reduce((a, b) => a + b, 0));
@@ -238,8 +336,15 @@ function Rooms({
           <g key={room.spaceId}>
             <rect x={roomX} y={y} width={width} height={h} fill={ROOM_COLORS[room.kind]} />
             <Wear x={roomX} y={y} w={width} h={h} state={room.state} />
-            <rect x={roomX} y={y + h - 4} width={width} height="4" fill="#c9a77d" />
-            <Furniture kind={room.kind} x={roomX} y={y + h - 4} w={width} />
+            <Floor x={roomX} y={y + h - 4} w={width} tier={room.tier} />
+            {room.tier === 'premium' && room.state >= 3 && (
+              <Decor kind={room.kind} x={roomX} y={y + h - 4} w={width} />
+            )}
+            <Furniture kind={room.kind} x={roomX} y={y + h - 4} w={width} tier={room.tier} />
+            {unit.resident && look && room === living && !room.renovating && (
+              <Resident x={roomX + width * 0.7} y={y + h - 4} look={look} />
+            )}
+            {night && unit.occupied && <Lamplight x={roomX} y={y} w={width} h={h} />}
             {room.renovating && <Worker x={roomX + width * 0.35} y={y + h - 4} />}
             <rect x={roomX + width - 1} y={y} width="2" height={h} fill="#8a7a62" />
           </g>
@@ -281,6 +386,14 @@ export function SectionScreen({
       state.purchases.find((p) => p.property.id === buildingId)?.property)
     : undefined;
   const night = ambience.moment === 'night' || ambience.moment === 'evening';
+  // Who is at home in the player's dwelling: the tenant has a face drawn from their name.
+  const residentLook = (unit: SectionUnit): Look | null => {
+    const resident = unit.resident;
+    if (!resident) return null;
+    const parts = resident.kind === 'player' ? state.player.avatar : faceOf(resident.name);
+    const look = avatarLook(parts);
+    return { skin: css(look.skin), hair: css(look.hair), top: css(look.top) };
+  };
   const floorHeight = section.kind === 'house' ? 96 : 84;
   const height = ROOF + section.floors * floorHeight + FRAME + 22;
   const inner = WIDTH - FRAME * 2;
@@ -352,6 +465,12 @@ export function SectionScreen({
       </p>
       <div className={`section-frame${night ? ' night' : ''}`} data-testid="section">
         <svg viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={title}>
+          <defs>
+            <radialGradient id="section-lamp">
+              <stop offset="0" stopColor="#ffd27a" stopOpacity="0.5" />
+              <stop offset="1" stopColor="#ffd27a" stopOpacity="0" />
+            </radialGradient>
+          </defs>
           <rect width={WIDTH} height={height} fill={night ? '#26304f' : '#dfeaf0'} />
           {/* Roof and floors. */}
           {section.kind === 'house' ? (
@@ -425,7 +544,15 @@ export function SectionScreen({
             return (
               <g key={unit.id}>
                 {ours && unit.rooms.length > 0 ? (
-                  <Rooms unit={unit} x={x} y={y} w={w} h={h} />
+                  <Rooms
+                    unit={unit}
+                    x={x}
+                    y={y}
+                    w={w}
+                    h={h}
+                    night={night}
+                    look={residentLook(unit)}
+                  />
                 ) : (
                   <g>
                     <rect
@@ -453,7 +580,9 @@ export function SectionScreen({
                     )}
                   </g>
                 )}
-                {lit && <rect x={x} y={y} width={w} height={h} fill="#ffd27a" opacity="0.18" />}
+                {lit && !(ours && unit.rooms.length > 0) && (
+                  <rect x={x} y={y} width={w} height={h} fill="#ffd27a" opacity="0.18" />
+                )}
                 {night && !unit.occupied && (
                   <rect x={x} y={y} width={w} height={h} fill="#10152a" opacity="0.45" />
                 )}

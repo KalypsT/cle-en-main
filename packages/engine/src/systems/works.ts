@@ -34,6 +34,7 @@ import {
 } from './dwelling.ts';
 import { dailyFreeTime } from './household.ts';
 import { findOwned } from './renting.ts';
+import { snapshotOf, worksReportOf } from './works-report.ts';
 import { addWorks, ledgerOf } from './taxes.ts';
 import { renownOf } from './cities.ts';
 import { editableListing } from './listings.ts';
@@ -489,6 +490,7 @@ export function startWorks(
     transformation: null,
     hazard: null,
     dpeBefore: owned.property.dpe,
+    before: snapshotOf(content, state, owned.property),
     paid: 0,
   };
   owned.works = project;
@@ -720,6 +722,8 @@ function completeProject(ctx: SystemContext, owned: OwnedProperty, project: Work
     }
   }
   state.worksDone[property.cityId] = (state.worksDone[property.cityId] ?? 0) + 1;
+  // The record comes before the works are cleared: it needs the snapshot taken at the start.
+  owned.lastWorks = worksReportOf(content, state, owned, ctx.today, project.paid);
   owned.works = null;
   ctx.events.push({
     type: 'worksCompleted',

@@ -61,6 +61,7 @@ export {
   type PendingDecision,
   type PropertyCashFlow,
 } from './systems/ui-queries.ts';
+export { type WorksBeforeAfter, type WorksChange } from './systems/works-report.ts';
 export { signedLine, statementNet } from './systems/history.ts';
 export { type AgendaRefusal } from './systems/agenda.ts';
 export { type CatalogRefusal, NO_CHOICE } from './systems/catalog.ts';
