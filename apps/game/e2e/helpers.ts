@@ -86,8 +86,14 @@ export async function waitNextDay(page: Page) {
   await pause(page);
 }
 
+/**
+ * Sets the speed, unless it is already set: setting it again would drop the time the clock
+ * gathered towards its next hour. Dispatched straight to the button, like `pause`: waiting
+ * for it to be « stable » can outlast a retry while the street starves the page of frames.
+ */
 export async function speed(page: Page, value: number) {
-  await page.getByRole('button', { name: fill(t.status.speed, { speed: value }) }).click();
+  const button = page.getByRole('button', { name: fill(t.status.speed, { speed: value }) });
+  if ((await button.getAttribute('aria-pressed')) !== 'true') await button.dispatchEvent('click');
 }
 
 export async function tab(page: Page, name: keyof typeof t.tabs) {
