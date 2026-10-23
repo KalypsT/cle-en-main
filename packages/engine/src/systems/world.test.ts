@@ -139,6 +139,46 @@ describe('streets', () => {
     expect(where({ ...state, listings: [...state.listings, ...doubled] })).toEqual(before);
   });
 
+  it('draws a listing with the look of the building it stands in for', () => {
+    // Notes of a test game: the buildings changed as listings came and went.
+    const state = newGame();
+    let dwellings = 0;
+    let sameStyle = 0;
+    let identical = 0;
+    for (const neighbourhood of content.cities[CITY]?.neighbourhoods ?? []) {
+      const empty = engine.streets({ ...state, listings: [] }, CITY, neighbourhood.id);
+      const streets = engine.streets(state, CITY, neighbourhood.id);
+      streets.forEach((street, streetIndex) => {
+        street.buildings.forEach((building, index) => {
+          if (building.role !== 'listing') return;
+          const before = empty[streetIndex]?.buildings[index];
+          if (!before || before.role !== 'ordinary') return; // At the end of the street.
+          // Same place: same colours and details, same tree.
+          expect(building.placeId).toBe(before.placeId);
+          expect(building.variant).toBe(before.variant);
+          expect(building.tree).toBe(before.tree);
+          // A shop, a parking or a plot is drawn as such: only the dwellings are compared.
+          if (building.kind !== 'apartment' && building.kind !== 'house') return;
+          dwellings += 1;
+          if (building.kind === before.kind && building.epoch === before.epoch) sameStyle += 1;
+          if (
+            building.kind === before.kind &&
+            building.epoch === before.epoch &&
+            building.floors === before.floors &&
+            building.shop === before.shop
+          ) {
+            identical += 1;
+          }
+        });
+      });
+    }
+    expect(dwellings).toBeGreaterThan(10);
+    // Nearly always the same style; usually the same height too (a flat high up may need
+    // a taller building than the places left).
+    expect(sameStyle / dwellings).toBeGreaterThan(0.95);
+    expect(identical / dwellings).toBeGreaterThan(0.75);
+  });
+
   it('places every listing of the neighbourhood once, with an « À vendre » bubble', () => {
     const state = newGame();
     for (const neighbourhood of content.cities[CITY]?.neighbourhoods ?? []) {

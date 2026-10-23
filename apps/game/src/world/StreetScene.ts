@@ -589,7 +589,7 @@ export class StreetScene {
         if (spec.shop) {
           // Neighbouring shops never share a sign.
           const signs = Math.max(1, data.shopNames.length);
-          let signIndex = hashString(`${data.seed}#${building.id}`) % signs;
+          let signIndex = hashString(`${data.seed}#${building.placeId}`) % signs;
           if (signIndex === lastSign) signIndex = (signIndex + 1) % signs;
           lastSign = signIndex;
           const name = data.shopNames[signIndex] ?? '';
@@ -665,8 +665,8 @@ export class StreetScene {
             .stroke({ color: 0x2f4f3a, width: 1 });
         }
         if (item.treeX !== null)
-          drawTree(front, item.treeX, data.season, hashString(building.id), snow);
-        const hash = hashString(`life#${building.id}`);
+          drawTree(front, item.treeX, data.season, hashString(building.placeId), snow);
+        const hash = hashString(`life#${building.placeId}`);
         if (spec.chimney && hash % 10 < 6) {
           const height = spec.roof.shape === 'flat' ? 14 : spec.roof.height * 0.8;
           chimneys.push({
@@ -763,7 +763,7 @@ export class StreetScene {
         spec.windows.forEach((win, index) => {
           const mine = building.role === 'owned' && building.highlightFloor === win.floor;
           if (!(mine && share > 0.1) && win.light >= share) return;
-          const look = hashString(`${building.id}#${index}`) % 20;
+          const look = hashString(`${building.placeId}#${index}`) % 20;
           const tv = look === 0 && data.hour >= 19;
           const color = tv ? 0x8fb4ea : win.light < share * 0.3 ? 0xffd88a : 0xf5b95a;
           const x = item.x + win.x;
@@ -812,7 +812,7 @@ export class StreetScene {
               const sy = y + h * shelf;
               g.rect(x + 2, sy, w - 4, 1.2).fill({ color: 0x8a6a4a, alpha: glow });
               for (let gx = x + 4, i = 0; gx < x + w - 5; gx += 6, i++) {
-                const goods = GOODS[(hashString(building.id) + i) % GOODS.length] ?? 0xf2c14e;
+                const goods = GOODS[(hashString(building.placeId) + i) % GOODS.length] ?? 0xf2c14e;
                 g.rect(gx, sy - 4, 4, 4).fill({ color: goods, alpha: glow * 0.9 });
               }
             }
