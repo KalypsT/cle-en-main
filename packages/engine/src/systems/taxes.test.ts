@@ -308,7 +308,9 @@ function loanOn(propertyId: string): GameState['loans'][number] {
     remaining: 0,
     paymentsMade: 0,
     startDate: { year: 2027, month: 1, day: 1 },
+    interestPaid: 0,
     renegotiationSuggested: false,
+    renegotiationDeclinedPercent: null,
     propertyId,
   };
 }

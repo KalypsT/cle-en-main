@@ -293,6 +293,8 @@ function shareOwnership(
     quotes: [],
     works: null,
     lastWorks: null,
+    lastCoproMeeting: null,
+    unpaidRentInsurance: { premiums: 0, paidOut: 0 },
     // What is left of the works envelope goes with the first flat (and its loan).
     worksFund: i === 0 ? owned.worksFund : null,
     worksForCapitalGains: share(owned.worksForCapitalGains, flat),

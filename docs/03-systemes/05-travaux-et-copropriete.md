@@ -159,3 +159,5 @@ C'est le cœur ludique de la gestion. Pas de mini-jeux : la richesse vient des c
 - Le résultat est annoncé avec humour (« M. Grosjean, du 2e, a voté contre, comme chaque année depuis 1987 »).
 - Un vote positif déclenche un **appel de fonds** étalé sur plusieurs mois, et améliore l'état des parties communes (donc la valeur et parfois le DPE).
 - Avec **un immeuble entier**, il n'y a plus de copropriété : le joueur décide seul des travaux des parties communes.
+
+> **Notes de partie (après la PR 29)** : la fiche du bien garde le **récapitulatif de la dernière assemblée** (`OwnedProperty.lastCoproMeeting`, format de sauvegarde v23) jusqu'à la convocation suivante : chaque résolution, le vote du joueur (ou son absence), adoptée ou rejetée avec sa phrase, sa part, la mensualité et la durée de l'appel de fonds, les mois qui restent (chaque appel connaît sa résolution), les parties communes rénovées et le DPE avant et après s'il change. L'actualité de l'assemblée donne toutes les résolutions.

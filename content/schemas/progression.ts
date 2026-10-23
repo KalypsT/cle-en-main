@@ -298,7 +298,6 @@ export const yvonTextsSchema = z
         highDebtRatio: z.number().min(0).max(1),
         dpeBanYears: z.number().int().min(1),
         regimeSavingEuros: euros,
-        renegotiatePoints: z.number().min(0),
         /** Monthly cash flow within ± this amount: « balanced » (progression, step 3). */
         cashFlowEuros: euros,
         /** Loan length of the cash-flow outlook shown on a listing, with the account bank. */

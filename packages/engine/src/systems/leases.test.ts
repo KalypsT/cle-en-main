@@ -94,6 +94,26 @@ describe('unpaid rents', () => {
     }
     expect(events.find((e) => e.type === 'procedureStarted')).toMatchObject({ cost: 0 });
   });
+
+  it('counts the premiums of the insurance and what it paid in the tenant’s place', () => {
+    const { engine, state } = badPayer(true);
+    const { state: after, events } = until(engine, state, (e) => e.type === 'procedureStarted');
+    let premiums = 0;
+    let paidOut = 0;
+    for (const event of events) {
+      if (event.type === 'rentMissed') paidOut += event.amount;
+      if (event.type !== 'monthlyStatement') continue;
+      for (const line of event.lines) {
+        if (line.kind === 'ownerInsurance') premiums += line.amount;
+      }
+    }
+    const owned = after.properties[0];
+    expect(owned?.unpaidRentInsurance.paidOut).toBe(paidOut);
+    expect(paidOut).toBeGreaterThan(0);
+    // The landlord insurance is not the unpaid-rent one: the premiums are less than the line.
+    expect(owned?.unpaidRentInsurance.premiums).toBeGreaterThan(0);
+    expect(owned?.unpaidRentInsurance.premiums).toBeLessThan(premiums);
+  });
 });
 
 describe('incidents', () => {

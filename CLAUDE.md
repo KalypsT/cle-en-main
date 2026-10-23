@@ -45,7 +45,7 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 | `pnpm dev` | Lancer le jeu en développement (http://localhost:5173/cle-en-main/) |
 | `pnpm build` | Construire la PWA dans `apps/game/dist` |
 | `pnpm preview` | Servir le build (http://localhost:4173/cle-en-main/), service worker compris |
-| `pnpm test` | Tests Vitest de tous les paquets (moteur, contenu, bots) |
+| `pnpm test` | Tests Vitest de tous les paquets (moteur, contenu, bots, session du jeu) |
 | `pnpm test:e2e` | Tests Playwright de fumée (construit puis sert le jeu) |
 | `pnpm typecheck` | Vérifier les types (`tsc`) de tous les paquets |
 | `pnpm lint` | ESLint, puis vérification Prettier |

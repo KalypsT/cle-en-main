@@ -73,7 +73,9 @@ describe('transformations (milestone 8)', () => {
         remaining: 100_000_00,
         paymentsMade: 0,
         startDate: { ...state.clock.date },
+        interestPaid: 0,
         renegotiationSuggested: false,
+        renegotiationDeclinedPercent: null,
         propertyId: 'property-t',
       },
     ];

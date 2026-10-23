@@ -39,6 +39,8 @@ import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
 import { StreetWorld } from '../world/StreetWorld.tsx';
 import { AgendaScreen } from '../screens/AgendaScreen.tsx';
 import { BankScreen } from '../screens/BankScreen.tsx';
+import { LoanScreen } from '../screens/LoanScreen.tsx';
+import { NextStatementScreen } from '../screens/NextStatementScreen.tsx';
 import { BankerScreen } from '../screens/BankerScreen.tsx';
 import { SoldPropertyScreen } from '../screens/SoldPropertyScreen.tsx';
 import { CitiesScreen } from '../screens/CitiesScreen.tsx';
@@ -517,6 +519,10 @@ function RouteScreen({ route }: { route: Route }) {
       return <CitiesScreen />;
     case 'bank':
       return <BankScreen />;
+    case 'loan':
+      return <LoanScreen id={route.id} />;
+    case 'nextStatement':
+      return <NextStatementScreen />;
     case 'banker':
       return <BankerScreen id={route.id} />;
     case 'soldProperty':

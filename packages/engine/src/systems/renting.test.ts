@@ -137,6 +137,31 @@ describe('offering a property for rent', () => {
 });
 
 describe('candidates and move-in', () => {
+  it('weighs a candidate’s unpaid-rent risk against the insurance premium', () => {
+    const listed = list(owner());
+    const { state } = advanceUntil(listed, (e) => e.type === 'applicationReceived', 60);
+    const application = state.properties[0]?.rental?.applications[0];
+    if (!application) throw new Error('No candidate');
+    const risk = engine.unpaidRentRisk(state, PROPERTY, application.id);
+    expect(risk?.premium).toBeGreaterThan(0);
+    // A fragile candidate costs more on average than a solid one.
+    const fragile = deepClone(state);
+    const sure = deepClone(state);
+    const tenantOf = (s: typeof state) => s.properties[0]?.rental?.applications[0]?.tenant;
+    const weak = tenantOf(fragile);
+    const strong = tenantOf(sure);
+    if (!weak || !strong) throw new Error('No tenant');
+    weak.monthlyIncome = 1;
+    weak.guarantor = false;
+    strong.monthlyIncome *= 10;
+    strong.guarantor = true;
+    const weakRisk = engine.unpaidRentRisk(fragile, PROPERTY, application.id);
+    const strongRisk = engine.unpaidRentRisk(sure, PROPERTY, application.id);
+    expect(weakRisk?.expectedLoss).toBeGreaterThan(strongRisk?.expectedLoss ?? Infinity);
+    expect(weakRisk?.reliability).toBeLessThan(strongRisk?.reliability ?? 0);
+    expect(engine.unpaidRentRisk(state, PROPERTY, 'nobody')).toBeNull();
+  });
+
   it('receives candidates, each visit taking the owner’s free time', () => {
     const listed = list(owner());
     const { state } = advanceUntil(listed, (e) => e.type === 'applicationReceived', 60);

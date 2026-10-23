@@ -205,9 +205,16 @@ function applyEffects(
         break;
       case 'rent':
         if (owned?.lease) {
-          owned.lease.monthlyRent = toCents(
-            Math.round((owned.lease.monthlyRent * (1 + effect.share)) / 100),
-          );
+          const previousRent = owned.lease.monthlyRent;
+          owned.lease.monthlyRent = toCents(Math.round((previousRent * (1 + effect.share)) / 100));
+          if (owned.lease.monthlyRent !== previousRent) {
+            ctx.events.push({
+              type: 'rentAdjusted',
+              propertyId: owned.property.id,
+              monthlyRent: owned.lease.monthlyRent,
+              previousRent,
+            });
+          }
         }
         break;
       case 'priceIndex':

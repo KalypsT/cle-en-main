@@ -138,6 +138,8 @@ function setup(): GameState {
     valueHistory: [],
     log: [],
     lastWorks: null,
+    lastCoproMeeting: null,
+    unpaidRentInsurance: { premiums: 0, paidOut: 0 },
     rentsReceived: 0,
   };
   state.properties = [owned];
@@ -152,7 +154,9 @@ function setup(): GameState {
       remaining: PRICE,
       paymentsMade: 0,
       startDate: { year: 2026, month: 12, day: 15 },
+      interestPaid: 0,
       renegotiationSuggested: false,
+      renegotiationDeclinedPercent: null,
       propertyId: 'property-t2',
     },
   ];

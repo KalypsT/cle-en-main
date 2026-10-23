@@ -136,6 +136,7 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
       lease.arrears.amount += due;
       lease.arrears.months += 1;
       lease.missedRents += 1;
+      if (lease.insured) owned.unpaidRentInsurance.paidOut += due;
       ctx.events.push({ type: 'rentMissed', propertyId, amount: due, insured: lease.insured });
       startProcedureIfDue(ctx, owned, lease, lines);
     }
@@ -156,6 +157,7 @@ export function runMonthlyLeases(ctx: SystemContext, lines: StatementLine[]): vo
     }
     if (lease.insured) {
       const premium = Math.round(due * rules.unpaidRentInsurance.premiumShare);
+      owned.unpaidRentInsurance.premiums += premium;
       state.player.balance -= premium;
       addCost(state, owned, premium);
       lines.push({ kind: 'ownerInsurance', propertyId, amount: premium });

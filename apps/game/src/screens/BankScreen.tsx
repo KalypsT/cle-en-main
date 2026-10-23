@@ -124,12 +124,26 @@ export function BankScreen() {
   );
 }
 
+/** How a loan ended: a refinancing by its own bank is a renegotiation; fees mean ahead of time. */
+function closedReason(
+  loan: ClosedLoan,
+  replacedBank: string | null,
+): keyof typeof t.bank.closedReasons {
+  if (loan.reason === 'refinanced' && replacedBank === loan.bankId) return 'renegotiated';
+  if (loan.reason === 'repaid' && loan.fees > 0) return 'prepaid';
+  return loan.reason;
+}
+
 /** A loan that came to an end: what it cost, and how it ended. */
 export function ClosedLoanCard({ loan }: { loan: ClosedLoan }) {
   const { state } = useGame();
   const nav = useNav();
   const texts = t.bank;
   const route = subjectRoute(state, loan.subject);
+  const replacedBank =
+    state.loans.find((other) => other.id === loan.replacedBy)?.bankId ??
+    state.closedLoans.find((other) => other.id === loan.replacedBy)?.bankId ??
+    null;
   return (
     <Card
       title={format(texts.closedTitle, {
@@ -139,12 +153,8 @@ export function ClosedLoanCard({ loan }: { loan: ClosedLoan }) {
       testId="closed-loan"
     >
       <p className="small strong">
-        {format(texts.closedReasons[loan.reason], {
-          bank: bankName(
-            state.loans.find((other) => other.id === loan.replacedBy)?.bankId ??
-              state.closedLoans.find((other) => other.id === loan.replacedBy)?.bankId ??
-              '',
-          ),
+        {format(texts.closedReasons[closedReason(loan, replacedBank)], {
+          bank: bankName(replacedBank ?? ''),
         })}
       </p>
       {loan.subject &&
@@ -217,12 +227,12 @@ function LoanTotals({ sheets }: { sheets: LoanSheet[] }) {
   );
 }
 
-/** One loan: how far it is repaid, what it costs, and a cheaper bank if there is one. */
+/** One loan, in short: how far it is repaid, what it costs; its screen tells the rest. */
 function LoanCard({ sheet, company }: { sheet: LoanSheet; company: boolean }) {
-  const { state, act } = useGame();
+  const { state } = useGame();
+  const nav = useNav();
   const texts = t.bank;
   const owned = state.properties.find((o) => o.property.id === sheet.propertyId);
-  const refinance = sheet.refinance;
   return (
     <Card
       title={format(texts.loanTitle, { bank: bankName(sheet.bankId) })}
@@ -234,62 +244,54 @@ function LoanCard({ sheet, company }: { sheet: LoanSheet; company: boolean }) {
           {format(texts.loanFor, { property: propertyLabel(owned.property) })}
         </p>
       )}
+      <LoanProgress sheet={sheet} />
+      <KeyValues
+        rows={[
+          { label: texts.remaining, value: formatEuros(sheet.remaining) },
+          { label: texts.payment, value: formatMoney(sheet.monthlyPayment) },
+          { label: texts.rate, value: formatPercent(sheet.ratePercent) },
+          { label: texts.end, value: loanEnd(sheet) },
+        ]}
+      />
+      {sheet.worthy && !sheet.declined && (
+        <p className="small strong">
+          {format(texts.offerWorthy, {
+            bank: bankName(sheet.worthy.bankId),
+            rate: formatPercent(sheet.worthy.ratePercent),
+          })}
+        </p>
+      )}
+      <button
+        type="button"
+        className="button block"
+        data-testid="loan-details"
+        onClick={() => nav.push({ name: 'loan', id: sheet.loanId })}
+      >
+        {texts.details}
+      </button>
+    </Card>
+  );
+}
+
+/** How far a loan is repaid, with its meter. */
+export function LoanProgress({ sheet }: { sheet: LoanSheet }) {
+  return (
+    <>
       <span className="small">
-        {format(texts.repaid, { percent: formatPercent(sheet.repaidShare * 100) })}
+        {format(t.bank.repaid, { percent: formatPercent(sheet.repaidShare * 100) })}
       </span>
       <span className="meter" aria-hidden="true">
         <span style={{ width: `${Math.round(sheet.repaidShare * 100)}%` }} />
       </span>
-      <KeyValues
-        rows={[
-          { label: texts.principal, value: formatEuros(sheet.principal) },
-          { label: texts.remaining, value: formatEuros(sheet.remaining) },
-          { label: texts.payment, value: formatMoney(sheet.monthlyPayment) },
-          { label: texts.rate, value: formatPercent(sheet.ratePercent) },
-          { label: texts.interestPaid, value: formatEuros(sheet.interestPaid) },
-          { label: texts.interestLeft, value: formatEuros(sheet.interestLeft) },
-          {
-            label: texts.totalCost,
-            value: formatEuros(sheet.interestPaid + sheet.interestLeft),
-            total: true,
-          },
-          {
-            label: texts.end,
-            value: format(texts.endValue, {
-              month: uiTexts.calendar.months[sheet.endDate.month - 1] ?? '',
-              year: sheet.endDate.year,
-              months: sheet.monthsLeft,
-            }),
-          },
-        ]}
-      />
-      {refinance && (
-        <>
-          <p className="small">
-            {format(refinance.saving > 0 ? texts.refinance : texts.refinanceLoss, {
-              bank: bankName(refinance.bankId),
-              rate: formatPercent(refinance.ratePercent),
-              payment: formatMoney(refinance.monthlyPayment),
-              fees: formatEuros(refinance.fees),
-              saving: formatEuros(refinance.saving),
-            })}
-          </p>
-          {refinance.saving > 0 &&
-            (refinance.refusal ? (
-              <p className="small muted">{texts.refinanceRefused}</p>
-            ) : (
-              <button
-                type="button"
-                className="button block"
-                onClick={() =>
-                  act({ type: 'bank/refinance', loanId: sheet.loanId, bankId: refinance.bankId })
-                }
-              >
-                {format(texts.refinanceAction, { bank: bankName(refinance.bankId) })}
-              </button>
-            ))}
-        </>
-      )}
-    </Card>
+    </>
   );
+}
+
+/** « Dernière mensualité » of a loan: its month, and the months left. */
+export function loanEnd(sheet: Pick<LoanSheet, 'endDate' | 'monthsLeft'>): string {
+  return format(t.bank.endValue, {
+    month: uiTexts.calendar.months[sheet.endDate.month - 1] ?? '',
+    year: sheet.endDate.year,
+    months: sheet.monthsLeft,
+  });
 }

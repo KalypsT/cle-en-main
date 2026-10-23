@@ -86,7 +86,6 @@
     "highDebtRatio": 0.33,
     "dpeBanYears": 3,
     "regimeSavingEuros": 100,
-    "renegotiatePoints": 0.7,
     "cashFlowEuros": 30,
     "outlookYears": 25
   }

@@ -281,6 +281,7 @@ function Candidate({
           {format(t.rent.reliabilityValue, { value: Math.round(reliability * 100) })}
         </span>
       </div>
+      <InsuranceAdvice owned={owned} applicationId={application.id} />
       <p className="tiny muted">
         {format(t.rent.expires, { when: formatWhen(application.expiresDay, state.clock.date) })}
       </p>
@@ -311,6 +312,37 @@ function Candidate({
           {t.rent.accept}
         </button>
       </div>
+    </div>
+  );
+}
+
+/** The candidate's risk of unpaid rent against the premium, and Yvon's hint when it pays. */
+function InsuranceAdvice({
+  owned,
+  applicationId,
+}: {
+  owned: OwnedProperty;
+  applicationId: string;
+}) {
+  const { state } = useGame();
+  const risk = engine.unpaidRentRisk(state, owned.property.id, applicationId);
+  if (!risk) return null;
+  const insured = owned.rental?.insured ?? false;
+  return (
+    <div className="stack tight" data-testid="insurance-advice">
+      <p className="small muted">
+        {format(t.rent.risk, {
+          loss: formatEuros(risk.expectedLoss),
+          premium: formatEuros(risk.premium),
+        })}
+      </p>
+      {insured ? (
+        <p className="small muted">{t.rent.riskCovered}</p>
+      ) : (
+        risk.expectedLoss > risk.premium && (
+          <p className="small strong warning">{t.rent.riskAdvice}</p>
+        )
+      )}
     </div>
   );
 }

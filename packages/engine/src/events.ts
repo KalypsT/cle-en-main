@@ -51,9 +51,22 @@ export type GameEvent =
       type: 'renegotiationAvailable';
       loanId: string;
       currentRatePercent: number;
-      marketOfferPercent: number;
+      /** Best offer worth taking: its rate and its bank. */
+      offerPercent: number;
+      bankId: string;
     }
   | { type: 'loanRefinanced'; oldLoanId: string; newLoanId: string; fees: Cents }
+  /** Early repayment: part of the capital (payment or duration lowered), or all of it. */
+  | {
+      type: 'loanPrepaid';
+      loanId: string;
+      amount: Cents;
+      fees: Cents;
+      full: boolean;
+      mode: 'payment' | 'duration';
+      monthlyPayment: Cents;
+      monthsLeft: number;
+    }
   | { type: 'bankMeetingHeld'; bankId: string; trust: number }
   | { type: 'resigned' }
   /** Works handed to the project manager (milestone 8): his fee is paid. */
@@ -220,6 +233,8 @@ export type GameEvent =
     }
   | { type: 'leaseRenewed'; propertyId: string; termDay: number }
   | { type: 'rentRevised'; propertyId: string; monthlyRent: Cents }
+  /** The rent changed during the lease after an event (an agreement with the tenant). */
+  | { type: 'rentAdjusted'; propertyId: string; monthlyRent: Cents; previousRent: Cents }
   | { type: 'tenantLifeEvent'; propertyId: string; eventId: string }
   | { type: 'incidentReported'; propertyId: string; kindId: string }
   | { type: 'incidentRepaired'; propertyId: string; kindId: string; cost: Cents }
@@ -369,6 +384,7 @@ export const NEWS_EVENT_TYPES = [
   'loanRepaid',
   'renegotiationAvailable',
   'loanRefinanced',
+  'loanPrepaid',
   'bankMeetingHeld',
   'resigned',
   'worksDelegated',
@@ -402,6 +418,7 @@ export const NEWS_EVENT_TYPES = [
   'tenantLeft',
   'leaseRenewed',
   'rentRevised',
+  'rentAdjusted',
   'tenantLifeEvent',
   'incidentReported',
   'incidentRepaired',

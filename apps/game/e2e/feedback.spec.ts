@@ -50,8 +50,9 @@ test('lists a property for sale, then paints a room oneself', async ({ page }) =
   // The loan of the purchase, in detail.
   await openMenuEntry(page, t.menu.bank);
   const loan = page.getByTestId('loan').first();
-  await expect(loan).toContainText(t.bank.interestLeft);
   await expect(loan).toContainText(t.bank.end);
+  await loan.getByTestId('loan-details').click();
+  await expect(page.getByTestId('loan-figures')).toContainText(t.bank.interestLeft);
   await capture(page, '04-banque', MILESTONE);
 });
 

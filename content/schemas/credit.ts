@@ -44,11 +44,24 @@ export const creditRulesSchema = z
       .strict(),
     renegotiation: z
       .object({
-        /** Market offer must beat the loan rate by this much to be suggested. */
+        /** A bank's real offer must beat the loan rate by this much to be suggested. */
         thresholdPercent: percent,
         /** One-off fees: share of the remaining capital plus a fixed amount. */
         feesShareOfRemaining: share,
         fixedFees: euros,
+        /** Once declined, suggested again only when an offer drops by this much more. */
+        renotifyStepPercent: percent,
+      })
+      .strict(),
+    /** Partial or full early repayment of a loan (indemnités de remboursement anticipé). */
+    earlyRepayment: z
+      .object({
+        /** Penalty: the lower of this share of the amount repaid … */
+        penaltyShareOfAmount: share,
+        /** … and this many months of interest on it, at the loan's rate. */
+        penaltyInterestMonths: z.number().int().min(0),
+        /** Smallest partial repayment, in euros (repaying everything is always allowed). */
+        minAmount: euros,
       })
       .strict(),
     trust: z

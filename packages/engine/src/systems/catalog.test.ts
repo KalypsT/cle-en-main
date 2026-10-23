@@ -98,6 +98,41 @@ describe('catalogue of events (docs/03-systemes/07)', () => {
     ).toMatchObject({ ok: false, reason: { code: 'event.unknown' } });
   });
 
+  it('tells the player when an event changes the rent', () => {
+    const garden: CatalogEvent = {
+      ...paint,
+      id: 'testGarden',
+      choices: [
+        { id: 'accept', label: 'Accepter', effects: [{ type: 'rent', share: -0.05 }] },
+        { id: 'refuse', label: 'Refuser', effects: [] },
+      ],
+    };
+    const { content, state } = setup([garden]);
+    const engine = createEngine(content);
+    const next = engine.advanceHours(state, 24);
+    const started = next.events.find((e) => e.type === 'catalogEventStarted');
+    if (started?.type !== 'catalogEventStarted') throw new Error('No event');
+    const before = next.state.properties[0]?.lease?.monthlyRent ?? 0;
+    const chosen = engine.dispatch(next.state, {
+      type: 'event/choose',
+      eventId: started.event.id,
+      choiceId: 'accept',
+    });
+    if (!chosen.ok) throw new Error(chosen.reason.code);
+    const after = chosen.state.properties[0]?.lease?.monthlyRent ?? 0;
+    expect(after).toBeLessThan(before);
+    expect(chosen.events).toContainEqual({
+      type: 'rentAdjusted',
+      propertyId: 'property-sample',
+      monthlyRent: after,
+      previousRent: before,
+    });
+    expect(chosen.state.properties[0]?.log.at(-1)).toMatchObject({
+      kind: 'rentRevised',
+      monthlyRent: after,
+    });
+  });
+
   it('applies the default choice at the deadline and waits for the cooldown', () => {
     const { content, state } = setup([paint]);
     const engine = createEngine(content);

@@ -14,7 +14,7 @@ import type { GameState, Holder, OwnedProperty, Property } from '../state.ts';
 import {
   evaluateLoan,
   type LoanDecision,
-  marketOffer,
+  worthyRefinance,
   quoteRate,
   type RateQuote,
   requiredContribution,
@@ -23,7 +23,7 @@ import { believedView, conditionLabel } from './dwelling.ts';
 import { netWorth } from './net-worth.ts';
 import { dwellingKindOf, type Estimate, estimateValue } from './valuation.ts';
 import { isRemoteSelfManaged, remoteManagementFee } from './cities.ts';
-import { expectedSalary, livingCosts } from './household.ts';
+import { monthlyStatementEstimate } from './outlook.ts';
 import { purchaseFees } from './purchases.ts';
 import { cashDueAtDeed } from './purchases.ts';
 import {
@@ -66,7 +66,7 @@ export type PendingDecision = {
   | { kind: 'quoteExpiring'; propertyId: string; quoteId: string; artisanId: string }
   | { kind: 'dpeWarning'; propertyId: string }
   | { kind: 'vacant'; propertyId: string }
-  | { kind: 'renegotiation'; loanId: string; marketPercent: number }
+  | { kind: 'renegotiation'; loanId: string; bankId: string; ratePercent: number }
   | { kind: 'cashAlert'; lowest: Cents }
   | { kind: 'catalogEvent'; instanceId: string; eventId: string }
   | { kind: 'challengeOffer'; challengeId: string }
@@ -211,17 +211,14 @@ export function pendingDecisions(content: GameContent, state: GameState): Pendin
   }
 
   for (const loan of state.loans) {
-    if (!loan.renegotiationSuggested) continue;
-    const years = Math.max(
-      1,
-      Math.round((loan.durationMonths - loan.paymentsMade) / MONTHS_PER_YEAR),
-    );
-    const offer = marketOffer(content, state, years);
-    if (offer < loan.ratePercent) {
+    if (!loan.renegotiationSuggested || loan.renegotiationDeclinedPercent !== null) continue;
+    const offer = worthyRefinance(content, state, loan);
+    if (offer) {
       list.push({
         kind: 'renegotiation',
         loanId: loan.id,
-        marketPercent: offer,
+        bankId: offer.bankId,
+        ratePercent: offer.ratePercent,
         deadlineDay: null,
       });
     }
@@ -615,21 +612,6 @@ export function cashForecast(
     }
   }
   return { days, lowest, lowestDay, endBalance: balance };
-}
-
-/** Net of next month's statement, from today's situation (salary at its average). */
-export function monthlyStatementEstimate(content: GameContent, state: GameState): Cents {
-  const { player } = state;
-  let net = expectedSalary(content, player) - player.monthlyRent - livingCosts(content, player);
-  for (const owned of state.properties) {
-    const flow = propertyCashFlow(content, state, owned);
-    // The property tax is charged once a year, not monthly.
-    net += flow.net + flow.loanPayment + flow.propertyTax;
-  }
-  net -= state.loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
-  const { installments } = state.tax;
-  if (installments.remaining > 0) net -= installments.monthly;
-  return net;
 }
 
 /** Point on the city map, in metres from its origin (x east, y north). */

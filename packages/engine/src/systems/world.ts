@@ -94,6 +94,11 @@ export type BuildingRole = 'ordinary' | 'owned' | 'listing' | 'purchase' | 'riva
 export interface StreetBuilding {
   /** Stable id: the property's, or `${streetId}.${index}` for an ordinary building. */
   id: string;
+  /**
+   * The place in the street, `${streetId}.${index}`: a property takes the place of an
+   * ordinary building and keeps its look, so the decoration hangs on the place.
+   */
+  placeId: string;
   role: BuildingRole;
   propertyId: string | null;
   /** The player lives there. */
@@ -441,29 +446,64 @@ function runningTrades(owned: OwnedProperty | null): Map<string, Trade> {
   return trades;
 }
 
+/** Floors a property needs: an apartment's own floor at least. */
+function minFloorsOf(property: Property): number {
+  return property.kind === 'apartment' ? (property.floor ?? 0) + 1 : 1;
+}
+
+/** How a property is drawn: a block of flats (a shop too) or a low building. */
+function facadeKind(kind: PropertyKind): 'apartment' | 'house' {
+  return kind === 'apartment' || kind === 'building' || kind === 'commercial'
+    ? 'apartment'
+    : 'house';
+}
+
+/**
+ * How well an ordinary building's place suits a property, best first: same kind, epoch and
+ * enough floors, and its shop if any (nothing but the façade's state changes when it comes
+ * or goes); then same kind and epoch, a little taller if need be (same colours and style);
+ * then same kind; then any place.
+ */
+const FITS: readonly ((slot: StreetBuilding, property: Property) => boolean)[] = [
+  (slot, property) =>
+    slot.kind === facadeKind(property.kind) &&
+    slot.epoch === property.epoch &&
+    slot.floors >= minFloorsOf(property) &&
+    // A flat on the ground floor leaves no room for the shop.
+    !(slot.shop && property.kind === 'apartment' && (property.floor ?? 0) === 0),
+  (slot, property) => slot.kind === facadeKind(property.kind) && slot.epoch === property.epoch,
+  (slot, property) => slot.kind === facadeKind(property.kind),
+  () => true,
+];
+
 function placedBuilding(
   content: GameContent,
   state: GameState,
   placed: Placed,
-  shop: boolean,
-  tree: boolean,
+  place: { slot: StreetBuilding | null; placeId: string; shop: boolean; tree: boolean },
 ): StreetBuilding {
   const { property, owned } = placed;
+  const { slot } = place;
   const seen = placed.role === 'listing' ? believedView(content, property) : property;
   const { facadeState, newWindows } = facadeOf(content, seen);
   const running = runningTrades(owned);
   const roofWorks = [...running.keys()].some((itemId) => itemId === 'roof');
-  const variant = hashFloat(state.seed, `variant#${property.id}`);
-  const minFloors = property.kind === 'apartment' ? (property.floor ?? 0) + 1 : 1;
+  // In the place of an ordinary building, the property takes its look: its colours and
+  // details (the variant), its height, its shop and its tree.
+  const variant = slot?.variant ?? hashFloat(state.seed, `variant#${property.id}`);
+  const minFloors = minFloorsOf(property);
   const floors = Math.max(
     minFloors,
-    floorsOf(
-      content,
-      property.kind,
-      property.epoch,
-      hashFloat(state.seed, `floors#${property.id}`),
-    ),
+    slot?.floors ??
+      floorsOf(
+        content,
+        property.kind,
+        property.epoch,
+        hashFloat(state.seed, `floors#${property.id}`),
+      ),
   );
+  const shop = slot?.shop ?? place.shop;
+  const tree = slot?.tree ?? place.tree;
   let bubbles: Bubble[] = [];
   if (owned) bubbles = ownedBubbles(content, state, owned);
   else if (placed.listingId) {
@@ -473,6 +513,7 @@ function placedBuilding(
   }
   return {
     id: property.id,
+    placeId: place.placeId,
     role: placed.role,
     propertyId: property.id,
     home: state.player.homePropertyId === property.id,
@@ -513,6 +554,7 @@ function ordinaryBuilding(
     : 'before1948';
   return {
     id,
+    placeId: id,
     role: 'ordinary',
     propertyId: null,
     home: false,
@@ -548,53 +590,69 @@ export function streets(
   if (!world) return [];
   const moment = momentOf(content, state.clock.hour);
   const weather = weatherOn(content, state.seed, cityId, toDayNumber(state.clock.date));
-  const placed = placedProperties(state, cityId, neighbourhoodId);
-  return world.streets.map((street, streetIndex) => {
-    const ordinary = Array.from(
-      { length: street.buildings * content.world.placesPerBuilding },
-      (_, index) =>
-        ordinaryBuilding(
-          content,
-          state,
-          cityId,
-          neighbourhoodId,
-          `${street.id}.${index}`,
-          world.shopShare,
-          world.treeShare,
-        ),
-    );
-    // Each placed building takes one of the street's places, drawn from its id, from an
-    // ordinary building: nothing moves along when a listing comes or goes. The player's
-    // properties choose first, so a listing never pushes them; a taken place goes to the next
-    // free one, and the rare ones left without a place go to the end of the street.
-    const slots: (Placed | null)[] = ordinary.map(() => null);
-    const extra: Placed[] = [];
-    for (const entry of placed) {
-      const id = entry.property.id;
-      if (Math.floor(hashFloat(0, `street#${id}`) * world.streets.length) !== streetIndex) continue;
-      const wanted = Math.floor(hashFloat(0, `position#${id}`) * slots.length);
-      let slot = -1;
-      for (let step = 0; step < slots.length; step++) {
-        const candidate = (wanted + step) % slots.length;
-        if (slots[candidate] === null) {
-          slot = candidate;
-          break;
+  const ordinary = world.streets.map((street) =>
+    Array.from({ length: street.buildings * content.world.placesPerBuilding }, (_, index) =>
+      ordinaryBuilding(
+        content,
+        state,
+        cityId,
+        neighbourhoodId,
+        `${street.id}.${index}`,
+        world.shopShare,
+        world.treeShare,
+      ),
+    ),
+  );
+  // Every place of the neighbourhood, street after street.
+  const places = ordinary.flatMap((buildings, street) =>
+    buildings.map((building, index) => ({ street, index, building })),
+  );
+  const firstPlace = ordinary.map((_, street) =>
+    ordinary.slice(0, street).reduce((sum, buildings) => sum + buildings.length, 0),
+  );
+  // Each placed building takes the place of an ordinary building it looks like, searched
+  // from a place drawn from its id (in a street drawn from its id, then the next ones), so
+  // nothing moves along when a listing comes or goes. The player's properties choose first,
+  // so a listing never pushes them; the rare ones left without a place go to the end of
+  // their street.
+  const taken: (Placed | null)[] = places.map(() => null);
+  const extra: Placed[][] = ordinary.map(() => []);
+  for (const entry of placedProperties(state, cityId, neighbourhoodId)) {
+    const id = entry.property.id;
+    const street = Math.floor(hashFloat(0, `street#${id}`) * ordinary.length);
+    const length = ordinary[street]?.length ?? 0;
+    const wanted = (firstPlace[street] ?? 0) + Math.floor(hashFloat(0, `position#${id}`) * length);
+    let found = -1;
+    for (const fits of FITS) {
+      for (let step = 0; step < places.length && found < 0; step++) {
+        const candidate = (wanted + step) % places.length;
+        const place = places[candidate];
+        if (taken[candidate] === null && place && fits(place.building, entry.property)) {
+          found = candidate;
         }
       }
-      if (slot >= 0) slots[slot] = entry;
-      else extra.push(entry);
+      if (found >= 0) break;
     }
-    const place = (entry: Placed) => {
-      const shop = hashFloat(state.seed, `shop#${entry.property.id}`) < world.shopShare;
-      const tree = hashFloat(state.seed, `tree#${entry.property.id}`) < world.treeShare;
-      return placedBuilding(content, state, entry, shop, tree);
-    };
+    if (found >= 0) taken[found] = entry;
+    else extra[street]?.push(entry);
+  }
+  const placeOf = (entry: Placed, slot: StreetBuilding | null) => {
+    const id = entry.property.id;
+    return placedBuilding(content, state, entry, {
+      slot,
+      placeId: slot?.placeId ?? id,
+      shop: hashFloat(state.seed, `shop#${id}`) < world.shopShare,
+      tree: hashFloat(state.seed, `tree#${id}`) < world.treeShare,
+    });
+  };
+  return world.streets.map((street, streetIndex) => {
+    const first = firstPlace[streetIndex] ?? 0;
     const buildings: StreetBuilding[] = [
-      ...ordinary.map((building, index) => {
-        const entry = slots[index];
-        return entry ? place(entry) : building;
+      ...(ordinary[streetIndex] ?? []).map((building, index) => {
+        const entry = taken[first + index];
+        return entry ? placeOf(entry, building) : building;
       }),
-      ...extra.map(place),
+      ...(extra[streetIndex] ?? []).map((entry) => placeOf(entry, null)),
     ];
     return {
       id: street.id,

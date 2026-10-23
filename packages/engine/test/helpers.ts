@@ -243,6 +243,8 @@ export function sampleOwned(
     valueHistory: [],
     log: [],
     lastWorks: null,
+    lastCoproMeeting: null,
+    unpaidRentInsurance: { premiums: 0, paidOut: 0 },
     rentsReceived: 0,
   };
 }

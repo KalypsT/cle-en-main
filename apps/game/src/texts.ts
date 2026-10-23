@@ -393,6 +393,13 @@ export function describeEvent(
       return events.renegotiationAvailable;
     case 'loanRefinanced':
       return format(events.loanRefinanced, { fees: formatMoney(event.fees) });
+    case 'loanPrepaid':
+      return format(event.full ? events.loanPrepaidFull : events.loanPrepaid, {
+        amount: formatMoney(event.amount),
+        fees: formatMoney(event.fees),
+        payment: formatMoney(event.monthlyPayment),
+        months: event.monthsLeft,
+      });
     case 'bankMeetingHeld':
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':
@@ -505,6 +512,11 @@ export function describeEvent(
       return format(events.leaseRenewed, { date: formatDayLong(event.termDay) });
     case 'rentRevised':
       return format(events.rentRevised, { rent: formatMoney(event.monthlyRent) });
+    case 'rentAdjusted':
+      return format(events.rentAdjusted, {
+        before: formatMoney(event.previousRent),
+        rent: formatMoney(event.monthlyRent),
+      });
     case 'tenantLifeEvent':
       return gameContent.tenantTexts.lifeEvents[event.eventId] ?? null;
     case 'incidentReported':
@@ -574,15 +586,19 @@ export function describeEvent(
         count: event.resolutions.length,
       });
     case 'coproMeetingHeld': {
-      const result = event.results[0];
-      if (!result) return null;
-      const verdicts = result.passed
-        ? gameContent.worksTexts.meetingPassed
-        : gameContent.worksTexts.meetingRejected;
-      return format(events.coproMeetingHeld, {
-        resolution: gameContent.worksTexts.resolutions[result.id] ?? result.id,
-        verdict: verdicts[result.textIndex] ?? '',
-      });
+      if (event.results.length === 0) return null;
+      // Every resolution of the meeting, not only the first one.
+      return event.results
+        .map((result) =>
+          format(events.coproMeetingHeld, {
+            resolution: gameContent.worksTexts.resolutions[result.id] ?? result.id,
+            verdict:
+              (result.passed
+                ? gameContent.worksTexts.meetingPassed
+                : gameContent.worksTexts.meetingRejected)[result.textIndex] ?? '',
+          }),
+        )
+        .join(' ');
     }
     case 'diagnosisDone':
       return format(events.diagnosisDone, {

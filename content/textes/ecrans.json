@@ -510,7 +510,7 @@
       "reminderSettled": "Relance : le locataire a payé",
       "reminderFailed": "Relance restée sans effet",
       "procedure": "Procédure d'expulsion engagée : {cost}, expulsion prévue le {date}",
-      "rentRevised": "Loyer révisé : {rent} / mois",
+      "rentRevised": "Nouveau loyer : {rent} / mois",
       "leaseRenewed": "Bail reconduit jusqu'au {date}",
       "dpeWarning": "Alerte DPE : location interdite à partir du {date}",
       "worksCompleted": "Chantier terminé : {cost} au total, imprévus compris",
@@ -617,7 +617,12 @@
       "satisfaction": "Satisfaction au départ : {value} / 100",
       "reason": "Départ : {reason}",
       "untracked": "Parti avant ce suivi : loyers, impayés et satisfaction non comptés."
-    }
+    },
+    "unpaidInsurance": "Assurance loyers impayés",
+    "insurancePremiums": "Primes payées",
+    "insurancePaidOut": "Loyers versés par l'assureur",
+    "insuranceHint": "Comptés depuis la mise à jour du jeu qui les suit. L'assureur prend aussi en charge la procédure en cas d'impayé.",
+    "insuranceBalance": "Bilan de l'assurance"
   },
   "rent": {
     "heading": "Mise en location",
@@ -658,7 +663,10 @@
     "shortTermHint": "Pas de locataire à choisir : les voyageurs arrivent dès la mise en ligne. Les revenus suivent les saisons ; gérée vous-même, elle demande {minutes} min par jour (un jour manqué est un jour perdu), ou confiez-la à une conciergerie.",
     "sharedHint": "Plusieurs colocataires, un seul bail meublé : loyer plus élevé, départs plus fréquents.",
     "commercialHint": "Bail commercial de 9 ans : candidats rares, mais un commerçant reste longtemps et fait ses petites réparations.",
-    "parkingHint": "Un parking se loue simplement, sans incident à gérer."
+    "parkingHint": "Un parking se loue simplement, sans incident à gérer.",
+    "risk": "Impayés : environ {loss} par mois en moyenne sans assurance ; l'assurance coûte {premium} par mois.",
+    "riskAdvice": "Candidat fragile : l'assurance loyers impayés serait rentable. Cochez-la dans l'annonce avant d'accepter.",
+    "riskCovered": "Votre annonce est assurée contre les impayés."
   },
   "decisions": {
     "heading": "Décisions",
@@ -736,7 +744,7 @@
       "quoteExpiring": "Un devis expire bientôt",
       "dpeWarning": "DPE : location bientôt interdite",
       "vacant": "Logement vide : à louer, à rénover ou à vendre",
-      "renegotiation": "Renégociation possible : le marché est à {rate}",
+      "renegotiation": "{bank} vous propose de reprendre un crédit à {rate}",
       "cashAlert": "Trésorerie : passage sous zéro prévu ({amount})",
       "catalogEvent": "Événement : à vous de décider",
       "challengeOffer": "Défi de {giver}"
@@ -1282,10 +1290,8 @@
     "totalCost": "Coût total des intérêts",
     "end": "Dernière mensualité",
     "endValue": "{month} {year} ({months} mois)",
-    "refinance": "{bank} vous prêterait le restant à {rate} : {payment} par mois, {fees} de frais, soit {saving} d'économie.",
-    "refinanceLoss": "{bank} prête à {rate}, mais les frais ({fees}) dépassent l'économie d'intérêts.",
-    "refinanceRefused": "Elle refuserait toutefois aujourd'hui : son banquier ne vous suit pas encore.",
-    "refinanceAction": "Faire racheter par {bank}",
+    "details": "Détails, renégociation, remboursement anticipé",
+    "offerWorthy": "{bank} ferait mieux : {rate}",
     "totals": "En tout",
     "totalPayments": "Mensualités par mois",
     "totalRemaining": "Capital restant dû",
@@ -1298,6 +1304,8 @@
       "repaid": "Remboursé jusqu'au bout",
       "sold": "Remboursé à la vente du bien",
       "refinanced": "Racheté par {bank}",
+      "renegotiated": "Renégocié avec {bank}",
+      "prepaid": "Remboursé par anticipation",
       "freshStart": "Effacé par la faillite"
     },
     "started": "Commencé le",
@@ -1331,7 +1339,24 @@
     "share": "Votre part : {amount}, en appels de fonds sur {months} mois",
     "for": "Pour",
     "against": "Contre",
-    "absent": "Sans votre vote, les autres copropriétaires décident pour vous."
+    "absent": "Sans votre vote, les autres copropriétaires décident pour vous.",
+    "lastHeading": "Dernière assemblée générale",
+    "lastWhen": "Tenue le {date}.",
+    "lastAbsent": "Vous n'y étiez pas : les autres copropriétaires ont voté sans vous.",
+    "passed": "Adoptée",
+    "rejected": "Rejetée",
+    "yourVote": "Votre vote : {vote}",
+    "votes": {
+      "for": "pour",
+      "against": "contre",
+      "none": "absent"
+    },
+    "call": "Votre part : {amount}, soit {monthly} par mois pendant {months} mois",
+    "callLeft": "Encore {months} mois d'appels de fonds.",
+    "callDone": "Appels de fonds terminés.",
+    "commonParts": "Parties communes rénovées.",
+    "dpeChange": "DPE du logement : {before} → {after}",
+    "nothing": "Rien n'a été adopté : pas d'appel de fonds."
   },
   "works": {
     "heading": "Travaux",
@@ -1473,5 +1498,93 @@
     "company": "Détenu par votre SCI.",
     "valueHeading": "Valeur mois par mois",
     "gone": "Ce bien n'est plus dans vos archives."
+  },
+  "loan": {
+    "heading": "Crédit {bank}",
+    "unknown": "Ce crédit est terminé.",
+    "split": "Votre prochaine mensualité",
+    "splitInterest": "Intérêts",
+    "splitCapital": "Capital remboursé",
+    "splitHint": "La mensualité reste la même jusqu'au bout (taux fixe) : chaque mois, la part des intérêts baisse et celle du capital augmente. Pour la faire baisser : renégocier, ou rembourser une partie par anticipation.",
+    "refinanceHeading": "Renégocier ou faire racheter",
+    "refinanceIntro": "Votre banque peut renégocier votre taux ; une autre peut racheter le crédit. Dans les deux cas, le restant dû est repris au nouveau taux sur les mois qui restent, contre des frais (pénalités et dossier).",
+    "noOffer": "Aucune banque ne fait mieux que votre taux aujourd'hui.",
+    "own": "Renégociation avec {bank}",
+    "other": "Rachat par {bank}",
+    "newRate": "Nouveau taux",
+    "newPayment": "Nouvelle mensualité",
+    "fees": "Frais",
+    "saving": "Gain sur la durée restante, frais déduits",
+    "loss": "Les frais dépassent l'économie d'intérêts : pas intéressant.",
+    "refused": "Elle refuserait aujourd'hui : son banquier ne vous suit pas encore.",
+    "acceptOwn": "Renégocier avec {bank}",
+    "acceptOther": "Faire racheter par {bank}",
+    "decline": "Refuser les offres du moment",
+    "declined": "Vous avez refusé ces offres : vous serez prévenu si les taux baissent encore.",
+    "prepayHeading": "Rembourser par anticipation",
+    "prepayIntro": "Indemnités : {share} du montant remboursé, au plus {months} mois d'intérêts. Au moins {min}, ou tout le restant dû.",
+    "amount": "Montant à rembourser (€)",
+    "all": "Tout",
+    "mode": "Après le remboursement",
+    "modes": {
+      "payment": "Baisser la mensualité",
+      "duration": "Raccourcir la durée"
+    },
+    "modeHints": {
+      "payment": "Même date de fin, mensualité plus légère : de la marge chaque mois.",
+      "duration": "Même mensualité, fin plus tôt : plus d'intérêts économisés."
+    },
+    "previewPayment": "Nouvelle mensualité",
+    "previewEnd": "Dernière mensualité",
+    "previewFees": "Indemnités",
+    "previewSaved": "Intérêts économisés",
+    "previewNet": "Gain net",
+    "previewEnds": "Le crédit est soldé.",
+    "confirm": "Rembourser {amount}",
+    "confirmAll": "Solder le crédit : {amount}",
+    "tooSmall": "Au moins {amount}, ou tout le restant dû.",
+    "noCash": "Votre compte ne suffit pas : {amount} avec les indemnités."
+  },
+  "nextStatement": {
+    "heading": "Prochain bilan",
+    "intro": "Ce que devrait contenir le bilan du {date}, d'après la situation d'aujourd'hui, ligne par ligne, à côté du dernier bilan.",
+    "net": "Solde prévu",
+    "vsLast": "{amount} par rapport au bilan du {date} ({last})",
+    "sameAsLast": "Comme au bilan du {date}.",
+    "noLast": "Premier bilan : rien à comparer encore.",
+    "tileChange": "{amount} depuis le dernier bilan",
+    "groups": {
+      "household": "Vous",
+      "tax": "Impôts",
+      "other": "Autres"
+    },
+    "kinds": {
+      "salary": "Salaire",
+      "rent": "Votre loyer",
+      "livingCosts": "Train de vie",
+      "rentalIncome": "Loyer et charges reçus",
+      "propertyCharges": "Charges",
+      "ownerInsurance": "Assurances",
+      "managementFees": "Frais d'agence",
+      "legalCosts": "Frais de procédure",
+      "coproCall": "Appel de fonds de la copropriété",
+      "taxInstalment": "Impôt sur les revenus",
+      "taxRefund": "Remboursement d'impôt",
+      "loanPayment": "Mensualité de crédit",
+      "remoteManagement": "Gestion à distance",
+      "overdraftInterest": "Agios du découvert"
+    },
+    "loanOf": "Crédit {bank}",
+    "delta": "{amount} vs dernier bilan",
+    "gone": "plus prévu (dernier bilan : {amount})",
+    "new": "nouveau",
+    "notes": {
+      "variable": "Votre salaire varie avec les primes : le bilan prévoit la moyenne.",
+      "seasonal": "Location courte durée : le loyer suit la saison.",
+      "unpaid": "Le locataire ne paie plus et le loyer n'est pas assuré : aucun loyer prévu.",
+      "oneOff": "Ponctuel : seulement au dernier bilan."
+    },
+    "why": "Depuis le dernier bilan",
+    "open": "Voir le bien"
   }
 }

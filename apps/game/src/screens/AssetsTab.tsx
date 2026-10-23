@@ -1,5 +1,6 @@
 import { type PropertyStatus, toDayNumber } from '@cle/engine';
 import { engine } from '../engine.ts';
+import { nextStatementHint } from './NextStatementScreen.tsx';
 import { useGame, useNav } from '../game/context.tsx';
 import {
   format,
@@ -68,7 +69,8 @@ export function AssetsTab() {
               {formatSigned(summary.monthlyBudget)}
             </span>
           }
-          hint={t.street.monthlyHint}
+          hint={nextStatementHint(state)}
+          onClick={() => nav.push({ name: 'nextStatement' })}
         />
       </div>
 
