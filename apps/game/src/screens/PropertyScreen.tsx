@@ -116,6 +116,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
         </Card>
       )}
       <CoproMeetingCard owned={owned} />
+      <LastCoproMeetingCard owned={owned} />
       <DpeCard property={property} id={property.id} />
       <LastWorksCard
         owned={owned}
@@ -382,6 +383,71 @@ function CoproMeetingCard({ owned }: { owned: OwnedProperty }) {
   );
 }
 
+/** What the last general meeting decided, until the next one is called (notes of a test game). */
+function LastCoproMeetingCard({ owned }: { owned: OwnedProperty }) {
+  const report = owned.lastCoproMeeting;
+  if (!report || owned.coproMeeting) return null;
+  const texts = t.coproMeeting;
+  const works = gameContent.works.copro;
+  const passed = report.resolutions.filter((resolution) => resolution.passed);
+  return (
+    <Card title={texts.lastHeading} testId="copro-last-meeting">
+      <p className="small muted">
+        {format(texts.lastWhen, { date: formatDayLong(report.day) })}
+        {!report.attended && ` ${texts.lastAbsent}`}
+      </p>
+      <ul className="stack tight">
+        {report.resolutions.map((resolution) => {
+          const rule = works.resolutions.find((r) => r.id === resolution.id);
+          const call = owned.coproCalls.find((c) => c.resolutionId === resolution.id);
+          const verdicts = resolution.passed
+            ? gameContent.worksTexts.meetingPassed
+            : gameContent.worksTexts.meetingRejected;
+          return (
+            <li key={resolution.id} className="stack tight">
+              <span className="row between">
+                <span className="strong">
+                  {gameContent.worksTexts.resolutions[resolution.id] ?? resolution.id}
+                </span>
+                <Badge tone={resolution.passed ? 'green' : undefined}>
+                  {resolution.passed ? texts.passed : texts.rejected}
+                </Badge>
+              </span>
+              <span className="small muted">{verdicts[resolution.textIndex] ?? ''}</span>
+              <span className="small">
+                {format(texts.yourVote, { vote: texts.votes[resolution.vote ?? 'none'] })}
+              </span>
+              {resolution.passed && (
+                <>
+                  <span className="small">
+                    {format(texts.call, {
+                      amount: formatEuros(resolution.cost),
+                      monthly: formatEuros(resolution.monthly),
+                      months: resolution.months,
+                    })}
+                  </span>
+                  <span className="small muted">
+                    {call ? format(texts.callLeft, { months: call.monthsLeft }) : texts.callDone}
+                  </span>
+                  {rule && rule.commonParts > 0 && (
+                    <span className="small muted">{texts.commonParts}</span>
+                  )}
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {passed.length === 0 && <p className="small muted">{texts.nothing}</p>}
+      {report.dpeBefore !== report.dpeAfter && (
+        <p className="small strong">
+          {format(texts.dpeChange, { before: report.dpeBefore, after: report.dpeAfter })}
+        </p>
+      )}
+    </Card>
+  );
+}
+
 /** « Transformer le bien » (milestone 8): the project manager's quotes, and the one under way. */
 function Transformations({ owned }: { owned: OwnedProperty }) {
   const { state, act } = useGame();
@@ -530,6 +596,7 @@ function CurrentLease({ owned }: { owned: OwnedProperty }) {
             { label: t.property.insured, value: lease.insured ? t.common.yes : t.common.no },
           ]}
         />
+        <UnpaidRentInsurance owned={owned} />
         {gameContent.renting.leaseTypes[lease.leaseType].shortTerm && (
           <button
             type="button"
@@ -725,5 +792,29 @@ function Finances({ owned }: { owned: OwnedProperty }) {
         </select>
       </Card>
     </>
+  );
+}
+
+/** What the unpaid-rent insurance cost and paid back on this property. */
+function UnpaidRentInsurance({ owned }: { owned: OwnedProperty }) {
+  const { premiums, paidOut } = owned.unpaidRentInsurance;
+  if (premiums === 0 && paidOut === 0) return null;
+  return (
+    <div className="stack tight" data-testid="unpaid-rent-insurance">
+      <span className="small strong">{t.property.unpaidInsurance}</span>
+      <KeyValues
+        rows={[
+          { label: t.property.insurancePremiums, value: formatSigned(-premiums) },
+          { label: t.property.insurancePaidOut, value: formatSigned(paidOut) },
+          {
+            label: t.property.insuranceBalance,
+            value: formatSigned(paidOut - premiums),
+            className: tone(paidOut - premiums),
+            total: true,
+          },
+        ]}
+      />
+      <p className="tiny muted">{t.property.insuranceHint}</p>
+    </div>
   );
 }

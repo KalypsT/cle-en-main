@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 22;
+export const FORMAT_VERSION = 23;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -571,6 +571,26 @@ export interface CoproMeeting {
   }[];
 }
 
+/** What the last general meeting decided (save format 23): the recap of the property. */
+export interface CoproMeetingReport {
+  day: number;
+  attended: boolean;
+  resolutions: {
+    id: string;
+    /** Player's share of the cost. */
+    cost: Cents;
+    vote: 'for' | 'against' | null;
+    passed: boolean;
+    /** Verdict text (content/textes/travaux.json). */
+    textIndex: number;
+    /** Call for funds of an adopted resolution: per month, over `months`. */
+    monthly: Cents;
+    months: number;
+  }[];
+  dpeBefore: DpeLabel;
+  dpeAfter: DpeLabel;
+}
+
 export interface OwnedProperty {
   property: Property;
   holder: Holder;
@@ -595,8 +615,15 @@ export interface OwnedProperty {
   /** Works not deducted from the rents: they count in the capital gain (instead of the flat allowance). */
   worksForCapitalGains: Cents;
   coproMeeting: CoproMeeting | null;
-  /** Calls for funds voted by the co-ownership, charged monthly. */
-  coproCalls: { monthly: Cents; monthsLeft: number }[];
+  /** The last general meeting held, until the next one is called over it (save format 23). */
+  lastCoproMeeting: CoproMeetingReport | null;
+  /** Calls for funds voted by the co-ownership, charged monthly, with their resolution. */
+  coproCalls: { monthly: Cents; monthsLeft: number; resolutionId: string | null }[];
+  /**
+   * Unpaid-rent insurance of this property's leases since save format 23: premiums paid,
+   * and rents the insurer paid in the tenant's place.
+   */
+  unpaidRentInsurance: { premiums: Cents; paidOut: Cents };
   /**
    * Estimated value and what its loans still owe, on the deed day then on the 1st of each
    * month (the value curve).

@@ -498,9 +498,24 @@ describe('works', () => {
     const result = held.events.find((e) => e.type === 'coproMeetingHeld');
     expect(result).toMatchObject({ results: [{ id: resolution.id, passed: true }] });
     const rule = content.works.copro.resolutions.find((r) => r.id === resolution.id);
+    const monthly = Math.round(resolution.cost / (rule?.months ?? 1));
     expect(held.state.properties[0]?.coproCalls).toEqual([
-      { monthly: Math.round(resolution.cost / (rule?.months ?? 1)), monthsLeft: rule?.months },
+      { monthly, monthsLeft: rule?.months, resolutionId: resolution.id },
     ]);
+    // The recap of the meeting stays on the property until the next one.
+    expect(held.state.properties[0]?.lastCoproMeeting).toMatchObject({
+      attended: true,
+      resolutions: [
+        {
+          id: resolution.id,
+          cost: resolution.cost,
+          vote: 'for',
+          passed: true,
+          monthly,
+          months: rule?.months,
+        },
+      ],
+    });
     const month = playUntil(engine, held.state, (e) => e.type === 'monthStarted', 40);
     const statement = month.events.find((e) => e.type === 'monthlyStatement');
     expect(statement?.type === 'monthlyStatement' && statement.lines).toContainEqual(

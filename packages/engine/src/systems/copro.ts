@@ -1,7 +1,7 @@
 import type { StatementLine } from '../events.ts';
 import { toCents } from '../money.ts';
 import { nextInt, nextRange, pickWeighted } from '../random.ts';
-import type { CoproMeeting, OwnedProperty } from '../state.ts';
+import type { CoproMeeting, CoproMeetingReport, OwnedProperty } from '../state.ts';
 import type { SystemContext } from './context.ts';
 import { clampState, dpeOf, energyNeeds, freezeItems } from './dwelling.ts';
 import { findOwned } from './renting.ts';
@@ -83,6 +83,13 @@ function holdMeeting(ctx: SystemContext, owned: OwnedProperty, meeting: CoproMee
   const lots = property.copro?.lots ?? 1;
   const weight = 1 / lots;
   const results: { id: string; passed: boolean; textIndex: number }[] = [];
+  const report: CoproMeetingReport = {
+    day: ctx.today,
+    attended: meeting.attended,
+    resolutions: [],
+    dpeBefore: property.dpe,
+    dpeAfter: property.dpe,
+  };
   for (const resolution of meeting.resolutions) {
     const rule = content.works.copro.resolutions.find((r) => r.id === resolution.id);
     if (!rule) continue;
@@ -93,12 +100,20 @@ function holdMeeting(ctx: SystemContext, owned: OwnedProperty, meeting: CoproMee
         : resolution.support * (1 - weight) + (resolution.vote === 'for' ? weight : 0);
     const passed = forShare > 0.5;
     const texts = passed ? content.worksTexts.meetingPassed : content.worksTexts.meetingRejected;
-    results.push({ id: resolution.id, passed, textIndex: nextInt(state.rng, 0, texts.length - 1) });
-    if (!passed) continue;
-    owned.coproCalls.push({
-      monthly: Math.round(resolution.cost / rule.months),
-      monthsLeft: rule.months,
+    const textIndex = nextInt(state.rng, 0, texts.length - 1);
+    results.push({ id: resolution.id, passed, textIndex });
+    const monthly = Math.round(resolution.cost / rule.months);
+    report.resolutions.push({
+      id: resolution.id,
+      cost: resolution.cost,
+      vote: resolution.vote,
+      passed,
+      textIndex,
+      monthly: passed ? monthly : 0,
+      months: passed ? rule.months : 0,
     });
+    if (!passed) continue;
+    owned.coproCalls.push({ monthly, monthsLeft: rule.months, resolutionId: resolution.id });
     if (rule.commonParts > 0 || rule.energy !== 1) {
       property.items = property.items.map((item) =>
         item.kind === 'commonParts'
@@ -113,6 +128,8 @@ function holdMeeting(ctx: SystemContext, owned: OwnedProperty, meeting: CoproMee
     }
   }
   owned.coproMeeting = null;
+  report.dpeAfter = property.dpe;
+  owned.lastCoproMeeting = report;
   ctx.events.push({ type: 'coproMeetingHeld', propertyId: property.id, results });
 }
 

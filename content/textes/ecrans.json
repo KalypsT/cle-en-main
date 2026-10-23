@@ -617,7 +617,12 @@
       "satisfaction": "Satisfaction au départ : {value} / 100",
       "reason": "Départ : {reason}",
       "untracked": "Parti avant ce suivi : loyers, impayés et satisfaction non comptés."
-    }
+    },
+    "unpaidInsurance": "Assurance loyers impayés",
+    "insurancePremiums": "Primes payées",
+    "insurancePaidOut": "Loyers versés par l'assureur",
+    "insuranceHint": "Comptés depuis la mise à jour du jeu qui les suit. L'assureur prend aussi en charge la procédure en cas d'impayé.",
+    "insuranceBalance": "Bilan de l'assurance"
   },
   "rent": {
     "heading": "Mise en location",
@@ -658,7 +663,10 @@
     "shortTermHint": "Pas de locataire à choisir : les voyageurs arrivent dès la mise en ligne. Les revenus suivent les saisons ; gérée vous-même, elle demande {minutes} min par jour (un jour manqué est un jour perdu), ou confiez-la à une conciergerie.",
     "sharedHint": "Plusieurs colocataires, un seul bail meublé : loyer plus élevé, départs plus fréquents.",
     "commercialHint": "Bail commercial de 9 ans : candidats rares, mais un commerçant reste longtemps et fait ses petites réparations.",
-    "parkingHint": "Un parking se loue simplement, sans incident à gérer."
+    "parkingHint": "Un parking se loue simplement, sans incident à gérer.",
+    "risk": "Impayés : environ {loss} par mois en moyenne sans assurance ; l'assurance coûte {premium} par mois.",
+    "riskAdvice": "Candidat fragile : l'assurance loyers impayés serait rentable. Cochez-la dans l'annonce avant d'accepter.",
+    "riskCovered": "Votre annonce est assurée contre les impayés."
   },
   "decisions": {
     "heading": "Décisions",
@@ -1331,7 +1339,24 @@
     "share": "Votre part : {amount}, en appels de fonds sur {months} mois",
     "for": "Pour",
     "against": "Contre",
-    "absent": "Sans votre vote, les autres copropriétaires décident pour vous."
+    "absent": "Sans votre vote, les autres copropriétaires décident pour vous.",
+    "lastHeading": "Dernière assemblée générale",
+    "lastWhen": "Tenue le {date}.",
+    "lastAbsent": "Vous n'y étiez pas : les autres copropriétaires ont voté sans vous.",
+    "passed": "Adoptée",
+    "rejected": "Rejetée",
+    "yourVote": "Votre vote : {vote}",
+    "votes": {
+      "for": "pour",
+      "against": "contre",
+      "none": "absent"
+    },
+    "call": "Votre part : {amount}, soit {monthly} par mois pendant {months} mois",
+    "callLeft": "Encore {months} mois d'appels de fonds.",
+    "callDone": "Appels de fonds terminés.",
+    "commonParts": "Parties communes rénovées.",
+    "dpeChange": "DPE du logement : {before} → {after}",
+    "nothing": "Rien n'a été adopté : pas d'appel de fonds."
   },
   "works": {
     "heading": "Travaux",

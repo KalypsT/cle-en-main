@@ -607,3 +607,50 @@ export function moveOutOfHome(ctx: SystemContext): RentRefusal | null {
   ctx.events.push({ type: 'movedOutOfHome', propertyId });
   return null;
 }
+
+/** The risk of unpaid rent of a candidate, against the insurance's premium, per month. */
+export interface UnpaidRentRisk {
+  /** Reliability as the player sees it (the hidden one differs a little). */
+  reliability: number;
+  /** Premium of the unpaid-rent insurance, per month. */
+  premium: Cents;
+  /** Average loss per month without insurance: rents never recovered and the procedure. */
+  expectedLoss: Cents;
+}
+
+/**
+ * What a candidate's unpaid rents would cost on average without insurance, by the rules of
+ * content/location.json (`unpaid`): a payment missed, a reminder that fails, then the
+ * procedure with its months without rent. An estimate on the reliability the player sees.
+ */
+export function unpaidRentRisk(
+  content: GameContent,
+  state: GameState,
+  propertyId: string,
+  applicationId: string,
+): UnpaidRentRisk | null {
+  const owned = findOwned(state, propertyId);
+  const rental = owned?.rental;
+  const application = rental?.applications.find((a) => a.id === applicationId);
+  if (!owned || !rental || !application) return null;
+  const rules = content.renting;
+  const leaseRules = rules.leaseTypes[rental.leaseType];
+  const due =
+    rental.monthlyRent +
+    (leaseRules.recoverableCharges ? recoverableCharges(content, owned.property) : 0);
+  const reliability = Math.max(
+    0,
+    Math.min(1, visibleReliability(content, application.tenant, rental.monthlyRent)),
+  );
+  const unpaid = rules.unpaid;
+  const missed = unpaid.monthlyProbability * crisisFactor(state, 'unpaidRents') * (1 - reliability);
+  const reminderFails = 1 - Math.min(1, unpaid.reminderSuccess * reliability);
+  const procedureCost = toCents((unpaid.procedureCost.min + unpaid.procedureCost.max) / 2);
+  const monthsLost =
+    unpaid.procedureAfterMonths + (unpaid.procedureMonths.min + unpaid.procedureMonths.max) / 2;
+  return {
+    reliability,
+    premium: Math.round(due * rules.unpaidRentInsurance.premiumShare),
+    expectedLoss: Math.round(missed * reminderFails * (procedureCost + monthsLost * due)),
+  };
+}

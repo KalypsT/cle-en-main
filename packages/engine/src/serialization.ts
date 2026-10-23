@@ -62,6 +62,22 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  */
 export const MIGRATIONS: MigrationRegistry = {
   /**
+   * Version 22 to 23: no general meeting was kept, the calls for funds did not say their
+   * resolution, and the unpaid-rent insurance starts counting.
+   */
+  22: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      lastCoproMeeting: null,
+      coproCalls: ((entry.coproCalls as Record<string, unknown>[]) ?? []).map((call) => ({
+        ...call,
+        resolutionId: null,
+      })),
+      unpaidRentInsurance: { premiums: 0, paidOut: 0 },
+    })),
+  }),
+  /**
    * Version 21 to 22: early repayments change a loan's schedule, so each loan counts the
    * interest it paid (until now, those of its original schedule); no offer was declined.
    */
@@ -1649,9 +1665,39 @@ const gameStateSchema = z
             })
             .strict()
             .nullable(),
+          // Added in version 23.
+          lastCoproMeeting: z
+            .object({
+              day,
+              attended: z.boolean(),
+              resolutions: z.array(
+                z
+                  .object({
+                    id: z.string(),
+                    cost: cents.min(0),
+                    vote: z.enum(['for', 'against']).nullable(),
+                    passed: z.boolean(),
+                    textIndex: z.number().int().min(0),
+                    monthly: cents.min(0),
+                    months: z.number().int().min(0),
+                  })
+                  .strict(),
+              ),
+              dpeBefore: z.enum(DPE_LABELS),
+              dpeAfter: z.enum(DPE_LABELS),
+            })
+            .strict()
+            .nullable(),
           coproCalls: z.array(
-            z.object({ monthly: cents, monthsLeft: z.number().int().min(0) }).strict(),
+            z
+              .object({
+                monthly: cents,
+                monthsLeft: z.number().int().min(0),
+                resolutionId: z.string().nullable(),
+              })
+              .strict(),
           ),
+          unpaidRentInsurance: z.object({ premiums: cents.min(0), paidOut: cents.min(0) }).strict(),
           valueHistory: valueHistorySchema,
           log: propertyLogSchema,
           // Added in version 17.

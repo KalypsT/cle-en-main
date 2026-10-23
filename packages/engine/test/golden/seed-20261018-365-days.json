@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 22,
+    "formatVersion": 23,
     "seed": 20261018,
     "rng": [
       2720554145,
@@ -1127,6 +1127,27 @@
               }
             ]
           }
+        },
+        "lastCoproMeeting": {
+          "day": 21014,
+          "attended": false,
+          "resolutions": [
+            {
+              "id": "collectiveBoiler",
+              "cost": 48200,
+              "vote": null,
+              "passed": false,
+              "textIndex": 2,
+              "monthly": 0,
+              "months": 0
+            }
+          ],
+          "dpeBefore": "E",
+          "dpeAfter": "E"
+        },
+        "unpaidRentInsurance": {
+          "premiums": 0,
+          "paidOut": 0
         },
         "worksFund": null,
         "worksForCapitalGains": 97695,

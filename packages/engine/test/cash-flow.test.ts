@@ -138,6 +138,8 @@ function setup(): GameState {
     valueHistory: [],
     log: [],
     lastWorks: null,
+    lastCoproMeeting: null,
+    unpaidRentInsurance: { premiums: 0, paidOut: 0 },
     rentsReceived: 0,
   };
   state.properties = [owned];

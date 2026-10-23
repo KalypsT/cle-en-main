@@ -551,6 +551,24 @@ describe('migrations', () => {
     expect(migrateRaw(raw, context, 20)).toEqual({ ...raw, formatVersion: 20 });
   });
 
+  it('starts the meeting recap and the insurance counts of a version 22 save empty', () => {
+    const raw = {
+      formatVersion: 22,
+      properties: [{ property: { id: 'p-1' }, coproCalls: [{ monthly: 100_00, monthsLeft: 3 }] }],
+    };
+    const migrated = migrateRaw(raw, context, 23) as {
+      formatVersion: number;
+      properties: Record<string, unknown>[];
+    };
+    expect(migrated.formatVersion).toBe(23);
+    expect(migrated.properties[0]).toEqual({
+      property: { id: 'p-1' },
+      coproCalls: [{ monthly: 100_00, monthsLeft: 3, resolutionId: null }],
+      lastCoproMeeting: null,
+      unpaidRentInsurance: { premiums: 0, paidOut: 0 },
+    });
+  });
+
   it('counts the interest a version 21 loan paid, by its schedule', () => {
     const loan = {
       id: 'loan-1',

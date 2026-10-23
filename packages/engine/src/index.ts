@@ -26,6 +26,7 @@ export {
 } from './systems/banking.ts';
 export { expectedSalary, livingCosts } from './systems/household.ts';
 export type { OutlookLine, OutlookNote, StatementOutlook } from './systems/outlook.ts';
+export type { UnpaidRentRisk } from './systems/renting.ts';
 export { visitMinutes } from './systems/agenda.ts';
 export { dailyListingRate } from './systems/listings.ts';
 export { type Estimate, type ValueBreakdown } from './systems/valuation.ts';
