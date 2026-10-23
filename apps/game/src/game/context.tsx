@@ -55,6 +55,8 @@ export type Route =
   | { name: 'bank' }
   /** One loan: its details, renegotiation and early repayment. */
   | { name: 'loan'; id: string }
+  /** The next monthly statement, line by line, against the last one. */
+  | { name: 'nextStatement' }
   /** A property sold, read only (« Biens vendus »). */
   | { name: 'soldProperty'; id: string }
   /** The history with one bank. */

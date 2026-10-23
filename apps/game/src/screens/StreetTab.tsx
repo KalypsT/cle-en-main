@@ -10,6 +10,7 @@ import { GoalCard } from '../ui/GoalCard.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { DecisionRow, showDecisionsSection } from './DecisionsTab.tsx';
 import { ListingRow } from './ListingsScreen.tsx';
+import { nextStatementHint } from './NextStatementScreen.tsx';
 
 /** How many items each section of the dashboard shows. */
 const OPPORTUNITIES = 3;
@@ -129,8 +130,8 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
                   {formatSigned(summary.monthlyBudget)}
                 </span>
               }
-              hint={t.street.monthlyHint}
-              onClick={() => nav.goTab('assets')}
+              hint={nextStatementHint(state)}
+              onClick={() => nav.push({ name: 'nextStatement' })}
             />
           </div>
 

@@ -1519,5 +1519,47 @@
     "confirmAll": "Solder le crédit : {amount}",
     "tooSmall": "Au moins {amount}, ou tout le restant dû.",
     "noCash": "Votre compte ne suffit pas : {amount} avec les indemnités."
+  },
+  "nextStatement": {
+    "heading": "Prochain bilan",
+    "intro": "Ce que devrait contenir le bilan du {date}, d'après la situation d'aujourd'hui, ligne par ligne, à côté du dernier bilan.",
+    "net": "Solde prévu",
+    "vsLast": "{amount} par rapport au bilan du {date} ({last})",
+    "sameAsLast": "Comme au bilan du {date}.",
+    "noLast": "Premier bilan : rien à comparer encore.",
+    "tileChange": "{amount} depuis le dernier bilan",
+    "groups": {
+      "household": "Vous",
+      "tax": "Impôts",
+      "other": "Autres"
+    },
+    "kinds": {
+      "salary": "Salaire",
+      "rent": "Votre loyer",
+      "livingCosts": "Train de vie",
+      "rentalIncome": "Loyer et charges reçus",
+      "propertyCharges": "Charges",
+      "ownerInsurance": "Assurances",
+      "managementFees": "Frais d'agence",
+      "legalCosts": "Frais de procédure",
+      "coproCall": "Appel de fonds de la copropriété",
+      "taxInstalment": "Impôt sur les revenus",
+      "taxRefund": "Remboursement d'impôt",
+      "loanPayment": "Mensualité de crédit",
+      "remoteManagement": "Gestion à distance",
+      "overdraftInterest": "Agios du découvert"
+    },
+    "loanOf": "Crédit {bank}",
+    "delta": "{amount} vs dernier bilan",
+    "gone": "plus prévu (dernier bilan : {amount})",
+    "new": "nouveau",
+    "notes": {
+      "variable": "Votre salaire varie avec les primes : le bilan prévoit la moyenne.",
+      "seasonal": "Location courte durée : le loyer suit la saison.",
+      "unpaid": "Le locataire ne paie plus et le loyer n'est pas assuré : aucun loyer prévu.",
+      "oneOff": "Ponctuel : seulement au dernier bilan."
+    },
+    "why": "Depuis le dernier bilan",
+    "open": "Voir le bien"
   }
 }

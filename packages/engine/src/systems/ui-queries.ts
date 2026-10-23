@@ -23,7 +23,7 @@ import { believedView, conditionLabel } from './dwelling.ts';
 import { netWorth } from './net-worth.ts';
 import { dwellingKindOf, type Estimate, estimateValue } from './valuation.ts';
 import { isRemoteSelfManaged, remoteManagementFee } from './cities.ts';
-import { expectedSalary, livingCosts } from './household.ts';
+import { monthlyStatementEstimate } from './outlook.ts';
 import { purchaseFees } from './purchases.ts';
 import { cashDueAtDeed } from './purchases.ts';
 import {
@@ -612,21 +612,6 @@ export function cashForecast(
     }
   }
   return { days, lowest, lowestDay, endBalance: balance };
-}
-
-/** Net of next month's statement, from today's situation (salary at its average). */
-export function monthlyStatementEstimate(content: GameContent, state: GameState): Cents {
-  const { player } = state;
-  let net = expectedSalary(content, player) - player.monthlyRent - livingCosts(content, player);
-  for (const owned of state.properties) {
-    const flow = propertyCashFlow(content, state, owned);
-    // The property tax is charged once a year, not monthly.
-    net += flow.net + flow.loanPayment + flow.propertyTax;
-  }
-  net -= state.loans.reduce((sum, loan) => sum + loan.monthlyPayment, 0);
-  const { installments } = state.tax;
-  if (installments.remaining > 0) net -= installments.monthly;
-  return net;
 }
 
 /** Point on the city map, in metres from its origin (x east, y north). */

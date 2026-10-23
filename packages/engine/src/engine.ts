@@ -50,6 +50,7 @@ import {
   runMonthlyTrust,
   runRenegotiationCheck,
 } from './systems/banking.ts';
+import { statementOutlook } from './systems/outlook.ts';
 import {
   cancelAgendaItem,
   moveAgendaItem,
@@ -787,6 +788,7 @@ export function createEngine(content: GameContent) {
     },
     /** Each loan: repaid share, interest paid and left, end, a cheaper bank (« Banque »). */
     loanSheets: (state: GameState) => loanSheets(content, state),
+    statementOutlook: (state: GameState) => statementOutlook(content, state),
     previewPrepayment: (state: GameState, loanId: string, amount: Cents, mode: PrepaymentMode) =>
       previewPrepayment(content, state, loanId, amount, mode),
     /**
