@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 21;
+export const FORMAT_VERSION = 22;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -155,9 +155,16 @@ export interface Loan {
   monthlyPayment: Cents;
   remaining: Cents;
   paymentsMade: number;
+  /** Interest of the payments made so far (early repayments change the schedule). */
+  interestPaid: Cents;
   startDate: CalendarDate;
   /** True once the player was told this loan can be renegotiated. */
   renegotiationSuggested: boolean;
+  /**
+   * Rate of the best offer when the player declined it: not suggested again until an
+   * offer drops further (content/credit.json, `renotifyStepPercent`). Null otherwise.
+   */
+  renegotiationDeclinedPercent: number | null;
   /** Property financed by this loan: it is repaid when the property is sold. */
   propertyId: string | null;
 }

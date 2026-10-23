@@ -20,6 +20,10 @@ import type { HazardChoice, ItemChoice, WorksRefusal } from './systems/works.ts'
 export type GameAction =
   | { type: 'bank/meet'; bankId: string }
   | { type: 'bank/refinance'; loanId: string; bankId: string }
+  /** No to the refinancing offers of the moment: no reminder until an offer drops further. */
+  | { type: 'bank/declineRefinancing'; loanId: string }
+  /** Repays `amount` of a loan ahead of time; `mode` says what goes down. */
+  | { type: 'bank/prepay'; loanId: string; amount: Cents; mode: 'payment' | 'duration' }
   | { type: 'job/resign' }
   /** Creates the player's SCI (milestone 8). */
   | { type: 'company/create' }

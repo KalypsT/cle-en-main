@@ -20,6 +20,7 @@ import {
 import { toDayNumber } from './calendar.ts';
 import { FORMAT_VERSION } from './state.ts';
 import { conditionLabel, dpeOf, energyNeeds, isIndecent } from './systems/dwelling.ts';
+import { scheduledInterestPaid } from './systems/banking.ts';
 
 const context = { content };
 
@@ -548,6 +549,31 @@ describe('migrations', () => {
     const review = { year: 2027, advice: [{ kind: 'vacancy', propertyId: 'p-1' }] };
     const raw = { formatVersion: 19, reviews: { years: [review] } };
     expect(migrateRaw(raw, context, 20)).toEqual({ ...raw, formatVersion: 20 });
+  });
+
+  it('counts the interest a version 21 loan paid, by its schedule', () => {
+    const loan = {
+      id: 'loan-1',
+      principal: 100_000_00,
+      ratePercent: 4,
+      durationMonths: 240,
+      paymentsMade: 12,
+      renegotiationSuggested: true,
+    };
+    const raw = { formatVersion: 21, loans: [loan] };
+    const migrated = migrateRaw(raw, context, 22) as {
+      formatVersion: number;
+      loans: Record<string, unknown>[];
+    };
+    expect(migrated.formatVersion).toBe(22);
+    expect(migrated.loans[0]).toEqual({
+      ...loan,
+      interestPaid: scheduledInterestPaid(100_000_00, 4, 240, 12),
+      renegotiationDeclinedPercent: null,
+    });
+    // A year of a 4 % loan of 100 000 €: a little under 4 000 € of interest.
+    expect(migrated.loans[0]?.interestPaid).toBeGreaterThan(3_800_00);
+    expect(migrated.loans[0]?.interestPaid).toBeLessThan(4_000_00);
   });
 
   it('starts the before and after of the works of a version 20 save empty', () => {

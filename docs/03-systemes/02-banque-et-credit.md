@@ -65,6 +65,13 @@ Mécanisme volontairement simple, en une seule étape :
 - Le joueur accepte ou refuse, auprès de sa banque (renégociation) ou d'une concurrente (rachat).
 - **Vente d'un bien** : son crédit est remboursé automatiquement sur le prix de vente, avec les mêmes frais.
 
+> **Notes de partie (après la PR 29)** :
+> - La notification ne compare plus le taux du crédit au taux de marché brut, mais aux **offres réelles des banques** (marge, profil, confiance compris) : elle n'apparaît que si une banque accepterait, que son taux bat celui du crédit d'au moins le seuil (0,7 point) et que l'économie d'intérêts dépasse les frais. L'avis d'Yvon suit la même règle.
+> - Chaque crédit a son **écran** (depuis « Banque et SCI » ou la décision) : chiffres du crédit, part des intérêts et du capital dans la prochaine mensualité, offre de **sa banque** (renégociation) et de la **meilleure autre banque** (rachat, celle qui accepterait d'abord), avec nouvelle mensualité, frais et gain net.
+> - **Refuser** les offres du moment retire la décision ; elle revient si une offre baisse encore de 0,3 point (`renotifyStepPercent`), ou plus tard si les taux remontent puis redescendent.
+> - **Remboursement anticipé**, partiel ou total, depuis le même écran : au moins 1 000 € (ou tout le restant dû) ; indemnités égales au plus petit de 3 % du montant et de 6 mois d'intérêts sur ce montant (plafond légal). Le joueur choisit de **baisser la mensualité** (même date de fin) ou de **raccourcir la durée** (même mensualité, plus d'intérêts économisés). Règles dans `content/credit.json` (`earlyRepayment`).
+> - Le crédit compte les intérêts réellement payés (`interestPaid`, format de sauvegarde v22).
+
 ## Le découvert
 
 - Simple **solde négatif** sur le compte courant.

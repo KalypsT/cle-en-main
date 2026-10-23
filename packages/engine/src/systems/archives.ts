@@ -15,6 +15,8 @@ export function archiveLoan(
   loan: Loan,
   reason: 'repaid' | 'sold' | 'refinanced' | 'freshStart',
   replacedBy: string | null = null,
+  /** Early repayment fees, when the player repaid it himself. */
+  prepaymentFees = 0,
 ): void {
   const { state } = ctx;
   const owned = state.properties.find((o) => o.property.id === loan.propertyId);
@@ -32,7 +34,10 @@ export function archiveLoan(
     paymentsMade: loan.paymentsMade,
     interestPaid: interestPaidOf(loan),
     remaining: Math.max(0, loan.remaining),
-    fees: reason === 'sold' || reason === 'refinanced' ? refinancingFees(ctx.content, loan) : 0,
+    fees:
+      reason === 'sold' || reason === 'refinanced'
+        ? refinancingFees(ctx.content, loan)
+        : prepaymentFees,
     reason,
     replacedBy,
   });

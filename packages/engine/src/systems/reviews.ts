@@ -3,7 +3,7 @@ import { findJob, type GameContent, type Stat } from '../content.ts';
 import type { StatementLine } from '../events.ts';
 import { type Cents, toCents } from '../money.ts';
 import type { Advice, AgendaItem, GameState, MonthlyPoint, YearReview } from '../state.ts';
-import { debtRatio, marketOffer, monthlyLoanPayments } from './banking.ts';
+import { debtRatio, monthlyLoanPayments, worthyRefinance } from './banking.ts';
 import { challengeProgress, findChallenge } from './challenges.ts';
 import type { SystemContext } from './context.ts';
 import { signedLine } from './history.ts';
@@ -20,7 +20,6 @@ import { pendingDecisions, propertyCashFlow } from './ui-queries.ts';
 
 const HOURS_PER_DAY = 24;
 const DAYS_PER_YEAR = 365;
-const MONTHS_PER_YEAR = 12;
 
 /**
  * Is nothing urgent waiting for the player? Then the automatic acceleration
@@ -216,13 +215,7 @@ export function buildYearReview(ctx: SystemContext, regime: readonly Advice[]): 
   const deficits = state.tax.landlordDeficits.reduce((sum, d) => sum + d.amount, 0);
   if (deficits > 0) advice.push({ kind: 'deficitCarry', amount: deficits });
   advice.push(...regime.filter((a) => a.kind === 'autoRegime'));
-  const expensive = state.loans.some((loan) => {
-    const years = Math.max(
-      1,
-      Math.round((loan.durationMonths - loan.paymentsMade) / MONTHS_PER_YEAR),
-    );
-    return loan.ratePercent - marketOffer(content, state, years) >= thresholds.renegotiatePoints;
-  });
+  const expensive = state.loans.some((loan) => worthyRefinance(content, state, loan) !== null);
   if (expensive) advice.push({ kind: 'renegotiate' });
   advice.push({ kind: cashFlow >= 0 ? 'goodYear' : 'badYear', amount: Math.abs(cashFlow) });
   if (state.properties.length === 0) advice.push({ kind: 'noProperty' });

@@ -152,7 +152,9 @@ function setup(): GameState {
       remaining: PRICE,
       paymentsMade: 0,
       startDate: { year: 2026, month: 12, day: 15 },
+      interestPaid: 0,
       renegotiationSuggested: false,
+      renegotiationDeclinedPercent: null,
       propertyId: 'property-t2',
     },
   ];

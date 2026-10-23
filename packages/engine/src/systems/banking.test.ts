@@ -265,18 +265,19 @@ describe('loans', () => {
     const owing = withLoan(state, { ...offer, ratePercent, monthlyPayment });
     const [sheet] = engine.loanSheets(owing);
     const [loan] = owing.loans;
-    if (!sheet?.refinance || !loan) throw new Error('No refinancing');
+    const refinance = sheet?.refinance[0];
+    if (!refinance || !loan) throw new Error('No refinancing');
     const result = act(owing, {
       type: 'bank/refinance',
       loanId: loan.id,
-      bankId: sheet.refinance.bankId,
+      bankId: refinance.bankId,
     });
     expect(result.state.closedLoans).toEqual([
       expect.objectContaining({
         id: loan.id,
         reason: 'refinanced',
         remaining: loan.remaining,
-        fees: sheet.refinance.fees,
+        fees: refinance.fees,
         replacedBy: result.state.loans[0]?.id,
       }),
     ]);
@@ -333,9 +334,10 @@ describe('loan sheets', () => {
     const ratePercent = offer.ratePercent + 1.5;
     const monthlyPayment = annuityPayment(offer.amount, ratePercent, offer.durationYears * 12);
     const [sheet] = engine.loanSheets(withLoan(state, { ...offer, ratePercent, monthlyPayment }));
-    expect(sheet?.refinance?.ratePercent).toBeLessThan(ratePercent);
-    expect(sheet?.refinance?.monthlyPayment).toBeLessThan(monthlyPayment);
-    expect(sheet?.refinance?.saving).toBeGreaterThan(0);
+    const best = sheet?.refinance.at(-1);
+    expect(best?.ratePercent).toBeLessThan(ratePercent);
+    expect(best?.monthlyPayment).toBeLessThan(monthlyPayment);
+    expect(best?.saving).toBeGreaterThan(0);
   });
 });
 
@@ -444,6 +446,57 @@ describe('renegotiation', () => {
     expect(result.state.player.balance).toBe(state.player.balance - fees);
   });
 
+  it('does not suggest a renegotiation that no bank would really grant', () => {
+    // Only the market's rate is low: every bank's margin and the profile keep the
+    // real offers within the threshold, so the player is not told for nothing.
+    const state = newGame();
+    const offer = acceptedOffer(state, { amount: toCents(60_000) });
+    const best = Math.min(
+      ...content.banks.map(
+        (bank) => quoteRate(content, state, bank, offer.durationYears).ratePercent,
+      ),
+    );
+    const ratePercent = best + content.credit.renegotiation.thresholdPercent - 0.2;
+    const monthlyPayment = annuityPayment(offer.amount, ratePercent, offer.durationYears * 12);
+    const owing = withLoan(state, { ...offer, ratePercent, monthlyPayment });
+    const next = advanceToNextMonth(owing);
+    expect(next.events.filter((e) => e.type === 'renegotiationAvailable')).toHaveLength(0);
+    expect(engine.pendingDecisions(next.state).some((d) => d.kind === 'renegotiation')).toBe(false);
+  });
+
+  it('names the bank of the offer and lists the own bank first', () => {
+    const owing = expensiveLoan();
+    const next = advanceToNextMonth(owing);
+    const told = next.events.find((e) => e.type === 'renegotiationAvailable');
+    if (told?.type !== 'renegotiationAvailable') throw new Error('Not suggested');
+    const [sheet] = engine.loanSheets(next.state);
+    expect(sheet?.refinance[0]).toMatchObject({ own: true, bankId: owing.loans[0]?.bankId });
+    expect(sheet?.worthy).toMatchObject({ bankId: told.bankId, ratePercent: told.offerPercent });
+    expect(engine.pendingDecisions(next.state)).toContainEqual(
+      expect.objectContaining({ kind: 'renegotiation', bankId: told.bankId }),
+    );
+  });
+
+  it('stops reminding once declined, until an offer drops further', () => {
+    const suggested = advanceToNextMonth(expensiveLoan()).state;
+    const loan = suggested.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    const declined = act(suggested, { type: 'bank/declineRefinancing', loanId: loan.id }).state;
+    expect(engine.pendingDecisions(declined).some((d) => d.kind === 'renegotiation')).toBe(false);
+    expect(engine.loanSheets(declined)[0]?.declined).toBe(true);
+    const later = advanceToNextMonth(declined);
+    expect(later.events.filter((e) => e.type === 'renegotiationAvailable')).toHaveLength(0);
+    // Rates fall by more than the step: the player is told again.
+    const lower = deepClone(later.state);
+    lower.market.ratePercent -= content.credit.renegotiation.renotifyStepPercent + 0.2;
+    const again = advanceToNextMonth(lower);
+    expect(again.events.filter((e) => e.type === 'renegotiationAvailable')).toHaveLength(1);
+    expect(engine.pendingDecisions(again.state).some((d) => d.kind === 'renegotiation')).toBe(true);
+    expect(
+      engine.dispatch(newGame(), { type: 'bank/declineRefinancing', loanId: 'loan-x' }),
+    ).toMatchObject({ reason: { code: 'loan.unknown' } });
+  });
+
   it('refuses a refinancing that would not lower the rate', () => {
     const state = newGame();
     const current = withLoan(state, acceptedOffer(state, { bankId: 'rigueur' }));
@@ -459,5 +512,132 @@ describe('renegotiation', () => {
     ).toMatchObject({
       reason: { code: 'loan.unknown' },
     });
+  });
+});
+
+describe('early repayment', () => {
+  function owing(): GameState {
+    const state = deepClone(newGame());
+    state.player.balance = toCents(50_000);
+    return withLoan(state, acceptedOffer(state, { amount: toCents(60_000) }));
+  }
+
+  it('caps the penalty at the lower of 3 % and six months of interest', () => {
+    const state = owing();
+    const loan = state.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    const rules = content.credit.earlyRepayment;
+    const amount = toCents(10_000);
+    const expected = Math.round(
+      Math.min(
+        amount * rules.penaltyShareOfAmount,
+        ((amount * loan.ratePercent) / 100 / 12) * rules.penaltyInterestMonths,
+      ),
+    );
+    expect(engine.previewPrepayment(state, loan.id, amount, 'payment')?.fees).toBe(expected);
+  });
+
+  it('lowers the payment and keeps the end of the loan', () => {
+    const state = owing();
+    const loan = state.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    const amount = toCents(10_000);
+    const preview = engine.previewPrepayment(state, loan.id, amount, 'payment');
+    if (!preview) throw new Error('No preview');
+    expect(preview.refusal).toBeNull();
+    const result = act(state, { type: 'bank/prepay', loanId: loan.id, amount, mode: 'payment' });
+    const after = result.state.loans[0];
+    expect(after?.remaining).toBe(loan.remaining - amount);
+    expect(after?.monthlyPayment).toBe(preview.monthlyPayment);
+    expect(after?.monthlyPayment).toBeLessThan(loan.monthlyPayment);
+    expect(after?.durationMonths).toBe(loan.durationMonths);
+    expect(result.state.player.balance).toBe(state.player.balance - amount - preview.fees);
+    expect(result.events).toContainEqual(
+      expect.objectContaining({ type: 'loanPrepaid', amount, fees: preview.fees, full: false }),
+    );
+  });
+
+  it('keeps the payment and shortens the loan', () => {
+    const state = owing();
+    const loan = state.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    const amount = toCents(20_000);
+    const preview = engine.previewPrepayment(state, loan.id, amount, 'duration');
+    const payment = engine.previewPrepayment(state, loan.id, amount, 'payment');
+    if (!preview || !payment) throw new Error('No preview');
+    // Shorter, and saves more interest than a lower payment.
+    expect(preview.monthsLeft).toBeLessThan(loan.durationMonths);
+    expect(preview.interestSaved).toBeGreaterThan(payment.interestSaved);
+    const after = act(state, { type: 'bank/prepay', loanId: loan.id, amount, mode: 'duration' })
+      .state.loans[0];
+    expect(after?.monthlyPayment).toBe(loan.monthlyPayment);
+    expect(after?.durationMonths).toBe(preview.monthsLeft);
+    expect(engine.loanSheets({ ...state, loans: after ? [after] : [] })[0]?.endDate).toEqual(
+      preview.endDate,
+    );
+  });
+
+  it('ends the loan when everything is repaid, and keeps its penalty', () => {
+    const state = owing();
+    const loan = state.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    const result = act(state, {
+      type: 'bank/prepay',
+      loanId: loan.id,
+      amount: loan.remaining + toCents(5_000),
+      mode: 'payment',
+    });
+    const fees = engine.previewPrepayment(state, loan.id, loan.remaining, 'payment')?.fees ?? -1;
+    expect(result.state.loans).toEqual([]);
+    expect(result.state.player.balance).toBe(state.player.balance - loan.remaining - fees);
+    expect(result.events.some((e) => e.type === 'loanRepaid')).toBe(true);
+    expect(result.state.closedLoans).toEqual([
+      expect.objectContaining({ id: loan.id, reason: 'repaid', fees, remaining: loan.remaining }),
+    ]);
+  });
+
+  it('refuses a repayment too small or above the cash', () => {
+    const state = owing();
+    const loan = state.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    expect(
+      engine.dispatch(state, {
+        type: 'bank/prepay',
+        loanId: loan.id,
+        amount: 100,
+        mode: 'payment',
+      }),
+    ).toMatchObject({ reason: { code: 'loan.prepaymentTooSmall' } });
+    const poor = { ...state, player: { ...state.player, balance: toCents(2_000) } };
+    expect(
+      engine.dispatch(poor, {
+        type: 'bank/prepay',
+        loanId: loan.id,
+        amount: toCents(5_000),
+        mode: 'payment',
+      }),
+    ).toMatchObject({ reason: { code: 'account.insufficientFunds' } });
+  });
+
+  it('counts the interest really paid after an early repayment', () => {
+    const state = owing();
+    const loan = state.loans[0];
+    if (!loan) throw new Error('Missing loan');
+    let current = act(state, {
+      type: 'bank/prepay',
+      loanId: loan.id,
+      amount: toCents(10_000),
+      mode: 'payment',
+    }).state;
+    let interest = 0;
+    for (let month = 0; month < 3; month++) {
+      const next = advanceToNextMonth(current);
+      current = next.state;
+      for (const event of next.events) {
+        if (event.type !== 'monthlyStatement') continue;
+        for (const line of event.lines) if (line.kind === 'loanPayment') interest += line.interest;
+      }
+    }
+    expect(current.loans[0]?.interestPaid).toBe(interest);
   });
 });

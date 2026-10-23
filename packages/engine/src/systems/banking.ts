@@ -131,15 +131,6 @@ export function quoteRate(
   return { ...quote, ratePercent: roundRate(Math.max(rules.insurancePercent, total)) };
 }
 
-/** Rate a borrower could get on the market, without bank margin: used to suggest renegotiation. */
-export function marketOffer(content: GameContent, state: GameState, durationYears: number): number {
-  return roundRate(
-    state.market.ratePercent +
-      durationSpread(content, durationYears) +
-      content.credit.insurancePercent,
-  );
-}
-
 /** Rents of the player's own leases (the SCI's are not his income for the banks). */
 function personalRents(state: GameState): Cents {
   return state.properties.reduce(
@@ -445,8 +436,10 @@ export function grantLoan(
     monthlyPayment: offer.monthlyPayment,
     remaining: offer.amount,
     paymentsMade: 0,
+    interestPaid: 0,
     startDate: { ...state.clock.date },
     renegotiationSuggested: false,
+    renegotiationDeclinedPercent: null,
     propertyId,
   };
   state.loans.push(loan);
@@ -467,6 +460,7 @@ export function runMonthlyLoanPayments(ctx: SystemContext, lines: StatementLine[
     state.player.balance -= due;
     loan.remaining -= capital;
     loan.paymentsMade += 1;
+    loan.interestPaid += interest;
     lines.push({ kind: 'loanPayment', loanId: loan.id, amount: due, interest, capital });
     if (loan.remaining <= 0 || loan.paymentsMade >= loan.durationMonths) {
       archiveLoan(ctx, loan, 'repaid');
@@ -496,26 +490,41 @@ export function runMonthlyTrust(ctx: SystemContext, paidBankIds: ReadonlySet<str
   }
 }
 
-/** Tells the player once when a loan could be renegotiated, and again after rates rose back. */
+/**
+ * Tells the player once when a bank really offers to take a loan over for less (its
+ * own bank or another, fees deducted), again after rates rose back, and, once he
+ * declined, only when an offer drops further.
+ */
 export function runRenegotiationCheck(ctx: SystemContext): void {
   const { content, state } = ctx;
-  const threshold = content.credit.renegotiation.thresholdPercent;
+  const step = content.credit.renegotiation.renotifyStepPercent;
   for (const loan of state.loans) {
-    const offer = marketOffer(content, state, remainingYears(content, loan));
-    const worthIt = loan.ratePercent - offer >= threshold;
-    if (worthIt && !loan.renegotiationSuggested) {
+    const best = worthyRefinance(content, state, loan);
+    if (!best) {
+      loan.renegotiationSuggested = false;
+      loan.renegotiationDeclinedPercent = null;
+      continue;
+    }
+    const declined = loan.renegotiationDeclinedPercent;
+    if (declined !== null && declined - best.ratePercent >= step - RATE_EPSILON) {
+      loan.renegotiationDeclinedPercent = null;
+      loan.renegotiationSuggested = false;
+    }
+    if (!loan.renegotiationSuggested && loan.renegotiationDeclinedPercent === null) {
       loan.renegotiationSuggested = true;
       ctx.events.push({
         type: 'renegotiationAvailable',
         loanId: loan.id,
         currentRatePercent: loan.ratePercent,
-        marketOfferPercent: offer,
+        offerPercent: best.ratePercent,
+        bankId: best.bankId,
       });
-    } else if (!worthIt) {
-      loan.renegotiationSuggested = false;
     }
   }
 }
+
+/** Rates are rounded to the hundredth: compares them without floating-point noise. */
+const RATE_EPSILON = 1e-9;
 
 function remainingMonths(loan: Loan): number {
   return loan.durationMonths - loan.paymentsMade;
@@ -559,6 +568,8 @@ export type BankActionRefusal =
   | 'loan.unknown'
   | 'loan.notWorthRefinancing'
   | 'loan.refinancingRefused'
+  | 'loan.noRefinancingOffer'
+  | 'loan.prepaymentTooSmall'
   | 'account.insufficientFunds';
 
 /** A meeting with a banker: costs free time, builds trust. */
@@ -587,6 +598,97 @@ export function holdMeeting(ctx: SystemContext, bankId: string): BankActionRefus
 export function refinancingFees(content: GameContent, loan: Loan): Cents {
   const rules = content.credit.renegotiation;
   return Math.round(loan.remaining * rules.feesShareOfRemaining) + toCents(rules.fixedFees);
+}
+
+/** A bank's offer to take a loan over today, over the months left. */
+export interface RefinanceOption {
+  bankId: string;
+  /** The loan's own bank: a renegotiation rather than a buy-back. */
+  own: boolean;
+  ratePercent: number;
+  monthlyPayment: Cents;
+  fees: Cents;
+  /** Interest saved over the months left, fees deducted (may be negative). */
+  saving: Cents;
+  /** Why the bank would refuse to take it over today; null if it would. */
+  refusal: LoanRefusalCode | null;
+}
+
+/**
+ * What the loan's own bank (a renegotiation) and the best other bank (a buy-back)
+ * would offer today, when their rate beats the loan's: own bank first. Among the
+ * other banks, one that would accept comes before a cheaper one that would refuse.
+ */
+export function refinanceOptions(
+  content: GameContent,
+  state: GameState,
+  loan: Loan,
+): RefinanceOption[] {
+  const monthsLeft = remainingMonths(loan);
+  if (monthsLeft <= 0 || loan.remaining <= 0) return [];
+  const years = remainingYears(content, loan);
+  const interestLeft = amortize(
+    loan.remaining,
+    loan.ratePercent,
+    loan.monthlyPayment,
+    monthsLeft,
+  ).interest;
+  const fees = refinancingFees(content, loan);
+  const optionOf = (bank: Bank): RefinanceOption | null => {
+    const ratePercent = quoteRate(content, state, bank, years).ratePercent;
+    if (ratePercent >= loan.ratePercent - RATE_EPSILON) return null;
+    const monthlyPayment = annuityPayment(loan.remaining, ratePercent, monthsLeft);
+    const interest = amortize(loan.remaining, ratePercent, monthlyPayment, monthsLeft).interest;
+    return {
+      bankId: bank.id,
+      own: bank.id === loan.bankId,
+      ratePercent,
+      monthlyPayment,
+      fees,
+      saving: interestLeft - interest - fees,
+      refusal: checkBorrower(content, state, bank),
+    };
+  };
+  const options: RefinanceOption[] = [];
+  const ownBank = content.banks.find((bank) => bank.id === loan.bankId);
+  const own = ownBank ? optionOf(ownBank) : null;
+  if (own) options.push(own);
+  let other: RefinanceOption | null = null;
+  for (const bank of content.banks) {
+    if (bank.id === loan.bankId) continue;
+    const option = optionOf(bank);
+    if (!option) continue;
+    const accepts = option.refusal === null;
+    const otherAccepts = other?.refusal === null;
+    if (
+      !other ||
+      (accepts && !otherAccepts) ||
+      (accepts === otherAccepts && option.ratePercent < other.ratePercent)
+    ) {
+      other = option;
+    }
+  }
+  if (other) options.push(other);
+  return options;
+}
+
+/**
+ * The offer worth suggesting: a bank would accept, its rate beats the loan's by the
+ * threshold and the interest saved pays the fees. The lowest rate of those; null if none.
+ */
+export function worthyRefinance(
+  content: GameContent,
+  state: GameState,
+  loan: Loan,
+): RefinanceOption | null {
+  const threshold = content.credit.renegotiation.thresholdPercent;
+  let best: RefinanceOption | null = null;
+  for (const option of refinanceOptions(content, state, loan)) {
+    if (option.refusal !== null || option.saving <= 0) continue;
+    if (loan.ratePercent - option.ratePercent < threshold - RATE_EPSILON) continue;
+    if (!best || option.ratePercent < best.ratePercent) best = option;
+  }
+  return best;
 }
 
 /** Replaces a loan by a new one at the bank's current rate, over the remaining months. */
@@ -619,13 +721,160 @@ export function refinanceLoan(
     monthlyPayment: annuityPayment(loan.remaining, rate, months),
     remaining: loan.remaining,
     paymentsMade: 0,
+    interestPaid: 0,
     startDate: { ...state.clock.date },
     renegotiationSuggested: false,
+    renegotiationDeclinedPercent: null,
     propertyId: loan.propertyId,
   };
   archiveLoan(ctx, loan, 'refinanced', replacement.id);
   state.loans = state.loans.map((other) => (other.id === loan.id ? replacement : other));
   ctx.events.push({ type: 'loanRefinanced', oldLoanId: loan.id, newLoanId: replacement.id, fees });
+  return null;
+}
+
+/** The player declines the offers of the moment: no reminder until an offer drops further. */
+export function declineRefinancing(ctx: SystemContext, loanId: string): BankActionRefusal | null {
+  const { content, state } = ctx;
+  const loan = state.loans.find((candidate) => candidate.id === loanId);
+  if (!loan) return 'loan.unknown';
+  const best = worthyRefinance(content, state, loan);
+  if (!best) return 'loan.noRefinancingOffer';
+  loan.renegotiationDeclinedPercent = best.ratePercent;
+  return null;
+}
+
+/** What an early repayment leaves of the loan: a lower payment, or fewer months. */
+export type PrepaymentMode = 'payment' | 'duration';
+
+/**
+ * Early repayment penalty (indemnités de remboursement anticipé): the lower of a share
+ * of the amount and a few months of interest on it, as French law caps them.
+ */
+export function earlyRepaymentFees(content: GameContent, loan: Loan, amount: Cents): Cents {
+  const rules = content.credit.earlyRepayment;
+  const share = amount * rules.penaltyShareOfAmount;
+  const interest =
+    ((amount * loan.ratePercent) / 100 / MONTHS_PER_YEAR) * rules.penaltyInterestMonths;
+  return Math.round(Math.min(share, interest));
+}
+
+/** An early repayment, before the player confirms it. */
+export interface PrepaymentPreview {
+  loanId: string;
+  /** Amount repaid, never above the capital left. */
+  amount: Cents;
+  /** The whole capital left: the loan ends. */
+  full: boolean;
+  fees: Cents;
+  /** Payment and months left after the repayment (0 and 0 when it ends the loan). */
+  monthlyPayment: Cents;
+  monthsLeft: number;
+  /** Month of the last payment after the repayment. */
+  endDate: CalendarDate;
+  /** Interest no longer paid over the rest of the loan (fees not deducted). */
+  interestSaved: Cents;
+  /** Why it cannot be done now; null if it can. */
+  refusal: BankActionRefusal | null;
+}
+
+/** Months needed to repay `remaining` with `payment` a month (at most `max`). */
+function monthsToRepay(remaining: Cents, ratePercent: number, payment: Cents, max: number) {
+  let left = remaining;
+  let months = 0;
+  while (left > 0 && months < max) {
+    const split = splitPayment(left, ratePercent, payment);
+    if (split.capital <= 0) return max;
+    left -= split.capital;
+    months += 1;
+  }
+  return months;
+}
+
+function endDateOf(loan: Loan, durationMonths: number): CalendarDate {
+  const end = loan.startDate.year * MONTHS_PER_YEAR + loan.startDate.month - 1 + durationMonths;
+  return { year: Math.floor(end / MONTHS_PER_YEAR), month: (end % MONTHS_PER_YEAR) + 1, day: 1 };
+}
+
+export function previewPrepayment(
+  content: GameContent,
+  state: GameState,
+  loanId: string,
+  amount: Cents,
+  mode: PrepaymentMode,
+): PrepaymentPreview | null {
+  const loan = state.loans.find((candidate) => candidate.id === loanId);
+  if (!loan) return null;
+  const repaid = Math.max(0, Math.min(Math.round(amount), loan.remaining));
+  const full = repaid >= loan.remaining;
+  const fees = earlyRepaymentFees(content, loan, repaid);
+  const monthsBefore = remainingMonths(loan);
+  const left = loan.remaining - repaid;
+  const before = amortize(loan.remaining, loan.ratePercent, loan.monthlyPayment, monthsBefore);
+  let monthlyPayment = 0;
+  let monthsLeft = 0;
+  if (!full) {
+    if (mode === 'payment') {
+      monthsLeft = monthsBefore;
+      monthlyPayment = annuityPayment(left, loan.ratePercent, monthsLeft);
+    } else {
+      monthlyPayment = loan.monthlyPayment;
+      monthsLeft = monthsToRepay(left, loan.ratePercent, monthlyPayment, monthsBefore);
+    }
+  }
+  const after = full ? 0 : amortize(left, loan.ratePercent, monthlyPayment, monthsLeft).interest;
+  let refusal: BankActionRefusal | null = null;
+  if (repaid <= 0 || (!full && repaid < toCents(content.credit.earlyRepayment.minAmount))) {
+    refusal = 'loan.prepaymentTooSmall';
+  } else if (state.player.balance < repaid + fees) {
+    refusal = 'account.insufficientFunds';
+  }
+  return {
+    loanId,
+    amount: repaid,
+    full,
+    fees,
+    monthlyPayment,
+    monthsLeft,
+    endDate: endDateOf(loan, loan.paymentsMade + monthsLeft),
+    interestSaved: Math.max(0, before.interest - after),
+    refusal,
+  };
+}
+
+/** Repays part or all of a loan ahead of time, with its penalty. */
+export function prepayLoan(
+  ctx: SystemContext,
+  loanId: string,
+  amount: Cents,
+  mode: PrepaymentMode,
+): BankActionRefusal | null {
+  const { content, state } = ctx;
+  const preview = previewPrepayment(content, state, loanId, amount, mode);
+  const loan = state.loans.find((candidate) => candidate.id === loanId);
+  if (!preview || !loan) return 'loan.unknown';
+  if (preview.refusal) return preview.refusal;
+  state.player.balance -= preview.amount + preview.fees;
+  ctx.events.push({
+    type: 'loanPrepaid',
+    loanId,
+    amount: preview.amount,
+    fees: preview.fees,
+    full: preview.full,
+    mode,
+    monthlyPayment: preview.monthlyPayment,
+    monthsLeft: preview.monthsLeft,
+  });
+  if (preview.full) {
+    archiveLoan(ctx, loan, 'repaid', null, preview.fees);
+    loan.remaining = 0;
+    state.loans = state.loans.filter((other) => other.id !== loanId);
+    ctx.events.push({ type: 'loanRepaid', loanId });
+    return null;
+  }
+  loan.remaining -= preview.amount;
+  loan.monthlyPayment = preview.monthlyPayment;
+  loan.durationMonths = loan.paymentsMade + preview.monthsLeft;
   return null;
 }
 
@@ -635,7 +884,7 @@ export function recordRefusedApplication(ctx: SystemContext, bankId: string): vo
   relation.trust = clampTrust(relation.trust + ctx.content.credit.trust.refusedApplication);
 }
 
-/** The « Banque » sheet of a loan: where it stands, what it costs, a cheaper bank if any. */
+/** The « Banque » sheet of a loan: where it stands, what it costs, cheaper banks if any. */
 export interface LoanSheet {
   loanId: string;
   bankId: string;
@@ -650,32 +899,39 @@ export interface LoanSheet {
   monthsLeft: number;
   /** Month of the last payment. */
   endDate: CalendarDate;
-  /** Interest of the payments made, on the loan's original schedule. */
+  /** Interest of the payments made. */
   interestPaid: Cents;
   /** Interest of the payments left, at the current payment. */
   interestLeft: Cents;
+  /** How the next payment splits: interest, and capital repaid. */
+  nextPayment: { interest: Cents; capital: Cents };
   /** Remaining capital at each coming anniversary of the loan, starting now (the curve). */
   remainingByYear: Cents[];
-  /** The bank with the lowest rate today, when it beats this loan's rate. */
-  refinance: {
-    bankId: string;
-    ratePercent: number;
-    monthlyPayment: Cents;
-    fees: Cents;
-    /** Interest saved over the months left, fees deducted (may be negative). */
-    saving: Cents;
-    /** Why the bank would refuse to take it over today; null if it would. */
-    refusal: LoanRefusalCode | null;
-  } | null;
+  /** Own bank's and best other bank's offers, when they beat this loan's rate. */
+  refinance: RefinanceOption[];
+  /** The offer worth suggesting, if any (see `worthyRefinance`). */
+  worthy: RefinanceOption | null;
+  /** The player declined the offers of the moment. */
+  declined: boolean;
+}
+
+/** Interest paid so far on a loan. */
+export function interestPaidOf(loan: Loan): Cents {
+  return loan.interestPaid;
+}
+
+/** Interest of the first `paymentsMade` payments of a loan's original schedule. */
+export function scheduledInterestPaid(
+  principal: Cents,
+  ratePercent: number,
+  durationMonths: number,
+  paymentsMade: number,
+): Cents {
+  const original = annuityPayment(principal, ratePercent, durationMonths);
+  return amortize(principal, ratePercent, original, paymentsMade).interest;
 }
 
 /** Interest and capital left after paying `payment` each month from `remaining`. */
-/** Interest paid so far on a loan, by its original schedule. */
-export function interestPaidOf(loan: Loan): Cents {
-  const original = annuityPayment(loan.principal, loan.ratePercent, loan.durationMonths);
-  return amortize(loan.principal, loan.ratePercent, original, loan.paymentsMade).interest;
-}
-
 function amortize(remaining: Cents, ratePercent: number, payment: Cents, months: number) {
   let left = remaining;
   let interest = 0;
@@ -697,28 +953,12 @@ export function loanSheets(content: GameContent, state: GameState): LoanSheet[] 
   return state.loans.map((loan) => {
     const monthsLeft = remainingMonths(loan);
     const future = amortize(loan.remaining, loan.ratePercent, loan.monthlyPayment, monthsLeft);
-    const end =
-      loan.startDate.year * MONTHS_PER_YEAR + loan.startDate.month - 1 + loan.durationMonths;
-    let refinance: LoanSheet['refinance'] = null;
-    if (monthsLeft > 0 && loan.remaining > 0) {
-      const years = remainingYears(content, loan);
-      for (const bank of content.banks) {
-        const ratePercent = quoteRate(content, state, bank, years).ratePercent;
-        if (ratePercent >= loan.ratePercent) continue;
-        if (refinance && ratePercent >= refinance.ratePercent) continue;
-        const monthlyPayment = annuityPayment(loan.remaining, ratePercent, monthsLeft);
-        const fees = refinancingFees(content, loan);
-        const interest = amortize(loan.remaining, ratePercent, monthlyPayment, monthsLeft).interest;
-        refinance = {
-          bankId: bank.id,
-          ratePercent,
-          monthlyPayment,
-          fees,
-          saving: future.interest - interest - fees,
-          refusal: checkBorrower(content, state, bank),
-        };
-      }
-    }
+    const due = Math.min(
+      loan.monthlyPayment,
+      loan.remaining + splitPayment(loan.remaining, loan.ratePercent, 0).interest,
+    );
+    const next = splitPayment(loan.remaining, loan.ratePercent, due);
+    const worthy = worthyRefinance(content, state, loan);
     return {
       loanId: loan.id,
       bankId: loan.bankId,
@@ -730,15 +970,14 @@ export function loanSheets(content: GameContent, state: GameState): LoanSheet[] 
       repaidShare: loan.principal > 0 ? 1 - loan.remaining / loan.principal : 1,
       paymentsMade: loan.paymentsMade,
       monthsLeft,
-      endDate: {
-        year: Math.floor(end / MONTHS_PER_YEAR),
-        month: (end % MONTHS_PER_YEAR) + 1,
-        day: 1,
-      },
+      endDate: endDateOf(loan, loan.durationMonths),
       interestPaid: interestPaidOf(loan),
       interestLeft: future.interest,
+      nextPayment: { interest: next.interest, capital: next.capital },
       remainingByYear: future.byYear,
-      refinance,
+      refinance: refinanceOptions(content, state, loan),
+      worthy,
+      declined: worthy !== null && loan.renegotiationDeclinedPercent !== null,
     };
   });
 }

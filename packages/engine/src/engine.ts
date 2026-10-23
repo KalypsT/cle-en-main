@@ -41,6 +41,10 @@ import {
   quoteRate,
   type RateQuote,
   refinanceLoan,
+  declineRefinancing,
+  prepayLoan,
+  previewPrepayment,
+  type PrepaymentMode,
   runDailyOverdraft,
   runMonthlyLoanPayments,
   runMonthlyTrust,
@@ -429,6 +433,12 @@ export function createEngine(content: GameContent) {
       case 'bank/refinance':
         refusal = refinanceLoan(ctx, action.loanId, action.bankId);
         break;
+      case 'bank/declineRefinancing':
+        refusal = declineRefinancing(ctx, action.loanId);
+        break;
+      case 'bank/prepay':
+        refusal = prepayLoan(ctx, action.loanId, action.amount, action.mode);
+        break;
       case 'market/visit':
         refusal = requestVisit(ctx, action.listingId);
         break;
@@ -777,6 +787,8 @@ export function createEngine(content: GameContent) {
     },
     /** Each loan: repaid share, interest paid and left, end, a cheaper bank (« Banque »). */
     loanSheets: (state: GameState) => loanSheets(content, state),
+    previewPrepayment: (state: GameState, loanId: string, amount: Cents, mode: PrepaymentMode) =>
+      previewPrepayment(content, state, loanId, amount, mode),
     /**
      * A negotiated departure of an owned property's tenant: the usual range of the indemnity
      * (in months of rent) and the day a new offer is possible; null without one.

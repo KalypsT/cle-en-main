@@ -27,7 +27,7 @@ import {
   type OwnedProperty,
   type Property,
 } from './state.ts';
-import { initialBankRelations } from './systems/banking.ts';
+import { initialBankRelations, scheduledInterestPaid } from './systems/banking.ts';
 import { seedListings } from './systems/listings.ts';
 import { initialCityMarkets } from './systems/prices.ts';
 import {
@@ -61,6 +61,23 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  * the migration from the previous version here, and test it.
  */
 export const MIGRATIONS: MigrationRegistry = {
+  /**
+   * Version 21 to 22: early repayments change a loan's schedule, so each loan counts the
+   * interest it paid (until now, those of its original schedule); no offer was declined.
+   */
+  21: (raw) => ({
+    ...raw,
+    loans: ((raw.loans as Record<string, unknown>[]) ?? []).map((loan) => ({
+      ...loan,
+      interestPaid: scheduledInterestPaid(
+        Number(loan.principal),
+        Number(loan.ratePercent),
+        Number(loan.durationMonths),
+        Number(loan.paymentsMade),
+      ),
+      renegotiationDeclinedPercent: null,
+    })),
+  }),
   /**
    * Version 20 to 21: the works in progress did not record how the property was when they
    * started, and no finished works is kept: both start empty (the end of those works shows
@@ -1496,8 +1513,10 @@ const gameStateSchema = z
           monthlyPayment: cents.min(0),
           remaining: cents.min(0),
           paymentsMade: z.number().int().min(0),
+          interestPaid: cents.min(0),
           startDate: calendarDateSchema,
           renegotiationSuggested: z.boolean(),
+          renegotiationDeclinedPercent: z.number().nullable(),
           propertyId: z.string().nullable(),
         })
         .strict(),

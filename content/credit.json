@@ -29,7 +29,13 @@
   "renegotiation": {
     "thresholdPercent": 0.7,
     "feesShareOfRemaining": 0.03,
-    "fixedFees": 1000
+    "fixedFees": 1000,
+    "renotifyStepPercent": 0.3
+  },
+  "earlyRepayment": {
+    "penaltyShareOfAmount": 0.03,
+    "penaltyInterestMonths": 6,
+    "minAmount": 1000
   },
   "trust": {
     "startByJob": {

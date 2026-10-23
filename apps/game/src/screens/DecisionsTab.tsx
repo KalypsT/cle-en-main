@@ -18,6 +18,7 @@ import {
   subjectRoute,
 } from '../inbox.ts';
 import {
+  bankName,
   findCatalogEvent,
   format,
   formatDayYear,
@@ -67,7 +68,10 @@ export function decisionTitle(decision: PendingDecision): string {
     case 'coproVote':
       return format(texts.coproVote, { count: decision.resolutions });
     case 'renegotiation':
-      return format(texts.renegotiation, { rate: formatPercent(decision.marketPercent) });
+      return format(texts.renegotiation, {
+        bank: bankName(decision.bankId),
+        rate: formatPercent(decision.ratePercent),
+      });
     case 'cashAlert':
       return format(texts.cashAlert, { amount: formatEuros(decision.lowest) });
     case 'challengeOffer':
@@ -151,6 +155,7 @@ export function decisionRoute(decision: PendingDecision): Route | null {
     case 'challengeOffer':
       return { name: 'challenge' };
     case 'renegotiation':
+      return { name: 'loan', id: decision.loanId };
     case 'cashAlert':
       return { name: 'bank' };
   }

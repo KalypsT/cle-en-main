@@ -14,7 +14,7 @@ import type { GameState, Holder, OwnedProperty, Property } from '../state.ts';
 import {
   evaluateLoan,
   type LoanDecision,
-  marketOffer,
+  worthyRefinance,
   quoteRate,
   type RateQuote,
   requiredContribution,
@@ -66,7 +66,7 @@ export type PendingDecision = {
   | { kind: 'quoteExpiring'; propertyId: string; quoteId: string; artisanId: string }
   | { kind: 'dpeWarning'; propertyId: string }
   | { kind: 'vacant'; propertyId: string }
-  | { kind: 'renegotiation'; loanId: string; marketPercent: number }
+  | { kind: 'renegotiation'; loanId: string; bankId: string; ratePercent: number }
   | { kind: 'cashAlert'; lowest: Cents }
   | { kind: 'catalogEvent'; instanceId: string; eventId: string }
   | { kind: 'challengeOffer'; challengeId: string }
@@ -211,17 +211,14 @@ export function pendingDecisions(content: GameContent, state: GameState): Pendin
   }
 
   for (const loan of state.loans) {
-    if (!loan.renegotiationSuggested) continue;
-    const years = Math.max(
-      1,
-      Math.round((loan.durationMonths - loan.paymentsMade) / MONTHS_PER_YEAR),
-    );
-    const offer = marketOffer(content, state, years);
-    if (offer < loan.ratePercent) {
+    if (!loan.renegotiationSuggested || loan.renegotiationDeclinedPercent !== null) continue;
+    const offer = worthyRefinance(content, state, loan);
+    if (offer) {
       list.push({
         kind: 'renegotiation',
         loanId: loan.id,
-        marketPercent: offer,
+        bankId: offer.bankId,
+        ratePercent: offer.ratePercent,
         deadlineDay: null,
       });
     }

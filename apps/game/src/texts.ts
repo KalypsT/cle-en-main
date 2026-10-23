@@ -393,6 +393,13 @@ export function describeEvent(
       return events.renegotiationAvailable;
     case 'loanRefinanced':
       return format(events.loanRefinanced, { fees: formatMoney(event.fees) });
+    case 'loanPrepaid':
+      return format(event.full ? events.loanPrepaidFull : events.loanPrepaid, {
+        amount: formatMoney(event.amount),
+        fees: formatMoney(event.fees),
+        payment: formatMoney(event.monthlyPayment),
+        months: event.monthsLeft,
+      });
     case 'bankMeetingHeld':
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':

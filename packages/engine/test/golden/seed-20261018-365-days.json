@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 21,
+    "formatVersion": 22,
     "seed": 20261018,
     "rng": [
       2720554145,
@@ -673,12 +673,14 @@
         "monthlyPayment": 28021,
         "remaining": 4473508,
         "paymentsMade": 10,
+        "interestPaid": 153718,
         "startDate": {
           "year": 2026,
           "month": 12,
           "day": 3
         },
         "renegotiationSuggested": false,
+        "renegotiationDeclinedPercent": null,
         "propertyId": "property-99"
       }
     ],
