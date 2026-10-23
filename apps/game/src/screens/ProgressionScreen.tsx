@@ -1,30 +1,24 @@
-import { gameContent, type Stat } from '@cle/content';
+import { gameContent } from '@cle/content';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import {
-  bankName,
   chronicleText,
   format,
   formatDayLong,
+  formatDayYear,
   formatDecimal,
   formatPercent,
-  rivalName,
   t,
+  statLabel,
   titleName,
 } from '../texts.ts';
 import { Badge, Card, ScreenHeader, Segmented } from '../ui/components.tsx';
+import { GoalCard } from '../ui/GoalCard.tsx';
 import { ChallengeCard, ChallengeHistory } from './ChallengeScreen.tsx';
 
 type Tab = 'titles' | 'achievements' | 'challenges' | 'chronicle';
 const TABS: readonly Tab[] = ['titles', 'achievements', 'challenges', 'chronicle'];
-
-export function statLabel(stat: Stat, key: string | null): string {
-  const label = t.stats[stat];
-  if (stat === 'bankTrust' && key) return `${label} (${bankName(key)})`;
-  if (stat === 'rivalBeaten' && key) return `${label} (${rivalName(key)})`;
-  return label;
-}
 
 function value(current: number): string {
   return formatDecimal(Math.round(current));
@@ -52,6 +46,7 @@ function Titles() {
         )}
         {view.offMarket && <p className="small">{t.progression.offMarket}</p>}
       </Card>
+      <GoalCard />
       <Card title={t.progression.currentTitle}>
         <p className="h2 display" data-testid="current-title">
           {view.currentTitleId ? titleName(view.currentTitleId) : ''}
@@ -69,7 +64,7 @@ function Titles() {
               aside={
                 held !== null ? (
                   <Badge tone="green" icon="check">
-                    {format(t.progression.held, { date: formatDayLong(held) })}
+                    {format(t.progression.held, { date: formatDayYear(held) })}
                   </Badge>
                 ) : (
                   <Badge>{title.available ? t.progression.locked : t.progression.later}</Badge>

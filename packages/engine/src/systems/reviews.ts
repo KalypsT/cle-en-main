@@ -1,5 +1,5 @@
 import { type CalendarDate, fromDayNumber, toDayNumber } from '../calendar.ts';
-import { findJob, type GameContent } from '../content.ts';
+import { findJob, type GameContent, type Stat } from '../content.ts';
 import type { StatementLine } from '../events.ts';
 import { type Cents, toCents } from '../money.ts';
 import type { Advice, AgendaItem, GameState, MonthlyPoint, YearReview } from '../state.ts';
@@ -262,6 +262,61 @@ export function challengeView(content: GameContent, state: GameState) {
 }
 
 /** Titles, achievements, reputation and challenges for the « Progression » screens. */
+/** What is left to do for a condition of a title (game feel, lot 5). */
+export interface GoalCondition {
+  stat: Stat;
+  key: string | null;
+  current: number;
+  target: number;
+  /** How far along, 0 … 1. */
+  share: number;
+}
+
+/** A title the player may earn next, with how far along its conditions are. */
+export interface NextGoal {
+  titleId: string;
+  /** Mean of the conditions' shares, 0 … 1. */
+  share: number;
+  conditions: GoalCondition[];
+}
+
+/**
+ * The titles the player can go for now (their previous step is held), the
+ * closest to done first (the earlier step on a tie). The first is the goal the
+ * interface suggests; the others are the other branch.
+ */
+export function nextGoals(content: GameContent, state: GameState): NextGoal[] {
+  const cache = {};
+  const held = new Set(state.progress.titles.map((title) => title.id));
+  return content.titles
+    .filter(
+      (title) =>
+        !held.has(title.id) && title.available && title.requiresAny.some((id) => held.has(id)),
+    )
+    .map((title) => {
+      const conditions = title.conditions
+        .filter((condition) => condition.active !== false && condition.min !== undefined)
+        .map((condition): GoalCondition => {
+          const current = statValue(content, state, condition.stat, condition.key, cache);
+          const target = condition.min ?? 0;
+          return {
+            stat: condition.stat,
+            key: condition.key ?? null,
+            current,
+            target,
+            share: target > 0 ? Math.min(1, Math.max(0, current / target)) : 1,
+          };
+        });
+      const share =
+        conditions.length > 0
+          ? conditions.reduce((sum, condition) => sum + condition.share, 0) / conditions.length
+          : 0;
+      return { goal: { titleId: title.id, share, conditions }, step: title.step };
+    })
+    .sort((a, b) => b.goal.share - a.goal.share || a.step - b.step)
+    .map(({ goal }) => goal);
+}
+
 export function progressionView(content: GameContent, state: GameState) {
   const cache = {};
   const held = new Map(state.progress.titles.map((title) => [title.id, title.day]));

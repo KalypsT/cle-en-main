@@ -23,6 +23,38 @@ describe('progression (docs/02, sections 2.8 to 2.10)', () => {
     ]);
   });
 
+  it('suggests the title to go for next, the closest to done first', () => {
+    const engine = createEngine(content);
+    // At the start: only the first step is within reach, with no progress.
+    const start = newGame({ seed: 99 });
+    const [first, ...others] = engine.nextGoals(start);
+    expect(first).toMatchObject({ titleId: 'firstInvestor', share: 0 });
+    expect(first?.conditions).toEqual([
+      { stat: 'purchases', key: null, current: 0, target: 1, share: 0 },
+    ]);
+    expect(others).toEqual([]);
+
+    // After a purchase: the two branches, Bailleur and Rénovateur, both at zero.
+    const { state } = buyWithLoan(start, affordableListing(start).id);
+    const goals = engine.nextGoals(state);
+    expect(goals.map((goal) => goal.titleId).sort()).toEqual(['landlord', 'renovator']);
+    // A title already held is never suggested again.
+    expect(goals.some((goal) => goal.titleId === 'firstInvestor')).toBe(false);
+
+    // Progress on one branch puts it first: one counted work out of the three asked.
+    const worked: GameState = {
+      ...state,
+      progress: {
+        ...state.progress,
+        counters: { ...state.progress.counters, bigWorksDone: 1 },
+      },
+    };
+    const [leader] = engine.nextGoals(worked);
+    expect(leader?.titleId).toBe('renovator');
+    expect(leader?.share).toBeCloseTo(1 / 3, 5);
+    expect(leader?.conditions[0]).toMatchObject({ current: 1, target: 3 });
+  });
+
   it('earns Primo-investisseur, an achievement and reputation with the first deed', () => {
     const start = newGame({ seed: 99 });
     const { state, event } = buyWithLoan(start, affordableListing(start).id);

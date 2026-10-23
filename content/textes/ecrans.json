@@ -1096,6 +1096,14 @@
     "pastMonthHint": "Bilan d'un mois passé : la réputation est celle du jour du bilan.",
     "years": "Années"
   },
+  "goal": {
+    "heading": "Prochain titre",
+    "other": "Autre voie : {title}",
+    "perk": "Avantage : {perk}",
+    "progress": "{current} / {target}",
+    "see": "Tous les titres",
+    "nothing": "Vous avez gravi toutes les marches du moment."
+  },
   "worksReport": {
     "heading": "Avant / après",
     "kicker": "Chantier terminé",

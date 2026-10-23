@@ -7,7 +7,6 @@ import {
   fill,
   importState,
   openGame,
-  openMenuEntry,
   ownerGame,
   pause,
   referenceGame,
@@ -64,8 +63,19 @@ test('reviews the year with Yvon Tableur and shows the progression', async ({ pa
   await review.getByRole('button', { name: t.review.continue }).click();
   await pause(page);
 
-  await openMenuEntry(page, t.menu.progression);
+  // The street's drawer suggests the title to go for next: the landlord, with its meter.
+  await tab(page, 'street');
+  const drawer = page.getByTestId('street-drawer');
+  await drawer.getByRole('button', { name: t.street.openDashboard }).click();
+  const goal = drawer.getByTestId('next-goal');
+  await expect(goal).toContainText(t.goal.heading);
+  await expect(goal).toContainText(gameContent.titles.find((x) => x.id === 'landlord')?.name ?? '');
+  await expect(goal).toContainText(fill(t.goal.progress, { current: 1, target: 3 }));
+  await capture(page, '01-prochain-titre', 'objectifs');
+  await drawer.getByRole('button', { name: t.goal.see }).click();
+
   await expect(page.getByTestId('reputation')).toBeVisible();
+  await expect(page.getByTestId('next-goal')).toBeVisible();
   await expect(page.getByTestId('title-firstInvestor')).toContainText(
     fill(t.progression.held, { date: '' }).trim(),
   );

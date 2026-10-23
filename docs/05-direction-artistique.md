@@ -86,6 +86,12 @@ L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-e
 - **Manrope** pour l'interface (lisible, chiffres alignés).
 - **Une police expressive** pour le titre *Clé en main !* et les grands moments (bilans, titres), par exemple **Fraunces**.
 
+### Finitions (plaisir de jeu, lot 5)
+
+- **Chiffres clés** en Fraunces (`--font-display`), en chiffres alignés ; le reste de l'interface garde Manrope.
+- **Mouvement** : fondu et glissement de 8 px à l'arrivée d'un écran (0,22 s), ouverture du tiroir (0,25 s), pression de 2 % sur les boutons et les lignes, jauge qui se remplit (0,6 s). Tout est désactivé avec « réduire les animations ».
+- **Thème sombre** : relu sur les écrans des cinq lots ; les teintes fixes des scènes (laiton de la clé, médaillon doré, pièces d'or des loyers) sont voulues et gardées.
+
 ## 5.8 Le son
 
 - **Ambiances** par moment et par lieu : oiseaux le matin, rumeur de la ville, **cloches à midi**, pluie, chantier.

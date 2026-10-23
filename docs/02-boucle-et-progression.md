@@ -135,6 +135,8 @@ Chaque titre apporte un **petit avantage** (une marge bancaire réduite, un agen
 > - **Magnat** : 1 000 000 € nets (1,3 M€ auparavant). Il suit **Investisseur aguerri, Marchand de biens ou Promoteur** : transformer un bien n'est pas obligatoire, Promoteur reste une voie parmi d'autres (mesure du jalon 8 : avec Promoteur pour seul prérequis, un Chasseur ne devenait jamais Magnat).
 > - **Bailleur** ne compte que les logements loués (un parking ou un local ne fait pas un bailleur).
 
+> **Plaisir de jeu, lot 5** : l'interface suggère le **prochain titre** : parmi les titres dont l'étape précédente est tenue, celui dont les conditions sont les plus avancées (moyenne des parts accomplies ; l'étape la plus basse à égalité), avec une jauge par condition (chapitre 4). Aucune règle de titre ne change.
+
 Durées cibles, voir [08-equilibrage.md](08-equilibrage.md).
 
 ## 2.10 Succès, défis, chronique et statistiques

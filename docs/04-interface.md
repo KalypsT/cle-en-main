@@ -73,6 +73,12 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 > - **Dernier chantier** : la fiche du bien (Aperçu) a une carte « Dernier chantier » (date, coût, DPE) qui rouvre la même vue dans un écran « Avant / après ».
 > - **Façades en vignette** : les lignes de Mes biens, des achats en cours, des biens vendus, de la carte et des **Décisions** montrent le bâtiment tel que la rue le dessine ; sur une décision, une petite pastille en coin dit de quelle sorte de décision il s'agit (clé, banque, alerte…). Le terrain et le parking gardent leur dessin simple.
 
+> **Plaisir de jeu, lot 5 : objectifs et finitions** (2026-10-23, point ouvert n° 17) :
+> - **Prochain titre** : une carte (requête `nextGoals` du moteur, qui lit les conditions des titres) donne le titre le plus proche d'être gagné parmi ceux dont l'étape précédente est tenue : son nom, ce qu'il demande, **chaque condition avec sa jauge** (« Biens loués 1 / 3 »), son avantage et le nom de l'autre voie. Elle ouvre le **tiroir de la Rue** (sous les deux tuiles) et se trouve en tête de l'onglet Titres de Progression ; « Tous les titres » y mène. Le tiroir fermé ne change pas. Quand le joueur tient toutes les marches du moment, elle disparaît.
+> - **Chiffres clés** : montants des fiches, tuiles et avant / après en police d'affichage (Fraunces), chiffres alignés.
+> - **Transitions** : un écran entre par un fondu et un léger glissement, le corps du tiroir s'ouvre en douceur, les boutons et les lignes s'enfoncent un peu au toucher, l'icône de l'onglet actif grossit ; jauges qui se remplissent. Rien de tout cela si le téléphone demande moins d'animations.
+> - **Thème sombre** : relecture des écrans des lots 1 à 5 (rue, tiroir, carte, annonces, fiche, patrimoine, bien, progression, remise des clés, avant / après). Corrigés : les étiquettes de prix de la carte suivent le thème ; la date d'un titre obtenu (« Obtenu le mercredi 18 novembre 2026 ») dépassait de l'écran et rétrécissait toute la page sur téléphone (l'écran Progression : elle est abrégée et l'en-tête des cartes peut passer à la ligne) ; les confettis des scènes tombent derrière le texte.
+
 ## 4.6 Interactions clés
 
 - **Rue** : toucher une bulle (« À vendre », « Panne », « Travaux 25 % ») ouvre la fiche concernée ; toucher un bâtiment ouvre sa coupe.

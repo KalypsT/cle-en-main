@@ -69,6 +69,7 @@ import {
   buildYearReview,
   monthlyReview,
   pace,
+  nextGoals,
   progressionView,
   regimeAdvice,
 } from './systems/reviews.ts';
@@ -635,6 +636,8 @@ export function createEngine(content: GameContent) {
       priceChange(state, cityId, neighbourhoodId, months),
     /** Titles, achievements, reputation, challenge, records (« Progression »). */
     progression: (state: GameState) => progressionView(content, state),
+    /** The titles to go for now, the closest to done first (game feel, lot 5). */
+    nextGoals: (state: GameState) => nextGoals(content, state),
     /** The coming days of the agenda. */
     agendaWeek: (state: GameState, days?: number) => agendaWeek(content, state, days),
     /** Loads a save, migrating it to the current format. Throws SaveFormatError. */

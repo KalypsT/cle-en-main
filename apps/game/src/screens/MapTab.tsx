@@ -369,7 +369,7 @@ export function MapTab() {
                 >
                   <path
                     d={`M${x - w / 2} ${y - tip - h} h${w} v${h} h${-(w / 2 - tip)} l${-tip} ${tip} l${-tip} ${-tip} h${-(w / 2 - tip)}z`}
-                    fill={favorite ? '#fcefd3' : '#fffdf8'}
+                    fill={favorite ? 'var(--amber-soft)' : 'var(--surface)'}
                     stroke={TAG_COLORS[kind]}
                     strokeWidth={2 * pixel}
                     strokeLinejoin="round"
@@ -508,7 +508,7 @@ export function MapTab() {
         <span>
           <i
             className="legend-tag"
-            style={{ background: '#fcefd3', borderColor: 'var(--accent)' }}
+            style={{ background: 'var(--amber-soft)', borderColor: 'var(--accent)' }}
           />
           {t.map.legendFavorite}
         </span>

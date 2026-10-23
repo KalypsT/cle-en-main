@@ -1,4 +1,4 @@
-import { gameContent, screenTexts, uiTexts } from '@cle/content';
+import { gameContent, screenTexts, type Stat, uiTexts } from '@cle/content';
 import {
   type AnecdoteNote,
   type CalendarDate,
@@ -681,4 +681,12 @@ export function formatBuildDate(timestamp: number): string {
     date: longDateFormat.format(timestamp),
     time: realTimeFormat.format(timestamp),
   });
+}
+
+/** Label of a statistic, with the bank or the rival it is about. */
+export function statLabel(stat: Stat, key: string | null): string {
+  const label = t.stats[stat];
+  if (stat === 'bankTrust' && key) return `${label} (${bankName(key)})`;
+  if (stat === 'rivalBeaten' && key) return `${label} (${rivalName(key)})`;
+  return label;
 }
