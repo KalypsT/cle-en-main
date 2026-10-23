@@ -242,6 +242,7 @@ export function sampleOwned(
     coproCalls: [],
     valueHistory: [],
     log: [],
+    lastWorks: null,
     rentsReceived: 0,
   };
 }

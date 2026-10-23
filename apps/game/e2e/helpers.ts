@@ -101,6 +101,12 @@ export async function rootTab(page: Page, name: keyof typeof t.tabs) {
   await tab(page, name);
 }
 
+/** Unfolds the filters of the listings, folded behind one button (game feel, lot 3). */
+export async function openFilters(page: Page) {
+  const toggle = page.getByTestId('filters-toggle');
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+}
+
 /** Opens an entry of the « Menu » tab. */
 export async function openMenuEntry(page: Page, label: string) {
   await rootTab(page, 'menu');

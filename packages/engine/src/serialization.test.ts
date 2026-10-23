@@ -549,4 +549,26 @@ describe('migrations', () => {
     const raw = { formatVersion: 19, reviews: { years: [review] } };
     expect(migrateRaw(raw, context, 20)).toEqual({ ...raw, formatVersion: 20 });
   });
+
+  it('starts the before and after of the works of a version 20 save empty', () => {
+    const project = { id: 'works-1', startDay: 10, dpeBefore: 'F', paid: 0 };
+    const raw = {
+      formatVersion: 20,
+      properties: [
+        { property: { id: 'p-1' }, works: project },
+        { property: { id: 'p-2' }, works: null },
+      ],
+    };
+    const migrated = migrateRaw(raw, context, 21) as {
+      formatVersion: number;
+      properties: { works: unknown; lastWorks: unknown }[];
+    };
+    expect(migrated.formatVersion).toBe(21);
+    // The works under way did not record how the property was; nothing is kept as finished.
+    expect(migrated.properties[0]).toMatchObject({
+      works: { ...project, before: null },
+      lastWorks: null,
+    });
+    expect(migrated.properties[1]).toMatchObject({ works: null, lastWorks: null });
+  });
 });

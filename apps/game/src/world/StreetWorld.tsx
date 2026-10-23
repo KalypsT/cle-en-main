@@ -1,10 +1,18 @@
 import { gameContent } from '@cle/content';
-import { type Bubble, type StreetBuilding, toDayNumber, type Weather } from '@cle/engine';
+import {
+  type Bubble,
+  type Cents,
+  type StreetBuilding,
+  toDayNumber,
+  type Weather,
+} from '@cle/engine';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
-import { anecdoteText, format, t } from '../texts.ts';
+import { anecdoteText, format, formatSigned, t } from '../texts.ts';
+import { avatarLook } from '../ui/Avatar.tsx';
 import { Icon, type IconName } from '../ui/Icon.tsx';
+import { useReducedMotion } from '../ui/media.ts';
 import { FacadeShape } from './FacadeShape.tsx';
 import { type FrameStats, type QualityLevel, type SceneData, StreetScene } from './StreetScene.ts';
 import {
@@ -39,19 +47,6 @@ function qualityLevel(choice: 'auto' | 'high' | 'economy'): QualityLevel | 'auto
   return choice === 'auto' ? 'auto' : choice === 'high' ? 2 : 0;
 }
 
-function useReducedMotion(): boolean {
-  const query = '(prefers-reduced-motion: reduce)';
-  const [reduced, setReduced] = useState(() => window.matchMedia?.(query).matches ?? false);
-  useEffect(() => {
-    const media = window.matchMedia?.(query);
-    if (!media) return;
-    const listener = () => setReduced(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, []);
-  return reduced;
-}
-
 export function bubbleLabel(bubble: Bubble): string {
   return format(t.street.bubbles[bubble.kind], {
     percent: bubble.percent ?? 0,
@@ -79,6 +74,19 @@ const BUBBLE_ICONS: Record<Bubble['kind'], IconName> = {
   anecdote: 'person',
 };
 
+/** The player's flag on the roof of each of their buildings. */
+function OwnerFlag() {
+  return (
+    <span className="street-flag" aria-hidden="true">
+      <svg viewBox="0 0 22 30" width="22" height="30">
+        <rect x="1" y="0" width="2" height="30" rx="1" fill="#5a4a3a" />
+        <path className="street-flag-cloth" d="M3 2 H20 L15 8 L20 14 H3 Z" fill="var(--accent)" />
+        <circle cx="9" cy="8" r="2.2" fill="#f0b45a" />
+      </svg>
+    </span>
+  );
+}
+
 function buildingName(building: StreetBuilding): string {
   const names = t.street.buildingNames;
   if (building.home) return names.home;
@@ -86,8 +94,19 @@ function buildingName(building: StreetBuilding): string {
   return names[building.role];
 }
 
-export function StreetWorld({ active }: { active: boolean }) {
-  const { state, settings, audio, notify, ambience: shownAmbience } = useGame();
+/** The player's walk starts a little after the street shows its morning. */
+const PLAYER_WALK_DELAY_MS = 1500;
+/** Days a removal truck stays at the door of a tenant moving in. */
+const MOVING_DAYS = 1;
+/** How long the month's rents float above the let buildings. */
+const RENTS_SHOWN_MS = 3200;
+
+/**
+ * `held`: a review or a scene is open over the game; the month's rents wait
+ * for it to close before they rise above the buildings.
+ */
+export function StreetWorld({ active, held = false }: { active: boolean; held?: boolean }) {
+  const { state, session, settings, audio, notify, ambience: shownAmbience } = useGame();
   const nav = useNav();
   const cityId = nav.cityId;
   const neighbourhoods = gameContent.cities[cityId]?.neighbourhoods ?? [];
@@ -143,7 +162,7 @@ export function StreetWorld({ active }: { active: boolean }) {
   const [current, setCurrent] = useState(0);
   const [stats, setStats] = useState<FrameStats | null>(null);
   const reducedMotion = useReducedMotion();
-  const scale = sceneScale(size.height);
+  const scale = sceneScale(size.height, size.width);
   const offsetY = size.height - DESIGN_HEIGHT * scale;
 
   // Create the PixiJS scene once; it lives while the game runs.
@@ -193,6 +212,13 @@ export function StreetWorld({ active }: { active: boolean }) {
     return () => observer.disconnect();
   }, []);
 
+  // A tenant moving in: the removal truck stays the day of the move and the next.
+  const movingKey = properties
+    .filter((owned) => owned.lease && day - owned.lease.startDay <= MOVING_DAYS)
+    .map((owned) => owned.property.id)
+    .join(',');
+  const movingIn = useMemo(() => (movingKey ? movingKey.split(',') : []), [movingKey]);
+
   // The latest data, given to the scene at the next frame.
   const sceneData = useRef<Omit<SceneData, 'accent'> | null>(null);
   const sceneFrame = useRef<number | null>(null);
@@ -210,6 +236,7 @@ export function StreetWorld({ active }: { active: boolean }) {
       cityId,
       neighbourhoodId,
       seed: state.seed,
+      movingIn,
     };
     // Next frame: the theme (and so the accent colour) is applied by App after this effect.
     // One frame at a time, never cancelled: when the hours go by faster than the frames, a
@@ -219,7 +246,7 @@ export function StreetWorld({ active }: { active: boolean }) {
       if (sceneData.current)
         sceneRef.current?.setData({ ...sceneData.current, accent: cssAccent() });
     });
-  }, [active, layout, ambience, cityId, neighbourhoodId, state.seed, settings.theme]);
+  }, [active, layout, ambience, cityId, neighbourhoodId, state.seed, settings.theme, movingIn]);
   useEffect(
     () => () => {
       if (sceneFrame.current !== null) cancelAnimationFrame(sceneFrame.current);
@@ -227,43 +254,135 @@ export function StreetWorld({ active }: { active: boolean }) {
     [],
   );
 
-  // A new property (just bought): show its neighbourhood and centre it.
+  // A new property (just bought): show its neighbourhood and centre it. A new object each
+  // time, so that asking again for the same building centres it again.
   const ownedIds = state.properties.map((owned) => owned.property.id).join(',');
   const [seenOwned, setSeenOwned] = useState(ownedIds);
-  const [focus, setFocus] = useState<string | null>(null);
+  const [focus, setFocus] = useState<{ id: string; smooth: boolean } | null>(null);
   if (ownedIds !== seenOwned) {
     setSeenOwned(ownedIds);
     const known = new Set(seenOwned.split(','));
     const fresh = state.properties.find((owned) => !known.has(owned.property.id));
     if (fresh) {
-      setFocus(fresh.property.id);
+      setFocus({ id: fresh.property.id, smooth: false });
       setNeighbourhoodId(fresh.property.neighbourhoodId);
       if (fresh.property.cityId !== cityId) nav.setCityId(fresh.property.cityId);
     }
   }
 
+  // The rents of the month rise above the let buildings (docs/04, 4.9), once the review
+  // that comes with them is closed and the street on screen.
+  const [pendingRents, setPendingRents] = useState<Record<string, Cents> | null>(null);
+  const [shownRents, setShownRents] = useState<{
+    key: number;
+    amounts: Record<string, Cents>;
+  } | null>(null);
+  useEffect(
+    () =>
+      session.onEvents((events) => {
+        const amounts: Record<string, Cents> = {};
+        for (const event of events) {
+          if (event.type !== 'monthlyStatement') continue;
+          for (const line of event.lines) {
+            if (line.kind === 'rentalIncome' && line.amount > 0)
+              amounts[line.propertyId] = (amounts[line.propertyId] ?? 0) + line.amount;
+          }
+        }
+        if (Object.keys(amounts).length > 0) setPendingRents(amounts);
+      }),
+    [session],
+  );
+  if (pendingRents && active && !held) {
+    setShownRents({ key: (shownRents?.key ?? 0) + 1, amounts: pendingRents });
+    setPendingRents(null);
+  }
+  useEffect(() => {
+    if (!shownRents) return;
+    const timer = setTimeout(() => setShownRents(null), RENTS_SHOWN_MS);
+    return () => clearTimeout(timer);
+  }, [shownRents]);
+  const rentOrder = shownRents ? Object.keys(shownRents.amounts) : [];
+
+  // In the morning the player goes out: their avatar walks down the street once a day, out
+  // of their own home's door when they live in the street (docs/05, 5.5).
+  const walkedDay = useRef<number | null>(null);
+  const avatar = state.player.avatar;
+  const homeDoor = useMemo(() => {
+    const home = layout.streets
+      .flatMap((laid) => laid.buildings)
+      .find((item) => item.building.home);
+    return home ? home.x + home.spec.door.x + home.spec.door.w / 2 : null;
+  }, [layout]);
+  useEffect(() => {
+    if (!active || ambience.moment !== 'morning' || shownAmbience.still) return;
+    if (walkedDay.current === day) return;
+    const timer = setTimeout(() => {
+      walkedDay.current = day;
+      sceneRef.current?.walkPlayer({ ...avatarLook(avatar), marker: cssAccent() }, homeDoor);
+    }, PLAYER_WALK_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [active, ambience.moment, shownAmbience.still, day, homeDoor, avatar]);
+
+  // « Mes biens »: from one of the player's buildings of the city to the next (docs/04, 4.9).
+  const ownedHere = useMemo(() => {
+    const order = (gameContent.cities[cityId]?.neighbourhoods ?? []).map((n) => n.id);
+    return properties
+      .filter((owned) => owned.property.cityId === cityId)
+      .map((owned) => owned.property)
+      .sort(
+        (a, b) =>
+          order.indexOf(a.neighbourhoodId) - order.indexOf(b.neighbourhoodId) ||
+          a.id.localeCompare(b.id),
+      );
+  }, [properties, cityId]);
+  const nextOwned = useRef(0);
+  const showNextOwned = () => {
+    const target = ownedHere[nextOwned.current % ownedHere.length];
+    if (!target) return;
+    nextOwned.current += 1;
+    const sameNeighbourhood = target.neighbourhoodId === neighbourhoodId;
+    setNeighbourhoodId(target.neighbourhoodId);
+    setFocus({ id: target.id, smooth: sameNeighbourhood && !reducedMotion });
+  };
+
   // Back to where the player was in this neighbourhood, or to his first property.
-  const shown = useRef<{ neighbourhoodId: string | null; focus: string | null }>({
+  const shown = useRef<{
+    neighbourhoodId: string | null;
+    focus: { id: string; smooth: boolean } | null;
+  }>({
     neighbourhoodId: null,
     focus: null,
   });
+  // The scale and width the scroll position was set for: when they change (the view's real
+  // size arrives, the phone turns), the same point of the street stays in the middle.
+  const placed = useRef({ scale, width: size.width });
   useLayoutEffect(() => {
     const scroll = scrollRef.current;
     // Hidden (another tab): wait until the street shows to place it.
     if (!scroll || !active || scroll.clientWidth === 0) return;
-    if (shown.current.neighbourhoodId === scrollKey && shown.current.focus === focus) return;
+    const before = placed.current;
+    placed.current = { scale, width: size.width };
+    if (shown.current.neighbourhoodId === scrollKey && shown.current.focus === focus) {
+      if (before.scale !== scale || before.width !== size.width) {
+        const middle = (scroll.scrollLeft + before.width / 2) / before.scale;
+        scroll.scrollLeft = Math.max(0, middle * scale - size.width / 2);
+      }
+      return;
+    }
     const newFocus = focus !== shown.current.focus ? focus : null;
     shown.current = { neighbourhoodId: scrollKey, focus };
     memory.neighbourhoodId = neighbourhoodId;
     const buildings = layout.streets.flatMap((street) => street.buildings);
     const target = newFocus
-      ? buildings.find((item) => item.building.propertyId === newFocus)
+      ? buildings.find((item) => item.building.propertyId === newFocus.id)
       : memory.scroll[scrollKey] === undefined
         ? buildings.find((item) => item.building.role === 'owned')
         : undefined;
-    scroll.scrollLeft = target
+    const left = target
       ? Math.max(0, (target.x + target.spec.width / 2) * scale - size.width / 2)
       : (memory.scroll[scrollKey] ?? 0);
+    if (newFocus?.smooth) scroll.scrollTo({ left, behavior: 'smooth' });
+    else scroll.scrollLeft = left;
   }, [neighbourhoodId, scrollKey, focus, layout, scale, size.width, active]);
 
   useEffect(() => {
@@ -385,8 +504,30 @@ export function StreetWorld({ active }: { active: boolean }) {
                     }
                   />
                   {building.role === 'owned' && (
-                    <span className="street-mine" style={{ bottom: spec.groundHeight * scale + 4 }}>
-                      {building.home ? t.street.myHome : t.street.myProperty}
+                    <>
+                      <OwnerFlag />
+                      <span
+                        className="street-mine"
+                        style={{ bottom: spec.groundHeight * scale + 4 }}
+                      >
+                        <Icon name="key" size={12} />
+                        {building.home ? t.street.myHome : t.street.myProperty}
+                      </span>
+                    </>
+                  )}
+                  {shownRents && building.propertyId && shownRents.amounts[building.propertyId] && (
+                    <span
+                      key={shownRents.key}
+                      className="street-rent"
+                      data-testid="street-rent"
+                      style={{
+                        animationDelay: `${rentOrder.indexOf(building.propertyId) * 0.15}s`,
+                      }}
+                    >
+                      <span className="street-coin" aria-hidden="true">
+                        €
+                      </span>
+                      {formatSigned(shownRents.amounts[building.propertyId] ?? 0)}
                     </span>
                   )}
                   {building.bubbles.length > 0 && (
@@ -446,6 +587,17 @@ export function StreetWorld({ active }: { active: boolean }) {
             <Icon name="chevron" size={16} />
           </button>
         </div>
+        {ownedHere.length > 0 && (
+          <button
+            type="button"
+            className="street-chip street-owned"
+            data-testid="street-next-owned"
+            onClick={showNextOwned}
+          >
+            <Icon name="key" size={16} />
+            {format(t.street.myProperties, { count: ownedHere.length })}
+          </button>
+        )}
       </div>
       {failed && <p className="street-fallback-note small">{t.street.fallback}</p>}
       {stats && settings.showFps && active && (

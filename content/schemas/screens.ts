@@ -34,6 +34,20 @@ export const TUTORIAL_TRIGGERS = [
   'event:monthlyStatement',
 ] as const;
 
+/**
+ * What a step points at: the buttons marked `data-tutorial` with this name
+ * get a halo while the step is shown.
+ */
+export const TUTORIAL_TARGETS = [
+  'pause',
+  'listings',
+  'visit',
+  'financing',
+  'offer',
+  'loan',
+  'acceptLoan',
+] as const;
+
 /** Gérard's tutorial, then Yvon's first review (docs/04, section 4.7). */
 export const tutorialSchema = z
   .object({
@@ -41,6 +55,9 @@ export const tutorialSchema = z
     skip: text,
     disable: text,
     ok: text,
+    /** Folds the bubble into a small chip, and opens it again. */
+    fold: text,
+    unfold: text,
     steps: z
       .array(
         z
@@ -51,6 +68,7 @@ export const tutorialSchema = z
             /** Shown only once this happens (the step waits silently before). */
             showOn: z.enum(TUTORIAL_TRIGGERS).optional(),
             next: z.enum(TUTORIAL_TRIGGERS),
+            target: z.enum(TUTORIAL_TARGETS).optional(),
           })
           .strict(),
       )
@@ -60,3 +78,4 @@ export const tutorialSchema = z
 
 export type Tutorial = z.infer<typeof tutorialSchema>;
 export type TutorialTrigger = (typeof TUTORIAL_TRIGGERS)[number];
+export type TutorialTarget = (typeof TUTORIAL_TARGETS)[number];

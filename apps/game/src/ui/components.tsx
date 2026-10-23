@@ -29,28 +29,60 @@ export function ScreenHeader({
   );
 }
 
+/** A card that folds: its heading opens and closes it (game feel, lot 3). */
+export interface Fold {
+  open: boolean;
+  onToggle: () => void;
+}
+
 export function Card({
   title,
   aside,
   tint,
   children,
   testId,
+  fold,
+  id,
 }: {
   title?: ReactNode | undefined;
   aside?: ReactNode | undefined;
   tint?: 'amber' | 'brick' | 'accent' | undefined;
   children?: ReactNode | undefined;
   testId?: string | undefined;
+  fold?: Fold | undefined;
+  /** Anchor, to bring the card into view. */
+  id?: string | undefined;
 }) {
+  const open = fold?.open ?? true;
   return (
-    <section className={`card${tint ? ` tinted-${tint}` : ''}`} data-testid={testId}>
-      {(title || aside) && (
-        <div className="card-heading">
-          {title && <h2 className="h3">{title}</h2>}
-          {aside}
-        </div>
-      )}
-      {children}
+    <section
+      className={`card${tint ? ` tinted-${tint}` : ''}${fold ? ' foldable' : ''}`}
+      data-testid={testId}
+      id={id}
+    >
+      {(title || aside) &&
+        (fold ? (
+          <button
+            type="button"
+            className="card-heading card-fold"
+            aria-expanded={open}
+            onClick={fold.onToggle}
+          >
+            {title && <h2 className="h3">{title}</h2>}
+            <span className="row">
+              {aside}
+              <span className="card-chevron" aria-hidden="true">
+                <Icon name="chevron" size={18} />
+              </span>
+            </span>
+          </button>
+        ) : (
+          <div className="card-heading">
+            {title && <h2 className="h3">{title}</h2>}
+            {aside}
+          </div>
+        ))}
+      {open && children}
     </section>
   );
 }
@@ -104,13 +136,15 @@ export function Badge({
   tone,
   icon,
   children,
+  testId,
 }: {
   tone?: 'accent' | 'amber' | 'brick' | 'green' | undefined;
   icon?: IconName | undefined;
   children: ReactNode;
+  testId?: string | undefined;
 }) {
   return (
-    <span className={`badge${tone ? ` ${tone}` : ''}`}>
+    <span className={`badge${tone ? ` ${tone}` : ''}`} data-testid={testId}>
       {icon && <Icon name={icon} size={14} />}
       {children}
     </span>

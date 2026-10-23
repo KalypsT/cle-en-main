@@ -230,6 +230,7 @@ describe('streets', () => {
         ],
         hazard: null,
         dpeBefore: 'D',
+        before: null,
         paid: 0,
       },
     });
@@ -249,6 +250,46 @@ describe('streets', () => {
     expect(mine?.occupied).toBe(false);
     expect(mine?.rooms.find((room) => room.spaceId === 'living')?.renovating).toBe('painter');
     expect(section?.worksPercent).toBe(works?.percent);
+  });
+});
+
+describe('cross-section of the dwelling of the player', () => {
+  it('tells the range of each room and who lives there', () => {
+    const state = newGame();
+    const today = toDayNumber(state.clock.date);
+    const let_ = sampleOwned(today, { let: true });
+    const premium = {
+      ...let_,
+      property: {
+        ...let_.property,
+        items: let_.property.items.map((item) =>
+          item.spaceId === 'living' ? { ...item, tier: 'premium' as const } : item,
+        ),
+      },
+    };
+    const mineOf = (owned: typeof let_) =>
+      engine
+        .section(withOwned(state, owned), CITY, 'centreHistorique', owned.property.id)
+        ?.units.find((unit) => unit.role === 'player');
+    const mine = mineOf(premium);
+    // The living room, fitted in the premium range; the others as they are.
+    expect(mine?.rooms.find((room) => room.spaceId === 'living')?.tier).toBe('premium');
+    expect(mine?.rooms.find((room) => room.spaceId === 'bedroom')?.tier).toBe(
+      let_.property.items.find((item) => item.spaceId === 'bedroom')?.tier,
+    );
+    // The tenant of the lease lives there; an empty flat has nobody; the player's own home, them.
+    expect(mine?.resident).toEqual({
+      kind: 'tenant',
+      name: `${let_.lease?.tenant.firstName} ${let_.lease?.tenant.lastName}`,
+    });
+    expect(mineOf({ ...let_, lease: null })?.resident).toBeNull();
+    const home = { ...withOwned(state, { ...let_, lease: null }) };
+    home.player = { ...home.player, homePropertyId: let_.property.id };
+    expect(
+      engine
+        .section(home, CITY, 'centreHistorique', let_.property.id)
+        ?.units.find((unit) => unit.role === 'player')?.resident,
+    ).toEqual({ kind: 'player' });
   });
 });
 

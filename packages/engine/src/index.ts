@@ -48,6 +48,8 @@ export {
 export {
   type CashFlowOutlook,
   type CashForecast,
+  type DealKind,
+  type DealVerdict,
   decisionKey,
   type FinancingInput,
   type FinancingSimulation,
@@ -59,11 +61,18 @@ export {
   type PendingDecision,
   type PropertyCashFlow,
 } from './systems/ui-queries.ts';
+export { type WorksBeforeAfter, type WorksChange } from './systems/works-report.ts';
 export { signedLine, statementNet } from './systems/history.ts';
 export { type AgendaRefusal } from './systems/agenda.ts';
 export { type CatalogRefusal, NO_CHOICE } from './systems/catalog.ts';
 export { type ChallengeRefusal } from './systems/challenges.ts';
 export { type DayKind } from './systems/holidays.ts';
-export { type AgendaDay, type MonthlyReview, type ReviewGroup } from './systems/reviews.ts';
+export {
+  type AgendaDay,
+  type GoalCondition,
+  type MonthlyReview,
+  type NextGoal,
+  type ReviewGroup,
+} from './systems/reviews.ts';
 export { type CitySheet, type VisitQuote } from './systems/city-views.ts';
 export { type MoveRefusal } from './systems/cities.ts';

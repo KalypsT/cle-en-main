@@ -24,6 +24,8 @@ Toujours visible en haut de l'écran :
 - temps libre restant aujourd'hui ;
 - badge du nombre de décisions en attente.
 
+> **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) : la barre tient sur **deux lignes courtes**, sans cases : date et heure à gauche, vitesse à droite ; puis la trésorerie (icône €, toucher ouvre le Patrimoine) et le temps libre (icône d'horloge, petite jauge). Environ 80 px au lieu de 135. Le bouton des décisions disparaît : leur nombre reste sur l'onglet Décisions. Quand la trésorerie change, le montant **défile** vers sa nouvelle valeur, s'éclaire en vert ou en rouge, et la différence (« +450 € ») passe sous le montant (rien de tout cela si le téléphone demande moins d'animations).
+
 ## 4.4 La navigation
 
 **5 onglets** en bas de l'écran : **Rue · Carte · Décisions · Patrimoine · Menu**.
@@ -61,6 +63,22 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 > - **Financement simulé** : sa durée par défaut passe de 20 à 25 ans, comme le cash-flow prévu.
 > - **Bilan annuel** : un nouveau conseil d'Yvon nomme le bien loué qui coûte le plus chaque mois (−30 € ou moins), avec son montant. Format de sauvegarde **v20** (ce conseil s'ajoute aux types possibles ; rien à convertir).
 
+> **Plaisir de jeu, lot 3 : chasser la bonne affaire** (2026-10-22, point ouvert n° 17 ; verdict au chapitre 3.3) :
+> - **Liste des annonces** : les filtres (quartier, bonnes affaires, favoris, type, budget) se replient derrière un bouton « Filtres », qui devient « Filtres (n) » quand n filtres sont actifs ; le tri reste visible. Le panneau ouvert est gardé avec les filtres (le temps de la session). Chaque ligne montre la **façade du bâtiment** telle que la rue la dessine, et les badges **Bonne affaire**, **Au prix** ou **Trop cher**, et **Se paie tout seul**. Nouveau filtre : « Bonnes affaires ».
+> - **Fiche annonce** : sous le titre, trois pastilles résument l'annonce : **Prix** (le verdict et l'écart avec l'estimation), **Cash-flow** (le montant par mois et « Se paie tout seul », « Ni gain ni perte » ou « Coûte chaque mois »), **Énergie** (la lettre du DPE et « Louable », « Interdit à la location en 2034 »…). Les détails se replient : estimation, DPE, cash-flow prévu, état des pièces, diagnostic ; toucher une pastille ouvre sa partie et l'amène à l'écran. Le vendeur, le financement et les offres restent dépliés.
+> - **Carte** : une annonce seule est une **étiquette de prix** (« 85 k€ ») dont la pointe tombe sur le bien, bordée de vert (bonne affaire), de bleu volet (au prix) ou de rouge brique (trop cher), sur fond ambré si elle est en favori ; les groupes restent des pastilles numérotées (écart de regroupement porté de 40 à 52 px, les étiquettes étant plus larges). Les biens du joueur sont des maisons bleu volet à serrure ambrée. La légende suit.
+
+> **Plaisir de jeu, lot 4 : rénover avec plaisir** (2026-10-23, point ouvert n° 17 ; chapitre 3.5) :
+> - **Avant / après** : à la fin d'un chantier (dont l'avant a été photographié), une scène s'ouvre sur le jeu, avec la musique de célébration : « Chantier terminé » et le bien, sa **façade avant et après** (une poignée à faire glisser, ou au clavier ; si seuls des postes intérieurs ont changé, la façade est la même et seule la façade d'aujourd'hui s'affiche, sans curseur), la **classe énergétique** (E → D), la **valeur estimée** et le **loyer possible** avec leur gain (« Louable désormais » pour un logement qui ne l'était pas), le coût, **ce qui a changé** (poste, pièce, gamme, état 2 → 5) et l'état des **pièces** en barres. Boutons « Voir le bien » et « Continuer » toujours visibles au pied de la scène. La notification « Chantier terminé » n'est plus montrée dans ce cas.
+> - **Dernier chantier** : la fiche du bien (Aperçu) a une carte « Dernier chantier » (date, coût, DPE) qui rouvre la même vue dans un écran « Avant / après ».
+> - **Façades en vignette** : les lignes de Mes biens, des achats en cours, des biens vendus, de la carte et des **Décisions** montrent le bâtiment tel que la rue le dessine ; sur une décision, une petite pastille en coin dit de quelle sorte de décision il s'agit (clé, banque, alerte…). Le terrain et le parking gardent leur dessin simple.
+
+> **Plaisir de jeu, lot 5 : objectifs et finitions** (2026-10-23, point ouvert n° 17) :
+> - **Prochain titre** : une carte (requête `nextGoals` du moteur, qui lit les conditions des titres) donne le titre le plus proche d'être gagné parmi ceux dont l'étape précédente est tenue : son nom, ce qu'il demande, **chaque condition avec sa jauge** (« Biens loués 1 / 3 »), son avantage et le nom de l'autre voie. Elle ouvre le **tiroir de la Rue** (sous les deux tuiles) et se trouve en tête de l'onglet Titres de Progression ; « Tous les titres » y mène. Le tiroir fermé ne change pas. Quand le joueur tient toutes les marches du moment, elle disparaît.
+> - **Chiffres clés** : montants des fiches, tuiles et avant / après en police d'affichage (Fraunces), chiffres alignés.
+> - **Transitions** : un écran entre par un fondu et un léger glissement, le corps du tiroir s'ouvre en douceur, les boutons et les lignes s'enfoncent un peu au toucher, l'icône de l'onglet actif grossit ; jauges qui se remplissent. Rien de tout cela si le téléphone demande moins d'animations.
+> - **Thème sombre** : relecture des écrans des lots 1 à 5 (rue, tiroir, carte, annonces, fiche, patrimoine, bien, progression, remise des clés, avant / après). Corrigés : les étiquettes de prix de la carte suivent le thème ; la date d'un titre obtenu (« Obtenu le mercredi 18 novembre 2026 ») dépassait de l'écran et rétrécissait toute la page sur téléphone (l'écran Progression : elle est abrégée et l'en-tête des cartes peut passer à la ligne) ; les confettis des scènes tombent derrière le texte.
+
 ## 4.6 Interactions clés
 
 - **Rue** : toucher une bulle (« À vendre », « Panne », « Travaux 25 % ») ouvre la fiche concernée ; toucher un bâtiment ouvre sa coupe.
@@ -68,11 +86,20 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Chaque montant important** peut être expliqué en un toucher (« pourquoi ce taux ? », « d'où vient cet impôt ? »).
 - **Notifications** : discrètes pour l'information, pause automatique pour les décisions importantes.
 
+> **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) :
+> - **Bonnes nouvelles** : une carte sous la barre d'état, bordée de vert, qui n'arrête pas le temps et part seule au bout de 4 secondes environ (ou au toucher) : offre acceptée, prêt accordé ou proposé (avec le montant et le taux), compromis signé, locataire qui emménage, chantier terminé, aide à la rénovation, vente conclue, bien vendu, crédit remboursé, transformation terminée, bien hors marché proposé, défi réussi. Celui qui l'apporte y figure quand il a un visage : le banquier (souriant, sauf Hortense Rigueur), le locataire, le donneur du défi. Arrivées ensemble (en vitesse rapide), elles sont regroupées : « 3 bonnes nouvelles ». Elles attendent qu'un bilan ou une scène soit fermé. Les refus gardent leur notification d'avant.
+> - **Succès débloqué** : la même carte, dorée, avec un médaillon de trophée, le nom du succès et sa description.
+> - **Remise des clés** : à la signature de l'acte, une scène au-dessus du jeu : la clé à tête de maison entre dans une serrure en laiton et tourne, puis « Vous êtes propriétaire ! », la façade du bien, son prix, « Voir mon bien » et « Continuer ». Complète (confettis, musique de célébration) pour le premier achat ; courte ensuite (« Une clé de plus au trousseau »), elle se ferme seule au bout de 3,6 secondes. Elle passe avant la célébration d'un nouveau titre.
+> - **Vibrations** (réglage « Vibrations », activé par défaut, affiché seulement si le téléphone sait vibrer, donc pas sur iPhone) : un coup bref au tampon du notaire, deux petits à l'arrivée des loyers.
+> - **Mode hors ligne** : la note « Le jeu est prêt à fonctionner hors ligne » ne s'affiche qu'une fois par appareil, en petite pastille verte en haut de l'écran.
+
 ## 4.7 Le didacticiel
 
 - Pendant le **premier mois à Dole**, **Gérard Prudhomme** (La Tirelire Comtoise) accompagne pas à pas vers le premier achat : repérer une annonce, visiter, simuler le financement, faire une offre, signer le compromis.
 - Puis **Yvon Tableur** présente le premier bilan.
 - Désactivable, et il ne bloque jamais le joueur.
+
+> **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) : la bulle ne pousse plus le haut de chaque écran. Elle **flotte en bas**, au-dessus des onglets (et au-dessus du tiroir de la Rue ou des boutons « Visiter / Faire une offre » de l'annonce). Un chevron la **replie** en pastille au visage de Gérard, à droite ; elle se rouvre d'un toucher, et d'elle-même à l'étape suivante. Chaque étape peut **désigner un bouton** (`target` dans `content/textes/didacticiel.json`) : il porte un halo bleu qui pulse (un contour fixe si le téléphone demande moins d'animations), comme l'onglet qui y mène. Pause, annonces, Visiter, Simuler le financement, Faire une offre, Demander un prêt, Accepter l'offre de prêt.
 
 ## 4.8 Les sauvegardes
 
@@ -105,6 +132,13 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - **Panorama** : téléphone tourné, la Rue passe en plein écran avec une barre d'état réduite (date, heure, vitesse) ; les autres écrans demandent de revenir en portrait.
 - **Thème** : Clair, Sombre, Automatique (sombre pendant la nuit du jeu ; à ×4 et au-delà, il garde le moment où le temps s'est accéléré, voir 05, 5.4), Selon le téléphone (par défaut).
 - **Réglages de la rue** : qualité graphique (Automatique, Haute, Économie) et compteur d'images par seconde, pour vérifier la fluidité sur le téléphone.
+
+> **Plaisir de jeu, lot 2 : la rue devient « mon empire »** (2026-10-22, point ouvert n° 17) :
+> - **Cadrage en portrait** : un téléphone tenu droit montre la scène sur 470 unités de haut au lieu de 560 (le haut du ciel, où se tiennent les pastilles du quartier et de la rue, est coupé) : les façades sont environ 20 % plus grandes, la chaussée et les jardinières restent visibles au-dessus du tiroir. Le panorama et le grand écran ne changent pas. Quand la taille de la vue change (à l'ouverture, en tournant le téléphone), le même point de la rue reste au milieu : la rue s'ouvre bien centrée sur le premier bien du joueur.
+> - **Les biens du joueur** : un fanion bleu volet à pastille dorée flotte sur le toit de chacun de ses bâtiments ; la plaque « Mon bien » (ou « Chez moi ») porte une clé. Les bulles de ces bâtiments se tiennent au-dessus du fanion.
+> - **« Mes biens · n »** : une pastille sous celles du quartier et de la rue, visible dès que le joueur possède un bien dans la ville regardée : chaque toucher mène au bien suivant (quartier compris), dans l'ordre des quartiers.
+> - **Les loyers du mois** : le 1er, chaque bien loué fait monter une pièce d'or et son loyer (« +450 € »), l'un après l'autre, une fois le bilan du mois (ou de l'année) refermé et la rue à l'écran.
+> - **Bonnes nouvelles** : quand le joueur signe le compromis d'un bien qu'un rival visait, ce rival fait la tête : Monique Delaporte (portrait contrarié), les frères Martinot, la SCI Horizon (textes dans `content/textes/ecrans.json`, `goodNews.rivalBeaten`).
 
 ## 4.10 Rythme et progression (jalon 6)
 

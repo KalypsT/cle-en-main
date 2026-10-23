@@ -6,6 +6,7 @@ import { cityName, format, formatEuros, formatSigned, jobName, t, tone } from '.
 import { Avatar } from '../ui/Avatar.tsx';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Empty, SectionTitle, Tile } from '../ui/components.tsx';
+import { GoalCard } from '../ui/GoalCard.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { DecisionRow, showDecisionsSection } from './DecisionsTab.tsx';
 import { ListingRow } from './ListingsScreen.tsx';
@@ -133,12 +134,15 @@ export function StreetTab({ inline = false }: { inline?: boolean }) {
             />
           </div>
 
+          <GoalCard onOpen={() => nav.goTab('menu', { name: 'progression' })} />
+
           <SectionTitle
             title={t.street.opportunities}
             action={
               <button
                 type="button"
                 className="link-button"
+                data-tutorial="listings"
                 onClick={() => nav.push({ name: 'listings' })}
               >
                 {format(t.common.seeAll, { count: cityListings.length })}

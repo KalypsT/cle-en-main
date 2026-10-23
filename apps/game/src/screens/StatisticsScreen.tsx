@@ -1,11 +1,10 @@
 import type { Stat } from '@cle/content';
 import { toDayNumber } from '@cle/engine';
 import { useGame, useNav } from '../game/context.tsx';
-import { format, formatDay, formatDecimal, formatEuros, t } from '../texts.ts';
+import { format, formatDay, formatDecimal, formatEuros, statLabel, t } from '../texts.ts';
 import { Card, Empty, KeyValues, ScreenHeader } from '../ui/components.tsx';
 import { NeighbourhoodPrices, RateCurve } from '../ui/MarketCurves.tsx';
 import { LineChart, type Series } from '../ui/LineChart.tsx';
-import { statLabel } from './ProgressionScreen.tsx';
 
 const COUNTERS: readonly Stat[] = [
   'purchases',

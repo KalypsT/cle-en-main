@@ -69,6 +69,7 @@ import {
   buildYearReview,
   monthlyReview,
   pace,
+  nextGoals,
   progressionView,
   regimeAdvice,
 } from './systems/reviews.ts';
@@ -151,8 +152,10 @@ import {
 } from './systems/works.ts';
 import { worksCatalog, worksEstimate, worksPlan } from './systems/works-view.ts';
 import { believedView } from './systems/dwelling.ts';
+import { worksBeforeAfter } from './systems/works-report.ts';
 import {
   cashForecast,
+  dealVerdict,
   type FinancingInput,
   listingView,
   mapPosition,
@@ -633,6 +636,8 @@ export function createEngine(content: GameContent) {
       priceChange(state, cityId, neighbourhoodId, months),
     /** Titles, achievements, reputation, challenge, records (« Progression »). */
     progression: (state: GameState) => progressionView(content, state),
+    /** The titles to go for now, the closest to done first (game feel, lot 5). */
+    nextGoals: (state: GameState) => nextGoals(content, state),
     /** The coming days of the agenda. */
     agendaWeek: (state: GameState, days?: number) => agendaWeek(content, state, days),
     /** Loads a save, migrating it to the current format. Throws SaveFormatError. */
@@ -826,6 +831,13 @@ export function createEngine(content: GameContent) {
         ? cashFlowOutlook(content, state, listing.property, listing.askingPrice, price)
         : null;
     },
+    /** Before and after of the last works finished on a property of the player. */
+    worksBeforeAfter: (state: GameState, propertyId: string) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? worksBeforeAfter(owned) : null;
+    },
+    /** « Bonne affaire », « Au prix » or « Trop cher »: the asking price against the estimate. */
+    dealVerdict: (state: GameState, listingId: string) => dealVerdict(content, state, listingId),
     /** Price per m² against the neighbourhood, rent, gross yield, estimate of a listing. */
     listingView: (state: GameState, listingId: string) => listingView(content, state, listingId),
     /** Sheets of the region map: every city, the base first. */

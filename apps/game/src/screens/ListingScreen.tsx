@@ -1,5 +1,12 @@
 import { gameContent } from '@cle/content';
-import { fromDayNumber, type Listing, toDayNumber, type Trade, type VisitQuote } from '@cle/engine';
+import {
+  type CashFlowOutlook,
+  fromDayNumber,
+  type Listing,
+  toDayNumber,
+  type Trade,
+  type VisitQuote,
+} from '@cle/engine';
 import { useEffect, useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -20,7 +27,17 @@ import {
   t,
   tradeName,
 } from '../texts.ts';
-import { Amount, Badge, BottomSheet, Card, Empty, ScreenHeader } from '../ui/components.tsx';
+import {
+  Amount,
+  Badge,
+  BottomSheet,
+  Card,
+  DpeLetter,
+  Empty,
+  type Fold,
+  ScreenHeader,
+} from '../ui/components.tsx';
+import { useReducedMotion } from '../ui/media.ts';
 import { ItemsList, ItemsSummary, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { CashFlowOutlookCard, outlookAdvice, outlookTone } from '../ui/CashFlowOutlook.tsx';
@@ -82,9 +99,111 @@ export function ListingScreen({ id }: { id: string }) {
   );
 }
 
+/** The folding parts of the sheet, summed up at its top. */
+type Section = 'estimate' | 'dpe' | 'outlook' | 'items' | 'diagnose';
+
+const SUMMARY_TONES = { bargain: 'positive', fair: '', expensive: 'negative' } as const;
+
+/**
+ * The listing at a glance (game feel, lot 3): its price against the player's
+ * estimate, the monthly cash-flow and the energy class. Each pill opens its part.
+ */
+function DealSummary({
+  listing,
+  outlook,
+  onReveal,
+}: {
+  listing: Listing;
+  outlook: CashFlowOutlook | null;
+  onReveal: (section: Section) => void;
+}) {
+  const { state } = useGame();
+  const verdict = engine.dealVerdict(state, listing.id);
+  const quote = engine.rentQuote(state, listing.id, 'bare');
+  const summary = t.listing.summary;
+  const gap = verdict ? Math.round(Math.abs(verdict.priceGap) * 100) : 0;
+  const dpeText =
+    quote?.block === 'rent.indecent'
+      ? summary.indecent
+      : quote?.block === 'rent.dpeBanned'
+        ? summary.dpeBanned
+        : quote?.banDay !== null && quote?.banDay !== undefined
+          ? format(summary.dpeBan, { year: fromDayNumber(quote.banDay).year })
+          : summary.dpeOk;
+  return (
+    <div className="deal-summary" data-testid="deal-summary">
+      {verdict && (
+        <button
+          type="button"
+          className={`deal-pill ${SUMMARY_TONES[verdict.kind]}`}
+          onClick={() => onReveal('estimate')}
+        >
+          <span className="deal-pill-label">{summary.price}</span>
+          <span className="deal-pill-value">{t.listings.verdict[verdict.kind]}</span>
+          <span className="deal-pill-hint">
+            {gap === 0
+              ? summary.equal
+              : format(verdict.priceGap < 0 ? summary.under : summary.over, { value: gap })}
+          </span>
+        </button>
+      )}
+      {outlook && (
+        <button
+          type="button"
+          className={`deal-pill ${outlookTone(outlook)}`}
+          onClick={() => onReveal('outlook')}
+        >
+          <span className="deal-pill-label">{summary.cashFlow}</span>
+          <span className="deal-pill-value">
+            {format(t.outlook.badge, { amount: formatSigned(outlook.monthly) })}
+          </span>
+          <span className="deal-pill-hint">
+            {outlook.tone === 'positive'
+              ? t.listings.paysForItself
+              : outlook.tone === 'negative'
+                ? summary.costs
+                : summary.balanced}
+          </span>
+        </button>
+      )}
+      <button
+        type="button"
+        className={`deal-pill${quote?.block ? ' negative' : quote?.banDay ? ' warning' : ''}`}
+        onClick={() => onReveal('dpe')}
+      >
+        <span className="deal-pill-label">{summary.dpe}</span>
+        <span className="deal-pill-value">
+          <DpeLetter dpe={listing.property.dpe} />
+        </span>
+        <span className="deal-pill-hint">{dpeText}</span>
+      </button>
+    </div>
+  );
+}
+
 function ListingBody({ listing }: { listing: Listing }) {
   const { state, act } = useGame();
   const [offering, setOffering] = useState(false);
+  const reduced = useReducedMotion();
+  // The details are folded: the summary tells the essential, each pill opens its part.
+  const [opened, setOpened] = useState<ReadonlySet<Section>>(() => new Set());
+  const fold = (section: Section): Fold => ({
+    open: opened.has(section),
+    onToggle: () =>
+      setOpened((previous) => {
+        const next = new Set(previous);
+        if (!next.delete(section)) next.add(section);
+        return next;
+      }),
+  });
+  const reveal = (section: Section) => {
+    setOpened((previous) => new Set(previous).add(section));
+    requestAnimationFrame(() =>
+      document
+        .getElementById(section)
+        ?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }),
+    );
+  };
   const { property } = listing;
   const view = engine.listingView(state, listing.id);
   const outlook = engine.cashFlowOutlook(state, listing.id);
@@ -185,6 +304,7 @@ function ListingBody({ listing }: { listing: Listing }) {
         {view && (
           <p className={`small strong ${view.priceGap < 0 ? 'positive' : 'warning'}`}>{gapText}</p>
         )}
+        <DealSummary listing={listing} outlook={outlook} onReveal={reveal} />
         <div className="row wrap">
           {view && (
             <Badge>
@@ -264,7 +384,7 @@ function ListingBody({ listing }: { listing: Listing }) {
       )}
 
       {view && (
-        <Card title={t.listing.estimate}>
+        <Card title={t.listing.estimate} fold={fold('estimate')} id="estimate">
           <Amount
             label={format(t.listing.estimateRange, {
               low: formatEuros(view.estimate.low),
@@ -278,15 +398,17 @@ function ListingBody({ listing }: { listing: Listing }) {
         </Card>
       )}
 
-      <DpeCard property={property} id={listing.id} />
+      <DpeCard property={property} id={listing.id} fold={fold('dpe')} />
 
-      {outlook && <CashFlowOutlookCard outlook={outlook} />}
+      {outlook && <CashFlowOutlookCard outlook={outlook} fold={fold('outlook')} />}
 
       <FinancingPanel listingId={listing.id} askingPrice={listing.askingPrice} />
 
       <Card
         title={t.listing.items}
         aside={view && <ItemsSummary known={view.knownItems} total={view.totalItems} />}
+        fold={fold('items')}
+        id="items"
       >
         {noisy && (
           <Badge tone="amber" icon="alert">
@@ -297,7 +419,7 @@ function ListingBody({ listing }: { listing: Listing }) {
       </Card>
 
       {trades.length > 0 && (
-        <Card title={t.listing.diagnose}>
+        <Card title={t.listing.diagnose} fold={fold('diagnose')} id="diagnose">
           <p className="small muted">
             {format(t.listing.diagnoseHint, {
               amount: formatEuros(gameContent.works.diagnosis.cost * 100),
@@ -323,6 +445,7 @@ function ListingBody({ listing }: { listing: Listing }) {
         <button
           type="button"
           className="button"
+          data-tutorial="visit"
           disabled={listing.visited || planned !== undefined}
           onClick={() => act({ type: 'market/visit', listingId: listing.id })}
         >
@@ -335,6 +458,7 @@ function ListingBody({ listing }: { listing: Listing }) {
         <button
           type="button"
           className="button primary"
+          data-tutorial="offer"
           disabled={offer !== null || offersLeft <= 0}
           onClick={() => setOffering(true)}
         >

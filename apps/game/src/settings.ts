@@ -25,6 +25,8 @@ export interface Settings {
   quality: QualityChoice;
   /** Frames per second over the street (to check the fluidity). */
   showFps: boolean;
+  /** The phone buzzes with the notary's stamp and the rents (Android; iPhones ignore it). */
+  vibration: boolean;
   volumes: Volumes;
 }
 
@@ -38,6 +40,7 @@ const DEFAULTS: Settings = {
   theme: 'system',
   quality: 'auto',
   showFps: false,
+  vibration: true,
   volumes: { music: 0.6, ambience: 0.5, effects: 0.7 },
 };
 
@@ -63,6 +66,7 @@ export function loadSettings(): Settings {
         ? (parsed.quality as QualityChoice)
         : DEFAULTS.quality,
       showFps: typeof parsed.showFps === 'boolean' ? parsed.showFps : DEFAULTS.showFps,
+      vibration: typeof parsed.vibration === 'boolean' ? parsed.vibration : DEFAULTS.vibration,
       volumes: {
         music: volume(volumes.music, DEFAULTS.volumes.music),
         ambience: volume(volumes.ambience, DEFAULTS.volumes.ambience),

@@ -62,6 +62,19 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  */
 export const MIGRATIONS: MigrationRegistry = {
   /**
+   * Version 20 to 21: the works in progress did not record how the property was when they
+   * started, and no finished works is kept: both start empty (the end of those works shows
+   * its figures without a picture of the before).
+   */
+  20: (raw) => ({
+    ...raw,
+    properties: ((raw.properties as Record<string, unknown>[]) ?? []).map((entry) => ({
+      ...entry,
+      works: isRecord(entry.works) ? { ...entry.works, before: null } : entry.works,
+      lastWorks: null,
+    })),
+  }),
+  /**
    * Version 19 to 20: Yvon's yearly advice may now name a property that costs money each
    * month (progression, step 3); nothing to convert.
    */
@@ -816,6 +829,24 @@ const quoteSchema = z
   })
   .strict();
 
+const worksSnapshotSchema = z
+  .object({
+    dpe: z.enum(DPE_LABELS),
+    value: cents.min(0),
+    rent: cents.min(0),
+    facadeState: z.number(),
+    newWindows: z.boolean(),
+    items: z.array(z.object({ id: z.string(), state: z.number(), tier: tierSchema }).strict()),
+  })
+  .strict();
+const worksReportSchema = z
+  .object({
+    day,
+    cost: cents,
+    before: worksSnapshotSchema,
+    after: worksSnapshotSchema,
+  })
+  .strict();
 const worksProjectSchema = z
   .object({
     id: z.string(),
@@ -866,6 +897,8 @@ const worksProjectSchema = z
       .strict()
       .nullable(),
     dpeBefore: z.enum(DPE_LABELS),
+    // Added in version 21 (before and after of the works).
+    before: worksSnapshotSchema.nullable(),
     paid: cents,
   })
   .strict();
@@ -1573,6 +1606,8 @@ const gameStateSchema = z
             .strict(),
           quotes: z.array(quoteSchema),
           works: worksProjectSchema.nullable(),
+          // Added in version 21.
+          lastWorks: worksReportSchema.nullable(),
           worksFund: z
             .object({ amount: cents.min(0), loanId: z.string(), untilDay: day })
             .strict()

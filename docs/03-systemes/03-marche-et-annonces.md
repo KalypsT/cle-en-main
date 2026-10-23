@@ -60,6 +60,8 @@ Chaque bien a :
    - Le joueur paie le prix, les frais de notaire et (avec un prêt) les frais de dossier et de garantie, moins le dépôt et le prêt. S'il n'a pas assez sur son compte, la vente est annulée et **le dépôt est perdu**.
    - Les défauts encore cachés se découvrent en prenant possession du bien.
 
+> **Plaisir de jeu, lot 3 : le verdict** (2026-10-22, point ouvert n° 17). Chaque annonce porte un verdict tiré de l'**estimation du joueur** (celle de la fiche : ce que visites et diagnostics ont appris, les défauts encore cachés comptés selon leur probabilité ; le verdict ne trahit donc jamais un défaut caché) : **Bonne affaire** quand le prix affiché est au moins **8 %** sous l'estimation, **Trop cher** quand il est au moins **8 %** au-dessus, **Au prix** entre les deux (`verdict` de `content/marche.json`, requête `dealVerdict`). Le badge **Se paie tout seul** s'affiche quand le cash-flow prévu est vert (+30 € par mois ou plus, chapitre 4.5). Avant la visite, l'estimation est plus floue : le verdict peut changer après elle. Le succès « Flair de fouine » garde son propre seuil (10 % sous l'estimation à l'achat).
+
 ## Les opportunités particulières
 
 - **Enchères judiciaires** : rares, annoncées quelques jours avant, sans visite ni condition de prêt. Enchère en direct avec les rivaux. Risque élevé, décote possible.

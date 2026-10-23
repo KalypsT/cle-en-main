@@ -48,7 +48,6 @@
   --gap: 16px;
   --tap: 44px;
   --shadow: 0 1px 2px rgb(60 45 20 / 6%), 0 4px 14px rgb(60 45 20 / 6%);
-  --status-height: 112px;
   --tabs-height: 64px;
   --drawer-peek: 84px;
 
@@ -318,6 +317,7 @@ select {
 
 .card-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -725,8 +725,8 @@ select {
   z-index: 20;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: calc(env(safe-area-inset-top) + 10px) var(--gap) 10px;
+  gap: 4px;
+  padding: calc(env(safe-area-inset-top) + 8px) var(--gap) 6px;
   background: var(--ivory);
   border-bottom: 1px solid var(--border);
 }
@@ -754,7 +754,7 @@ select {
   display: grid;
   place-items: center;
   min-width: 44px;
-  height: 36px;
+  height: 32px;
   border: 0;
   border-radius: 9px;
   background: none;
@@ -774,21 +774,45 @@ select {
   color: var(--on-accent);
 }
 
-.status-tiles {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr auto;
-  gap: 8px;
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 28px;
 }
 
-.status-tiles .tile {
-  padding: 6px 10px;
+.status-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+}
+
+button.status-stat {
   cursor: pointer;
 }
 
+.status-value {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-value .negative {
+  color: var(--brick);
+}
+
 .freetime-bar {
-  height: 4px;
-  margin-top: 3px;
-  border-radius: 2px;
+  width: 56px;
+  height: 5px;
+  border-radius: 3px;
   background: var(--ivory-deep);
   overflow: hidden;
 }
@@ -799,21 +823,85 @@ select {
   background: var(--accent);
 }
 
-.decisions-button {
+/* An amount that rolls to its new value, flashes and lets the difference float away. */
+.animated-euros {
   position: relative;
-  display: grid;
-  place-items: center;
-  min-width: 52px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-small);
-  background: var(--surface);
-  cursor: pointer;
+  display: inline-block;
+  margin: 0 -4px;
+  padding: 0 4px;
+  border-radius: 6px;
+  transition:
+    color 0.3s,
+    background-color 0.3s;
 }
 
-.decisions-button .counter {
+.animated-euros.gain {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.animated-euros.loss {
+  color: var(--brick);
+  background: var(--brick-soft);
+}
+
+.money-delta {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  left: 0;
+  top: 100%;
+  z-index: 25;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Money coming in rises into the balance; money going out drops away from it. */
+.gain > .money-delta {
+  color: var(--green);
+  animation: money-in 1.4s ease-out forwards;
+}
+
+.loss > .money-delta {
+  color: var(--brick);
+  animation: money-out 1.4s ease-in forwards;
+}
+
+@keyframes money-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  25% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes money-out {
+  from {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(18px);
+  }
 }
 
 .alert-banner {
@@ -1007,21 +1095,217 @@ select {
   bottom: calc(env(safe-area-inset-bottom) + var(--tabs-height) + 72px);
 }
 
-.tutorial {
+/* Good news and achievements, just under the status bar (docs/04, 4.6). */
+.toasts {
+  position: fixed;
+  top: calc(var(--status-bottom, 92px) + 8px);
+  left: 50%;
+  z-index: 45;
+  width: min(448px, calc(100% - 2 * var(--gap)));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
   display: flex;
+  align-items: center;
   gap: 12px;
-  margin: var(--gap) var(--gap) 0;
-  padding: 12px;
+  width: 100%;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid var(--green-soft);
+  border-left: 5px solid var(--green);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow:
+    var(--shadow),
+    0 10px 30px rgb(60 45 20 / 16%);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: toast-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.toast-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.toast-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast-kicker {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.toast-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+/* An achievement: a gold badge and its name in the display font. */
+.toast-achievement {
+  border-color: var(--amber-line);
+  border-left-color: #c9962a;
+  background: linear-gradient(120deg, var(--surface) 55%, var(--amber-soft));
+}
+
+.toast-achievement .toast-kicker {
+  color: var(--amber);
+}
+
+.toast-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.toast-badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fde7a6, #e0ad3c 60%, #b98522);
+  color: #5a3d06;
+  box-shadow:
+    inset 0 -3px 0 rgb(0 0 0 / 12%),
+    0 2px 8px rgb(185 133 34 / 35%);
+  animation: badge-shine 1.2s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+  }
+}
+
+@keyframes badge-shine {
+  from {
+    transform: rotate(-25deg) scale(0.4);
+  }
+  60% {
+    transform: rotate(8deg) scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast-badge {
+    animation: none;
+  }
+}
+
+/* Over the open tutorial bubble, the notices stand just above it. */
+.app:has(.tutorial) .notice {
+  bottom: calc(var(--tutorial-clearance, 0px) + 8px);
+}
+
+/* A quiet note at the top, once: the game works offline. */
+.pwa-chip {
+  position: fixed;
+  top: calc(var(--status-bottom, env(safe-area-inset-top)) + 8px);
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 2 * var(--gap));
+  padding: 6px 12px;
+  transform: translateX(-50%);
+  border: 1px solid var(--green-soft);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 700;
+  pointer-events: none;
+  animation: toast-in 0.4s ease-out;
+}
+
+/* Over the bottom of the screen, above the tabs and the listing's actions (docs/04, 4.7). */
+.tutorial {
+  --tutorial-lift: 0px;
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom) + 10px + var(--tutorial-lift));
+  z-index: 40;
+  display: flex;
+  gap: 10px;
+  width: min(448px, calc(100% - 2 * var(--gap)));
+  padding: 10px 6px 8px 12px;
+  transform: translateX(-50%);
   border: 1px solid var(--accent-line);
   border-radius: 18px;
   background: var(--surface);
-  box-shadow: var(--shadow);
+  box-shadow:
+    var(--shadow),
+    0 8px 28px rgb(60 45 20 / 14%);
+  animation: tutorial-in 0.35s ease-out;
+}
+
+/* Lifted over the street's drawer, and over the listing's sticky actions. */
+.shell.street-mode .tutorial {
+  --tutorial-lift: var(--drawer-peek);
+}
+
+.shell:has(.sticky-actions) .tutorial {
+  --tutorial-lift: 72px;
+}
+
+/* The end of a page can still be scrolled out from under the open bubble. */
+.shell:not(.street-mode):has(.tutorial:not(.folded)) .content {
+  padding-bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom) + 180px);
+}
+
+.shell.wide .tutorial {
+  left: auto;
+  right: var(--gap);
+  transform: none;
+}
+
+.shell.panorama .tutorial {
+  display: none;
 }
 
 .tutorial-face {
   flex: none;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
+}
+
+.tutorial-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.tutorial-fold {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin: -8px 0 -6px;
+  color: var(--muted);
+}
+
+.tutorial-fold svg {
+  transform: rotate(90deg);
 }
 
 .tutorial-actions {
@@ -1029,6 +1313,230 @@ select {
   flex-wrap: wrap;
   gap: 4px 12px;
   justify-content: flex-end;
+  padding-right: 6px;
+}
+
+/* Folded: a small chip with the speaker's face, on the right. */
+.tutorial.folded {
+  left: auto;
+  right: var(--gap);
+  width: auto;
+  padding: 0;
+  transform: none;
+  border-radius: 999px;
+}
+
+.tutorial-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap);
+  padding: 4px 10px 4px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+@keyframes tutorial-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+/* What the tutorial points at: a soft pulsing ring. */
+.halo {
+  position: relative;
+  z-index: 1;
+  animation: halo-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes halo-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tutorial {
+    animation: none;
+  }
+
+  .halo {
+    animation: none;
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* A card that folds: its whole heading opens and closes it. */
+.card-fold {
+  width: 100%;
+  min-height: var(--tap);
+  margin: -6px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card-chevron {
+  display: inline-grid;
+  color: var(--muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+}
+
+.card-fold[aria-expanded='true'] .card-chevron {
+  transform: rotate(-90deg);
+}
+
+.card[id] {
+  scroll-margin-top: calc(var(--status-bottom, 90px) + 12px);
+}
+
+/* The listing at a glance: price, cash-flow, energy (game feel, lot 3). */
+.deal-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.deal-pill {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 2px;
+  min-height: 84px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.deal-pill-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.deal-pill-value {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.deal-pill-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.deal-pill.positive {
+  border-top-color: var(--green);
+  background: color-mix(in srgb, var(--green-soft) 55%, var(--surface));
+}
+
+.deal-pill.positive .deal-pill-value {
+  color: var(--green);
+}
+
+.deal-pill.negative {
+  border-top-color: var(--brick);
+  background: color-mix(in srgb, var(--brick-soft) 55%, var(--surface));
+}
+
+.deal-pill.negative .deal-pill-value {
+  color: var(--brick);
+}
+
+.deal-pill.warning {
+  border-top-color: var(--amber);
+}
+
+/* The listings' filters, folded behind one button (game feel, lot 3). */
+.filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filters-toggle.active {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.filters-chevron {
+  display: inline-grid;
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+}
+
+.filters-toggle[aria-expanded='true'] .filters-chevron {
+  transform: rotate(-90deg);
+}
+
+.filters-panel {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* The kind of a decision, as a small mark over the corner of its building. */
+.thumb-marked {
+  position: relative;
+  display: grid;
+}
+
+.thumb-mark {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* A row's picture: the building as the street draws it. */
+.facade-thumb {
+  display: block;
+  border-radius: 8px;
 }
 
 /* ---------- Domain widgets ---------- */
@@ -1197,6 +1705,13 @@ select {
   margin-right: 6px;
   border-radius: 3px;
   vertical-align: -1px;
+}
+
+/* A listing's price tag on the map, by verdict. */
+.legend i.legend-tag {
+  width: 16px;
+  border: 2px solid;
+  background: var(--surface);
 }
 
 .chart {
@@ -1461,8 +1976,12 @@ select {
 .street-mine {
   position: absolute;
   left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   transform: translateX(-50%);
-  padding: 1px 8px;
+  padding: 2px 8px 2px 6px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
   border-radius: 999px;
   background: var(--accent);
   color: var(--on-accent);
@@ -1470,6 +1989,106 @@ select {
   font-weight: 800;
   white-space: nowrap;
   pointer-events: none;
+}
+
+/* The player's flag on the roof, waving a little (docs/04, 4.9). */
+.street-flag {
+  position: absolute;
+  top: -26px;
+  left: 18%;
+  pointer-events: none;
+}
+
+.street-flag svg {
+  display: block;
+  overflow: visible;
+}
+
+.street-flag-cloth {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: flag-wave 2.4s ease-in-out infinite;
+}
+
+@keyframes flag-wave {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(-6deg) scaleX(0.9);
+  }
+}
+
+/* The month's rents rise above the let buildings, one after the other. */
+.street-rent {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px 2px 3px;
+  border: 1px solid #e0ad3c;
+  border-radius: 999px;
+  background: #fff6dc;
+  color: #2e6a33;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgb(120 80 10 / 25%);
+  pointer-events: none;
+  translate: -50% 0;
+  animation: rent-rise 3s ease-out both;
+}
+
+.street-coin {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fde7a6, #e0ad3c 60%, #b98522);
+  color: #5a3d06;
+  font-size: 0.7rem;
+}
+
+@keyframes rent-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-34px);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-44px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .street-rent {
+    animation: none;
+    top: -28px;
+  }
+}
+
+/* The bubbles of the player's buildings stand above the flag. */
+.street-flag ~ .street-bubbles {
+  bottom: calc(100% + 30px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .street-flag-cloth {
+    animation: none;
+  }
 }
 
 .street-bubbles {
@@ -1572,6 +2191,18 @@ select {
 
 .street-name {
   padding: 0 2px;
+}
+
+/* « Mes biens »: from one of the player's buildings to the next. */
+.street-owned {
+  gap: 6px;
+  padding: 0 14px 0 12px;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .street-name button {
@@ -1746,7 +2377,7 @@ select {
   pointer-events: auto;
 }
 
-.shell.panorama .status-tiles,
+.shell.panorama .status-line,
 .shell.panorama .tab-bar,
 .shell.panorama .street-drawer,
 .shell.panorama .street-header {
@@ -2114,4 +2745,481 @@ select {
   margin: 2px 0 8px 10px;
   padding-left: 12px;
   border-left: 3px solid var(--accent);
+}
+
+/* ---------- Handing over the keys (docs/04, 4.6) ---------- */
+
+.keys-overlay {
+  align-items: center;
+  padding: var(--gap);
+}
+
+.keys-body {
+  border-radius: 24px;
+  padding-bottom: 20px;
+  text-align: center;
+  animation: keys-pop 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+.keys-body.short {
+  width: min(400px, 100%);
+}
+
+.keys-lock {
+  width: min(320px, 100%);
+  margin: 0 auto -6px;
+  overflow: visible;
+}
+
+.keys-lock.short {
+  width: min(240px, 80%);
+}
+
+.keys-plate {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: plate-click 1.6s ease-out;
+}
+
+.keys-key {
+  transform-box: view-box;
+  transform-origin: 0 57px;
+  animation: key-turn 1.6s ease-out both;
+}
+
+.keys-rays {
+  fill: #e8b04c;
+  opacity: 0;
+  animation: rays 1.6s ease-out;
+}
+
+.short .keys-key,
+.short .keys-plate,
+.short .keys-rays {
+  animation-duration: 1s;
+}
+
+.keys-text {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  animation: keys-text-in 1.6s ease-out both;
+}
+
+.keys-body.short .keys-text {
+  animation-duration: 1s;
+}
+
+.keys-facade {
+  width: 100%;
+  margin: 4px 0;
+}
+
+.keys-facade .facade {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-small);
+}
+
+.keys-kicker {
+  margin: 0;
+  color: var(--amber);
+}
+
+@keyframes keys-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes key-turn {
+  0% {
+    opacity: 0;
+    transform: translateX(-170px);
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(0) scaleY(1);
+  }
+  62% {
+    transform: translateX(0) scaleY(0.15);
+  }
+  74%,
+  100% {
+    transform: translateX(0) scaleY(1);
+  }
+}
+
+@keyframes plate-click {
+  0%,
+  68% {
+    transform: none;
+  }
+  76% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes rays {
+  0%,
+  66% {
+    opacity: 0;
+    transform: translate(236px, 60px) scale(0.6);
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(236px, 60px) scale(1.25);
+  }
+}
+
+@keyframes keys-text-in {
+  0%,
+  55% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keys-body,
+  .keys-key,
+  .keys-plate,
+  .keys-rays,
+  .keys-text {
+    animation: none;
+  }
+}
+
+/* ---------- Before and after of some works (game feel, lot 4) ---------- */
+
+.before-after-view {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--sky);
+  touch-action: pan-y;
+}
+
+.before-after-view .facade {
+  display: block;
+  width: 100%;
+}
+
+.before-after-top {
+  position: absolute;
+  inset: 0;
+}
+
+.before-after-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fffdf8;
+  box-shadow: 0 0 6px rgb(0 0 0 / 35%);
+  pointer-events: none;
+}
+
+.before-after-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
+}
+
+.before-after-tag {
+  position: absolute;
+  top: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgb(36 38 43 / 70%);
+  color: #fffdf8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.before-after-tag.before {
+  left: 8px;
+}
+
+.before-after-tag.after {
+  right: 8px;
+}
+
+/* The range input covers the picture and carries the handle. */
+.before-after-view input[type='range'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.before-after-view:has(input:focus-visible) {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ba-figures {
+  display: grid;
+  gap: 8px;
+}
+
+.ba-figure {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+
+.ba-figure-label {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ba-figure-values {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.ba-from {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.ba-to {
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.ba-changes,
+.ba-rooms {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ba-changes li,
+.ba-rooms li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.room-bar {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 110px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--ivory-deep);
+  overflow: hidden;
+}
+
+.room-bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+}
+
+.room-bar-before {
+  background: var(--border-strong);
+}
+
+.room-bar-after {
+  background: var(--green);
+  opacity: 0.85;
+  clip-path: inset(0 0 0 0);
+}
+
+/* The scene of the end of some works. */
+.works-overlay {
+  align-items: center;
+  padding: var(--gap);
+}
+
+/* The actions stay at the foot of the scene, whatever the length of what changed. */
+.works-actions {
+  position: sticky;
+  bottom: -20px;
+  margin: 0 -16px -20px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, var(--ivory) 30%);
+}
+
+.works-body {
+  border-radius: 24px;
+  padding-bottom: 20px;
+  animation: keys-pop 0.45s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+
+/* ---------- Key figures, softer transitions, next goal (game feel, lot 5) ---------- */
+
+/* The figures that matter wear the display font, like the titles of the celebrations. */
+.big-number,
+.drawer-figures strong,
+.tile-value,
+.ba-to {
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-weight: 700;
+}
+
+.big-number {
+  letter-spacing: 0;
+}
+
+/* A screen comes in with a short fade and a small slide, instead of appearing at once. */
+.content > .screen {
+  animation: screen-in 0.22s ease-out both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* The dashboard drawer opens its body smoothly. */
+.drawer-body {
+  animation: drawer-in 0.25s ease-out both;
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.street-drawer {
+  transition: box-shadow 0.25s;
+}
+
+.street-drawer.open {
+  box-shadow: 0 -10px 30px rgb(30 25 15 / 20%);
+}
+
+/* A touch is felt: buttons and rows press in a little. */
+.button,
+.list-row,
+.deal-pill,
+.filters-toggle {
+  transition:
+    transform 0.12s ease-out,
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.button:active:not(:disabled),
+.list-row:active,
+.deal-pill:active,
+.filters-toggle:active {
+  transform: scale(0.98);
+}
+
+.tab-bar button svg {
+  transition: transform 0.2s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.tab-bar button[aria-current='page'] svg {
+  transform: translateY(-1px) scale(1.12);
+}
+
+/* The next title: its name, and each condition with its meter. */
+.goal-title {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.goal-conditions {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goal-line {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.goal-meter {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ivory-deep);
+  overflow: hidden;
+}
+
+.goal-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #f0b45a));
+  transition: width 0.6s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content > .screen,
+  .drawer-body,
+  .goal-meter > span {
+    animation: none;
+    transition: none;
+  }
+
+  .button:active:not(:disabled),
+  .list-row:active,
+  .deal-pill:active,
+  .filters-toggle:active {
+    transform: none;
+  }
+
+  .tab-bar button[aria-current='page'] svg {
+    transform: none;
+  }
+}
+
+/* The confetti falls behind the text of the scenes, never over it. */
+.keys-body > :not(.confetti),
+.overlay-body > :not(.confetti) {
+  position: relative;
+  z-index: 1;
 }

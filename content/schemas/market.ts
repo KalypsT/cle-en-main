@@ -226,6 +226,12 @@ export const marketRulesSchema = z
         coOwnershipChargesPerM2: euros,
       })
       .strict(),
+    /**
+     * Verdict on a listing (game feel, lot 3): the asking price against the player's own
+     * estimate. A bargain at `bargainShare` or more under it, too dear at `expensiveShare`
+     * or more over it, at the price between the two.
+     */
+    verdict: z.object({ bargainShare: share, expensiveShare: share }).strict(),
   })
   .strict();
 

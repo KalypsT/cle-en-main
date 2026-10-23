@@ -56,6 +56,7 @@ Les biens du joueur sont marqués de sa couleur d'accent. Les états visibles : 
   - marche animée par le code (balancement des bras et des jambes).
 - **Réalisation des passants (retours de jeu du 22 octobre 2026)** : adultes, enfants, personnes âgées (cheveux gris, pas lents, souvent une canne, parfois un béret), adolescents (capuche, téléphone), joggeurs par beau temps (tenue de sport, foulées amples) ; chapeaux, casquettes, chignons et queues de cheval ; parfois deux personnes qui marchent ensemble, au même pas. Six passants sur dix s'arrêtent de temps en temps 2 à 6 secondes (jamais les cyclistes, les joggeurs ni les couples) ; le chien remue la queue.
 - **Personnages nommés** (banquiers, comptable, rivaux, artisans, agences) : **portraits en buste** avec trois expressions (neutre, content, contrarié), dans les dialogues et les notifications.
+- **Réalisation (plaisir de jeu, lot 1)** : le portrait a quatre expressions : le sourire de tous les jours, content (bouche ouverte, sourcils levés), neutre et contrarié. Portraits de Gérard, Yvon, Kévin Boost, Hortense Rigueur (lunettes carrées, chignon ; elle ne sourit jamais : « content » reste neutre), Monique Delaporte et des frères Martinot (`CHARACTER_AVATARS`, `apps/game/src/ui/Avatar.tsx`). Un locataire reçoit un visage tiré de son nom : toujours le même pour la même personne.
 - **Avatar du joueur** : composé de six choix : visage (4), coiffure (11), couleur de cheveux (8), teint (6), tenue (8) et accessoire (7 : aucun, lunettes rondes ou carrées, barbe, barbe et lunettes, boucles d'oreilles, boucles et lunettes). Les cheveux sont dessinés en deux couches (derrière la tête pour le volume, la longueur, le chignon ; devant, découpée sur le visage, pour la frange), si bien que chaque coiffure suit chaque forme de visage. La sauvegarde garde quatre indices : la coiffure et la couleur partagent `hair`, la tenue et l'accessoire partagent `outfit`.
 
 ## 5.6 Les animations
@@ -68,12 +69,28 @@ Passants (certains s'arrêtent quelques secondes ; jamais les cyclistes), voitur
 - **Voitures** : une voie par sens ; chacune ralentit derrière une plus lente et garde ses distances ; une voiture n'entre que si sa voie est libre.
 - **Lumières** : de l'arrière vers l'avant, les façades, les fenêtres et vitrines allumées, ce qui se tient devant les façades (volets, croisillons, balcons, arbres, lampadaires, enseignes, ouvriers), puis les passants et les voitures, et enfin le halo des lampadaires et les guirlandes.
 
+**Les bons moments (plaisir de jeu, lot 1)** : la remise des clés à l'acte (la clé de l'icône entre dans une serrure en laiton, tourne, un éclat jaillit), la trésorerie qui défile avec la différence qui monte ou descend, le médaillon doré d'un succès, la carte d'une bonne nouvelle qui descend sous la barre d'état. Tout s'arrête quand le téléphone demande moins d'animations.
+
+**La coupe d'immeuble (plaisir de jeu, lot 4)** : les pièces du joueur suivent la **gamme** de leurs postes (moyenne de la pièce) : sol en lino uni (Éco), en lames (Standard) ou en parquet à chevrons (Premium) ; mobilier plus terne en Éco, plus sombre et plus riche en Premium ; une pièce Premium en bon état gagne un cadre au mur et un tapis. L'**habitant** se tient dans la pièce de vie : le locataire, avec un visage tiré de son nom (le même que dans les notifications), ou le joueur avec les couleurs de son avatar. Le soir et la nuit, la **lumière chaude des lampes** déborde des pièces habitées. Rien de tout cela ne change les règles : `tier` de la pièce et `resident` du logement sont de simples données de la vue.
+
+**La rue du joueur (plaisir de jeu, lot 2)** :
+- un **camion de déménagement** (caisse crème à bande orange) se gare, roues sur la bordure, devant le bien dont le locataire emménage, le jour de l'entrée et le lendemain ; des cartons scotchés et une lampe attendent près de la porte ;
+- l'**avatar du joueur** passe dans la rue chaque matin, une fois par jour de jeu : il sort de chez lui quand sa résidence principale est dans la vue, sinon il arrive par un côté. Il porte le teint, la couleur des cheveux et la tenue de son avatar, un sac (un parapluie sous la pluie), et un petit triangle bleu volet au-dessus de la tête. Pas de promenade si le téléphone demande moins d'animations ;
+- le **fanion** du toit ondule doucement (immobile si le téléphone demande moins d'animations), les **pièces d'or** des loyers montent au-dessus des biens loués.
+- Fluidité mesurée (processeur ×4 plus lent, rendu logiciel, nouvelle partie) : 26 à 28 images par seconde en qualité « Économie » contre 29 avant le lot, le recadrage dessinant des façades plus grandes ; 10 en « Automatique », inchangé.
+
 L'animation doit rester fluide sur un téléphone de milieu de gamme (voir [08-equilibrage.md](08-equilibrage.md) et [09-feuille-de-route.md](09-feuille-de-route.md)).
 
 ## 5.7 Typographie
 
 - **Manrope** pour l'interface (lisible, chiffres alignés).
 - **Une police expressive** pour le titre *Clé en main !* et les grands moments (bilans, titres), par exemple **Fraunces**.
+
+### Finitions (plaisir de jeu, lot 5)
+
+- **Chiffres clés** en Fraunces (`--font-display`), en chiffres alignés ; le reste de l'interface garde Manrope.
+- **Mouvement** : fondu et glissement de 8 px à l'arrivée d'un écran (0,22 s), ouverture du tiroir (0,25 s), pression de 2 % sur les boutons et les lignes, jauge qui se remplit (0,6 s). Tout est désactivé avec « réduire les animations ».
+- **Thème sombre** : relu sur les écrans des cinq lots ; les teintes fixes des scènes (laiton de la clé, médaillon doré, pièces d'or des loyers) sont voulues et gardées.
 
 ## 5.8 Le son
 

@@ -22,7 +22,7 @@ import {
   SectionTitle,
   Tile,
 } from '../ui/components.tsx';
-import { KindThumb } from '../ui/Facade.tsx';
+import { PropertyThumb } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
 
 const STATUS_TONE: Record<PropertyStatus, 'accent' | 'amber' | 'green' | undefined> = {
@@ -103,7 +103,7 @@ export function AssetsTab() {
             {state.purchases.map((purchase) => (
               <ListRow
                 key={purchase.id}
-                thumb={<KindThumb property={purchase.property} />}
+                thumb={<PropertyThumb property={purchase.property} />}
                 title={propertyLabel(purchase.property)}
                 subtitle={format(t.assets.deedOn, { date: formatDayLong(purchase.deedDay) })}
                 side={<span className="strong">{formatEuros(purchase.price)}</span>}
@@ -135,7 +135,7 @@ export function AssetsTab() {
             return (
               <ListRow
                 key={row.propertyId}
-                thumb={<KindThumb property={owned.property} owned />}
+                thumb={<PropertyThumb property={owned.property} owned />}
                 title={propertyLabel(owned.property)}
                 testId={`property-${row.propertyId}`}
                 extra={<Badge tone={STATUS_TONE[row.status]}>{t.assets.status[row.status]}</Badge>}
@@ -182,7 +182,7 @@ export function AssetsTab() {
             {[...state.soldProperties].reverse().map((sold) => (
               <ListRow
                 key={`${sold.property.id}-${sold.soldDay}`}
-                thumb={<KindThumb property={sold.property} />}
+                thumb={<PropertyThumb property={sold.property} />}
                 title={propertyLabel(sold.property)}
                 subtitle={format(t.assets.soldLine, { date: formatDayYear(sold.soldDay) })}
                 extra={sold.forced ? <Badge tone="amber">{t.assets.forced}</Badge> : undefined}

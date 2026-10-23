@@ -1,5 +1,11 @@
 import { gameContent } from '@cle/content';
-import { decisionKey, type GameState, type MailItem, type PendingDecision } from '@cle/engine';
+import {
+  decisionKey,
+  type GameState,
+  type MailItem,
+  type PendingDecision,
+  type Property,
+} from '@cle/engine';
 import { useEffect, useState } from 'react';
 import { useGame, useNav, type Route } from '../game/context.tsx';
 import {
@@ -24,7 +30,8 @@ import {
   t,
 } from '../texts.ts';
 import { Badge, Chip, Empty, ListRow, ScreenHeader, Segmented } from '../ui/components.tsx';
-import type { IconName } from '../ui/Icon.tsx';
+import { Icon, type IconName } from '../ui/Icon.tsx';
+import { PropertyThumb } from '../ui/Facade.tsx';
 
 const ICONS: Record<PendingDecision['kind'], IconName> = {
   counterOffer: 'tag',
@@ -74,6 +81,24 @@ export function decisionTitle(decision: PendingDecision): string {
     case 'vacant':
       return texts[decision.kind];
   }
+}
+
+/** The property a decision is about, if there is one (its picture goes in the row). */
+function decisionProperty(decision: PendingDecision, state: GameState): Property | null {
+  if (decision.kind === 'catalogEvent') {
+    const instance = state.catalog.pending.find((p) => p.id === decision.instanceId);
+    return state.properties.find((o) => o.property.id === instance?.propertyId)?.property ?? null;
+  }
+  if ('listingId' in decision) {
+    return state.listings.find((l) => l.id === decision.listingId)?.property ?? null;
+  }
+  if ('purchaseId' in decision) {
+    return state.purchases.find((p) => p.id === decision.purchaseId)?.property ?? null;
+  }
+  if ('propertyId' in decision) {
+    return state.properties.find((o) => o.property.id === decision.propertyId)?.property ?? null;
+  }
+  return null;
 }
 
 /** What the decision is about: the property's label, or the event's family. */
@@ -136,11 +161,24 @@ export function DecisionRow({ decision }: { decision: PendingDecision }) {
   const nav = useNav();
   const route = decisionRoute(decision);
   const subject = decisionSubject(decision, state);
+  const property = decisionProperty(decision, state);
+  const owned = property !== null && state.properties.some((o) => o.property.id === property.id);
   const urgent =
     decision.deadlineDay !== null && formatWhen(decision.deadlineDay, state.clock.date);
   return (
     <ListRow
-      icon={ICONS[decision.kind]}
+      icon={property ? undefined : ICONS[decision.kind]}
+      thumb={
+        property ? (
+          // The building, and the kind of decision as a small mark over its corner.
+          <span className="thumb-marked">
+            <PropertyThumb property={property} owned={owned} />
+            <span className="thumb-mark">
+              <Icon name={ICONS[decision.kind]} size={13} />
+            </span>
+          </span>
+        ) : undefined
+      }
       title={decisionTitle(decision)}
       subtitle={subject ?? undefined}
       testId={`decision-${decision.kind}`}

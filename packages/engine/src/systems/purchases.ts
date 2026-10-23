@@ -288,6 +288,7 @@ function signDeed(ctx: SystemContext, purchase: Purchase): void {
     },
     quotes: [],
     works: null,
+    lastWorks: null,
     worksFund:
       loan && envelope > 0
         ? {

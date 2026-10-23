@@ -19,14 +19,24 @@ export interface ListingFilters {
   /** Maximum price, in euros. */
   budget: number | null;
   favorites: boolean;
+  /** Only the listings the player's estimate calls a bargain. */
+  bargains?: boolean;
   sort: ListingSort;
 }
 
 /** Screens pushed on top of a tab. */
 export type Route =
-  | { name: 'listings'; neighbourhoodId?: string; favorites?: boolean; filters?: ListingFilters }
+  | {
+      name: 'listings';
+      neighbourhoodId?: string;
+      favorites?: boolean;
+      filters?: ListingFilters;
+      /** The filters' panel is open. */
+      filtersOpen?: boolean;
+    }
   | { name: 'listing'; id: string }
   | { name: 'purchase'; id: string }
+  | { name: 'worksReport'; id: string }
   | { name: 'property'; id: string; tab?: PropertyTab }
   | { name: 'rent'; id: string }
   | { name: 'works'; id: string }

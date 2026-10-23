@@ -68,7 +68,12 @@ export function FinancingPanel({
 
   if (!open) {
     return (
-      <button type="button" className="button block" onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className="button block"
+        data-tutorial="financing"
+        onClick={() => setOpen(true)}
+      >
         {t.financing.open}
       </button>
     );

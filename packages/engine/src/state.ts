@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 20;
+export const FORMAT_VERSION = 21;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -508,6 +508,31 @@ export interface TransformationProject {
   overrun: number;
 }
 
+/**
+ * A property as the works found it or left it (game feel, lot 4): what the
+ * « avant / après » of the end of the works shows.
+ */
+export interface WorksSnapshot {
+  dpe: DpeLabel;
+  /** The player's estimate of the value, and the market rent of a bare let. */
+  value: Cents;
+  rent: Cents;
+  /** What the street sees of the building (façade, windows, roof), 1 … 5. */
+  facadeState: number;
+  newWindows: boolean;
+  /** State and range of every item, by `itemId`. */
+  items: { id: string; state: number; tier: Tier }[];
+}
+
+/** The last works finished on a property, before and after. */
+export interface WorksReport {
+  day: number;
+  /** What the works cost the player. */
+  cost: Cents;
+  before: WorksSnapshot;
+  after: WorksSnapshot;
+}
+
 export interface WorksProject {
   id: string;
   startDay: number;
@@ -519,6 +544,8 @@ export interface WorksProject {
   /** A hazard waiting for the player's decision: the works are paused. */
   hazard: PendingHazard | null;
   dpeBefore: DpeLabel;
+  /** The property when the works started; null for works begun before save format 21. */
+  before: WorksSnapshot | null;
   /** Paid so far: deposits, bills, hazards. */
   paid: Cents;
 }
@@ -554,6 +581,8 @@ export interface OwnedProperty {
   furnishedTax: FurnishedTaxState;
   quotes: Quote[];
   works: WorksProject | null;
+  /** The last works finished, before and after (save format 21); null if none since. */
+  lastWorks: WorksReport | null;
   /** Money lent for works, kept for this property's bills until `untilDay`. */
   worksFund: { amount: Cents; loanId: string; untilDay: number } | null;
   /** Works not deducted from the rents: they count in the capital gain (instead of the flat allowance). */

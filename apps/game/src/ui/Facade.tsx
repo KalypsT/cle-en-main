@@ -1,4 +1,5 @@
-import type { Property } from '@cle/engine';
+import type { BuildingPlace, Property } from '@cle/engine';
+import { memo, useMemo } from 'react';
 import { engine } from '../engine.ts';
 import { useGame } from '../game/context.tsx';
 import { FacadeShape } from '../world/FacadeShape.tsx';
@@ -23,10 +24,13 @@ export function Facade({
   property,
   owned = false,
   height = 150,
+  look,
 }: {
   property: Property;
   owned?: boolean;
   height?: number;
+  /** A state of the building to draw instead of today's (the « avant » of some works). */
+  look?: { facadeState: number; newWindows: boolean };
 }) {
   const { state } = useGame();
   const place = engine.building(state, property.id);
@@ -42,8 +46,8 @@ export function Facade({
     floors: building?.floors ?? (property.kind === 'house' ? 2 : 4),
     shop: property.kind === 'commercial' || (building?.shop ?? false),
     variant: building?.variant ?? pickIndex(property.id, 1, 1000) / 1000,
-    facadeState: building?.facadeState ?? 3.5,
-    newWindows: building?.newWindows ?? false,
+    facadeState: look?.facadeState ?? building?.facadeState ?? 3.5,
+    newWindows: look?.newWindows ?? building?.newWindows ?? false,
     highlightFloor: building?.highlightFloor ?? null,
   });
   const viewHeight = 150;
@@ -66,7 +70,7 @@ export function Facade({
           spec={spec}
           highlightFloor={building?.highlightFloor ?? null}
           accent={owned ? 'var(--accent)' : null}
-          scaffolding={building?.scaffolding ?? false}
+          scaffolding={look ? false : (building?.scaffolding ?? false)}
         />
       </g>
     </svg>
@@ -114,6 +118,78 @@ function PlotFacade({
       )}
     </svg>
   );
+}
+
+/**
+ * The building of a listing or a property as the street draws it, cut to the
+ * building alone: the picture of a list row (game feel, lot 3). Built once per
+ * property: the clock's hours do not draw it again.
+ */
+export const FacadeThumb = memo(function FacadeThumb({
+  property,
+  place,
+  owned = false,
+}: {
+  property: Property;
+  /** `engine.building` of the property, read once by the row. */
+  place: BuildingPlace | null;
+  owned?: boolean;
+}) {
+  if (property.kind === 'land' || property.kind === 'parking') {
+    return <KindThumb property={property} owned={owned} />;
+  }
+  const building = place?.building;
+  const spec = facadeSpec({
+    id: property.id,
+    cityId: property.cityId,
+    kind: property.kind,
+    epoch: property.epoch,
+    floors: building?.floors ?? (property.kind === 'house' ? 2 : 4),
+    shop: property.kind === 'commercial' || (building?.shop ?? false),
+    variant: building?.variant ?? pickIndex(property.id, 1, 1000) / 1000,
+    facadeState: building?.facadeState ?? 3.5,
+    newWindows: building?.newWindows ?? false,
+    highlightFloor: building?.highlightFloor ?? null,
+  });
+  const height = spec.wallHeight + spec.roof.height;
+  // Square around the building, with a little sky and pavement.
+  const side = Math.max(spec.width, height) + 12;
+  const x = (spec.width - side) / 2;
+  return (
+    <svg
+      className="facade-thumb"
+      width="48"
+      height="48"
+      viewBox={`${x} ${-side + 6} ${side} ${side}`}
+      aria-hidden="true"
+    >
+      <rect x={x} y={-side + 6} width={side} height={side} fill="var(--sky, #dfe9ee)" />
+      <rect x={x} y="0" width={side} height="6" fill="var(--pavement, #cfc8b8)" />
+      <FacadeShape
+        spec={spec}
+        highlightFloor={building?.highlightFloor ?? null}
+        accent={owned ? 'var(--accent)' : null}
+        scaffolding={building?.scaffolding ?? false}
+      />
+    </svg>
+  );
+});
+
+/**
+ * The picture of a property in a list row: its building as the street draws it
+ * (the building is read once, the hours of the clock do not draw it again).
+ */
+export function PropertyThumb({
+  property,
+  owned = false,
+}: {
+  property: Property;
+  owned?: boolean;
+}) {
+  const { state } = useGame();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const place = useMemo(() => engine.building(state, property.id), [property]);
+  return <FacadeThumb property={property} place={place} owned={owned} />;
 }
 
 /** Small picture for list rows. */

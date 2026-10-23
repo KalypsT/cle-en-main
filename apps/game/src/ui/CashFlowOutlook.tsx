@@ -1,7 +1,7 @@
 import type { CashFlowOutlook } from '@cle/engine';
 import { gameContent } from '@cle/content';
 import { format, formatEuros, formatSigned, t } from '../texts.ts';
-import { Amount, Card, KeyValues } from './components.tsx';
+import { Amount, Card, type Fold, KeyValues } from './components.tsx';
 
 /** Colour of a cash-flow outlook (progression, step 3). */
 export function outlookTone(outlook: CashFlowOutlook): string {
@@ -26,10 +26,16 @@ export function outlookAdvice(outlook: CashFlowOutlook): string {
 }
 
 /** « Cash-flow prévu » of a listing: every amount comes from the engine. */
-export function CashFlowOutlookCard({ outlook }: { outlook: CashFlowOutlook }) {
+export function CashFlowOutlookCard({
+  outlook,
+  fold,
+}: {
+  outlook: CashFlowOutlook;
+  fold?: Fold | undefined;
+}) {
   const sim = outlook.simulation;
   return (
-    <Card title={t.outlook.heading} testId="cash-flow-outlook">
+    <Card title={t.outlook.heading} testId="cash-flow-outlook" fold={fold} id="outlook">
       <Amount
         label={format(t.outlook.label, { years: gameContent.yvon.thresholds.outlookYears })}
         value={format(t.outlook.perMonth, { amount: formatSigned(outlook.monthly) })}

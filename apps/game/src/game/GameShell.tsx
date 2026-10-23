@@ -1,10 +1,11 @@
 import { music, type TutorialTrigger } from '@cle/content';
-import type { GameAction, GameEvent } from '@cle/engine';
+import type { GameAction, GameEvent, GameState } from '@cle/engine';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { AudioMixer } from '../audio/mixer.ts';
 import type { EffectName } from '../audio/effects.ts';
 import type { GameSession } from '../session/game-session.ts';
-import { saveSettings, type Settings } from '../settings.ts';
+import { loadSettings, saveSettings, type Settings } from '../settings.ts';
+import { vibrateFor } from '../audio/haptics.ts';
 import { describeEvent, t, texts } from '../texts.ts';
 import { Icon, type IconName } from '../ui/Icon.tsx';
 import {
@@ -28,6 +29,7 @@ import { MenuTab } from '../screens/MenuTab.tsx';
 import { PropertyScreen } from '../screens/PropertyScreen.tsx';
 import { PurchaseScreen } from '../screens/PurchaseScreen.tsx';
 import { SaleScreen } from '../screens/SaleScreen.tsx';
+import { WorksReportScreen } from '../screens/WorksReportScreen.tsx';
 import { WorksScreen } from '../screens/WorksScreen.tsx';
 import { RentScreen } from '../screens/RentScreen.tsx';
 import { SettingsScreen } from '../screens/SettingsScreen.tsx';
@@ -48,6 +50,16 @@ import { RewindScreen } from '../screens/RewindScreen.tsx';
 import { StatisticsScreen } from '../screens/StatisticsScreen.tsx';
 import type { Checkpoint } from '../storage/saves.ts';
 import { type Overlay, OverlayView } from './Overlays.tsx';
+import {
+  dismissGoodNews,
+  type GoodNews,
+  goodNewsOf,
+  type GoodNewsQueue,
+  queueGoodNews,
+  rivalNews,
+  rivalsBeaten,
+} from './good-news.ts';
+import { GoodNewsToasts } from './GoodNewsToasts.tsx';
 import { ScrollMemory } from './scroll-memory.ts';
 
 const TABS: { id: TabId; icon: IconName }[] = [
@@ -111,13 +123,24 @@ function effectOf(event: GameEvent): EffectName | null {
 }
 
 /** Overlays that play the celebration music (docs/05, 5.8). */
-const FESTIVE: ReadonlySet<Overlay['kind']> = new Set(['month', 'year', 'title']);
+const FESTIVE: ReadonlySet<Overlay['kind']> = new Set(['month', 'year', 'title', 'keys', 'works']);
 
 /** What an engine event brings over the game (reviews, titles, fresh start, end). */
-function overlaysOf(events: GameEvent[], monthly: boolean): Overlay[] {
+function overlaysOf(events: GameEvent[], state: GameState, monthly: boolean): Overlay[] {
   const overlays: Overlay[] = [];
   for (const event of events) {
-    if (event.type === 'yearStarted') overlays.push({ kind: 'year' });
+    if (event.type === 'deedSigned') {
+      overlays.push({
+        kind: 'keys',
+        propertyId: event.propertyId,
+        price: event.price,
+        first: (state.progress.counters.purchases ?? 0) <= 1,
+      });
+    } else if (event.type === 'worksCompleted') {
+      // Only when the before was recorded: works begun before save format 21 have no picture.
+      const owned = state.properties.find((o) => o.property.id === event.propertyId);
+      if (owned?.lastWorks) overlays.push({ kind: 'works', propertyId: event.propertyId });
+    } else if (event.type === 'yearStarted') overlays.push({ kind: 'year' });
     else if (event.type === 'monthStarted' && event.month !== 1 && monthly) {
       overlays.push({ kind: 'month' });
     } else if (event.type === 'titleEarned')
@@ -192,44 +215,60 @@ export function GameShell({
     session.getSnapshot().state.gameOver ? [{ kind: 'gameOver' }] : [],
   );
   const overlay = overlays[0];
+  const [goodNews, setGoodNews] = useState<GoodNewsQueue>({ shown: null, waiting: [] });
+  const nextGoodNews = useCallback(() => setGoodNews(dismissGoodNews), []);
+  // The rivals the player had beaten, to tell when one more loses a property.
+  const beaten = useRef<Record<string, number>>({});
   const resumeSpeed = useRef<number | null>(null);
   const celebrating = overlay !== undefined && FESTIVE.has(overlay.kind);
   useEffect(
     () => audio.setMusic(celebrating ? 'celebration' : music.slotByMoment[ambience.moment]),
     [audio, celebrating, ambience.moment],
   );
-  useEffect(
-    () =>
-      session.onEvents((events, state) => {
-        for (const event of events) {
-          const effect = effectOf(event);
-          if (effect) audio.effect(effect);
+  useEffect(() => {
+    beaten.current = rivalsBeaten(session.getSnapshot().state);
+    return session.onEvents((events, state) => {
+      for (const event of events) {
+        const effect = effectOf(event);
+        if (effect) {
+          audio.effect(effect);
+          if (loadSettings().vibration) vibrateFor(effect);
         }
-        // A refused offer is told at once, wherever the player is.
-        const bad = events.filter(
-          (event) =>
-            (event.type === 'offerAnswered' && event.answer === 'refused') ||
-            event.type === 'counterOfferExpired',
+      }
+      const good = events
+        .map((event) => goodNewsOf(event, state))
+        .filter((news): news is GoodNews => news !== null);
+      if (events.some((event) => event.type === 'compromisSigned')) {
+        good.push(...rivalNews(beaten.current, state));
+        beaten.current = rivalsBeaten(state);
+      }
+      if (good.length > 0) {
+        setGoodNews((queue) => queueGoodNews(queue, good));
+      }
+      // A refused offer is told at once, wherever the player is.
+      const bad = events.filter(
+        (event) =>
+          (event.type === 'offerAnswered' && event.answer === 'refused') ||
+          event.type === 'counterOfferExpired',
+      );
+      if (bad.length > 0) {
+        notify(
+          bad
+            .map((event) => describeEvent(event, state))
+            .filter(Boolean)
+            .join(' '),
         );
-        if (bad.length > 0) {
-          notify(
-            bad
-              .map((event) => describeEvent(event, state))
-              .filter(Boolean)
-              .join(' '),
-          );
-        }
-        const fresh = overlaysOf(events, settings.monthlyReview);
-        if (fresh.length === 0) return;
-        // The clock waits while a review or a celebration is open, then goes on at its speed.
-        if (resumeSpeed.current === null) {
-          resumeSpeed.current = session.getSnapshot().speed;
-          session.setSpeed(0);
-        }
-        setOverlays((queue) => [...queue, ...fresh]);
-      }),
-    [session, audio, notify, settings.monthlyReview],
-  );
+      }
+      const fresh = overlaysOf(events, state, settings.monthlyReview);
+      if (fresh.length === 0) return;
+      // The clock waits while a review or a celebration is open, then goes on at its speed.
+      if (resumeSpeed.current === null) {
+        resumeSpeed.current = session.getSnapshot().speed;
+        session.setSpeed(0);
+      }
+      setOverlays((queue) => [...queue, ...fresh]);
+    });
+  }, [session, audio, notify, settings.monthlyReview]);
   const closeOverlay = useCallback(() => {
     setOverlays((queue) => queue.slice(1));
     if (overlays.length <= 1 && resumeSpeed.current !== null) {
@@ -380,13 +419,15 @@ export function GameShell({
       <NavigationContext.Provider value={nav}>
         <div className={shellClass}>
           <StatusBar />
+          {/* The news wait while a review or a scene is open over the game. */}
+          <GoodNewsToasts shown={overlay ? null : goodNews.shown} onDismiss={nextGoodNews} />
           <div className="street-stage" hidden={!showStreet}>
-            <StreetWorld active={showStreet} />
+            <StreetWorld active={showStreet} held={overlay !== undefined} />
           </div>
           <main className="content" key={`${tab}-${stack.length}`}>
-            <TutorialBubble shownStep={shownStep} />
             {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} wide={wide} />}
           </main>
+          <TutorialBubble shownStep={shownStep} />
           {panorama && !wide && !streetRoot && (
             <div className="rotate-notice" role="status">
               <p>{t.common.rotate}</p>
@@ -401,6 +442,7 @@ export function GameShell({
                 setOverlays([]);
                 nav.goTab('menu', { name: 'progression' });
               }}
+              onShowProperty={(id) => nav.goTab('assets', { name: 'property', id })}
             />
           )}
           <nav className="tab-bar" aria-label={t.tabs.street}>
@@ -408,6 +450,7 @@ export function GameShell({
               <button
                 key={id}
                 type="button"
+                data-tab={id}
                 aria-current={tab === id ? 'page' : undefined}
                 onClick={() => nav.selectTab(id)}
               >
@@ -452,6 +495,8 @@ function RouteScreen({ route }: { route: Route }) {
       return <PropertyScreen id={route.id} initialTab={route.tab} />;
     case 'rent':
       return <RentScreen id={route.id} />;
+    case 'worksReport':
+      return <WorksReportScreen id={route.id} />;
     case 'works':
       return <WorksScreen id={route.id} />;
     case 'sale':

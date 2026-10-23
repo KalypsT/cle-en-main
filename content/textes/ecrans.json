@@ -62,7 +62,6 @@
   "status": {
     "balance": "Trésorerie",
     "freeTime": "Temps libre",
-    "decisions": "Décisions en attente",
     "speedControls": "Vitesse du temps",
     "pause": "Pause",
     "speed": "×{speed}",
@@ -101,6 +100,7 @@
     "neighbourhood": "Quartier",
     "previousStreet": "Rue précédente",
     "nextStreet": "Rue suivante",
+    "myProperties": "Mes biens · {count}",
     "scene": "{street}, {moment}, {weather}",
     "openSection": "{name}, {street} : voir la coupe",
     "buildingNames": {
@@ -177,6 +177,14 @@
     "count": "{count} annonce(s)",
     "empty": "Aucune annonce ne correspond à ces filtres.",
     "filters": "Filtres",
+    "filtersCount": "Filtres ({count})",
+    "bargainsOnly": "Bonnes affaires",
+    "verdict": {
+      "bargain": "Bonne affaire",
+      "fair": "Au prix",
+      "expensive": "Trop cher"
+    },
+    "paysForItself": "Se paie tout seul",
     "allNeighbourhoods": "Tous les quartiers",
     "allKinds": "Tous",
     "favoritesOnly": "Favoris",
@@ -209,6 +217,20 @@
     }
   },
   "listing": {
+    "summary": {
+      "price": "Prix",
+      "cashFlow": "Cash-flow",
+      "dpe": "Énergie",
+      "under": "{value} % sous votre estimation",
+      "over": "{value} % au-dessus de votre estimation",
+      "equal": "Au niveau de votre estimation",
+      "costs": "Coûte chaque mois",
+      "balanced": "Ni gain ni perte",
+      "dpeOk": "Louable",
+      "dpeBan": "Interdit à la location en {year}",
+      "dpeBanned": "Interdit à la location",
+      "indecent": "Logement indécent"
+    },
     "heading": "Annonce",
     "addFavorite": "Ajouter aux favoris",
     "removeFavorite": "Retirer des favoris",
@@ -723,7 +745,6 @@
   "map": {
     "heading": "Carte de {city}",
     "listingsCount": "{count} annonce(s)",
-    "legendListings": "Annonces",
     "legendOwned": "Mes biens",
     "legendFavorite": "Favoris",
     "colorBy": "Couleur des quartiers",
@@ -802,6 +823,8 @@
     },
     "volume": "{label} : {percent} %",
     "soundHint": "Le son démarre au premier toucher de l'écran.",
+    "vibration": "Vibrations",
+    "vibrationHint": "Le téléphone vibre au coup de tampon du notaire et à l'arrivée des loyers.",
     "noMusic": "Aucune musique n'est encore fournie : seules les ambiances et les effets se font entendre.",
     "autoSpeed": "Accélération automatique",
     "autoSpeedHint": "Quand rien ne presse, le temps passe en ×{speed}, puis revient à la vitesse choisie à la prochaine décision.",
@@ -1073,11 +1096,64 @@
     "pastMonthHint": "Bilan d'un mois passé : la réputation est celle du jour du bilan.",
     "years": "Années"
   },
+  "goal": {
+    "heading": "Prochain titre",
+    "other": "Autre voie : {title}",
+    "perk": "Avantage : {perk}",
+    "progress": "{current} / {target}",
+    "see": "Tous les titres",
+    "nothing": "Vous avez gravi toutes les marches du moment."
+  },
+  "worksReport": {
+    "heading": "Avant / après",
+    "kicker": "Chantier terminé",
+    "title": "{property}",
+    "before": "Avant",
+    "after": "Après",
+    "compare": "Faites glisser pour comparer",
+    "dpe": "Classe énergétique",
+    "value": "Valeur estimée",
+    "rent": "Loyer possible",
+    "rentNone": "Non louable",
+    "rentNowPossible": "Louable désormais",
+    "cost": "Coût du chantier : {cost}",
+    "changes": "Ce qui a changé",
+    "stateFromTo": "{from} → {to}",
+    "item": "{item} · {space}",
+    "rooms": "Pièces",
+    "stateOf": "État {state} sur 5",
+    "see": "Voir le bien",
+    "continue": "Continuer",
+    "card": "Dernier chantier",
+    "cardHint": "{date} : {cost}, DPE {before} → {after}.",
+    "open": "Voir l'avant / après",
+    "noPicture": "Ce chantier a commencé avant l'enregistrement de l'avant / après : seuls ses chiffres sont gardés."
+  },
+  "goodNews": {
+    "many": "{count} bonnes nouvelles",
+    "loanGranted": "{banker} vous accorde {amount} à {rate}. Reste à accepter l'offre !",
+    "loanProposal": "{banker} vous fait une proposition : {amount} à {rate}.",
+    "rivalBeaten": {
+      "delaporte": "Monique Delaporte voulait ce bien aussi. Elle ne vous dit plus bonjour.",
+      "martinot": "Les frères Martinot lorgnaient ce bien. Ils grommellent en chœur.",
+      "horizon": "La SCI Horizon Patrimoine visait ce bien. Son service communication « prend acte »."
+    }
+  },
   "celebration": {
     "title": "Nouveau titre !",
     "perk": "Avantage : {perk}",
     "continue": "Merci !",
-    "achievement": "Succès débloqué"
+    "achievement": "Succès débloqué",
+    "keys": {
+      "kicker": "Remise des clés",
+      "firstTitle": "Vous êtes propriétaire !",
+      "title": "Une clé de plus au trousseau",
+      "firstText": "Votre premier bien : {property}. Le notaire range son tampon, Gérard vous serre la main. Bienvenue chez vous… enfin, chez vos futurs locataires.",
+      "text": "{property} est à vous.",
+      "price": "Acheté {price}",
+      "see": "Voir mon bien",
+      "continue": "Continuer"
+    }
   },
   "rewind": {
     "heading": "Revenir en arrière",

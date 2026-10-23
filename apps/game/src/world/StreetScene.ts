@@ -11,6 +11,7 @@ import {
   landmarkOf,
   drawTerrace,
   drawTree,
+  drawMovingTruck,
   drawVan,
   forSalePanel,
   GARLAND_COLORS,
@@ -23,6 +24,7 @@ import {
   createBird,
   createCar,
   createPassant,
+  type PassantLook,
   createWorker,
   type Walker,
 } from './people.ts';
@@ -81,6 +83,8 @@ export interface SceneData {
   neighbourhoodId: string;
   /** Stable seed of the decoration (the game's seed). */
   seed: number;
+  /** Buildings where a tenant of the player is moving in: a removal truck at the door. */
+  movingIn: readonly string[];
 }
 
 export interface FrameStats {
@@ -299,7 +303,7 @@ export class StreetScene {
   resize(width: number, height: number): void {
     this.width = Math.max(1, width);
     this.height = Math.max(1, height);
-    this.scale = sceneScale(this.height);
+    this.scale = sceneScale(this.height, this.width);
     if (!this.app) return;
     this.app.renderer.resize(this.width, this.height);
     this.sky.width = this.width;
@@ -346,6 +350,7 @@ export class StreetScene {
       data.christmas,
       data.accent,
       data.neighbourhoodId,
+      data.movingIn.join(','),
     ].join('#');
     if (staticKey !== this.staticKey) {
       this.staticKey = staticKey;
@@ -639,6 +644,10 @@ export class StreetScene {
           const worker = createWorker(random);
           worker.view.position.set(item.x + spec.width * 0.3, GROUND_Y - spec.groundHeight - 2);
           workers.push(worker);
+        } else if (data.movingIn.includes(building.id)) {
+          const door = item.x + spec.door.x + spec.door.w / 2;
+          // The truck stands just past the door, the boxes before it.
+          drawMovingTruck(front, door + 8, door);
         }
         if (data.christmas) {
           const y = GROUND_Y - spec.wallHeight + 6;
@@ -875,7 +884,26 @@ export class StreetScene {
     };
   }
 
-  private addPassant(x: number, dir: 1 | -1, together = false): Walker | null {
+  /**
+   * The player's own avatar walks by: out of their home's door when it is in
+   * view, or in from a side of the street.
+   */
+  walkPlayer(look: PassantLook, doorX: number | null): void {
+    if (!this.data || !this.app || this.reducedMotion) return;
+    const { left, right } = this.view();
+    const dir = this.random() < 0.5 ? 1 : -1;
+    const fromDoor = doorX !== null && doorX > left && doorX < right;
+    const x = fromDoor ? doorX : dir === 1 ? left - MARGIN / 2 : right + MARGIN / 2;
+    const walker = this.addPassant(x, dir, false, look);
+    // On the near side of the pavement, in front of the others.
+    if (walker) {
+      walker.y = GROUND_Y + SIDEWALK - 6;
+      walker.update(0, true);
+      this.sortActors();
+    }
+  }
+
+  private addPassant(x: number, dir: 1 | -1, together = false, look?: PassantLook): Walker | null {
     const data = this.data;
     if (!data) return null;
     const walker = createPassant({
@@ -884,6 +912,7 @@ export class StreetScene {
       night: data.moment === 'night',
       random: this.random,
       together,
+      ...(look ? { look } : {}),
     });
     walker.x = x;
     walker.dir = dir;

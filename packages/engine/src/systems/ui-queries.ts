@@ -513,6 +513,36 @@ export function cashFlowOutlook(
   return { simulation, monthly, tone, breakEvenPrice };
 }
 
+/** What the player can tell of a listing's price at a glance (game feel, lot 3). */
+export type DealKind = 'bargain' | 'fair' | 'expensive';
+
+export interface DealVerdict {
+  kind: DealKind;
+  /** Asking price against the player's own estimate (−0,12: 12 % under it). */
+  priceGap: number;
+}
+
+/**
+ * The asking price of a listing against the player's estimate (`estimateValue`:
+ * what visits and diagnoses taught, hidden defects by their probability, so it
+ * never gives a secret away). Thresholds in content/marche.json (`verdict`).
+ */
+export function dealVerdict(
+  content: GameContent,
+  state: GameState,
+  listingId: string,
+): DealVerdict | null {
+  const listing = state.listings.find((candidate) => candidate.id === listingId);
+  if (!listing) return null;
+  const { estimate } = estimateValue(content, state, listing.property, listing.visited);
+  if (estimate <= 0) return null;
+  const priceGap = listing.askingPrice / estimate - 1;
+  const { bargainShare, expensiveShare } = content.market.verdict;
+  const kind: DealKind =
+    priceGap <= -bargainShare ? 'bargain' : priceGap >= expensiveShare ? 'expensive' : 'fair';
+  return { kind, priceGap };
+}
+
 /** Balance expected over the next days from the flows already known (docs/02, 2.6). */
 export interface CashForecast {
   days: number;

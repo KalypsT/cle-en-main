@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import {
+  openFilters,
   capture,
+  fill,
   newGame,
   openGame,
   pause,
@@ -25,6 +27,14 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   // Gérard welcomes the player, then waits for a listing to be opened.
   const bubble = page.getByTestId('tutorial');
   await expect(bubble).toContainText(tutorial.steps[0]?.text ?? '');
+  // The bubble points at the pause, folds into a chip and opens again.
+  await expect(page.locator('[data-tutorial="pause"]')).toHaveClass(/halo/);
+  await bubble.getByRole('button', { name: tutorial.fold }).click();
+  await expect(bubble).not.toContainText(tutorial.steps[0]?.text ?? '');
+  await bubble
+    .getByRole('button', { name: fill(tutorial.unfold, { name: tutorial.speakers.gerard.name }) })
+    .click();
+  await expect(bubble).toContainText(tutorial.steps[0]?.text ?? '');
   await bubble.getByRole('button', { name: tutorial.ok }).click();
   await expect(bubble).toContainText(tutorial.steps[1]?.text ?? '');
 
@@ -33,11 +43,18 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   await capture(page, '03-carte');
   await page.getByRole('button', { name: /annonce\(s\)$/ }).click();
   // « ≤ 90 000 € » (the thousands separator is a narrow no-break space).
+  await openFilters(page);
   await page.getByRole('button', { name: /^≤ 90\D000/ }).click();
   await page.getByRole('button', { name: t.listings.sortYield }).click();
   await capture(page, '04-annonces');
+  // Each listing says what the player's estimate thinks of its price.
+  await expect(
+    page.locator('[data-testid^="listing-"] [data-testid^="verdict-"]').first(),
+  ).toBeVisible();
   await page.locator('[data-testid^="listing-"]').first().click();
   await expect(bubble).toContainText(tutorial.steps[2]?.text ?? '');
+  await expect(page.getByTestId('deal-summary')).toBeVisible();
+  await expect(page.locator('[data-tutorial="visit"]')).toHaveClass(/halo/);
   await capture(page, '05-fiche-annonce');
 
   // Visit, then simulate the financing.
@@ -129,6 +146,14 @@ test('plays from the tutorial to the first let property', async ({ page }) => {
   const mine = page.getByText(t.street.myProperty);
   await expect(mine).toBeVisible();
   await capture(page, '09-rue-mon-bien', 'jalon-5');
+  // Its flag on the roof, and « Mes biens » brings it back to the middle of the view.
+  await expect(page.locator('.street-building', { has: mine }).locator('.street-flag')).toHaveCount(
+    1,
+  );
+  const myProperties = page.getByTestId('street-next-owned');
+  await expect(myProperties).toHaveText(fill(t.street.myProperties, { count: 1 }));
+  await myProperties.click();
+  await expect(mine).toBeInViewport();
   await page.locator('.street-building', { has: mine }).locator('.street-hit').click();
   await expect(page.getByTestId('unit-player')).toBeVisible();
   await capture(page, '10-coupe-mon-bien', 'jalon-5');

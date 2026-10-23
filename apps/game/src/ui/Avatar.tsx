@@ -276,15 +276,29 @@ function hairLayers(
   }
 }
 
+/** The three expressions of the portraits (docs/05, 5.5); « smile » is the everyday face. */
+export type Mood = 'smile' | 'happy' | 'neutral' | 'upset';
+
+/** Mouths and eyebrows of each expression. */
+const MOODS: Record<Mood, { mouth: string; open: boolean; brows: string }> = {
+  smile: { mouth: 'M42 60 q8 6 16 0', open: false, brows: 'M35 40 q5 -3 10 0M55 40 q5 -3 10 0' },
+  happy: { mouth: 'M41 58 q9 11 18 0z', open: true, brows: 'M35 38 q5 -4 10 0M55 38 q5 -4 10 0' },
+  neutral: { mouth: 'M43 61 h14', open: false, brows: 'M35 40 h10M55 40 h10' },
+  upset: { mouth: 'M42 63 q8 -6 16 0', open: false, brows: 'M35 38 l10 3M55 41 l10 -3' },
+};
+
 export function Avatar({
   parts,
   size = 64,
   label,
+  mood = 'smile',
 }: {
   parts: AvatarParts;
   size?: number;
   label?: string;
+  mood?: Mood;
 }) {
+  const face = MOODS[mood];
   const clipId = `${useId()}-head`;
   const skin = pick(SKINS, parts.skin);
   const skinShade = shade(skin, 0.86);
@@ -332,13 +346,7 @@ export function Avatar({
       </g>
       <circle cx="40" cy="48" r="3" fill="#24262b" />
       <circle cx="60" cy="48" r="3" fill="#24262b" />
-      <path
-        d="M35 40 q5 -3 10 0M55 40 q5 -3 10 0"
-        stroke={browColor}
-        strokeWidth="2.5"
-        fill="none"
-        strokeLinecap="round"
-      />
+      <path d={face.brows} stroke={browColor} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <path
         d="M50 49 q-3 6 0 8"
         stroke={skinShade}
@@ -347,11 +355,12 @@ export function Avatar({
         strokeLinecap="round"
       />
       <path
-        d={accessory.beard ? 'M43 62 q7 4 14 0' : 'M42 60 q8 6 16 0'}
+        d={accessory.beard && mood === 'smile' ? 'M43 62 q7 4 14 0' : face.mouth}
         stroke={accessory.beard ? '#f3d2c5' : '#7a3b2a'}
         strokeWidth="2.5"
-        fill="none"
+        fill={face.open ? '#7a3b2a' : 'none'}
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       {accessory.earrings && (
         <g fill="#e3b341">
@@ -379,8 +388,75 @@ export function Avatar({
   );
 }
 
-/** Portraits of the named characters (Gérard, Yvon), for the tutorial. */
+/** Portraits of the named characters: the tutorial, the good news, the challenges. */
 export const CHARACTER_AVATARS: Record<string, AvatarParts> = {
   gerard: compose({ face: 2, hair: 4, hairColor: 6, skin: 0, outfit: 4, accessory: 1 }),
   yvon: compose({ face: 1, hair: 0, hairColor: 1, skin: 1, outfit: 1, accessory: 0 }),
+  kevin: compose({ face: 3, hair: 6, hairColor: 4, skin: 2, outfit: 7, accessory: 0 }),
+  hortense: compose({ face: 1, hair: 2, hairColor: 0, skin: 5, outfit: 4, accessory: 2 }),
+  monique: compose({ face: 0, hair: 3, hairColor: 5, skin: 0, outfit: 6, accessory: 6 }),
+  martinot: compose({ face: 2, hair: 9, hairColor: 2, skin: 1, outfit: 5, accessory: 3 }),
 };
+
+/** Hortense Rigueur never smiles (content/banques.json: « Aucun sourire »). */
+const STERN: ReadonlySet<string> = new Set(['hortense']);
+
+/** A character's expression: the stern ones stay neutral when pleased. */
+export function characterMood(id: string, mood: Mood): Mood {
+  return STERN.has(id) && (mood === 'happy' || mood === 'smile') ? 'neutral' : mood;
+}
+
+/** The banker of each bank, and the rivals, among the portraits. */
+export const BANK_CHARACTERS: Record<string, string> = {
+  tirelire: 'gerard',
+  fougueux: 'kevin',
+  rigueur: 'hortense',
+};
+export const RIVAL_CHARACTERS: Record<string, string> = {
+  delaporte: 'monique',
+  martinot: 'martinot',
+};
+
+/**
+ * A steady face for someone without a portrait (a tenant): drawn from their
+ * name, so the same person always looks the same.
+ */
+export function faceOf(name: string): AvatarParts {
+  let hash = 2166136261;
+  for (let i = 0; i < name.length; i++) {
+    hash ^= name.charCodeAt(i);
+    hash = Math.imul(hash, 16777619) >>> 0;
+  }
+  const next = (count: number) => {
+    const value = hash % count;
+    hash = Math.floor(hash / count) || Math.imul(hash ^ 0x9e3779b9, 2654435761) >>> 0;
+    return value;
+  };
+  return compose({
+    face: next(FACES.length),
+    hair: next(HAIR_STYLES.length),
+    hairColor: next(HAIR_COLORS.length),
+    skin: next(SKINS.length),
+    outfit: next(OUTFITS.length),
+    accessory: next(ACCESSORIES.length),
+  });
+}
+
+/** Hair styles long enough to show behind a passer-by's head. */
+const LONG_HAIR: ReadonlySet<HairStyle> = new Set(['long', 'bun', 'ponytail', 'bob']);
+
+/** The colours of an avatar, for the player walking down the street (docs/05, 5.5). */
+export function avatarLook(parts: AvatarParts): {
+  skin: number;
+  hair: number;
+  top: number;
+  longHair: boolean;
+} {
+  const color = (hex: string) => parseInt(hex.slice(1), 16);
+  return {
+    skin: color(pick(SKINS, parts.skin)),
+    hair: color(pick(HAIR_COLORS, AVATAR_CONTROLS.hairColor.get(parts))),
+    top: color(pick(OUTFITS, parts.outfit).body),
+    longHair: LONG_HAIR.has(pick(HAIR_STYLES, AVATAR_CONTROLS.hair.get(parts))),
+  };
+}

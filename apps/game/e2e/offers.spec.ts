@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  openFilters,
   dismissOverlays,
   newGame,
   openGame,
@@ -20,6 +21,7 @@ test('tells a refused offer, on the listing and in the mail', async ({ page }) =
 
   await tab(page, 'assets');
   await page.getByRole('button', { name: t.assets.seeListings }).click();
+  await openFilters(page);
   await page.getByRole('button', { name: /^≤ 90\D000/ }).click();
   await page.locator('[data-testid^="listing-"]').first().click();
 

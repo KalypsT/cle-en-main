@@ -7,13 +7,15 @@ import {
   type Moment,
   type Season,
   type SpaceKind,
+  type Tier,
   type Trade,
   type Weather,
 } from '../content.ts';
 import { EPOCHS, MOMENTS, SEASONS, WEATHERS } from '../content-constants.ts';
 import { hashFloat } from '../random.ts';
 import type { AnecdoteNote, GameState, OwnedProperty, Property, PropertyKind } from '../state.ts';
-import { believedView, isDwelling, weightedState } from './dwelling.ts';
+import { believedView, isDwelling } from './dwelling.ts';
+import { facadeOf } from './works-report.ts';
 import { worksPlan } from './works-view.ts';
 
 /*
@@ -134,6 +136,8 @@ export interface SectionRoom {
   state: number;
   /** Trade of an artisan (or the player) working in the room today. */
   renovating: Trade | null;
+  /** Range of the room's fittings (the mean of its items), for the floor and the furniture. */
+  tier: Tier;
 }
 
 export interface SectionUnit {
@@ -146,6 +150,8 @@ export interface SectionUnit {
   propertyId: string | null;
   /** Somebody lives there (tenant, the player, or a neighbour). */
   occupied: boolean;
+  /** Who lives in the player's dwelling: the tenant (by name), the player, or nobody. */
+  resident: { kind: 'tenant'; name: string } | { kind: 'player' } | null;
   /** The player's rooms; empty for the neighbours. */
   rooms: SectionRoom[];
   /** Trades working on the whole dwelling (electricity, heating…) today. */
@@ -164,7 +170,6 @@ export interface SectionView {
   worksPercent: number | null;
 }
 
-const VISIBLE_ITEMS = new Set(['facade', 'windows', 'roof', 'commonParts']);
 const PERCENT_STEP = 5;
 
 function beforeOrSame(date: CalendarDate, [month, day]: readonly [number, number]): boolean {
@@ -445,12 +450,7 @@ function placedBuilding(
 ): StreetBuilding {
   const { property, owned } = placed;
   const seen = placed.role === 'listing' ? believedView(content, property) : property;
-  const visible = seen.items.filter((item) => VISIBLE_ITEMS.has(item.kind));
-  const facadeState =
-    visible.length > 0
-      ? visible.reduce((sum, item) => sum + item.state, 0) / visible.length
-      : weightedState(content, seen);
-  const windows = seen.items.find((item) => item.kind === 'windows');
+  const { facadeState, newWindows } = facadeOf(content, seen);
   const running = runningTrades(owned);
   const roofWorks = [...running.keys()].some((itemId) => itemId === 'roof');
   const variant = hashFloat(state.seed, `variant#${property.id}`);
@@ -482,8 +482,8 @@ function placedBuilding(
     // A shop only under flats, and never where the flat itself is on the ground floor.
     shop: shop && property.kind === 'apartment' && (property.floor ?? 0) > 0,
     tree,
-    facadeState: Math.round(facadeState * 10) / 10,
-    newWindows: windows ? windows.state >= 5 || windows.tier === 'premium' : false,
+    facadeState,
+    newWindows,
     scaffolding: Boolean(owned?.works) || placed.role === 'rival',
     tarp: roofWorks,
     highlightFloor: property.kind === 'apartment' ? (property.floor ?? 0) : null,
@@ -619,6 +619,8 @@ function unitsLayout(count: number, floors: number, firstFloor: number) {
   return layout;
 }
 
+const TIER_RANK: readonly Tier[] = ['eco', 'standard', 'premium'];
+
 function roomsOf(property: Property, running: Map<string, Trade>, prefix: string): SectionRoom[] {
   return property.spaces
     .filter((space) => space.kind !== 'garden' && space.id.startsWith(prefix))
@@ -628,12 +630,17 @@ function roomsOf(property: Property, running: Map<string, Trade>, prefix: string
         items.length > 0 ? items.reduce((sum, item) => sum + item.state, 0) / items.length : 3;
       const renovating =
         items.map((item) => running.get(`${space.id}.${item.kind}`)).find((t) => t) ?? null;
+      const tierMean =
+        items.length > 0
+          ? items.reduce((sum, item) => sum + TIER_RANK.indexOf(item.tier), 0) / items.length
+          : 1;
       return {
         spaceId: space.id,
         kind: space.kind,
         surface: space.surface,
         state: Math.round(state * 10) / 10,
         renovating,
+        tier: TIER_RANK[Math.round(tierMean)] ?? 'standard',
       };
     });
 }
@@ -676,6 +683,13 @@ export function section(
   const playerOccupied = owned
     ? Boolean(owned.lease) || state.player.homePropertyId === owned.property.id
     : role !== 'neighbour';
+  const residentOf = (mine: boolean): SectionUnit['resident'] => {
+    if (!mine || !owned) return null;
+    if (state.player.homePropertyId === owned.property.id) return { kind: 'player' };
+    return owned.lease
+      ? { kind: 'tenant', name: `${owned.lease.tenant.firstName} ${owned.lease.tenant.lastName}` }
+      : null;
+  };
   const dwellingWorks = [...running.entries()]
     .filter(([itemId]) => !itemId.includes('.'))
     .map(([, trade]) => trade);
@@ -695,6 +709,8 @@ export function section(
         role,
         propertyId: property?.id ?? null,
         occupied: property ? playerOccupied : occupiedHash(buildingId),
+        // The household lives on the ground floor.
+        resident: floor === 0 ? residentOf(true) : null,
         // A single-storey house keeps every room on the ground floor.
         rooms: rooms.filter((room) => {
           const wanted = Math.min(floorsOfRooms[room.kind] ?? 0, building.floors - 1);
@@ -714,6 +730,7 @@ export function section(
         role,
         propertyId: property.id,
         occupied: owned ? playerOccupied || occupiedHash(`${buildingId}${prefix}`) : true,
+        resident: i === 0 ? residentOf(true) : null,
         rooms: roomsOf(property, running, prefix),
         works: dwellingWorks,
       });
@@ -735,6 +752,7 @@ export function section(
           role: mine ? role : 'neighbour',
           propertyId: mine ? (property?.id ?? null) : null,
           occupied: mine ? playerOccupied : occupiedHash(id),
+          resident: residentOf(mine),
           rooms: mine && property ? roomsOf(property, running, '') : [],
           works: mine ? dwellingWorks : [],
         });

@@ -45,18 +45,30 @@ export interface PassantContext {
   random: () => number;
   /** Walking with somebody: never stops alone. */
   together?: boolean;
+  /** The player's own avatar: these colours, and a marker over the head. */
+  look?: PassantLook;
+}
+
+export interface PassantLook {
+  skin: number;
+  hair: number;
+  top: number;
+  longHair: boolean;
+  /** Colour of the marker over the head (the accent). */
+  marker: number;
 }
 
 /** A passer-by on the pavement. */
 export function createPassant(context: PassantContext): Walker {
-  const { random, season, weather } = context;
+  const { random, season, weather, look } = context;
   const raining = weather === 'rain' || weather === 'snow';
   const view = new Container();
   const body = new Container();
   view.addChild(body);
   const figureRoll = random();
-  const figure: Figure =
-    figureRoll < 0.1
+  const figure: Figure = look
+    ? 'adult'
+    : figureRoll < 0.1
       ? 'child'
       : figureRoll < 0.22
         ? 'elder'
@@ -68,23 +80,26 @@ export function createPassant(context: PassantContext): Walker {
   const child = figure === 'child';
   const elder = figure === 'elder';
   const jogger = figure === 'jogger';
-  const skin = pickOf(SKINS, random);
-  const hair = elder ? pickOf(GREYS, random) : pickOf(HAIRS, random);
-  const top = jogger
-    ? pickOf(SPORT, random)
-    : elder
-      ? pickOf(MUTED, random)
-      : season === 'summer'
-        ? pickOf(SUMMER, random)
-        : pickOf(WARM, random);
+  const skin = look?.skin ?? pickOf(SKINS, random);
+  const hair = look?.hair ?? (elder ? pickOf(GREYS, random) : pickOf(HAIRS, random));
+  const top = look
+    ? look.top
+    : jogger
+      ? pickOf(SPORT, random)
+      : elder
+        ? pickOf(MUTED, random)
+        : season === 'summer'
+          ? pickOf(SUMMER, random)
+          : pickOf(WARM, random);
   const bottom = jogger ? 0x2b2d31 : pickOf(TROUSERS, random);
   const coat = !jogger && (season === 'winter' || (season === 'autumn' && random() < 0.6));
-  const skirt = !jogger && random() < 0.3;
+  const skirt = !jogger && !look && random() < 0.3;
   const scale = child ? 0.7 : figure === 'teen' ? 0.88 + random() * 0.08 : 0.92 + random() * 0.16;
 
   let accessory: Accessory = 'none';
   const roll = random();
   if (jogger) accessory = 'none';
+  else if (look) accessory = weather === 'rain' ? 'umbrella' : 'bag';
   else if (raining && weather === 'rain' && roll < 0.65) accessory = 'umbrella';
   else if (elder)
     accessory = roll < 0.6 ? 'cane' : roll < 0.75 ? 'bag' : roll < 0.85 ? 'dog' : 'none';
@@ -133,7 +148,7 @@ export function createPassant(context: PassantContext): Walker {
   }
   const head = new Graphics();
   head.circle(0, -29.5, 5.6).fill(skin);
-  const longHair = random() < 0.45;
+  const longHair = look?.longHair ?? random() < 0.45;
   head
     .moveTo(0 + 5.9 * Math.cos(Math.PI * 1.02), -29.8 + 5.9 * Math.sin(Math.PI * 1.02))
     .arc(0, -29.8, 5.9, Math.PI * 1.02, Math.PI * 1.98)
@@ -151,7 +166,7 @@ export function createPassant(context: PassantContext): Walker {
   } else if (figure === 'teen' && hatRoll < 0.35) {
     // A hood down on the back.
     head.roundRect(-8, -28, 5, 6, 2).fill(shade(top, -0.1));
-  } else if (hatRoll < (elder ? 0.45 : 0.12) && season !== 'winter') {
+  } else if (!look && hatRoll < (elder ? 0.45 : 0.12) && season !== 'winter') {
     const color = pickOf([0x2b2d31, 0x5a4a3a, 0x3f4f6a, 0x8a3a3a], random);
     if (elder || hatRoll < 0.05) {
       // A beret.
@@ -302,6 +317,15 @@ export function createPassant(context: PassantContext): Walker {
     }
   }
   if (extra) view.addChildAt(extra, 0);
+  if (look) {
+    // « You »: a small marker over the head, in the player's colour.
+    view.addChild(
+      new Graphics()
+        .poly([-4, -47 * scale, 4, -47 * scale, 0, -41 * scale])
+        .fill(look.marker)
+        .stroke({ color: 0xffffff, width: 1 }),
+    );
+  }
   // A soft shadow on the pavement, under the walker and what they walk with.
   const shadowWidth =
     accessory === 'bike' ? 15 : accessory === 'dog' || accessory === 'stroller' ? 18 : 7;
@@ -320,7 +344,7 @@ export function createPassant(context: PassantContext): Walker {
           ? 9 + random() * 4
           : (child ? 22 : 16) + random() * 12;
   // Some walkers stop now and then a few seconds (never the cyclists nor the joggers).
-  const stopper = !context.together && accessory !== 'bike' && !jogger && random() < 0.6;
+  const stopper = !context.together && !look && accessory !== 'bike' && !jogger && random() < 0.6;
   let stopped = 0;
   const walker: Walker = {
     view,

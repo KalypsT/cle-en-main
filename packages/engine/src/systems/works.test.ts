@@ -153,6 +153,49 @@ describe('works', () => {
     expect(done.state.tax.ledgers[id]?.works).toBe(18_240_00 - 7_296_00);
     expect(done.state.worksDone.dole).toBe(1);
     expect(done.state.artisans.batiJura?.jobs).toBe(1);
+
+    // The before and after of the works are kept on the property (game feel, lot 4).
+    const owned = done.state.properties[0];
+    const report = owned?.lastWorks;
+    if (!report) throw new Error('No works report');
+    expect(report.cost).toBe(18_240_00);
+    expect(report.day).toBe(toDayNumber(done.state.clock.date));
+    expect(report.before.dpe).toBe('F');
+    expect(report.after.dpe).toBe('C');
+    // Worth more, never rents for less (an indecent flat has no rent: 0), and the building
+    // looks better.
+    expect(report.after.value).toBeGreaterThan(report.before.value);
+    expect(report.after.rent).toBeGreaterThanOrEqual(report.before.rent);
+    expect(report.after.facadeState).toBeGreaterThanOrEqual(report.before.facadeState);
+    // The items that were worked on went to state 5; the others did not change.
+    const changed = report.after.items.filter((item, i) => {
+      const was = report.before.items[i];
+      return was?.id === item.id && (was.state !== item.state || was.tier !== item.tier);
+    });
+    expect(changed.map((item) => item.id).sort()).toEqual(['heating', 'insulation', 'windows']);
+    expect(owned?.works).toBeNull();
+
+    // The query the « avant / après » screen reads: the same figures, and the changes.
+    const view = engine.worksBeforeAfter(done.state, id);
+    if (!view) throw new Error('No before and after');
+    expect(view.dpe).toEqual({ before: 'F', after: 'C' });
+    expect(view.cost).toBe(18_240_00);
+    expect(view.value.after).toBeGreaterThan(view.value.before);
+    expect(view.changes.map((change) => change.itemId).sort()).toEqual([
+      'heating',
+      'insulation',
+      'windows',
+    ]);
+    for (const change of view.changes) {
+      expect(change.stateTo).toBe(5);
+      expect(change.stateTo).toBeGreaterThan(change.stateFrom);
+    }
+    // The most improved comes first.
+    const gains = view.changes.map((change) => change.stateTo - change.stateFrom);
+    expect(gains).toEqual([...gains].sort((a, b) => b - a));
+    // No works finished, or an unknown property: nothing.
+    expect(engine.worksBeforeAfter(done.state, 'nope')).toBeNull();
+    expect(engine.worksBeforeAfter(withOwned(flat(1)), id)).toBeNull();
   });
 
   it('pays no renovation aid without a DPE class gained, and caps it', () => {
@@ -166,6 +209,7 @@ describe('works', () => {
       transformation: null,
       hazard: null,
       dpeBefore: 'F' as const,
+      before: null,
       paid: 0,
       tasks: [
         {
