@@ -215,3 +215,7 @@ Rapport : [2026-10-25-rapport-bots-pr1.md](2026-10-25-rapport-bots-pr1.md). Les 
 | Marchand de biens | 62,6 k€, 18 723 € d'impôt sur les plus-values | 64,7 k€, 17 486 € | indemnités de vente plus basses |
 | Levier maximal | 71,8 k€, faillites 20 % | 77,9 k€, faillites 13 % | ventes forcées moins chères : encore plus loin de la cible (plus de 40 %), à reprendre avec l'équilibrage |
 | Promoteur | 228,2 k€ | 216,1 k€ | dans le bruit d'une série de 100 parties |
+
+### État au 25 octobre 2026
+
+Les cinq étapes sont faites sur la branche `claude/game-complete-analysis-q96jg6`, pour une seule pull request : décisions D1 à D5 prises comme proposé. Restent, hors de ce plan, les fonctionnalités prévues non réalisées (enchères judiciaires, bot Aléatoire, jalon 9) et l'équilibrage (série complète à relancer).
