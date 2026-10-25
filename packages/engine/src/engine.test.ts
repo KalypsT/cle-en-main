@@ -144,6 +144,31 @@ describe('household', () => {
     );
     expect(next.player.freeTimeMinutes).toBe(content.unemployedFreeTimeMinutes);
   });
+
+  it('finds the job again some weeks after looking for it', () => {
+    const state = newGame();
+    expect(engine.dispatch(state, { type: 'job/seek' })).toMatchObject({
+      ok: false,
+      reason: { code: 'job.employed' },
+    });
+    const resigned = engine.dispatch(state, { type: 'job/resign' });
+    if (!resigned.ok) throw new Error('Resign refused');
+    const seeking = engine.dispatch(resigned.state, { type: 'job/seek' });
+    if (!seeking.ok) throw new Error('Search refused');
+    const endDay = toDayNumber(state.clock.date) + content.jobSearchDays;
+    expect(seeking.state.player.jobSearchEndDay).toBe(endDay);
+    expect(seeking.events).toContainEqual({ type: 'jobSearchStarted', endDay });
+    expect(engine.dispatch(seeking.state, { type: 'job/seek' })).toMatchObject({
+      ok: false,
+      reason: { code: 'job.searching' },
+    });
+    // Still without a job the day before, back at work on the day.
+    const before = engine.advanceHours(seeking.state, 24 * (content.jobSearchDays - 1));
+    expect(before.state.player.employed).toBe(false);
+    const after = engine.advanceHours(before.state, 24);
+    expect(after.state.player).toMatchObject({ employed: true, jobSearchEndDay: null });
+    expect(after.events).toContainEqual({ type: 'jobFound', jobId: state.player.jobId });
+  });
 });
 
 describe('modes, rewind and pace (milestone 6)', () => {

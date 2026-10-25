@@ -1,6 +1,6 @@
 import { timeSettings } from '@cle/content';
 import { type GameEvent, type GameState, toIsoDate } from '@cle/engine';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AudioMixer } from './audio/mixer.ts';
 import { engine } from './engine.ts';
 import { GameShell } from './game/GameShell.tsx';
@@ -122,6 +122,9 @@ export function App() {
   const autoPause = useCallback(() => loadSettings().autoPause, []);
   const autoSpeed = useCallback(() => loadSettings().autoSpeed, []);
 
+  // Writes the lines of the game log not written yet (before leaving or rewinding a game).
+  const flushJournal = useRef<() => void>(() => undefined);
+
   const play = useCallback(
     (slot: SlotId, state: GameState) => {
       let journal: JournalEntry[] = [];
@@ -137,6 +140,7 @@ export function App() {
         journal = [];
         void appendJournal(slot, batch).catch(() => undefined);
       };
+      flushJournal.current = flush;
       const onEvents = (events: GameEvent[], current: GameState) => {
         for (const event of events) if (!UNLOGGED.has(event.type)) log(current, 'event', event);
         // Automatic save and rewind point on the first day of each month (docs/02, section 2.7).
@@ -190,6 +194,7 @@ export function App() {
   }, [screen, save]);
 
   const quit = (slot: SlotId, state: GameState) => {
+    flushJournal.current();
     void save(slot, state, true);
     rememberSlot(null);
     setScreen({ name: 'title' });
@@ -203,6 +208,7 @@ export function App() {
         notify(texts.errors.loadFailed);
         return;
       }
+      flushJournal.current();
       await dropCheckpointsFrom(slot, checkpoint.date);
       await save(slot, result.state, true);
       play(slot, result.state);

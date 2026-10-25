@@ -38,6 +38,7 @@ import {
   type LoanDecision,
   loanSheets,
   type LoanRequest,
+  meetingTone,
   quoteRate,
   type RateQuote,
   refinanceLoan,
@@ -84,7 +85,14 @@ import type { SystemContext } from './systems/context.ts';
 import { citySheet, citySheets, visitQuote } from './systems/city-views.ts';
 import { remoteManagementFee } from './systems/cities.ts';
 import { moveHome } from './systems/cities.ts';
-import { dailyFreeTime, runMonthlyHousehold, startFreeDay } from './systems/household.ts';
+import {
+  dailyFreeTime,
+  resign,
+  runDailyJobSearch,
+  runMonthlyHousehold,
+  seekJob,
+  startFreeDay,
+} from './systems/household.ts';
 import { freezeListings, runDailyListings, seedListings } from './systems/listings.ts';
 import { companySheet, createCompany, setPurchaseHolder } from './systems/company.ts';
 import { expireCrises } from './systems/crises.ts';
@@ -92,6 +100,7 @@ import {
   runDailyTransformations,
   startTransformation,
   transformationEstimate,
+  transformationFunding,
   transformationQuote,
 } from './systems/transformations.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
@@ -141,12 +150,19 @@ import {
   runMonthlyTaxInstalment,
   setTaxRegime,
 } from './systems/taxes.ts';
-import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
+import {
+  initialRivals,
+  interestedRivals,
+  rivalSheets,
+  runDailyRivals,
+  runMonthlyRivals,
+} from './systems/rivals.ts';
 import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.ts';
 import { ambience, findBuilding, section, streets } from './systems/world.ts';
 import {
   answerHazard,
   delegateWorks,
+  artisanBook,
   artisanDiscount,
   diagnose,
   type ItemChoice,
@@ -244,6 +260,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       avatar: { ...(options.avatar ?? { face: 0, hair: 0, skin: 0, outfit: 0 }) },
       jobId: job.id,
       employed: true,
+      jobSearchEndDay: null,
       balance: toCents(content.start.savings),
       overdraftDays: 0,
       overdraftInterestThisMonth: 0,
@@ -253,6 +270,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       rentalHistoryMonths: 0,
       bankruptDay: null,
       homePropertyId: null,
+      homeSinceDay: null,
       baseCityId: content.start.cityId,
       tripsToday: [],
       lastMoveDay: null,
@@ -348,6 +366,7 @@ function runNewDay(ctx: SystemContext, monthStarted: boolean, yearStarted: boole
     ctx.state.lastStatement = { date: { ...ctx.state.clock.date }, lines, balance: player.balance };
     keepStatement(ctx);
   }
+  runDailyJobSearch(ctx);
   startFreeDay(ctx, ctx.state.clock.date);
   runDailyAgenda(ctx);
   runDailyWorks(ctx);
@@ -588,13 +607,10 @@ export function createEngine(content: GameContent) {
         refusal = setPurchaseHolder(ctx, action.purchaseId, action.holder);
         break;
       case 'job/resign':
-        if (!draft.player.employed) {
-          refusal = 'job.alreadyResigned';
-        } else {
-          refusal = null;
-          draft.player.employed = false;
-          events.push({ type: 'resigned' });
-        }
+        refusal = resign(ctx);
+        break;
+      case 'job/seek':
+        refusal = seekJob(ctx);
         break;
     }
     if (refusal) return { ok: false, state, reason: { code: refusal } };
@@ -744,6 +760,20 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? transformationQuote(content, state, owned, kind) : null;
     },
+    /** Deposit today, balance at the end and cash missing for a transformation of an owned property. */
+    transformationFunding: (state: GameState, propertyId: string, kind: TransformationKind) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? transformationFunding(content, state, owned, kind) : null;
+    },
+    /** The artisans of every city, known or still to meet (« Carnet »). */
+    artisanBook: (state: GameState) => artisanBook(content, state),
+    /** Active rivals a listing would interest (never their estimate). */
+    interestedRivals: (state: GameState, listingId: string) =>
+      interestedRivals(content, state, listingId),
+    /** Rivals on the market, their purchases and those the player took from them (« Carnet »). */
+    rivalSheets: (state: GameState) => rivalSheets(content, state),
+    /** How a banker sounds at a meeting ending on `trust`. */
+    meetingTone: (trust: number) => meetingTone(content, trust),
     /** Leases an owned property may have (kind, rooms, SCI), in the order of content. */
     leaseOptions: (state: GameState, propertyId: string): LeaseType[] => {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);

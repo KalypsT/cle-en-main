@@ -3,7 +3,7 @@ import { archiveLoan, archiveSale } from './archives.ts';
 import { toCents } from '../money.ts';
 import { nextFloat, nextRange } from '../random.ts';
 import type { OwnedProperty, SaleMode } from '../state.ts';
-import { refinancingFees } from './banking.ts';
+import { earlyRepaymentFees } from './banking.ts';
 import { crisisFactor } from './crises.ts';
 import { occupiedDiscount } from './buyout.ts';
 import type { SystemContext } from './context.ts';
@@ -133,7 +133,11 @@ export function saleProceeds(
 function settlement(ctx: SystemContext, owned: OwnedProperty, received: Cents) {
   const loans = ctx.state.loans.filter((loan) => loan.propertyId === owned.property.id);
   const loanRepaid = loans.reduce((sum, loan) => sum + loan.remaining, 0);
-  const loanFees = loans.reduce((sum, loan) => sum + refinancingFees(ctx.content, loan), 0);
+  // The same penalty as an early repayment of the whole loan (docs/03-systemes/02).
+  const loanFees = loans.reduce(
+    (sum, loan) => sum + earlyRepaymentFees(ctx.content, loan, loan.remaining),
+    0,
+  );
   const capitalGainsTax = capitalGainsTaxOf(ctx, owned, received).tax;
   const depositTransferred = owned.lease?.deposit ?? 0;
   // What is left of the works envelope comes back to the account.

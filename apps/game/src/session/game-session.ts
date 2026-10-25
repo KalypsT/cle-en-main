@@ -70,6 +70,12 @@ export class GameSession {
    * paused the game are settled. Forgotten as soon as the speed is set otherwise.
    */
   private resume: { speed: number; keys: Set<string> } | null = null;
+  /**
+   * Scenes open over the game (reviews, celebrations): the clock waits while there is
+   * one, whatever the speed. Kept apart from the speed, so that closing a scene never
+   * undoes an automatic pause, nor the speed the player chose meanwhile.
+   */
+  private holds = 0;
   private frame: number | null = null;
   private lastFrameAt: number | null = null;
   private pendingMs = 0;
@@ -125,6 +131,22 @@ export class GameSession {
     this.update({ speed, autoPaused: false, accelerated: false });
   }
 
+  /** A scene opens over the game: the clock waits until it is released. */
+  hold(): void {
+    this.holds += 1;
+  }
+
+  /** A scene closes: the clock goes on at its speed once no scene holds it. */
+  release(): void {
+    this.holds = Math.max(0, this.holds - 1);
+    this.lastFrameAt = null;
+  }
+
+  /** A scene holds the clock. */
+  get held(): boolean {
+    return this.holds > 0;
+  }
+
   /**
    * Speed the clock really runs at: the automatic acceleration lifts any slower speed the
    * player chose (×1, ×2, ×4) while nothing waits for him (progression, step 4).
@@ -154,7 +176,7 @@ export class GameSession {
   private readonly onFrame = (now: number): void => {
     const elapsed = this.lastFrameAt === null ? 0 : Math.min(now - this.lastFrameAt, MAX_FRAME_MS);
     this.lastFrameAt = now;
-    if (this.snapshot.speed > 0) {
+    if (this.snapshot.speed > 0 && this.holds === 0) {
       this.pendingMs += elapsed * this.effectiveSpeed();
       let state = this.snapshot.state;
       const events: GameEvent[] = [];

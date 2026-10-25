@@ -43,6 +43,8 @@ export type Route =
   | { name: 'sale'; id: string }
   | { name: 'section'; neighbourhoodId: string; buildingId: string }
   | { name: 'settings' }
+  | { name: 'me' }
+  | { name: 'contacts' }
   | { name: 'event'; id: string }
   | { name: 'challenge' }
   | { name: 'progression' }

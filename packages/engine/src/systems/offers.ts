@@ -20,9 +20,11 @@ export function makeOffer(
   const { content, state } = ctx;
   const found = findListing(state, listingId);
   if (!found) return 'listing.unknown';
-  if (!Number.isInteger(amount) || amount <= 0) return 'offer.invalidAmount';
-  if (found.offer) return 'offer.pending';
   const rules = content.market.negotiation;
+  if (!Number.isInteger(amount) || amount <= 0) return 'offer.invalidAmount';
+  // Far above the asking price is a typing slip, not an offer.
+  if (amount > found.askingPrice * rules.maxOfferOfAsking) return 'offer.invalidAmount';
+  if (found.offer) return 'offer.pending';
   if (found.offersMade >= rules.maxOffersPerListing) return 'offer.tooMany';
   // The deposit of the compromis must be at hand.
   if (state.player.balance < Math.round(amount * content.market.purchase.depositShare)) {

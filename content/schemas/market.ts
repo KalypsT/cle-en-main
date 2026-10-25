@@ -165,6 +165,8 @@ export const marketRulesSchema = z
         counterBand: share,
         counterValidityDays: z.number().int().positive(),
         maxOffersPerListing: z.number().int().positive(),
+        /** Highest offer, as a multiple of the asking price: above, a typing slip. */
+        maxOfferOfAsking: z.number().min(1),
       })
       .strict(),
     visit: z

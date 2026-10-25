@@ -51,11 +51,13 @@ Chaque bien a :
 5. **Offre** : le joueur propose un prix. Le vendeur **accepte, refuse ou fait une contre-offre** (une seule étape de négociation). Sa décision dépend de sa motivation, du temps passé en ligne et de la concurrence. Les motivations sont décrites avec humour (« mutation », « succession », « veut partir élever des alpagas »).
    - Le vendeur répond le lendemain. Il accepte au-dessus de son **prix plancher** : prix affiché moins une remise qui dépend de sa motivation, augmente avec les mois en ligne et diminue si l'annonce est une bonne affaire (d'autres acheteurs sont intéressés).
    - Une offre un peu sous le plancher reçoit une **contre-offre**, valable 3 jours, que le joueur accepte ou refuse. Deux offres au plus par annonce. Chaque réponse du vendeur (acceptation, **refus**, contre-offre laissée expirer ou déclinée) est gardée comme **lettre** dans le Courrier des Décisions ([04-interface.md](../04-interface.md#410-rythme-et-progression-jalon-6)) : notification à l'écran pour un refus, encadré « Dernière réponse du vendeur » sur l'annonce, badge dans la liste. La lettre reste après le départ de l'annonce, jusqu'à ce que le joueur la ferme ou pendant 12 mois. Le vendeur ne donne pas de raison.
+   - **Corrections du 25 octobre 2026** : une offre au-dessus du prix affiché demande une confirmation, et une offre de plus de 1,5 fois le prix est refusée (`negotiation.maxOfferOfAsking` : une faute de frappe, pas une offre). La demande de prêt dit le jour de réponse de la banque choisie et refuse une banque trop lente ; sa durée par défaut est de 25 ans, comme le financement simulé.
    - Le commercial obtient une remise supplémentaire ; l'agent immobilier voit une partie des annonces un jour avant les autres acheteurs.
 6. **Compromis** : délai d'environ **2 semaines de jeu** pour obtenir le prêt (condition suspensive). Sans prêt, la vente est annulée sans pénalité.
    - Un **dépôt de garantie** de 5 % est versé à la signature ; il est rendu si le prêt n'est pas obtenu, déduit du prix à l'acte.
    - Le joueur demande un prêt à une ou plusieurs banques (montant, durée). Chaque banque répond après son délai ; le joueur choisit une offre. Il peut aussi renoncer à la condition de prêt et payer comptant.
    - Se retirer est gratuit pendant la condition de prêt, tant qu'aucun prêt n'est choisi.
+   - **Corrections du 25 octobre 2026** : une banque dont la réponse arriverait après la fin de la condition de prêt refuse la demande (`purchase.answerTooLate`) ; avant, l'achat était annulé avant sa réponse.
 7. **Acte** : signature chez le notaire environ **30 jours** après le compromis. Les frais de notaire sont payés, le bien appartient au joueur.
    - Le joueur paie le prix, les frais de notaire et (avec un prêt) les frais de dossier et de garantie, moins le dépôt et le prêt. S'il n'a pas assez sur son compte, la vente est annulée et **le dépôt est perdu**.
    - Les défauts encore cachés se découvrent en prenant possession du bien.
@@ -88,6 +90,7 @@ Chaque bien a :
   - L'acte est signé environ 60 jours après l'accord ; l'acheteur peut se désister (refus de son prêt), et le bien revient en vente.
 - À la vente : remboursement du crédit et calcul de la plus-value (voir [06-fiscalite.md](06-fiscalite.md)).
   - Le crédit lié au bien est remboursé sur le prix, avec les mêmes frais qu'un remboursement anticipé (chapitre 3.2). La plus-value est imposée à partir du jalon 2.
+  - **Corrections du 25 octobre 2026** : ces frais sont bien les indemnités de remboursement anticipé (le plus petit de 3 % et de 6 mois d'intérêts), vente forcée comprise ; la vente appliquait par erreur les frais de renégociation (3 % et 1 000 €).
 
 ## Les investisseurs rivaux
 
@@ -101,6 +104,7 @@ Trois rivaux nommés, chacun avec une stratégie, un budget, des villes préfér
 
 - Les rivaux **agissent sur le même marché** que le joueur : on voit « Vendu à Mme Delaporte » sur une annonce ratée.
 - Ils peuvent faire une **offre sur un bien que le joueur revend**.
+- **Corrections du 25 octobre 2026** : la fiche d'une annonce nomme les rivaux actifs que ce genre de bien intéresse (requête `interestedRivals` : type, surface, état, quartier), sans dire ce qu'ils en pensent ; le Carnet les présente.
 - Ils proposent parfois une **affaire**, pas toujours honnête.
 - Leur agressivité dépend du mode de partie et augmente quand le joueur grandit.
 - Ils restent peu nombreux (3) et lisibles : pas de simulation économique complète de leur patrimoine, seulement un budget, des préférences et des règles de décision.

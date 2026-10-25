@@ -3,6 +3,7 @@ import {
   act,
   advanceDays,
   advanceUntil,
+  content,
   engine,
   newGame,
   systemContext,
@@ -144,7 +145,11 @@ describe('offers', () => {
       return result.ok ? null : result.reason.code;
     };
     expect(refuse(state, 0)).toBe('offer.invalidAmount');
-    expect(refuse(state, 1_000_000_000_00)).toBe('account.insufficientFunds');
+    // Far above the asking price: a typing slip, refused.
+    const ceiling = listing.askingPrice * content.market.negotiation.maxOfferOfAsking;
+    expect(refuse(state, Math.floor(ceiling) + 100)).toBe('offer.invalidAmount');
+    const broke = { ...state, player: { ...state.player, balance: 0 } };
+    expect(refuse(broke, listing.askingPrice)).toBe('account.insufficientFunds');
     expect(
       engine.dispatch(state, { type: 'market/offer', listingId: 'nope', amount: 100 }).ok,
     ).toBe(false);

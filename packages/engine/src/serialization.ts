@@ -61,6 +61,38 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  * the migration from the previous version here, and test it.
  */
 export const MIGRATIONS: MigrationRegistry = {
+  /** Version 24 to 25: one may look for one's job again after resigning; nobody looks yet. */
+  24: (raw) => ({
+    ...raw,
+    player: { ...(raw.player as Record<string, unknown>), jobSearchEndDay: null },
+  }),
+  /**
+   * Version 23 to 24: the day the player moved into his home was not kept; the purchase
+   * day stands for it (he cannot have lived there longer), so a home owned for long keeps
+   * its capital gains exemption. A works envelope left on a loan that was refinanced goes
+   * to the loan that replaced it.
+   */
+  23: (raw) => {
+    const player = raw.player as Record<string, unknown>;
+    const properties = (raw.properties as Record<string, unknown>[]) ?? [];
+    const loans = (raw.loans as Record<string, unknown>[]) ?? [];
+    const propertyId = (entry: Record<string, unknown>) =>
+      (entry.property as Record<string, unknown>).id;
+    const home = properties.find((entry) => propertyId(entry) === player.homePropertyId);
+    return {
+      ...raw,
+      player: {
+        ...player,
+        homeSinceDay: home ? toDayNumber(home.purchaseDate as GameState['startDate']) : null,
+      },
+      properties: properties.map((entry) => {
+        const fund = entry.worksFund;
+        if (!isRecord(fund) || loans.some((loan) => loan.id === fund.loanId)) return entry;
+        const loan = loans.find((candidate) => candidate.propertyId === propertyId(entry));
+        return loan ? { ...entry, worksFund: { ...fund, loanId: loan.id } } : entry;
+      }),
+    };
+  },
   /**
    * Version 22 to 23: no general meeting was kept, the calls for funds did not say their
    * resolution, and the unpaid-rent insurance starts counting.
@@ -1438,6 +1470,7 @@ const gameStateSchema = z
           .strict(),
         jobId: z.string(),
         employed: z.boolean(),
+        jobSearchEndDay: day.nullable(),
         balance: cents,
         overdraftDays: z.number().int().min(0),
         overdraftInterestThisMonth: cents.min(0),
@@ -1447,6 +1480,7 @@ const gameStateSchema = z
         rentalHistoryMonths: z.number().int().min(0),
         bankruptDay: day.nullable(),
         homePropertyId: z.string().nullable(),
+        homeSinceDay: day.nullable(),
         baseCityId: z.string().min(1),
         tripsToday: z.array(z.string()),
         lastMoveDay: day.nullable(),

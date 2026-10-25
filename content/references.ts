@@ -27,6 +27,8 @@ export interface GameContent {
   livingCosts: LivingCosts;
   jobs: Job[];
   unemployedFreeTimeMinutes: number;
+  /** Days to find one's job again after resigning. */
+  jobSearchDays: number;
   credit: CreditRules;
   banks: Bank[];
   /** The SCI (milestone 8). */

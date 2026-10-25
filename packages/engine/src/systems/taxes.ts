@@ -592,6 +592,17 @@ export interface CapitalGain {
   gain: Cents;
   yearsHeld: number;
   tax: Cents;
+  /**
+   * The main residence: exempt once lived in long enough (null when not the home). `months`
+   * counts the months lived in it on the day the sale is agreed (today if not agreed yet).
+   */
+  home: { exempt: boolean; months: number; minMonths: number } | null;
+}
+
+/** Whole months the player has lived in his home on `day`. */
+function monthsLivedIn(state: GameState, day: number): number {
+  const since = state.player.homeSinceDay;
+  return since === null ? 0 : Math.max(0, Math.floor((day - since) / (DAYS_PER_YEAR / 12)));
 }
 
 /**
@@ -606,8 +617,15 @@ export function capitalGainsTax(
   const { content, state } = ctx;
   const rules = content.taxes.capitalGains;
   const years = yearsHeld(owned, state.clock.date);
-  if (state.player.homePropertyId === owned.property.id)
-    return { gain: 0, yearsHeld: years, tax: 0 };
+  let home: CapitalGain['home'] = null;
+  if (state.player.homePropertyId === owned.property.id) {
+    const today = toDayNumber(state.clock.date);
+    const agreement = owned.sale?.agreement;
+    const agreedDay = agreement ? agreement.deedDay - content.market.resale.deedDelayDays : today;
+    const months = monthsLivedIn(state, agreedDay);
+    home = { exempt: months >= rules.homeMinMonths, months, minMonths: rules.homeMinMonths };
+    if (home.exempt) return { gain: 0, yearsHeld: years, tax: 0, home };
+  }
   const price = owned.purchasePrice;
   const fees = Math.max(
     owned.acquisitionCost - price,
@@ -631,7 +649,7 @@ export function capitalGainsTax(
         (1 - allowance(rules.socialAllowances, years)) *
         content.taxes.socialContributions.capitalGains,
     );
-  return { gain, yearsHeld: years, tax };
+  return { gain, yearsHeld: years, tax, home };
 }
 
 export interface RegimeEstimate {

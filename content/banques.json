@@ -18,7 +18,12 @@
       },
       "counterOffers": true,
       "meetings": true,
-      "lendsToCompanies": true
+      "lendsToCompanies": true,
+      "meetingLines": {
+        "low": "« On va reprendre tout ça calmement, voulez-vous ? Un café, et vos relevés de compte. »",
+        "medium": "« Vous savez, à La Tirelire, on aime les gens qui viennent nous voir. Ma porte reste ouverte. »",
+        "high": "« Entre nous, des clients comme vous, j'en voudrais dix. Passez le bonjour à votre comptable ! »"
+      }
     },
     {
       "id": "fougueux",
@@ -38,7 +43,12 @@
       },
       "counterOffers": true,
       "meetings": true,
-      "lendsToCompanies": true
+      "lendsToCompanies": true,
+      "meetingLines": {
+        "low": "« Franchement, ton dossier, il faut le pitcher autrement. On se refait un call ? »",
+        "medium": "« J'aime ton mindset. On scale doucement, mais on scale. »",
+        "high": "« Toi et moi, c'est un match. Je te mets en tête du pipe, bro. »"
+      }
     },
     {
       "id": "rigueur",
@@ -58,7 +68,12 @@
       },
       "counterOffers": false,
       "meetings": true,
-      "lendsToCompanies": true
+      "lendsToCompanies": true,
+      "meetingLines": {
+        "low": "« Vos comptes ne m'inspirent pas. Revenez avec des chiffres, pas des intentions. »",
+        "medium": "« Votre dossier est correct. Correct n'est pas une qualité, c'est un minimum. »",
+        "high": "« Je n'ai rien à redire. Ne vous y habituez pas. »"
+      }
     },
     {
       "id": "zeroPapier",
@@ -75,7 +90,8 @@
       "derogation": null,
       "counterOffers": false,
       "meetings": false,
-      "lendsToCompanies": false
+      "lendsToCompanies": false,
+      "meetingLines": null
     }
   ]
 }

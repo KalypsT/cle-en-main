@@ -88,6 +88,30 @@ export function knownArtisans(
   );
 }
 
+/**
+ * The address book of artisans, city by city (« Carnet »): those the player can call, with his
+ * history with each, and the works still to finish there before new ones join the book.
+ */
+export function artisanBook(content: GameContent, state: GameState) {
+  return Object.keys(content.cities).map((cityId) => {
+    const done = state.worksDone[cityId] ?? 0;
+    const next = content.artisans
+      .filter((artisan) => artisan.cities.includes(cityId) && artisan.unlockAfterWorks > done)
+      .reduce((min, artisan) => Math.min(min, artisan.unlockAfterWorks), Number.POSITIVE_INFINITY);
+    return {
+      cityId,
+      worksDone: done,
+      artisans: knownArtisans(content, state, cityId).map((artisan) => ({
+        artisan,
+        jobs: jobsWith(state, artisan.id),
+        discount: artisanDiscount(content, state, artisan.id),
+      })),
+      /** Works to finish in the city before the next artisans join; null when all are known. */
+      worksToNext: Number.isFinite(next) ? next - done : null,
+    };
+  });
+}
+
 function jobsWith(state: GameState, artisanId: string): number {
   return state.artisans[artisanId]?.jobs ?? 0;
 }
@@ -289,11 +313,22 @@ export function delegateWorks(
     artisans.set(trade, best);
   }
   const quoteIds: string[] = [];
+  let quoted = 0;
   for (const [trade, items] of byTrade) {
     const artisan = artisans.get(trade);
-    if (artisan) quoteIds.push(writeQuote(ctx, owned, artisan, items).id);
+    if (!artisan) continue;
+    const quote = writeQuote(ctx, owned, artisan, items);
+    quoteIds.push(quote.id);
+    quoted += quote.total;
   }
-  const refusal = startWorks(ctx, propertyId, quoteIds, []);
+  // The deposits and the project manager's fee are both due today.
+  const dueToday =
+    Math.round(quoted * content.works.quotes.depositShare) +
+    Math.round(quoted * content.works.projectManager.feeShare);
+  const refusal =
+    availableForWorks(state, owned) < dueToday
+      ? 'account.insufficientFunds'
+      : startWorks(ctx, propertyId, quoteIds, []);
   if (refusal) {
     owned.quotes = owned.quotes.filter((quote) => !quoteIds.includes(quote.id));
     return refusal;

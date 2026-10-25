@@ -32,6 +32,8 @@ Toujours visible en haut de l'écran :
 
 Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiques, Réglages.
 
+> **Corrections du 25 octobre 2026** : « Moi » s'ajoute en tête du Menu (fiche du personnage, démission, reprise d'emploi, chapitre 3.1). Le **Carnet** existe : les artisans de chaque ville (métier, prix, fiabilité, personnalité, chantiers faits ensemble, remise, et combien de chantiers avant d'en connaître d'autres), les agences (caractère, honoraires, biens gérés), les banquiers (vers leur fiche), le comptable (honoraires de l'an dernier) et les rivaux actifs (stratégie, personnalité, biens achetés, biens que le joueur leur a pris). L'entrée « Impôts » prévue n'est pas faite : l'impôt se lit sur la fiche du bien et dans le bilan annuel. La fiche d'une annonce dit quels rivaux s'intéressent à ce genre de bien, jamais leur estimation.
+
 **Chaque onglet garde son écran.** Changer d'onglet puis revenir remet l'onglet tel qu'on l'a laissé (écrans empilés et position dans la page) ; toucher l'onglet déjà affiché revient à sa racine. Les filtres et le tri de la liste des annonces font partie de l'écran : ouvrir une annonce puis revenir les retrouve, comme la position dans la liste. Ils ne sont pas enregistrés dans la sauvegarde (le temps de la session seulement).
 
 ## 4.5 Inventaire des écrans
@@ -81,6 +83,8 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 > - **Transitions** : un écran entre par un fondu et un léger glissement, le corps du tiroir s'ouvre en douceur, les boutons et les lignes s'enfoncent un peu au toucher, l'icône de l'onglet actif grossit ; jauges qui se remplissent. Rien de tout cela si le téléphone demande moins d'animations.
 > - **Thème sombre** : relecture des écrans des lots 1 à 5 (rue, tiroir, carte, annonces, fiche, patrimoine, bien, progression, remise des clés, avant / après). Corrigés : les étiquettes de prix de la carte suivent le thème ; la date d'un titre obtenu (« Obtenu le mercredi 18 novembre 2026 ») dépassait de l'écran et rétrécissait toute la page sur téléphone (l'écran Progression : elle est abrégée et l'en-tête des cartes peut passer à la ligne) ; les confettis des scènes tombent derrière le texte.
 
+> **Corrections du 25 octobre 2026** (analyse de jouabilité) : la fiche d'un bien ne propose « Faire des travaux » que s'il a des postes à refaire, et « Mettre en location » que s'il se loue ; « Y habiter » seulement pour un logement, grisé avec sa raison s'il est en vente, en chantier ou indécent. Un terrain n'apparaît plus dans « À décider » comme logement vide. Au chantier, le devis le moins cher de chaque poste est seul coché d'office, et un poste présent deux fois (deux devis, ou un devis et « je le fais moi-même ») est signalé et bloque le lancement. Le journal de partie est écrit avant un retour en arrière ou en quittant la partie, et les sauvegardes d'un même emplacement passent l'une après l'autre (le point de retour du 1er n'est plus perdu).
+
 ## 4.6 Interactions clés
 
 - **Rue** : toucher une bulle (« À vendre », « Panne », « Travaux 25 % ») ouvre la fiche concernée ; toucher un bâtiment ouvre sa coupe.
@@ -100,6 +104,7 @@ Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiq
 - Pendant le **premier mois à Dole**, **Gérard Prudhomme** (La Tirelire Comtoise) accompagne pas à pas vers le premier achat : repérer une annonce, visiter, simuler le financement, faire une offre, signer le compromis.
 - Puis **Yvon Tableur** présente le premier bilan.
 - Désactivable, et il ne bloque jamais le joueur.
+- **Corrections du 25 octobre 2026** : si l'achat suivi tombe (prêt refusé, retrait, condition de prêt échue), Gérard revient à l'étape « repérer une affaire » (`backOnCancel` dans `content/textes/didacticiel.json`).
 
 > **Plaisir de jeu, lot 1** (2026-10-22, point ouvert n° 17) : la bulle ne pousse plus le haut de chaque écran. Elle **flotte en bas**, au-dessus des onglets (et au-dessus du tiroir de la Rue ou des boutons « Visiter / Faire une offre » de l'annonce). Un chevron la **replie** en pastille au visage de Gérard, à droite ; elle se rouvre d'un toucher, et d'elle-même à l'étape suivante. Chaque étape peut **désigner un bouton** (`target` dans `content/textes/didacticiel.json`) : il porte un halo bleu qui pulse (un contour fixe si le téléphone demande moins d'animations), comme l'onglet qui y mène. Pause, annonces, Visiter, Simuler le financement, Faire une offre, Demander un prêt, Accepter l'offre de prêt.
 

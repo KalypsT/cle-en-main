@@ -28,6 +28,7 @@ import { purchaseFees } from './purchases.ts';
 import { cashDueAtDeed } from './purchases.ts';
 import {
   letBanDay,
+  lettingBlock,
   monthsToDays,
   ownerInsurance,
   recoverableCharges,
@@ -199,12 +200,14 @@ export function pendingDecisions(content: GameContent, state: GameState): Pendin
     ) {
       list.push({ kind: 'dpeWarning', propertyId, deadlineDay: ban });
     }
+    // A plot of land is never let: it is no « empty home » to decide about.
     if (
       !owned.lease &&
       !owned.rental &&
       !owned.works &&
       !owned.sale &&
-      state.player.homePropertyId !== propertyId
+      state.player.homePropertyId !== propertyId &&
+      lettingBlock(content, owned.property, today) !== 'rent.notLettable'
     ) {
       list.push({ kind: 'vacant', propertyId, deadlineDay: null });
     }
@@ -586,6 +589,14 @@ export function cashForecast(
   // Works bills, at the planned end of each artisan's task, paid from the works fund first.
   for (const owned of state.properties) {
     let fund = owned.worksFund?.amount ?? 0;
+    // A transformation is billed on its last day: the quote less what was paid (the deposit).
+    const transformation = owned.works?.transformation;
+    if (transformation && transformation.endDay <= today + days) {
+      const bill = Math.max(0, transformation.total - (owned.works?.paid ?? 0));
+      const fromFund = Math.min(fund, bill);
+      fund -= fromFund;
+      add(Math.max(today, transformation.endDay), -(bill - fromFund));
+    }
     const tasks = (owned.works?.tasks ?? [])
       .filter((task) => task.status !== 'done' && task.artisanId !== null)
       .map((task) => ({

@@ -1,5 +1,12 @@
 import { gameContent } from '@cle/content';
-import { type Cents, type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
+import {
+  type Cents,
+  isDwelling,
+  type OwnedProperty,
+  type TaxRegimeChoice,
+  toDayNumber,
+  type TransformationKind,
+} from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { type PropertyTab, useGame, useNav } from '../game/context.tsx';
@@ -19,11 +26,13 @@ import {
   formatWhen,
   propertyLabel,
   t,
+  texts as uiTexts,
   tone,
 } from '../texts.ts';
 import {
   Amount,
   Badge,
+  BottomSheet,
   Card,
   Chip,
   Empty,
@@ -87,7 +96,18 @@ function Overview({ owned }: { owned: OwnedProperty }) {
   const estimate = engine.estimate(state, property.id);
   const summary = engine.portfolio(state).properties.find((p) => p.propertyId === property.id);
   const isHome = state.player.homePropertyId === property.id;
-  const canRent = !isHome && !owned.lease && !owned.sale?.agreement;
+  // A plot is never let; a parking space or a shop has no works of its own.
+  const lettable = engine.leaseOptions(state, property.id).length > 0;
+  const canRent = lettable && !isHome && !owned.lease && !owned.sale?.agreement;
+  const renovatable = (engine.worksCatalog(state, property.id) ?? []).some((item) => item.trade);
+  // Why the player cannot live here yet (the engine refuses it the same way).
+  const moveInBlock: 'home.forSale' | 'home.works' | 'home.indecent' | null = owned.sale
+    ? 'home.forSale'
+    : owned.works
+      ? 'home.works'
+      : engine.rentQuote(state, property.id, 'bare')?.block === 'rent.indecent'
+        ? 'home.indecent'
+        : null;
 
   return (
     <>
@@ -136,7 +156,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
                 : t.property.rent}
             </button>
           )}
-          {!owned.works?.transformation && (
+          {!owned.works?.transformation && (owned.works || renovatable) && (
             <button
               type="button"
               className="button block"
@@ -168,18 +188,23 @@ function Overview({ owned }: { owned: OwnedProperty }) {
               </button>
             </>
           ) : (
+            isDwelling(property.kind) &&
             !owned.lease &&
             state.player.homePropertyId === null && (
-              <button
-                type="button"
-                className="button block"
-                onClick={() =>
-                  window.confirm(t.property.moveInConfirm) &&
-                  act({ type: 'home/moveIn', propertyId: property.id })
-                }
-              >
-                {t.property.moveIn}
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="button block"
+                  disabled={moveInBlock !== null}
+                  onClick={() =>
+                    window.confirm(t.property.moveInConfirm) &&
+                    act({ type: 'home/moveIn', propertyId: property.id })
+                  }
+                >
+                  {t.property.moveIn}
+                </button>
+                {moveInBlock && <p className="small muted">{uiTexts.refusals[moveInBlock]}</p>}
+              </>
             )
           )}
         </div>
@@ -452,6 +477,7 @@ function LastCoproMeetingCard({ owned }: { owned: OwnedProperty }) {
 function Transformations({ owned }: { owned: OwnedProperty }) {
   const { state, act } = useGame();
   const texts = t.transformation;
+  const [confirming, setConfirming] = useState<TransformationOption | null>(null);
   const running = owned.works?.transformation;
   if (running) {
     return (
@@ -494,18 +520,89 @@ function Transformations({ owned }: { owned: OwnedProperty }) {
           <p className="small muted">
             {format(texts.duration, { months: Math.round(option.quote.days / 30) })}
           </p>
-          <button
-            type="button"
-            className="button block"
-            onClick={() =>
-              act({ type: 'works/transform', propertyId: owned.property.id, kind: option.kind })
-            }
-          >
+          <button type="button" className="button block" onClick={() => setConfirming(option)}>
             {texts.start}
           </button>
         </div>
       ))}
+      {confirming && (
+        <TransformationSheet
+          owned={owned}
+          option={confirming}
+          onClose={() => setConfirming(null)}
+          onConfirm={() => {
+            const done = act({
+              type: 'works/transform',
+              propertyId: owned.property.id,
+              kind: confirming.kind,
+            });
+            if (done) setConfirming(null);
+          }}
+        />
+      )}
     </Card>
+  );
+}
+
+type TransformationOption = Exclude<
+  ReturnType<typeof engine.transformationOptions>[number]['estimate'],
+  string
+> & { kind: TransformationKind };
+
+/**
+ * The project manager's quote before signing it: the deposit today, the balance on the last
+ * day, and the cash it would leave short (analysis of 2026-10-25, L4).
+ */
+function TransformationSheet({
+  owned,
+  option,
+  onClose,
+  onConfirm,
+}: {
+  owned: OwnedProperty;
+  option: TransformationOption;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const { state } = useGame();
+  const texts = t.transformation;
+  const funding = engine.transformationFunding(state, owned.property.id, option.kind);
+  if (!funding || typeof funding === 'string') return null;
+  const end = formatDayYear(funding.endDay);
+  return (
+    <BottomSheet
+      title={format(texts.confirmHeading, { kind: texts.kinds[option.kind] })}
+      onClose={onClose}
+    >
+      <KeyValues
+        rows={[
+          { label: texts.total, value: formatEuros(option.quote.total) },
+          { label: texts.deposit, value: formatEuros(funding.deposit) },
+          { label: format(texts.balance, { date: end }), value: formatEuros(funding.balance) },
+          { label: texts.available, value: formatEuros(funding.available), total: true },
+        ]}
+      />
+      <p
+        className={`small strong ${funding.missing > 0 ? 'negative' : 'positive'}`}
+        data-testid="transformation-funding"
+      >
+        {funding.missing > 0
+          ? format(texts.missing, { amount: formatEuros(funding.missing), date: end })
+          : texts.covered}
+      </p>
+      <p className="tiny muted">{texts.overrunHint}</p>
+      {option.blocked > 0 && (
+        <p className="small warning">{format(texts.blocked, { count: option.blocked })}</p>
+      )}
+      {option.firstBanDay !== null && (
+        <p className="small muted">
+          {format(texts.banDay, { date: formatDayYear(option.firstBanDay) })}
+        </p>
+      )}
+      <button type="button" className="button primary block" onClick={onConfirm}>
+        {texts.confirm}
+      </button>
+    </BottomSheet>
   );
 }
 
@@ -790,6 +887,7 @@ function Finances({ owned }: { owned: OwnedProperty }) {
             </option>
           ))}
         </select>
+        <RegimeEstimate owned={owned} />
       </Card>
     </>
   );
@@ -815,6 +913,38 @@ function UnpaidRentInsurance({ owned }: { owned: OwnedProperty }) {
         ]}
       />
       <p className="tiny muted">{t.property.insuranceHint}</p>
+    </div>
+  );
+}
+
+/**
+ * The year's tax on the rents with this property in each regime, the others at their best
+ * (docs/03-systemes/06, « l'impôt estimé selon chaque régime »).
+ */
+function RegimeEstimate({ owned }: { owned: OwnedProperty }) {
+  const { state } = useGame();
+  const texts = t.property;
+  // The main residence earns and deducts nothing.
+  if (state.player.homePropertyId === owned.property.id) return null;
+  if (owned.holder === 'company') return <p className="small muted">{texts.regimeCompany}</p>;
+  const estimate = engine
+    .estimateTaxes(state)
+    .properties.find((candidate) => candidate.propertyId === owned.property.id);
+  if (!estimate) return <p className="small muted">{texts.regimeNoRent}</p>;
+  return (
+    <div className="stack tight" data-testid="regime-estimate">
+      <p className="small muted">{format(texts.regimeEstimate, { year: state.clock.date.year })}</p>
+      {(['micro', 'real'] as const).map((regime) => (
+        <p key={regime} className={`small ${estimate.recommended === regime ? 'strong' : ''}`}>
+          {format(texts.regimeCost, {
+            regime: texts.regimes[regime],
+            amount: formatEuros(estimate[regime]),
+          })}
+        </p>
+      ))}
+      <p className="tiny muted">
+        {format(texts.regimeBest, { regime: texts.regimes[estimate.recommended] })}
+      </p>
     </div>
   );
 }

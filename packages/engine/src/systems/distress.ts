@@ -88,12 +88,14 @@ export function freshStart(
   player.overdraftDays = 0;
   player.overdraftInterestThisMonth = 0;
   player.employed = true;
+  player.jobSearchEndDay = null;
   player.baseCityId = content.start.cityId;
   player.monthlyRent = toCents(content.start.monthlyRent);
   for (const cityId of Object.keys(player.renown)) {
     player.renown[cityId] = Math.round((player.renown[cityId] ?? 0) * rules.reputationShare);
   }
   player.homePropertyId = null;
+  player.homeSinceDay = null;
   player.rentalHistoryMonths = 0;
   player.bankruptDay = null;
   player.reputation = Math.round(player.reputation * rules.reputationShare);

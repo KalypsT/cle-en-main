@@ -51,6 +51,17 @@ describe('resale', () => {
     expect(agencyFees).toBe(Math.round(price * content.market.resale.agencyFeeShare));
     expect(loanRepaid).toBeGreaterThan(0);
     expect(loanFees).toBeGreaterThan(0);
+    // The penalty of an early repayment of the whole loan (docs/03-systemes/02).
+    const rules = content.credit.earlyRepayment;
+    const rate = loan?.ratePercent ?? 0;
+    expect(loanFees).toBe(
+      Math.round(
+        Math.min(
+          loanRepaid * rules.penaltyShareOfAmount,
+          ((loanRepaid * rate) / 100 / 12) * rules.penaltyInterestMonths,
+        ),
+      ),
+    );
     expect(net).toBe(price - agencyFees - loanRepaid - loanFees);
     expect(closed.state.properties).toEqual([]);
     expect(closed.state.loans.some((l) => l.propertyId === propertyId)).toBe(false);

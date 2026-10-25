@@ -4,6 +4,7 @@ import { useGame, useNav } from '../game/context.tsx';
 import { loanAnswerText, subjectRoute } from '../inbox.ts';
 import {
   bankName,
+  describeEvent,
   format,
   formatDayYear,
   formatDecimal,
@@ -11,6 +12,7 @@ import {
   formatShortDate,
   subjectLabel,
   t,
+  texts as uiTexts,
 } from '../texts.ts';
 import { Card, Empty, KeyValues, ScreenHeader } from '../ui/components.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
@@ -41,6 +43,7 @@ export function BankerScreen({ id }: { id: string }) {
     <div className="screen" data-testid="banker">
       <ScreenHeader title={bank.banker.name} onBack={nav.pop} />
       <p className="small muted">{bank.name}</p>
+      <MeetingCard bankId={id} />
       <Card title={texts.trustCurve}>
         <KeyValues rows={[{ label: texts.trust, value: formatDecimal(relation.trust) }]} />
         {first && last && points.length >= 2 ? (
@@ -107,5 +110,54 @@ export function BankerScreen({ id }: { id: string }) {
         <ClosedLoanCard key={loan.id} loan={loan} />
       ))}
     </div>
+  );
+}
+
+/** A meeting with the banker: now, or planned in the agenda when free time is short. */
+function MeetingCard({ bankId }: { bankId: string }) {
+  const { state, act, notify } = useGame();
+  const bank = engine.content.banks.find((candidate) => candidate.id === bankId);
+  const relation = state.banks[bankId];
+  const texts = t.bank.banker;
+  if (!bank || !relation) return null;
+  if (!bank.meetings) {
+    return (
+      <Card title={texts.meetingHeading}>
+        <p className="small muted">{uiTexts.refusals['bank.noMeetings']}</p>
+      </Card>
+    );
+  }
+  const rules = engine.content.credit.trust;
+  const planned = state.agenda.find(
+    (item) => item.kind === 'bankMeeting' && item.bankId === bankId,
+  );
+  const nextDay =
+    relation.lastMeetingDay === null ? null : relation.lastMeetingDay + rules.meetingCooldownDays;
+  const tooSoon = nextDay !== null && nextDay > toDayNumber(state.clock.date);
+  const meet = () => {
+    const events = act({ type: 'bank/meet', bankId });
+    const plan = events?.find((event) => event.type === 'bankMeetingPlanned');
+    if (plan) notify(describeEvent(plan, state) ?? '');
+  };
+  return (
+    <Card title={texts.meetingHeading} testId="banker-meeting">
+      <p className="small muted">{format(texts.meetingHint, { gain: rules.meeting })}</p>
+      {planned ? (
+        <p className="small strong">
+          {format(texts.meetingPlanned, { date: formatDayYear(planned.day) })}
+        </p>
+      ) : (
+        <>
+          <button type="button" className="button primary block" disabled={tooSoon} onClick={meet}>
+            {texts.meet}
+          </button>
+          {tooSoon && nextDay !== null && (
+            <p className="small muted">
+              {format(texts.meetingNext, { date: formatDayYear(nextDay) })}
+            </p>
+          )}
+        </>
+      )}
+    </Card>
   );
 }

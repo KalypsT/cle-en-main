@@ -78,6 +78,8 @@ export const creditRulesSchema = z
         meeting: z.number(),
         meetingCooldownDays: z.number().int().min(0),
         meetingMinutes: z.number().int().min(0),
+        /** Tone of the banker at a meeting: low below `lowBelow`, high from `highFrom`. */
+        meetingTone: z.object({ lowBelow: trust, highFrom: trust }).strict(),
       })
       .strict(),
   })
@@ -100,6 +102,11 @@ export const bankSchema = z
     counterOffers: z.boolean(),
     /** Whether the banker takes meetings (a chatbot does not). */
     meetings: z.boolean(),
+    /** What the banker says at a meeting, by the trust it ends on (low, medium, high). */
+    meetingLines: z
+      .object({ low: z.string().min(1), medium: z.string().min(1), high: z.string().min(1) })
+      .strict()
+      .nullable(),
     /** Whether the bank lends to an SCI (milestone 8). */
     lendsToCompanies: z.boolean(),
   })

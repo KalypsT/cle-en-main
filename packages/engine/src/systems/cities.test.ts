@@ -15,6 +15,7 @@ import {
 import { toDayNumber } from '../calendar.ts';
 import { toCents } from '../money.ts';
 import { serializeGame } from '../serialization.ts';
+import type { GameState } from '../state.ts';
 import { homeRent, moveHome, renownOf } from './cities.ts';
 import { statValue } from './progress.ts';
 import { tripBetween } from './travel.ts';
@@ -218,11 +219,30 @@ describe('local renown', () => {
   });
 });
 
+/** Offers a property for rent at the market rent, managed by the player himself. */
+function offerForRent(state: GameState, propertyId: string): GameState {
+  const quote = engine.rentQuote(state, propertyId, 'bare');
+  if (!quote) throw new Error('No quote');
+  return act(state, {
+    type: 'rent/list',
+    propertyId,
+    leaseType: 'bare',
+    monthlyRent: quote.market,
+    agencyId: null,
+    insured: false,
+  }).state;
+}
+
 describe('managing from afar', () => {
   it('charges a monthly fee for each property of another city managed without an agency', () => {
     const start = newGame();
     const listing = affordableListing(start, 400_000, 'dijon');
-    const { state } = buyWithLoan(start, listing.id);
+    const bought = buyWithLoan(start, listing.id).state;
+    // A vacant property costs nothing from afar: only one let or offered for rent.
+    const vacant = advanceToNextMonth(bought).events.find((e) => e.type === 'monthlyStatement');
+    if (vacant?.type !== 'monthlyStatement') throw new Error('No statement');
+    expect(vacant.lines.some((line) => line.kind === 'remoteManagement')).toBe(false);
+    const state = offerForRent(bought, listing.property.id);
     const { events } = advanceToNextMonth(state);
     const statement = events.find((e) => e.type === 'monthlyStatement');
     if (statement?.type !== 'monthlyStatement') throw new Error('No statement');
@@ -241,7 +261,8 @@ describe('managing from afar', () => {
 
   it('charges nothing in the base city, nor for a property handled by an agency', () => {
     const start = newGame();
-    const local = buyWithLoan(start, affordableListing(start).id);
+    const flat = affordableListing(start);
+    const local = { state: offerForRent(buyWithLoan(start, flat.id).state, flat.property.id) };
     const events = advanceToNextMonth(local.state).events;
     const statement = events.find((e) => e.type === 'monthlyStatement');
     if (statement?.type !== 'monthlyStatement') throw new Error('No statement');
@@ -282,7 +303,7 @@ describe('the region map', () => {
 });
 
 describe('titles that need several cities', () => {
-  it('count the cities where the player owns a property', () => {
+  it('count the cities where the player owns a home, not a parking space', () => {
     const state = newGame();
     const day = state.clock.date.day;
     const dole = sampleOwned(day);
@@ -293,6 +314,10 @@ describe('titles that need several cities', () => {
     const withTwo = { ...state, properties: [dole, dijon] };
     expect(statValue(content, withOne, 'cities')).toBe(1);
     expect(statValue(content, withTwo, 'cities')).toBe(2);
+    const parking = sampleOwned(day, {
+      property: { id: 'property-parking', cityId: 'dijon', kind: 'parking' },
+    });
+    expect(statValue(content, { ...state, properties: [dole, parking] }, 'cities')).toBe(1);
   });
 
   it('are no longer inactive: Investisseur aguerri and Baron ask for their cities', () => {

@@ -73,3 +73,31 @@ export function startFreeDay(ctx: SystemContext, date: CalendarDate): void {
   ctx.state.player.freeTimeMinutes = dailyFreeTime(ctx.content, ctx.state, date);
   ctx.state.player.tripsToday = [];
 }
+
+/** The player resigns (docs/03-systemes/01): eight hours of free time a day, no more salary. */
+export function resign(ctx: SystemContext): 'job.alreadyResigned' | null {
+  const { player } = ctx.state;
+  if (!player.employed) return 'job.alreadyResigned';
+  player.employed = false;
+  ctx.events.push({ type: 'resigned' });
+  return null;
+}
+
+/** Without a job, the player looks for his own again: he finds it after a few weeks. */
+export function seekJob(ctx: SystemContext): 'job.employed' | 'job.searching' | null {
+  const { player } = ctx.state;
+  if (player.employed) return 'job.employed';
+  if (player.jobSearchEndDay !== null) return 'job.searching';
+  player.jobSearchEndDay = ctx.today + ctx.content.jobSearchDays;
+  ctx.events.push({ type: 'jobSearchStarted', endDay: player.jobSearchEndDay });
+  return null;
+}
+
+/** The job search that ends today: back at work, with the salary from the next statement. */
+export function runDailyJobSearch(ctx: SystemContext): void {
+  const { player } = ctx.state;
+  if (player.jobSearchEndDay === null || ctx.today < player.jobSearchEndDay) return;
+  player.jobSearchEndDay = null;
+  player.employed = true;
+  ctx.events.push({ type: 'jobFound', jobId: player.jobId });
+}

@@ -57,6 +57,7 @@
     "refusedApplication": -3,
     "meeting": 3,
     "meetingCooldownDays": 30,
-    "meetingMinutes": 60
+    "meetingMinutes": 60,
+    "meetingTone": { "lowBelow": 45, "highFrom": 70 }
   }
 }

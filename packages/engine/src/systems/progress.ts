@@ -68,7 +68,12 @@ export function statValue(
           owned.property.id !== state.player.homePropertyId && PASSOIRES.has(owned.property.dpe),
       ).length;
     case 'cities':
-      return new Set(state.properties.map((owned) => owned.property.cityId)).size;
+      // Homes only: a parking space in a second city is no expansion (titles of docs/02).
+      return new Set(
+        state.properties
+          .filter((owned) => isDwelling(owned.property.kind))
+          .map((owned) => owned.property.cityId),
+      ).size;
     case 'reputation':
       return state.player.reputation;
     case 'monthlyRent':

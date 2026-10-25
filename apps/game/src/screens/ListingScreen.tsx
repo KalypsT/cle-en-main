@@ -24,6 +24,7 @@ import {
   cityName,
   listingTitle,
   propertyLabel,
+  rivalName,
   t,
   tradeName,
 } from '../texts.ts';
@@ -233,6 +234,8 @@ function ListingBody({ listing }: { listing: Listing }) {
   const offersLeft = rules.maxOffersPerListing - listing.offersMade;
   const offer = listing.offer;
   const reply = sellerReply(state, listing.id);
+  // Who else may want it (never what they think it is worth).
+  const rivals = engine.interestedRivals(state, listing.id);
 
   // How the neighbourhood's prices moved over the last year (or since the curve began).
   const trend = engine.priceChange(state, property.cityId, property.neighbourhoodId, 12);
@@ -380,6 +383,11 @@ function ListingBody({ listing }: { listing: Listing }) {
       {motivation && (
         <Card title={t.listing.seller}>
           <p className="small">{motivation}</p>
+          {rivals.length > 0 && (
+            <p className="small warning" data-testid="listing-rivals">
+              {format(t.listing.rivals, { rivals: rivals.map(rivalName).join(', ') })}
+            </p>
+          )}
         </Card>
       )}
 
@@ -489,7 +497,13 @@ function OfferSheet({
   const share = gameContent.market.purchase.depositShare;
   const outlook = amount > 0 ? engine.cashFlowOutlook(state, listing.id, amount) : null;
 
+  const tooHigh = amount > asking * gameContent.market.negotiation.maxOfferOfAsking;
   const send = () => {
+    if (
+      amount > asking &&
+      !window.confirm(format(t.listing.offerAbove, { asking: formatEuros(asking) }))
+    )
+      return;
     if (act({ type: 'market/offer', listingId: listing.id, amount })) onClose();
   };
 
@@ -534,7 +548,8 @@ function OfferSheet({
         </div>
       )}
       <p className="small muted">{format(t.listing.offersLeft, { count: offersLeft })}</p>
-      <button type="button" className="button primary block" onClick={send}>
+      {tooHigh && <p className="small negative">{t.listing.offerTooHigh}</p>}
+      <button type="button" className="button primary block" onClick={send} disabled={tooHigh}>
         {t.listing.send}
       </button>
     </BottomSheet>

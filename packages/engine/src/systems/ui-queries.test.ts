@@ -107,7 +107,12 @@ describe('pending decisions', () => {
         { id: 'app-2', tenant: let_.lease.tenant, expiresDay: today + 1 },
       ],
     };
-    const decisions = engine.pendingDecisions(withOwned(state, vacant, let_, listed));
+    // A plot of land is never let: no « empty home » decision for it.
+    const land = sampleOwned(today, {
+      let: false,
+      property: { id: 'property-land', kind: 'land' },
+    });
+    const decisions = engine.pendingDecisions(withOwned(state, vacant, let_, listed, land));
     expect(decisions.map((d) => d.kind)).toEqual(['candidates', 'incident', 'vacant']);
     expect(decisions[0]).toMatchObject({ count: 2, deadlineDay: today + 1 });
     expect(decisions[1]).toMatchObject({

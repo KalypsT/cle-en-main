@@ -165,6 +165,7 @@ export const gameContent: GameContent = {
   livingCosts: livingCostsSchema.parse(livingCostsJson),
   jobs: jobsFile.jobs,
   unemployedFreeTimeMinutes: jobsFile.unemployedFreeTimeMinutes,
+  jobSearchDays: jobsFile.jobSearchDays,
   credit: creditRulesSchema.parse(creditJson),
   banks: banksFileSchema.parse(banksJson).banks,
   company: companyRulesSchema.parse(companyJson),

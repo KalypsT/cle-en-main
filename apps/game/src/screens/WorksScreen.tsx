@@ -77,8 +77,9 @@ function Planner({ owned }: { owned: OwnedProperty }) {
   const today = toDayNumber(state.clock.date);
   const quotes = owned.quotes.filter((quote) => quote.expiresDay > today);
   const [chosenQuotes, setChosenQuotes] = useState<Set<string> | null>(null);
-  // Every valid quote is taken until the player unticks one.
-  const taken = chosenQuotes ?? new Set(quotes.map((quote) => quote.id));
+  // Until the player ticks his own, the cheapest quote of each item is taken (quotes asked of
+  // two artisans of a trade, to compare, would cover the same items twice).
+  const taken = chosenQuotes ?? cheapestQuotes(quotes);
 
   if (catalog.length === 0) return <Empty icon="wrench">{t.works.nothing}</Empty>;
 
@@ -165,6 +166,18 @@ function Planner({ owned }: { owned: OwnedProperty }) {
       />
     </>
   );
+}
+
+/** The cheapest quotes, one per item: a quote is taken if none of its items is covered yet. */
+function cheapestQuotes(quotes: OwnedProperty['quotes']): Set<string> {
+  const covered = new Set<string>();
+  const taken = new Set<string>();
+  for (const quote of [...quotes].sort((a, b) => a.total - b.total)) {
+    if (quote.items.some((line) => covered.has(line.itemId))) continue;
+    for (const line of quote.items) covered.add(line.itemId);
+    taken.add(quote.id);
+  }
+  return taken;
 }
 
 function ItemPicker({
@@ -368,6 +381,16 @@ function Launch({
     const item = catalog.find((entry) => entry.id === choice.itemId);
     return sum + (item?.diy?.tiers[choice.tier].minutes ?? 0);
   }, 0);
+  // An item in two ticked quotes, or quoted and done oneself: the engine refuses it.
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const itemId of [
+    ...chosen.flatMap((quote) => quote.items.map((line) => line.itemId)),
+    ...diy.map((choice) => choice.itemId),
+  ]) {
+    if (seen.has(itemId)) duplicates.add(itemId);
+    seen.add(itemId);
+  }
   if (quotes.length === 0 && diy.length === 0 && delegated.length === 0) return null;
   const start = () => {
     const events = act({
@@ -419,7 +442,17 @@ function Launch({
           {deposit > 0 && (
             <p className="small">{format(t.works.deposit, { amount: formatEuros(deposit) })}</p>
           )}
-          <button type="button" className="button primary block" onClick={start}>
+          {duplicates.size > 0 && (
+            <p className="small negative" data-testid="works-duplicate">
+              {format(t.works.duplicate, { items: [...duplicates].map(nameOf).join(', ') })}
+            </p>
+          )}
+          <button
+            type="button"
+            className="button primary block"
+            onClick={start}
+            disabled={duplicates.size > 0}
+          >
             {t.works.start}
           </button>
         </>

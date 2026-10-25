@@ -86,6 +86,33 @@ describe('GameSession, automatic pause', () => {
     expect(session.getSnapshot()).toMatchObject({ speed: 0, autoPaused: true });
   });
 
+  it('waits for a review opened with the pause, then goes back to the former speed', () => {
+    const session = pausedSession();
+    // The monthly review opens on the same tick (the co-ownership meeting of the 1st).
+    session.hold();
+    session.dispatch({ type: 'challenge/answer', accept: false });
+    expect(session.getSnapshot()).toMatchObject({ speed: 2, autoPaused: false });
+    const held = session.getSnapshot().state.clock.elapsedHours;
+    frame(200);
+    frame(200);
+    expect(session.getSnapshot().state.clock.elapsedHours).toBe(held);
+    session.release();
+    frame(200);
+    frame(200);
+    expect(session.getSnapshot().state.clock.elapsedHours).toBeGreaterThan(held);
+  });
+
+  it('stays paused after a review while the decision still waits', () => {
+    const session = pausedSession();
+    session.hold();
+    session.release();
+    // Closing a scene never restarts the clock while the decision still waits.
+    expect(session.getSnapshot()).toMatchObject({ speed: 0, autoPaused: true });
+    const paused = session.getSnapshot().state.clock.elapsedHours;
+    frame(200);
+    expect(session.getSnapshot().state.clock.elapsedHours).toBe(paused);
+  });
+
   it('keeps the speed the player chose during the pause', () => {
     const session = pausedSession();
     session.setSpeed(0);

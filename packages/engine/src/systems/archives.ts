@@ -2,7 +2,7 @@ import { deepClone } from '../clone.ts';
 import type { GameEvent } from '../events.ts';
 import type { Cents } from '../money.ts';
 import type { GameState, Loan, OwnedProperty, PropertyLogEntry } from '../state.ts';
-import { interestPaidOf, refinancingFees } from './banking.ts';
+import { earlyRepaymentFees, interestPaidOf, refinancingFees } from './banking.ts';
 import type { SystemContext } from './context.ts';
 import { eventSubject, loanAnswerOf, subjectOf } from './inbox.ts';
 
@@ -34,10 +34,13 @@ export function archiveLoan(
     paymentsMade: loan.paymentsMade,
     interestPaid: interestPaidOf(loan),
     remaining: Math.max(0, loan.remaining),
+    // A sale repays the loan early (its penalty); a refinancing pays the bank's fees.
     fees:
-      reason === 'sold' || reason === 'refinanced'
-        ? refinancingFees(ctx.content, loan)
-        : prepaymentFees,
+      reason === 'sold'
+        ? earlyRepaymentFees(ctx.content, loan, loan.remaining)
+        : reason === 'refinanced'
+          ? refinancingFees(ctx.content, loan)
+          : prepaymentFees,
     reason,
     replacedBy,
   });

@@ -523,3 +523,25 @@ describe('works', () => {
     );
   });
 });
+
+describe('the address book of artisans', () => {
+  it('lists the artisans of each city, and the works before new ones join', () => {
+    const engine = createEngine(gameContent);
+    const state = newGame();
+    const book = engine.artisanBook(state);
+    expect(book.map((city) => city.cityId).sort()).toEqual(Object.keys(gameContent.cities).sort());
+    const dole = book.find((city) => city.cityId === 'dole');
+    const later = gameContent.artisans.filter(
+      (artisan) => artisan.cities.includes('dole') && artisan.unlockAfterWorks > 0,
+    );
+    expect(dole?.artisans.length).toBeGreaterThan(0);
+    expect(dole?.artisans.every((entry) => entry.artisan.unlockAfterWorks === 0)).toBe(true);
+    expect(dole?.worksToNext).toBe(
+      later.length > 0 ? Math.min(...later.map((a) => a.unlockAfterWorks)) : null,
+    );
+    // Works finished in the city bring the next artisans into the book.
+    const busy = deepClone(state);
+    busy.worksDone.dole = 100;
+    expect(engine.artisanBook(busy).find((city) => city.cityId === 'dole')?.worksToNext).toBeNull();
+  });
+});

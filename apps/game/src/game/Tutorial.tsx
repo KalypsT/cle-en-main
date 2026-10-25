@@ -27,6 +27,15 @@ export function tutorialReaction(
 ): { show: string } | { advance: number } | null {
   const step = currentStep(state);
   if (!step) return null;
+  // The purchase this step follows fell through: back to looking for another listing.
+  if (
+    step.backOnCancel &&
+    triggers.includes('event:purchaseCancelled') &&
+    state.purchases.length === 0
+  ) {
+    const back = tutorial.steps.findIndex((candidate) => candidate.id === step.backOnCancel);
+    if (back >= 0) return { advance: back };
+  }
   if (step.showOn && shownStep !== step.id) {
     return triggers.includes(step.showOn) ? { show: step.id } : null;
   }

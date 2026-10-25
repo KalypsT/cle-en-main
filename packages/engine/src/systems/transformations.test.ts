@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { deepClone } from '../clone.ts';
 import {
   act,
   advanceDays,
@@ -162,6 +163,38 @@ describe('transformations (milestone 8)', () => {
     expect(home?.surface).toBe(125);
   });
 
+  it('tells the deposit, the balance due at the end and the cash missing', () => {
+    const house = dwelling(basics({}), 2);
+    const quote = quoteOf(owning(house), 'division');
+    const deposit = Math.round(quote.total * content.works.quotes.depositShare);
+    const rich = engine.transformationFunding(owning(house), 'property-t', 'division');
+    expect(rich).toMatchObject({ deposit, balance: quote.total - deposit, missing: 0 });
+    const poor = engine.transformationFunding(owning(house, deposit), 'property-t', 'division');
+    expect(poor).toMatchObject({ available: deposit, missing: quote.total - deposit });
+  });
+
+  it('puts the balance of a transformation under way in the cash forecast', () => {
+    const house = dwelling(basics({}), 2);
+    const state = owning(house);
+    const quote = quoteOf(state, 'division');
+    const started = act(state, {
+      type: 'works/transform',
+      propertyId: 'property-t',
+      kind: 'division',
+    }).state;
+    // A month before its end, the forecast sees the bill coming.
+    const late = advanceDays(started, quote.days - 20).state;
+    const deposit = Math.round(quote.total * content.works.quotes.depositShare);
+    const forecast = engine.cashForecast(late, 30);
+    expect(forecast.endBalance).toBeLessThanOrEqual(
+      late.player.balance - (quote.total - deposit) + 5_000_00,
+    );
+    const end = toDayNumber(late.clock.date) + 20;
+    const poor = deepClone(late);
+    poor.player.balance = 1_000_00;
+    expect(engine.cashForecast(poor, 30)).toMatchObject({ lowestDay: end });
+  });
+
   it('needs an empty property', () => {
     const state = owning(dwelling(basics({}), 2));
     const owned = state.properties[0];
@@ -192,5 +225,18 @@ describe('transformations (milestone 8)', () => {
     expect(delegated.state.player.freeTimeMinutes).toBe(free);
     const fee = delegated.events.find((e) => e.type === 'worksDelegated');
     expect(fee).toMatchObject({ type: 'worksDelegated' });
+    // The deposits and the fee are due at once: without the cash, nothing starts.
+    const deposits = project?.tasks.reduce((sum, task) => sum + task.deposit, 0) ?? 0;
+    const poor = deepClone(state);
+    poor.player.balance = deposits;
+    const refused = engine.dispatch(poor, {
+      type: 'works/delegate',
+      propertyId: 'property-t',
+      items: [
+        { itemId: 'electricity', tier: 'standard' },
+        { itemId: 'heating', tier: 'standard' },
+      ],
+    });
+    expect(refused.ok ? null : refused.reason.code).toBe('account.insufficientFunds');
   });
 });

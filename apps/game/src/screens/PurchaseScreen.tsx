@@ -241,7 +241,8 @@ function ApplicationRow({
 function LoanRequestSheet({ purchase, onClose }: { purchase: Purchase; onClose: () => void }) {
   const { state, act } = useGame();
   const [bankId, setBankId] = useState(gameContent.start.accountBankId);
-  const [years, setYears] = useState(20);
+  // The same duration as the simulated financing and the cash-flow outlook.
+  const [years, setYears] = useState(25);
   const [works, setWorks] = useState(0);
   const [amount, setAmount] = useState<number | null>(null);
   const sim = engine.simulateFinancing(state, purchase.id, { bankId, durationYears: years, works });
@@ -254,6 +255,16 @@ function LoanRequestSheet({ purchase, onClose }: { purchase: Purchase; onClose: 
   });
   const verdict = preview ? loanVerdict(preview.decision) : null;
   const withWorks = works > 0;
+  // The bank must answer before the loan condition ends (the engine refuses otherwise).
+  const today = toDayNumber(state.clock.date);
+  const responseDay =
+    today + (gameContent.banks.find((bank) => bank.id === bankId)?.responseDelayDays ?? 0);
+  const tooLate = responseDay >= purchase.loanDeadlineDay;
+  const answer = format(tooLate ? t.purchase.answerTooLate : t.purchase.answerBy, {
+    bank: bankName(bankId),
+    when: formatWhen(responseDay, state.clock.date),
+    deadline: formatDayYear(purchase.loanDeadlineDay),
+  });
 
   const send = () => {
     const events = act(
@@ -274,7 +285,14 @@ function LoanRequestSheet({ purchase, onClose }: { purchase: Purchase; onClose: 
     <BottomSheet title={t.purchase.requestHeading} onClose={onClose}>
       <label className="field">
         <span className="field-label">{t.financing.bank}</span>
-        <select className="select" value={bankId} onChange={(e) => setBankId(e.target.value)}>
+        <select
+          className="select"
+          value={bankId}
+          onChange={(e) => {
+            setBankId(e.target.value);
+            setAmount(null);
+          }}
+        >
           {gameContent.banks.map((bank) => (
             <option key={bank.id} value={bank.id}>
               {bank.name} · {bank.banker.name}
@@ -303,7 +321,14 @@ function LoanRequestSheet({ purchase, onClose }: { purchase: Purchase; onClose: 
       </label>
       <label className="field">
         <span className="field-label">{t.financing.duration}</span>
-        <select className="select" value={years} onChange={(e) => setYears(Number(e.target.value))}>
+        <select
+          className="select"
+          value={years}
+          onChange={(e) => {
+            setYears(Number(e.target.value));
+            setAmount(null);
+          }}
+        >
           {durationChoices(withWorks).map((y) => (
             <option key={y} value={y}>
               {format(t.common.years, { years: y })}
@@ -341,7 +366,10 @@ function LoanRequestSheet({ purchase, onClose }: { purchase: Purchase; onClose: 
         />
       )}
       {verdict && <p className={`small strong ${verdict.tone}`}>{verdict.text}</p>}
-      <button type="button" className="button primary block" onClick={send}>
+      <p className={`small ${tooLate ? 'negative' : 'muted'}`} data-testid="loan-answer-day">
+        {answer}
+      </p>
+      <button type="button" className="button primary block" onClick={send} disabled={tooLate}>
         {t.purchase.send}
       </button>
     </BottomSheet>

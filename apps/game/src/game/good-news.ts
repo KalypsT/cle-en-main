@@ -18,6 +18,7 @@ import {
   RIVAL_CHARACTERS,
 } from '../ui/Avatar.tsx';
 import type { IconName } from '../ui/Icon.tsx';
+import { engine } from '../engine.ts';
 
 /** A good news told at once over the game (docs/04, 4.6), or an achievement earned. */
 export interface GoodNews {
@@ -59,6 +60,22 @@ export function goodNewsOf(event: GameEvent, state: GameState): GoodNews | null 
           amount: formatEuros(event.amount),
           rate: formatPercent(event.ratePercent ?? 0),
         }),
+        icon: 'bank',
+        ...(face ? { face } : {}),
+      };
+    }
+    case 'bankMeetingHeld': {
+      // The banker's line, by the trust the meeting ends on (content/banques.json).
+      const bank = gameContent.banks.find((candidate) => candidate.id === event.bankId);
+      const tone = engine.meetingTone(event.trust);
+      const id = BANK_CHARACTERS[event.bankId];
+      const face = id
+        ? character(id, tone === 'low' ? 'upset' : tone === 'high' ? 'happy' : 'smile')
+        : undefined;
+      return {
+        kind: 'news',
+        text: describeEvent(event, state) ?? '',
+        ...(bank?.meetingLines ? { detail: bank.meetingLines[tone] } : {}),
         icon: 'bank',
         ...(face ? { face } : {}),
       };
