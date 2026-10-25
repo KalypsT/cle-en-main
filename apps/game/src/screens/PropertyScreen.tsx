@@ -5,6 +5,7 @@ import {
   type OwnedProperty,
   type TaxRegimeChoice,
   toDayNumber,
+  type TransformationKind,
 } from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
@@ -31,6 +32,7 @@ import {
 import {
   Amount,
   Badge,
+  BottomSheet,
   Card,
   Chip,
   Empty,
@@ -475,6 +477,7 @@ function LastCoproMeetingCard({ owned }: { owned: OwnedProperty }) {
 function Transformations({ owned }: { owned: OwnedProperty }) {
   const { state, act } = useGame();
   const texts = t.transformation;
+  const [confirming, setConfirming] = useState<TransformationOption | null>(null);
   const running = owned.works?.transformation;
   if (running) {
     return (
@@ -517,18 +520,89 @@ function Transformations({ owned }: { owned: OwnedProperty }) {
           <p className="small muted">
             {format(texts.duration, { months: Math.round(option.quote.days / 30) })}
           </p>
-          <button
-            type="button"
-            className="button block"
-            onClick={() =>
-              act({ type: 'works/transform', propertyId: owned.property.id, kind: option.kind })
-            }
-          >
+          <button type="button" className="button block" onClick={() => setConfirming(option)}>
             {texts.start}
           </button>
         </div>
       ))}
+      {confirming && (
+        <TransformationSheet
+          owned={owned}
+          option={confirming}
+          onClose={() => setConfirming(null)}
+          onConfirm={() => {
+            const done = act({
+              type: 'works/transform',
+              propertyId: owned.property.id,
+              kind: confirming.kind,
+            });
+            if (done) setConfirming(null);
+          }}
+        />
+      )}
     </Card>
+  );
+}
+
+type TransformationOption = Exclude<
+  ReturnType<typeof engine.transformationOptions>[number]['estimate'],
+  string
+> & { kind: TransformationKind };
+
+/**
+ * The project manager's quote before signing it: the deposit today, the balance on the last
+ * day, and the cash it would leave short (analysis of 2026-10-25, L4).
+ */
+function TransformationSheet({
+  owned,
+  option,
+  onClose,
+  onConfirm,
+}: {
+  owned: OwnedProperty;
+  option: TransformationOption;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const { state } = useGame();
+  const texts = t.transformation;
+  const funding = engine.transformationFunding(state, owned.property.id, option.kind);
+  if (!funding || typeof funding === 'string') return null;
+  const end = formatDayYear(funding.endDay);
+  return (
+    <BottomSheet
+      title={format(texts.confirmHeading, { kind: texts.kinds[option.kind] })}
+      onClose={onClose}
+    >
+      <KeyValues
+        rows={[
+          { label: texts.total, value: formatEuros(option.quote.total) },
+          { label: texts.deposit, value: formatEuros(funding.deposit) },
+          { label: format(texts.balance, { date: end }), value: formatEuros(funding.balance) },
+          { label: texts.available, value: formatEuros(funding.available), total: true },
+        ]}
+      />
+      <p
+        className={`small strong ${funding.missing > 0 ? 'negative' : 'positive'}`}
+        data-testid="transformation-funding"
+      >
+        {funding.missing > 0
+          ? format(texts.missing, { amount: formatEuros(funding.missing), date: end })
+          : texts.covered}
+      </p>
+      <p className="tiny muted">{texts.overrunHint}</p>
+      {option.blocked > 0 && (
+        <p className="small warning">{format(texts.blocked, { count: option.blocked })}</p>
+      )}
+      {option.firstBanDay !== null && (
+        <p className="small muted">
+          {format(texts.banDay, { date: formatDayYear(option.firstBanDay) })}
+        </p>
+      )}
+      <button type="button" className="button primary block" onClick={onConfirm}>
+        {texts.confirm}
+      </button>
+    </BottomSheet>
   );
 }
 

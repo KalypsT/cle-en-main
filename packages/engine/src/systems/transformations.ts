@@ -129,6 +129,40 @@ export function quoteFor(
   };
 }
 
+/**
+ * What a transformation asks of the player's cash: the deposit today, the rest of the quote
+ * on its last day (overruns aside, which nobody knows beforehand), and what would be missing
+ * then if nothing came in meanwhile (the account and the works envelope only).
+ */
+export interface TransformationFunding {
+  deposit: Cents;
+  balance: Cents;
+  endDay: number;
+  /** Account (never below zero) and works envelope today. */
+  available: Cents;
+  /** Short of the deposit and the balance together; 0 when the cash is there. */
+  missing: Cents;
+}
+
+export function transformationFunding(
+  content: GameContent,
+  state: GameState,
+  owned: OwnedProperty,
+  kind: TransformationKind,
+): TransformationFunding | TransformationRefusal {
+  const quote = transformationQuote(content, state, owned, kind);
+  if (typeof quote === 'string') return quote;
+  const deposit = Math.round(quote.total * content.works.quotes.depositShare);
+  const available = Math.max(0, state.player.balance) + (owned.worksFund?.amount ?? 0);
+  return {
+    deposit,
+    balance: quote.total - deposit,
+    endDay: toDayNumber(state.clock.date) + quote.days,
+    available,
+    missing: Math.max(0, quote.total - available),
+  };
+}
+
 /** Pays a transformation from the works envelope first: it counts in the capital gain, not the rents. */
 function payTransformation(ctx: SystemContext, owned: OwnedProperty, amount: Cents): void {
   const fund = owned.worksFund;

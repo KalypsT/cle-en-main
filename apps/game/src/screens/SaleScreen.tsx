@@ -139,6 +139,20 @@ function PriceCard({ owned }: { owned: OwnedProperty }) {
               { label: t.sale.net, value: formatEuros(proceeds.net), total: true },
             ]}
           />
+          {proceeds.net < 0 && (
+            <div className="stack tight" data-testid="sale-shortfall">
+              <p className="small strong negative">
+                {format(t.sale.shortfall, { amount: formatEuros(-proceeds.net) })}
+              </p>
+              {-proceeds.net > state.player.balance && (
+                <p className="small negative">
+                  {format(t.sale.shortfallOverdraft, {
+                    balance: formatEuros(state.player.balance),
+                  })}
+                </p>
+              )}
+            </div>
+          )}
           {home && (
             <p className="small muted" data-testid="home-exemption">
               {format(home.exempt ? t.sale.homeExempt : t.sale.homeNotYet, {
@@ -213,7 +227,14 @@ function Offers({ owned }: { owned: OwnedProperty }) {
 }
 
 function OfferRow({ propertyId, offer }: { propertyId: string; offer: SaleOffer }) {
-  const { act } = useGame();
+  const { act, state } = useGame();
+  // Accepting an offer below the loan costs money: the player confirms it.
+  const net = engine.saleProceeds(state, propertyId, offer.amount)?.net ?? 0;
+  const accept = () => {
+    if (net < 0 && !window.confirm(format(t.sale.shortfallConfirm, { amount: formatEuros(-net) })))
+      return;
+    act({ type: 'sale/acceptOffer', propertyId, offerId: offer.id });
+  };
   const [counter, setCounter] = useState(() => roundPrice(offer.amount * 1.03));
   return (
     <li className="stack tight">
@@ -233,11 +254,7 @@ function OfferRow({ propertyId, offer }: { propertyId: string; offer: SaleOffer 
       ) : (
         <>
           <div className="row wrap">
-            <button
-              type="button"
-              className="button primary small"
-              onClick={() => act({ type: 'sale/acceptOffer', propertyId, offerId: offer.id })}
-            >
+            <button type="button" className="button primary small" onClick={accept}>
               {t.sale.accept}
             </button>
             <button

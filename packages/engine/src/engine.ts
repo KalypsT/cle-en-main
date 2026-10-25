@@ -92,6 +92,7 @@ import {
   runDailyTransformations,
   startTransformation,
   transformationEstimate,
+  transformationFunding,
   transformationQuote,
 } from './systems/transformations.ts';
 import { roundRate, runMonthlyMarketRate } from './systems/market-rate.ts';
@@ -744,6 +745,11 @@ export function createEngine(content: GameContent) {
     transformationQuote: (state: GameState, propertyId: string, kind: TransformationKind) => {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? transformationQuote(content, state, owned, kind) : null;
+    },
+    /** Deposit today, balance at the end and cash missing for a transformation of an owned property. */
+    transformationFunding: (state: GameState, propertyId: string, kind: TransformationKind) => {
+      const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
+      return owned ? transformationFunding(content, state, owned, kind) : null;
     },
     /** Leases an owned property may have (kind, rooms, SCI), in the order of content. */
     leaseOptions: (state: GameState, propertyId: string): LeaseType[] => {

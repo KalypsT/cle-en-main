@@ -56,6 +56,19 @@ test('lists a property for sale, then paints a room oneself', async ({ page }) =
   await capture(page, '04-banque', MILESTONE);
 });
 
+test('warns before a sale that would not cover the loan', async ({ page }) => {
+  await openGame(page);
+  const owner = ownerGame(24 * 120, (s) => s.properties.length > 0 && s.loans.length > 0);
+  // A loan far above the value: no price on the screen covers it.
+  const loans = owner.loans.map((loan) => ({ ...loan, remaining: loan.remaining * 4 }));
+  await importState(page, { ...owner, loans });
+  await tab(page, 'assets');
+  await page.locator('[data-testid^="property-"]').first().click();
+  await page.getByRole('button', { name: t.property.sell }).click();
+  await expect(page.getByTestId('sale-shortfall')).toBeVisible();
+  await expect(page.getByTestId('sale-shortfall')).toContainText(/de votre poche/);
+});
+
 test('draws the value curve of a property owned for a few months', async ({ page }) => {
   await openGame(page);
   await importState(page, ownerGame(24 * 200));
