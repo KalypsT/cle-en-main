@@ -24,6 +24,7 @@ import {
   cityName,
   listingTitle,
   propertyLabel,
+  rivalName,
   t,
   tradeName,
 } from '../texts.ts';
@@ -233,6 +234,8 @@ function ListingBody({ listing }: { listing: Listing }) {
   const offersLeft = rules.maxOffersPerListing - listing.offersMade;
   const offer = listing.offer;
   const reply = sellerReply(state, listing.id);
+  // Who else may want it (never what they think it is worth).
+  const rivals = engine.interestedRivals(state, listing.id);
 
   // How the neighbourhood's prices moved over the last year (or since the curve began).
   const trend = engine.priceChange(state, property.cityId, property.neighbourhoodId, 12);
@@ -380,6 +383,11 @@ function ListingBody({ listing }: { listing: Listing }) {
       {motivation && (
         <Card title={t.listing.seller}>
           <p className="small">{motivation}</p>
+          {rivals.length > 0 && (
+            <p className="small warning" data-testid="listing-rivals">
+              {format(t.listing.rivals, { rivals: rivals.map(rivalName).join(', ') })}
+            </p>
+          )}
         </Card>
       )}
 

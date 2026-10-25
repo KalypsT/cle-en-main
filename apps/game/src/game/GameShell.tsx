@@ -34,6 +34,7 @@ import { WorksScreen } from '../screens/WorksScreen.tsx';
 import { RentScreen } from '../screens/RentScreen.tsx';
 import { SettingsScreen } from '../screens/SettingsScreen.tsx';
 import { MeScreen } from '../screens/MeScreen.tsx';
+import { ContactsScreen } from '../screens/ContactsScreen.tsx';
 import { SectionScreen } from '../screens/SectionScreen.tsx';
 import { StreetTab } from '../screens/StreetTab.tsx';
 import { PANORAMA_QUERY, useMediaQuery, WIDE_QUERY } from '../ui/media.ts';
@@ -517,6 +518,8 @@ function RouteScreen({ route }: { route: Route }) {
       return <SettingsScreen />;
     case 'me':
       return <MeScreen />;
+    case 'contacts':
+      return <ContactsScreen />;
     case 'event':
       return <EventScreen id={route.id} />;
     case 'challenge':

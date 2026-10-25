@@ -7,6 +7,7 @@ import {
   cityListings,
   content,
   dwelling,
+  engine,
   newGame,
   type PropertyBasics,
   systemContext,
@@ -87,6 +88,20 @@ describe('rivals', () => {
       amount: listing.askingPrice,
     }).state;
     expect(runDays(offered, 30).state.listings).toHaveLength(1);
+  });
+
+  it('tells who a listing would interest, and keeps count of each rival in the book', () => {
+    const { state, listing } = withBargain(monique, 1);
+    expect(engine.interestedRivals(state, listing.id)).toContain('delaporte');
+    const large = withBargain({ ...monique, surface: 80 }, 1);
+    expect(engine.interestedRivals(large.state, large.listing.id)).not.toContain('delaporte');
+    // The SCI Horizon is not on the market yet: not in the book either.
+    const sheets = engine.rivalSheets(state);
+    expect(sheets.map((sheet) => sheet.rivalId)).not.toContain('horizon');
+    expect(sheets.find((sheet) => sheet.rivalId === 'delaporte')).toMatchObject({
+      purchases: 0,
+      beaten: 0,
+    });
   });
 
   it('the Martinot brothers renovate what they buy and put it back on the market', () => {

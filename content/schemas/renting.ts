@@ -125,6 +125,8 @@ const agencySchema = z
   .object({
     id,
     name: z.string().min(1),
+    /** Its character, as the address book tells it (docs/03-systemes/04). */
+    character: z.string().min(1),
     /** Fees, as a share of the rents collected. */
     feeShare: share,
     /** Multiplier on the arrival of candidates (fills homes faster). */

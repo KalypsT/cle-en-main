@@ -1,5 +1,5 @@
 import { gameContent } from '@cle/content';
-import type { Advice, CalendarDate, GameState } from '@cle/engine';
+import type { Advice, CalendarDate, GameState, TaxAssessment } from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { useGame, useNav } from '../game/context.tsx';
@@ -16,7 +16,7 @@ import {
   titleName,
   tone,
 } from '../texts.ts';
-import { Badge, Card, Chip, Empty, KeyValues, ScreenHeader } from '../ui/components.tsx';
+import { Badge, Card, Chip, Empty, KeyValues, ScreenHeader, Why } from '../ui/components.tsx';
 
 /** The short monthly review (docs/02, section 2.2): the last one, or a kept one (`date`). */
 export function MonthlyReviewContent({ date }: { date?: CalendarDate | undefined }) {
@@ -153,6 +153,14 @@ export function YearReviewContent({ year }: { year?: number | undefined }) {
               : []),
           ]}
         />
+        {assessment?.year === review.year && assessment.properties.length > 0 && (
+          <div className="row between small" data-testid="tax-why">
+            <span>{t.review.taxWhy}</span>
+            <Why title={t.review.taxWhy}>
+              <TaxDetail assessment={assessment} />
+            </Why>
+          </div>
+        )}
         <p className="small">
           {format(t.review.yearReputation, {
             start: formatDecimal(review.reputationStart),
@@ -236,6 +244,45 @@ export function YearReviewScreen() {
         </div>
       )}
       <YearReviewContent year={year} />
+    </div>
+  );
+}
+
+/** « D'où vient cet impôt ? »: each property's regime and result, then the household's tax. */
+function TaxDetail({ assessment }: { assessment: TaxAssessment }) {
+  const { state } = useGame();
+  const texts = t.review;
+  const label = (propertyId: string) => {
+    const property =
+      state.properties.find((owned) => owned.property.id === propertyId)?.property ??
+      state.soldProperties.find((sold) => sold.property.id === propertyId)?.property;
+    return property ? propertyLabel(property) : texts.taxSold;
+  };
+  return (
+    <div className="stack tight">
+      {assessment.properties.map((entry) => (
+        <p key={entry.propertyId} className="small">
+          {format(texts.taxProperty, {
+            property: label(entry.propertyId),
+            regime: t.property.regimes[entry.regime],
+            amount: formatSigned(entry.taxable),
+          })}
+        </p>
+      ))}
+      <KeyValues
+        rows={[
+          ...(assessment.deficitOnSalary > 0
+            ? [{ label: texts.taxDeficit, value: formatSigned(-assessment.deficitOnSalary) }]
+            : []),
+          { label: texts.taxIncome, value: formatSigned(-assessment.incomeTax) },
+          { label: texts.taxSocial, value: formatSigned(-assessment.socialContributions) },
+          { label: texts.taxAccountant, value: formatSigned(-assessment.accountantFees) },
+          ...(assessment.wealthTax > 0
+            ? [{ label: texts.taxWealth, value: formatSigned(-assessment.wealthTax) }]
+            : []),
+        ]}
+      />
+      <p className="tiny muted">{texts.taxHint}</p>
     </div>
   );
 }

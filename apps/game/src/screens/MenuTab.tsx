@@ -20,6 +20,7 @@ export function MenuTab() {
     { label: t.menu.cities, icon: 'globe', route: { name: 'cities' } },
     { label: t.menu.bank, icon: 'euro', route: { name: 'bank' } },
     { label: t.menu.agenda, icon: 'calendar', route: { name: 'agenda' } },
+    { label: t.menu.contacts, icon: 'book', route: { name: 'contacts' } },
     { label: t.menu.statement, icon: 'euro', route: { name: 'monthReview' } },
     { label: t.menu.yearReview, icon: 'book', route: { name: 'yearReview' } },
     { label: t.menu.progression, icon: 'trophy', route: { name: 'progression' } },

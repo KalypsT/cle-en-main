@@ -150,12 +150,19 @@ import {
   runMonthlyTaxInstalment,
   setTaxRegime,
 } from './systems/taxes.ts';
-import { initialRivals, runDailyRivals, runMonthlyRivals } from './systems/rivals.ts';
+import {
+  initialRivals,
+  interestedRivals,
+  rivalSheets,
+  runDailyRivals,
+  runMonthlyRivals,
+} from './systems/rivals.ts';
 import { runDailyCopro, runMonthlyCopro, voteResolution } from './systems/copro.ts';
 import { ambience, findBuilding, section, streets } from './systems/world.ts';
 import {
   answerHazard,
   delegateWorks,
+  artisanBook,
   artisanDiscount,
   diagnose,
   type ItemChoice,
@@ -758,6 +765,13 @@ export function createEngine(content: GameContent) {
       const owned = state.properties.find((candidate) => candidate.property.id === propertyId);
       return owned ? transformationFunding(content, state, owned, kind) : null;
     },
+    /** The artisans of every city, known or still to meet (« Carnet »). */
+    artisanBook: (state: GameState) => artisanBook(content, state),
+    /** Active rivals a listing would interest (never their estimate). */
+    interestedRivals: (state: GameState, listingId: string) =>
+      interestedRivals(content, state, listingId),
+    /** Rivals on the market, their purchases and those the player took from them (« Carnet »). */
+    rivalSheets: (state: GameState) => rivalSheets(content, state),
     /** How a banker sounds at a meeting ending on `trust`. */
     meetingTone: (trust: number) => meetingTone(content, trust),
     /** Leases an owned property may have (kind, rooms, SCI), in the order of content. */

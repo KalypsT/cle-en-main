@@ -254,3 +254,31 @@ export function runDailyRivals(ctx: SystemContext): void {
     offerOnPlayerSales(ctx, rival, rivalState, boldness);
   }
 }
+
+/**
+ * Active rivals a listing would interest (its kind, size, condition and neighbourhood): the
+ * player is told who may want it, never how much they think it is worth.
+ */
+export function interestedRivals(content: GameContent, state: GameState, listingId: string) {
+  const listing = state.listings.find((candidate) => candidate.id === listingId);
+  if (!listing) return [];
+  return content.rivals
+    .filter(
+      (rival) => isRivalActive(state, rival) && interest(content, rival, listing.property) > 0,
+    )
+    .map((rival) => rival.id);
+}
+
+/** The rivals as the address book shows them: those on the market, with their purchases. */
+export function rivalSheets(content: GameContent, state: GameState) {
+  return content.rivals
+    .filter((rival) => isRivalActive(state, rival))
+    .map((rival) => ({
+      rivalId: rival.id,
+      /** Properties it bought since the start of the game. */
+      purchases: state.rivals[rival.id]?.purchases ?? 0,
+      /** Compromis the player signed on a property it wanted. */
+      beaten: state.progress.counters[`rivalBeaten.${rival.id}`] ?? 0,
+      arrivedDay: state.rivals[rival.id]?.arrivedDay ?? null,
+    }));
+}

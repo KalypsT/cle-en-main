@@ -887,6 +887,7 @@ function Finances({ owned }: { owned: OwnedProperty }) {
             </option>
           ))}
         </select>
+        <RegimeEstimate owned={owned} />
       </Card>
     </>
   );
@@ -912,6 +913,38 @@ function UnpaidRentInsurance({ owned }: { owned: OwnedProperty }) {
         ]}
       />
       <p className="tiny muted">{t.property.insuranceHint}</p>
+    </div>
+  );
+}
+
+/**
+ * The year's tax on the rents with this property in each regime, the others at their best
+ * (docs/03-systemes/06, « l'impôt estimé selon chaque régime »).
+ */
+function RegimeEstimate({ owned }: { owned: OwnedProperty }) {
+  const { state } = useGame();
+  const texts = t.property;
+  // The main residence earns and deducts nothing.
+  if (state.player.homePropertyId === owned.property.id) return null;
+  if (owned.holder === 'company') return <p className="small muted">{texts.regimeCompany}</p>;
+  const estimate = engine
+    .estimateTaxes(state)
+    .properties.find((candidate) => candidate.propertyId === owned.property.id);
+  if (!estimate) return <p className="small muted">{texts.regimeNoRent}</p>;
+  return (
+    <div className="stack tight" data-testid="regime-estimate">
+      <p className="small muted">{format(texts.regimeEstimate, { year: state.clock.date.year })}</p>
+      {(['micro', 'real'] as const).map((regime) => (
+        <p key={regime} className={`small ${estimate.recommended === regime ? 'strong' : ''}`}>
+          {format(texts.regimeCost, {
+            regime: texts.regimes[regime],
+            amount: formatEuros(estimate[regime]),
+          })}
+        </p>
+      ))}
+      <p className="tiny muted">
+        {format(texts.regimeBest, { regime: texts.regimes[estimate.recommended] })}
+      </p>
     </div>
   );
 }

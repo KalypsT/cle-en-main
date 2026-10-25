@@ -89,6 +89,8 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
 ## À l'écran
 
 - Pour chaque bien, le jeu affiche **l'impôt estimé selon chaque régime** et **recommande** le plus avantageux.
+
+> **Corrections du 25 octobre 2026** : c'est désormais fait. Sous le choix du régime (fiche du bien, onglet Finances), l'impôt de l'année en cours, comptable compris, avec ce bien en simple puis au réel (les autres biens à leur meilleur ; requête `estimateTaxes`) et le moins cher du moment ; rien pour la résidence principale, une phrase pour un bien de la SCI (toujours au réel). Le bilan annuel a un « D'où vient cet impôt ? » : régime et résultat imposable de chaque bien, déficit déduit du salaire, impôt sur le revenu en plus, prélèvements sociaux, comptable et IFI.
 - **La recommandation est appliquée par défaut.** Le joueur peut la changer pour un bien s'il veut optimiser.
 - Chaque montant d'impôt peut être **expliqué** en un écran (« d'où vient ce montant ? »).
 

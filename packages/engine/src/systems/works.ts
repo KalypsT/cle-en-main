@@ -88,6 +88,30 @@ export function knownArtisans(
   );
 }
 
+/**
+ * The address book of artisans, city by city (« Carnet »): those the player can call, with his
+ * history with each, and the works still to finish there before new ones join the book.
+ */
+export function artisanBook(content: GameContent, state: GameState) {
+  return Object.keys(content.cities).map((cityId) => {
+    const done = state.worksDone[cityId] ?? 0;
+    const next = content.artisans
+      .filter((artisan) => artisan.cities.includes(cityId) && artisan.unlockAfterWorks > done)
+      .reduce((min, artisan) => Math.min(min, artisan.unlockAfterWorks), Number.POSITIVE_INFINITY);
+    return {
+      cityId,
+      worksDone: done,
+      artisans: knownArtisans(content, state, cityId).map((artisan) => ({
+        artisan,
+        jobs: jobsWith(state, artisan.id),
+        discount: artisanDiscount(content, state, artisan.id),
+      })),
+      /** Works to finish in the city before the next artisans join; null when all are known. */
+      worksToNext: Number.isFinite(next) ? next - done : null,
+    };
+  });
+}
+
 function jobsWith(state: GameState, artisanId: string): number {
   return state.artisans[artisanId]?.jobs ?? 0;
 }

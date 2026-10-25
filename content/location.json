@@ -496,6 +496,7 @@
     {
       "id": "immoZen",
       "name": "Immo Zen",
+      "character": "Réactive et fiable, mais chère.",
       "feeShare": 0.08,
       "applicationRate": 1.1,
       "reliabilityShift": 0.05,
@@ -510,6 +511,7 @@
     {
       "id": "bonnePioche",
       "name": "Agence Bonne Pioche",
+      "character": "Remplit vite les logements, avec des locataires moyens.",
       "feeShare": 0.05,
       "applicationRate": 1.6,
       "reliabilityShift": -0.08,
@@ -524,6 +526,7 @@
     {
       "id": "plusOuMoins",
       "name": "Gestion Plus ou Moins",
+      "character": "Imprévisible, au nom bien choisi.",
       "feeShare": 0.06,
       "applicationRate": 1.2,
       "reliabilityShift": 0,
@@ -538,6 +541,7 @@
     {
       "id": "conciergerie",
       "name": "Clés & Valises",
+      "character": "Accueil des voyageurs, ménage et linge : la location courte durée sans y passer ses soirées.",
       "feeShare": 0.2,
       "applicationRate": 1,
       "reliabilityShift": 0,

@@ -44,6 +44,7 @@ export type Route =
   | { name: 'section'; neighbourhoodId: string; buildingId: string }
   | { name: 'settings' }
   | { name: 'me' }
+  | { name: 'contacts' }
   | { name: 'event'; id: string }
   | { name: 'challenge' }
   | { name: 'progression' }

@@ -104,6 +104,7 @@ Trois rivaux nommés, chacun avec une stratégie, un budget, des villes préfér
 
 - Les rivaux **agissent sur le même marché** que le joueur : on voit « Vendu à Mme Delaporte » sur une annonce ratée.
 - Ils peuvent faire une **offre sur un bien que le joueur revend**.
+- **Corrections du 25 octobre 2026** : la fiche d'une annonce nomme les rivaux actifs que ce genre de bien intéresse (requête `interestedRivals` : type, surface, état, quartier), sans dire ce qu'ils en pensent ; le Carnet les présente.
 - Ils proposent parfois une **affaire**, pas toujours honnête.
 - Leur agressivité dépend du mode de partie et augmente quand le joueur grandit.
 - Ils restent peu nombreux (3) et lisibles : pas de simulation économique complète de leur patrimoine, seulement un budget, des préférences et des règles de décision.
