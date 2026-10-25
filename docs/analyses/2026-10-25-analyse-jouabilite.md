@@ -12,6 +12,7 @@ Revue complète du jeu à l'état de `main` (après la PR 32, jalon 8 et plans �
 | `pnpm lint` (ESLint + Prettier) | OK |
 | `pnpm validate-content` | OK, 45 fichiers |
 | `pnpm test` | OK, 334 tests (moteur 310, contenu 5, données 8, bots 8, session 3) |
+| `pnpm test:e2e` (Playwright, Chromium, jeu construit) | OK, 37 parcours (création, didacticiel jusqu'au premier bien loué, offres, prêts, chantier, vente, bilans, retour en arrière, export et import, hors ligne, rue, carte, villes, SCI) |
 | Lecture du code | moteur (achats, offres, annonces, banque, location, baux, travaux, transformations, fiscalité, détresse, agenda, copropriété, rivaux, progression, requêtes de l'interface), session de jeu, sauvegardes, coquille de l'interface et écrans principaux |
 | Joueur aléatoire (écrit pour l'analyse, hors dépôt) | 95 parties de 3 à 7 ans (près de 600 années de jeu, plus de 400 000 actions tentées), actions au hasard chaque jour, une partie sur deux avec 300 000 € de départ pour atteindre chantiers, ventes, SCI et transformations, toutes les requêtes de l'interface appelées, invariants vérifiés (pas d'exception, pas de `NaN`, sauvegarde relue à l'identique, aucun crédit orphelin, solde entier, réputation entre 0 et 100) |
 | Scripts ciblés | un script par anomalie suspectée, pour la confirmer sur le moteur réel |
