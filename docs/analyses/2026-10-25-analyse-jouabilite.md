@@ -169,5 +169,5 @@ Ce que j'en retiens :
 6. **L4** et **L5** : confirmation et solde à prévoir pour une transformation, solde de la transformation dans la prévision de trésorerie, alerte si une vente laisse le compte négatif.
 7. **B4** : refuser (ou avertir) une demande de prêt dont la réponse tomberait après la condition de prêt.
 8. **L3** : ne compter que les logements dans la condition des villes.
-10. Équilibrage : trancher la densité de décisions, recalibrer le Levier et le Promoteur, et relancer une série de 25 ans une fois L1, L2, B3 et le rendez-vous banquier corrigés (ils changent tous les chiffres ci-dessus).
 9. Écrans : impôt par régime sur la fiche du bien, démission (si on la garde), Carnet.
+10. Équilibrage : trancher la densité de décisions, recalibrer le Levier et le Promoteur, et relancer une série de 25 ans une fois L1, L2, B3 et le rendez-vous banquier corrigés (ils changent tous les chiffres ci-dessus).
