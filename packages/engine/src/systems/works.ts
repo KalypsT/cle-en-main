@@ -289,11 +289,22 @@ export function delegateWorks(
     artisans.set(trade, best);
   }
   const quoteIds: string[] = [];
+  let quoted = 0;
   for (const [trade, items] of byTrade) {
     const artisan = artisans.get(trade);
-    if (artisan) quoteIds.push(writeQuote(ctx, owned, artisan, items).id);
+    if (!artisan) continue;
+    const quote = writeQuote(ctx, owned, artisan, items);
+    quoteIds.push(quote.id);
+    quoted += quote.total;
   }
-  const refusal = startWorks(ctx, propertyId, quoteIds, []);
+  // The deposits and the project manager's fee are both due today.
+  const dueToday =
+    Math.round(quoted * content.works.quotes.depositShare) +
+    Math.round(quoted * content.works.projectManager.feeShare);
+  const refusal =
+    availableForWorks(state, owned) < dueToday
+      ? 'account.insufficientFunds'
+      : startWorks(ctx, propertyId, quoteIds, []);
   if (refusal) {
     owned.quotes = owned.quotes.filter((quote) => !quoteIds.includes(quote.id));
     return refusal;

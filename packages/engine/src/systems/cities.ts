@@ -66,12 +66,16 @@ export function moveHome(ctx: SystemContext, cityId: string): MoveRefusal | null
   return null;
 }
 
-/** A property of another city that the owner manages himself (no agency, not his home). */
+/**
+ * A property of another city, let or offered for rent, that the owner manages himself (no
+ * agency, not his home). A vacant property, one under works or for sale, costs nothing.
+ */
 export function isRemoteSelfManaged(state: GameState, owned: OwnedProperty): boolean {
   const { property } = owned;
   if (property.cityId === state.player.baseCityId) return false;
   if (property.id === state.player.homePropertyId) return false;
-  return (owned.lease?.agencyId ?? owned.rental?.agencyId ?? null) === null;
+  const letting = owned.lease ?? owned.rental;
+  return letting !== null && letting.agencyId === null;
 }
 
 /** Monthly fee for a property managed from afar (docs/03-systemes/08, « Gérer à distance »). */

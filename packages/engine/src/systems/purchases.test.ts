@@ -9,6 +9,7 @@ import {
   engine,
   newGame,
 } from '../../test/helpers.ts';
+import { deepClone } from '../clone.ts';
 import type { GameState } from '../state.ts';
 
 function underCompromis(state: GameState = newGame()) {
@@ -172,5 +173,48 @@ describe('purchase', () => {
     const loan = later.state.loans.find((l) => l.propertyId === owned?.property.id);
     const before = deed.state.loans.find((l) => l.propertyId === owned?.property.id);
     expect(loan?.monthlyPayment ?? 0).toBeLessThan(before?.monthlyPayment ?? 0);
+
+    // Refinanced meanwhile, the envelope follows the loan that took the old one over.
+    const expensive = deepClone(deed.state);
+    const old = expensive.loans[0];
+    if (!old || !owned?.worksFund) throw new Error('No loan');
+    old.ratePercent += 2;
+    const refinanced = act(expensive, {
+      type: 'bank/refinance',
+      loanId: old.id,
+      bankId: 'tirelire',
+    });
+    const replacement = refinanced.state.loans[0];
+    expect(replacement?.id).not.toBe(old.id);
+    expect(refinanced.state.properties[0]?.worksFund?.loanId).toBe(replacement?.id);
+    const returned = advanceDays(refinanced.state, 2 * 365 + 10).state;
+    // The unused envelope repaid the new loan instead of landing on the account.
+    expect(returned.loans[0]?.remaining ?? 0).toBeLessThan(
+      (replacement?.remaining ?? 0) - owned.worksFund.amount + 1,
+    );
+  });
+
+  it('refuses a bank that would answer after the loan condition', () => {
+    const { state, purchase } = underCompromis();
+    const request = (current: GameState, bankId: string) =>
+      engine.dispatch(current, {
+        type: 'purchase/requestLoan',
+        purchaseId: purchase.id,
+        bankId,
+        amount: purchase.price,
+        durationYears: 20,
+      });
+    const days = content.market.purchase.loanConditionDays;
+    const slow = content.banks.find((bank) => bank.id === 'rigueur')?.responseDelayDays ?? 0;
+    // The day before it is too late, Hortense Rigueur still answers in time.
+    const inTime = advanceDays(state, days - slow - 1).state;
+    expect(request(inTime, 'rigueur').ok).toBe(true);
+    const tooLate = advanceDays(state, days - slow).state;
+    expect(request(tooLate, 'rigueur')).toMatchObject({
+      ok: false,
+      reason: { code: 'purchase.answerTooLate' },
+    });
+    // ZéroPapier answers at once: still possible.
+    expect(request(tooLate, 'zeroPapier').ok).toBe(true);
   });
 });

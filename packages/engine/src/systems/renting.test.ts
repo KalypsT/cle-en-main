@@ -291,11 +291,45 @@ describe('main residence', () => {
     expect(back.player.homePropertyId).toBeNull();
   });
 
-  it('is exempt from the capital gains tax', () => {
+  it('is exempt from the capital gains tax once lived in long enough', () => {
     const state = owner();
     const home = act(state, { type: 'home/moveIn', propertyId: PROPERTY }).state;
-    expect(engine.capitalGainsTax(home, PROPERTY, 150_000_00)?.tax).toBe(0);
-    expect(engine.capitalGainsTax(state, PROPERTY, 150_000_00)?.tax).toBeGreaterThan(0);
+    const minMonths = content.taxes.capitalGains.homeMinMonths;
+    expect(home.player.homeSinceDay).toBe(toDayNumber(state.clock.date));
+    // Just moved in: taxed like any property, and the sale screen can say why.
+    const fresh = engine.capitalGainsTax(home, PROPERTY, 150_000_00);
+    expect(fresh?.tax).toBe(engine.capitalGainsTax(state, PROPERTY, 150_000_00)?.tax);
+    expect(fresh?.tax).toBeGreaterThan(0);
+    expect(fresh?.home).toEqual({ exempt: false, months: 0, minMonths });
+    // Lived in for the minimum: exempt.
+    const settled = deepClone(home);
+    settled.player.homeSinceDay = toDayNumber(state.clock.date) - Math.ceil(minMonths * 30.5);
+    expect(engine.capitalGainsTax(settled, PROPERTY, 150_000_00)).toMatchObject({
+      tax: 0,
+      home: { exempt: true, minMonths },
+    });
+    expect(act(settled, { type: 'home/moveOut' }).state.player.homeSinceDay).toBeNull();
+  });
+
+  it('is never a parking space, a shop or a plot, nor indecent, gutted or on sale', () => {
+    const refusal = (state: GameState) =>
+      engine.dispatch(state, { type: 'home/moveIn', propertyId: PROPERTY });
+    for (const kind of ['parking', 'commercial', 'land'] as const) {
+      const state = owner({ property: { kind } });
+      expect(refusal(state)).toMatchObject({ ok: false, reason: { code: 'home.notDwelling' } });
+    }
+    const indecent = owner();
+    const owned = indecent.properties[0];
+    if (!owned) throw new Error('No property');
+    owned.property = withState(owned.property, 1);
+    expect(refusal(indecent)).toMatchObject({ ok: false, reason: { code: 'home.indecent' } });
+    const listed = act(owner(), {
+      type: 'sale/list',
+      propertyId: PROPERTY,
+      askingPrice: 90_000_00,
+      mode: 'self',
+    }).state;
+    expect(refusal(listed)).toMatchObject({ ok: false, reason: { code: 'home.forSale' } });
   });
 });
 

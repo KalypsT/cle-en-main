@@ -46,6 +46,7 @@
     "acquisitionFeesFlatShare": 0.075,
     "worksFlatShare": 0.15,
     "worksFlatMinYears": 5,
+    "homeMinMonths": 12,
     "incomeTaxAllowances": [
       { "fromYear": 6, "toYear": 21, "perYear": 0.06 },
       { "fromYear": 22, "toYear": 22, "perYear": 0.04 }

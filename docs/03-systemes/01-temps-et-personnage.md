@@ -80,6 +80,8 @@ Chaque métier change trois choses : le **salaire**, le **temps libre** et la **
   - la ville de la résidence principale est la **base** pour le calcul des trajets.
 - **Déménager** (louer ou acheter ailleurs) change la base.
 
+> **Corrections du 25 octobre 2026** (analyse de jouabilité) : on n'habite qu'un **logement** (appartement, maison, immeuble), jamais un parking, un local ou un terrain ; ni un logement indécent, ni un bien en gros travaux ou en transformation, ni un bien mis en vente (le retirer d'abord). Le jour d'emménagement est gardé (`homeSinceDay`, format de sauvegarde 24) : il compte pour l'exonération de plus-value (chapitre 3.6). Un joueur qui habitait déjà un parking ou un terrain dans une partie en cours y reste ; la règle vaut pour sa prochaine installation.
+
 ## L'identité
 
 - Seulement un **nom** et un **avatar** composé (visage, coiffure, couleur de cheveux, teint, tenue, accessoire).

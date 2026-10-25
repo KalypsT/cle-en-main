@@ -551,6 +551,43 @@ describe('migrations', () => {
     expect(migrateRaw(raw, context, 20)).toEqual({ ...raw, formatVersion: 20 });
   });
 
+  it('dates a version 23 home from its purchase, and moves a stray works envelope', () => {
+    const raw = {
+      formatVersion: 23,
+      player: { homePropertyId: 'p-1' },
+      loans: [{ id: 'loan-9', propertyId: 'p-2' }],
+      properties: [
+        {
+          property: { id: 'p-1' },
+          purchaseDate: { year: 2027, month: 3, day: 1 },
+          worksFund: null,
+        },
+        {
+          property: { id: 'p-2' },
+          purchaseDate: { year: 2027, month: 5, day: 1 },
+          // Its loan was refinanced: loan-4 is gone, loan-9 took it over.
+          worksFund: { amount: 5_000_00, loanId: 'loan-4', untilDay: 99 },
+        },
+      ],
+    };
+    const migrated = migrateRaw(raw, context, 24) as {
+      formatVersion: number;
+      player: Record<string, unknown>;
+      properties: Record<string, unknown>[];
+    };
+    expect(migrated.formatVersion).toBe(24);
+    expect(migrated.player.homeSinceDay).toBe(toDayNumber({ year: 2027, month: 3, day: 1 }));
+    expect(migrated.properties[1]?.worksFund).toEqual({
+      amount: 5_000_00,
+      loanId: 'loan-9',
+      untilDay: 99,
+    });
+    const renting = migrateRaw({ ...raw, player: { homePropertyId: null } }, context, 24) as {
+      player: Record<string, unknown>;
+    };
+    expect(renting.player.homeSinceDay).toBeNull();
+  });
+
   it('starts the meeting recap and the insurance counts of a version 22 save empty', () => {
     const raw = {
       formatVersion: 22,

@@ -94,6 +94,7 @@ export function freshStart(
     player.renown[cityId] = Math.round((player.renown[cityId] ?? 0) * rules.reputationShare);
   }
   player.homePropertyId = null;
+  player.homeSinceDay = null;
   player.rentalHistoryMonths = 0;
   player.bankruptDay = null;
   player.reputation = Math.round(player.reputation * rules.reputationShare);

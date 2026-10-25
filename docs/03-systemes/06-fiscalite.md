@@ -70,6 +70,7 @@ Objectif : **des choix fiscaux intéressants, sans paperasse.** Le joueur peut i
   - taux de 19 % plus 17,2 % de prélèvements sociaux sur la plus-value nette ;
   - il diminue avec la durée de détention, avec une exonération totale d'impôt sur le revenu après 22 ans et des prélèvements sociaux après 30 ans ;
   - la **résidence principale est exonérée**.
+  - **Corrections du 25 octobre 2026** : à condition d'y avoir vécu au moins **12 mois** le jour de l'accord de vente (`capitalGains.homeMinMonths` de `content/fiscalite.json`) ; emménager juste avant de vendre n'exonère plus rien. L'écran Vente dit depuis combien de mois le bien est la résidence principale. Les parties en cours prennent la date d'achat comme date d'emménagement.
 - **Impôt sur la fortune immobilière (IFI)** : au-delà de **1,3 M€ de patrimoine immobilier net**, barème simplifié. Un marqueur de fin de partie, avec humour (« Félicitations, vous êtes officiellement riche »).
 - **Une société (SCI)** pour aller plus loin, au jalon 8 (régime à préciser à ce moment-là).
 

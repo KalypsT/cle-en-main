@@ -1438,6 +1438,8 @@
     "loanRepaid": "Crédit remboursé",
     "loanFees": "Indemnités de remboursement anticipé",
     "capitalGainsTax": "Impôt sur la plus-value",
+    "homeExempt": "Votre résidence principale depuis plus de {min} mois : la plus-value est exonérée.",
+    "homeNotYet": "Votre résidence principale depuis {months} mois : la plus-value n'est exonérée qu'après {min} mois d'occupation, comptés jusqu'à l'accord de vente.",
     "depositTransferred": "Dépôt de garantie remis à l'acheteur",
     "net": "Reste sur votre compte",
     "tenant": "Le bien est loué : il se vend avec son locataire, qui reste en place.",

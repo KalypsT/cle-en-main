@@ -56,6 +56,7 @@ Chaque bien a :
    - Un **dépôt de garantie** de 5 % est versé à la signature ; il est rendu si le prêt n'est pas obtenu, déduit du prix à l'acte.
    - Le joueur demande un prêt à une ou plusieurs banques (montant, durée). Chaque banque répond après son délai ; le joueur choisit une offre. Il peut aussi renoncer à la condition de prêt et payer comptant.
    - Se retirer est gratuit pendant la condition de prêt, tant qu'aucun prêt n'est choisi.
+   - **Corrections du 25 octobre 2026** : une banque dont la réponse arriverait après la fin de la condition de prêt refuse la demande (`purchase.answerTooLate`) ; avant, l'achat était annulé avant sa réponse.
 7. **Acte** : signature chez le notaire environ **30 jours** après le compromis. Les frais de notaire sont payés, le bien appartient au joueur.
    - Le joueur paie le prix, les frais de notaire et (avec un prêt) les frais de dossier et de garantie, moins le dépôt et le prêt. S'il n'a pas assez sur son compte, la vente est annulée et **le dépôt est perdu**.
    - Les défauts encore cachés se découvrent en prenant possession du bien.
@@ -88,6 +89,7 @@ Chaque bien a :
   - L'acte est signé environ 60 jours après l'accord ; l'acheteur peut se désister (refus de son prêt), et le bien revient en vente.
 - À la vente : remboursement du crédit et calcul de la plus-value (voir [06-fiscalite.md](06-fiscalite.md)).
   - Le crédit lié au bien est remboursé sur le prix, avec les mêmes frais qu'un remboursement anticipé (chapitre 3.2). La plus-value est imposée à partir du jalon 2.
+  - **Corrections du 25 octobre 2026** : ces frais sont bien les indemnités de remboursement anticipé (le plus petit de 3 % et de 6 mois d'intérêts), vente forcée comprise ; la vente appliquait par erreur les frais de renégociation (3 % et 1 000 €).
 
 ## Les investisseurs rivaux
 

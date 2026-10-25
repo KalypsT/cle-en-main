@@ -78,6 +78,7 @@ Valeurs de départ dans `content/villes.json` (trajets, frais à distance, notor
 
 - Un bien d'une autre ville que la base, **géré sans agence**, coûte **35 € par mois** (`remote.monthlyFeePerPropertyEuros`) : une ligne « frais de gestion » du bilan, déductible comme les autres charges. Une agence (la leur) supprime ce frais et les trajets du propriétaire pour les candidats et les états des lieux.
 - La résidence principale est exclue de ce frais.
+- **Corrections du 25 octobre 2026** : le frais ne vaut que pour un bien **loué ou proposé à la location** ; un bien vide, en chantier ou en vente ne coûte rien.
 
 ### La notoriété locale
 

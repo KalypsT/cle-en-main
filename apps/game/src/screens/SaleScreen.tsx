@@ -69,6 +69,9 @@ function PriceCard({ owned }: { owned: OwnedProperty }) {
   const rules = gameContent.market.resale;
   const discount = engine.occupiedDiscount(state, propertyId);
   const proceeds = engine.saleProceeds(state, propertyId, price, sale?.mode ?? mode);
+  const home = proceeds
+    ? engine.capitalGainsTax(state, propertyId, price - proceeds.agencyFees)?.home
+    : null;
   const min = roundPrice(estimate * 0.6);
   const max = roundPrice(estimate * 1.4);
   return (
@@ -136,6 +139,14 @@ function PriceCard({ owned }: { owned: OwnedProperty }) {
               { label: t.sale.net, value: formatEuros(proceeds.net), total: true },
             ]}
           />
+          {home && (
+            <p className="small muted" data-testid="home-exemption">
+              {format(home.exempt ? t.sale.homeExempt : t.sale.homeNotYet, {
+                months: home.months,
+                min: home.minMonths,
+              })}
+            </p>
+          )}
         </>
       )}
       {owned.lease && <p className="small muted">{t.sale.tenant}</p>}

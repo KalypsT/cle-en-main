@@ -253,6 +253,7 @@ export function createInitialState(content: GameContent, options: CreateGameOpti
       rentalHistoryMonths: 0,
       bankruptDay: null,
       homePropertyId: null,
+      homeSinceDay: null,
       baseCityId: content.start.cityId,
       tripsToday: [],
       lastMoveDay: null,

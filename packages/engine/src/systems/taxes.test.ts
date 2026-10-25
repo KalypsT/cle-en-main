@@ -192,6 +192,7 @@ describe('capital gains', () => {
       gain,
       yearsHeld: 2,
       tax: Math.round(gain * 0.19) + Math.round(gain * 0.172),
+      home: null,
     });
     // Ten years: the flat 15 % for works, 30 % of income-tax allowance, 8,25 % of social.
     const later = sellerAt(2036);

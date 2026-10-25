@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { deepClone } from '../clone.ts';
 import {
   act,
   advanceDays,
@@ -192,5 +193,18 @@ describe('transformations (milestone 8)', () => {
     expect(delegated.state.player.freeTimeMinutes).toBe(free);
     const fee = delegated.events.find((e) => e.type === 'worksDelegated');
     expect(fee).toMatchObject({ type: 'worksDelegated' });
+    // The deposits and the fee are due at once: without the cash, nothing starts.
+    const deposits = project?.tasks.reduce((sum, task) => sum + task.deposit, 0) ?? 0;
+    const poor = deepClone(state);
+    poor.player.balance = deposits;
+    const refused = engine.dispatch(poor, {
+      type: 'works/delegate',
+      propertyId: 'property-t',
+      items: [
+        { itemId: 'electricity', tier: 'standard' },
+        { itemId: 'heating', tier: 'standard' },
+      ],
+    });
+    expect(refused.ok ? null : refused.reason.code).toBe('account.insufficientFunds');
   });
 });

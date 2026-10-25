@@ -23,6 +23,7 @@ export type PurchaseRefusal =
   | 'purchase.unknownApplication'
   | 'purchase.applicationNotGranted'
   | 'purchase.binding'
+  | 'purchase.answerTooLate'
   | 'bank.unknown'
   | 'loan.invalidAmount';
 
@@ -145,6 +146,10 @@ export function requestLoan(
   if (!bank) return 'bank.unknown';
   if (!Number.isInteger(amount) || amount <= 0) return 'loan.invalidAmount';
   if (!Number.isInteger(works) || works < 0) return 'loan.invalidAmount';
+  // The answer must come before the loan condition ends, or the purchase falls through.
+  if (ctx.today + bank.responseDelayDays >= purchase.loanDeadlineDay) {
+    return 'purchase.answerTooLate';
+  }
   if (purchase.applications.some((a) => a.bankId === bankId && a.decision === null)) {
     return 'purchase.applicationPending';
   }

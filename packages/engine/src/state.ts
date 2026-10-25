@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 23;
+export const FORMAT_VERSION = 24;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -50,6 +50,8 @@ export interface PlayerState {
   bankruptDay: number | null;
   /** Owned property the player lives in (résidence principale); null while renting. */
   homePropertyId: string | null;
+  /** Day the player moved into that property; null while renting (save format 24). */
+  homeSinceDay: number | null;
   /** City of the home: trips are counted from it (docs/03-systemes/08). */
   baseCityId: string;
   /** Cities the player already went to today: one trip each, however many actions. */

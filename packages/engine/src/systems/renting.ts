@@ -71,6 +71,10 @@ export type RentRefusal =
   | 'agency.unknown'
   | 'home.already'
   | 'home.none'
+  | 'home.notDwelling'
+  | 'home.indecent'
+  | 'home.works'
+  | 'home.forSale'
   | 'time.notEnoughFreeTime'
   | 'account.insufficientFunds'
   | 'works.inProgress'
@@ -580,17 +584,26 @@ function termsOf(rental: RentalListing): RentalTerms {
   return { leaseType, monthlyRent, agencyId, insured };
 }
 
-/** The player moves into one of his properties (résidence principale): no more rent to pay. */
+/**
+ * The player moves into one of his properties (résidence principale): no more rent to pay.
+ * Only a home one can live in: no parking space, shop or plot, nothing indecent or gutted
+ * by works, and nothing on sale (the capital gains exemption asks for a real home).
+ */
 export function moveIntoHome(ctx: SystemContext, propertyId: string): RentRefusal | null {
-  const { state } = ctx;
+  const { content, state } = ctx;
   const owned = findOwned(state, propertyId);
   if (!owned) return 'property.unknown';
   if (state.player.homePropertyId === propertyId) return 'home.already';
   if (owned.holder === 'company') return 'company.noHome';
+  if (!isDwelling(owned.property.kind)) return 'home.notDwelling';
   if (owned.lease) return 'rent.alreadyLet';
   if (owned.sale?.agreement) return 'sale.agreed';
+  if (owned.sale) return 'home.forSale';
+  if (isIndecent(content, owned.property)) return 'home.indecent';
+  if (heavyWorksInProgress(content, owned) || owned.works?.transformation) return 'home.works';
   owned.rental = null;
   state.player.homePropertyId = propertyId;
+  state.player.homeSinceDay = ctx.today;
   state.player.baseCityId = owned.property.cityId;
   state.player.monthlyRent = 0;
   ctx.events.push({ type: 'movedIntoHome', propertyId });
@@ -603,6 +616,7 @@ export function moveOutOfHome(ctx: SystemContext): RentRefusal | null {
   const propertyId = state.player.homePropertyId;
   if (propertyId === null) return 'home.none';
   state.player.homePropertyId = null;
+  state.player.homeSinceDay = null;
   state.player.monthlyRent = homeRent(content, state.player.baseCityId);
   ctx.events.push({ type: 'movedOutOfHome', propertyId });
   return null;

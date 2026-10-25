@@ -101,6 +101,8 @@ export const taxRulesSchema = z
         /** Flat works allowance after this many full years, as a share of the price. */
         worksFlatShare: share,
         worksFlatMinYears: z.number().int().min(0),
+        /** Months lived in the main residence, on the day its sale is agreed, to be exempt. */
+        homeMinMonths: z.number().int().min(0),
         incomeTaxAllowances: z.array(allowanceSchema).min(1),
         socialAllowances: z.array(allowanceSchema).min(1),
       })

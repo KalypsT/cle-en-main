@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 23,
+    "formatVersion": 24,
     "seed": 20261018,
     "rng": [
       2720554145,
@@ -43,6 +43,7 @@
       "rentalHistoryMonths": 9,
       "bankruptDay": null,
       "homePropertyId": null,
+      "homeSinceDay": null,
       "baseCityId": "dole",
       "tripsToday": [],
       "lastMoveDay": null,

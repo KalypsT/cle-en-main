@@ -729,6 +729,10 @@ export function refinanceLoan(
   };
   archiveLoan(ctx, loan, 'refinanced', replacement.id);
   state.loans = state.loans.map((other) => (other.id === loan.id ? replacement : other));
+  // The works envelope set aside on the old loan now goes back to the new one.
+  for (const owned of state.properties) {
+    if (owned.worksFund?.loanId === loan.id) owned.worksFund.loanId = replacement.id;
+  }
   ctx.events.push({ type: 'loanRefinanced', oldLoanId: loan.id, newLoanId: replacement.id, fees });
   return null;
 }

@@ -1,5 +1,11 @@
 import { gameContent } from '@cle/content';
-import { type Cents, type OwnedProperty, type TaxRegimeChoice, toDayNumber } from '@cle/engine';
+import {
+  type Cents,
+  isDwelling,
+  type OwnedProperty,
+  type TaxRegimeChoice,
+  toDayNumber,
+} from '@cle/engine';
 import { useState } from 'react';
 import { engine } from '../engine.ts';
 import { type PropertyTab, useGame, useNav } from '../game/context.tsx';
@@ -19,6 +25,7 @@ import {
   formatWhen,
   propertyLabel,
   t,
+  texts as uiTexts,
   tone,
 } from '../texts.ts';
 import {
@@ -88,6 +95,14 @@ function Overview({ owned }: { owned: OwnedProperty }) {
   const summary = engine.portfolio(state).properties.find((p) => p.propertyId === property.id);
   const isHome = state.player.homePropertyId === property.id;
   const canRent = !isHome && !owned.lease && !owned.sale?.agreement;
+  // Why the player cannot live here yet (the engine refuses it the same way).
+  const moveInBlock: 'home.forSale' | 'home.works' | 'home.indecent' | null = owned.sale
+    ? 'home.forSale'
+    : owned.works
+      ? 'home.works'
+      : engine.rentQuote(state, property.id, 'bare')?.block === 'rent.indecent'
+        ? 'home.indecent'
+        : null;
 
   return (
     <>
@@ -168,18 +183,23 @@ function Overview({ owned }: { owned: OwnedProperty }) {
               </button>
             </>
           ) : (
+            isDwelling(property.kind) &&
             !owned.lease &&
             state.player.homePropertyId === null && (
-              <button
-                type="button"
-                className="button block"
-                onClick={() =>
-                  window.confirm(t.property.moveInConfirm) &&
-                  act({ type: 'home/moveIn', propertyId: property.id })
-                }
-              >
-                {t.property.moveIn}
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="button block"
+                  disabled={moveInBlock !== null}
+                  onClick={() =>
+                    window.confirm(t.property.moveInConfirm) &&
+                    act({ type: 'home/moveIn', propertyId: property.id })
+                  }
+                >
+                  {t.property.moveIn}
+                </button>
+                {moveInBlock && <p className="small muted">{uiTexts.refusals[moveInBlock]}</p>}
+              </>
             )
           )}
         </div>
