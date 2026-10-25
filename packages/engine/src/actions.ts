@@ -25,6 +25,8 @@ export type GameAction =
   /** Repays `amount` of a loan ahead of time; `mode` says what goes down. */
   | { type: 'bank/prepay'; loanId: string; amount: Cents; mode: 'payment' | 'duration' }
   | { type: 'job/resign' }
+  /** Looks for one's job again after resigning: back at work some days later. */
+  | { type: 'job/seek' }
   /** Creates the player's SCI (milestone 8). */
   | { type: 'company/create' }
   /** Buys in one's own name or through the SCI, before asking any bank. */
@@ -119,6 +121,8 @@ export type RefusalCode =
   | 'mail.unknown'
   | 'game.over'
   | 'job.alreadyResigned'
+  | 'job.employed'
+  | 'job.searching'
   | 'tutorial.invalidStep';
 
 /** Machine-readable refusal; the interface maps `code` to a text from `content/`. */

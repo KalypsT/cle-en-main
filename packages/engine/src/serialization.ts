@@ -61,6 +61,11 @@ export type MigrationRegistry = Readonly<Record<number, Migration>>;
  * the migration from the previous version here, and test it.
  */
 export const MIGRATIONS: MigrationRegistry = {
+  /** Version 24 to 25: one may look for one's job again after resigning; nobody looks yet. */
+  24: (raw) => ({
+    ...raw,
+    player: { ...(raw.player as Record<string, unknown>), jobSearchEndDay: null },
+  }),
   /**
    * Version 23 to 24: the day the player moved into his home was not kept; the purchase
    * day stands for it (he cannot have lived there longer), so a home owned for long keeps
@@ -1465,6 +1470,7 @@ const gameStateSchema = z
           .strict(),
         jobId: z.string(),
         employed: z.boolean(),
+        jobSearchEndDay: day.nullable(),
         balance: cents,
         overdraftDays: z.number().int().min(0),
         overdraftInterestThisMonth: cents.min(0),

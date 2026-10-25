@@ -551,6 +551,12 @@ describe('migrations', () => {
     expect(migrateRaw(raw, context, 20)).toEqual({ ...raw, formatVersion: 20 });
   });
 
+  it('starts nobody looking for a job in a version 24 save', () => {
+    const raw = { formatVersion: 24, player: { employed: false } };
+    const migrated = migrateRaw(raw, context, 25) as { player: Record<string, unknown> };
+    expect(migrated.player).toEqual({ employed: false, jobSearchEndDay: null });
+  });
+
   it('dates a version 23 home from its purchase, and moves a stray works envelope', () => {
     const raw = {
       formatVersion: 23,

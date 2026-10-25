@@ -404,6 +404,10 @@ export function describeEvent(
       return format(events.bankMeetingHeld, { trust: Math.round(event.trust) });
     case 'resigned':
       return events.resigned;
+    case 'jobSearchStarted':
+      return format(events.jobSearchStarted, { date: formatDayYear(event.endDay) });
+    case 'jobFound':
+      return format(events.jobFound, { job: jobName(event.jobId) });
     case 'worksDelegated':
       return format(events.worksDelegated, { amount: formatMoney(event.fee) });
     case 'transformationStarted':

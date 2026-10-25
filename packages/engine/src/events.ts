@@ -69,6 +69,8 @@ export type GameEvent =
     }
   | { type: 'bankMeetingHeld'; bankId: string; trust: number }
   | { type: 'resigned' }
+  | { type: 'jobSearchStarted'; endDay: number }
+  | { type: 'jobFound'; jobId: string }
   /** Works handed to the project manager (milestone 8): his fee is paid. */
   | { type: 'worksDelegated'; propertyId: string; fee: Cents }
   | {
@@ -387,6 +389,8 @@ export const NEWS_EVENT_TYPES = [
   'loanPrepaid',
   'bankMeetingHeld',
   'resigned',
+  'jobSearchStarted',
+  'jobFound',
   'worksDelegated',
   'transformationStarted',
   'transformationCompleted',

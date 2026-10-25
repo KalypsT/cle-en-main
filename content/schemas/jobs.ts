@@ -67,6 +67,8 @@ export const jobsFileSchema = z
   .object({
     /** Daily free time after resigning. */
     unemployedFreeTimeMinutes: minutes,
+    /** Days to find one's job again after resigning (docs/03-systemes/01, « Démissionner »). */
+    jobSearchDays: z.number().int().positive(),
     jobs: z
       .array(jobSchema)
       .min(1)

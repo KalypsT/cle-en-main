@@ -29,6 +29,8 @@ Une jauge de 0 à 100 par banque.
 
 **Les rendez-vous** (1 h de temps libre) font progresser la relation et permettent de négocier. Ils donnent lieu à de courts dialogues avec une touche d'humour, dont le ton dépend de la confiance.
 
+> **Corrections du 25 octobre 2026** : le rendez-vous avait disparu de l'interface au jalon 4 (les bots, eux, en prenaient un par mois). La fiche de chaque banquier (Banque et SCI, « Vos banquiers ») a une carte **Rendez-vous** : une heure de temps libre, ou le premier créneau de l'agenda, un par mois au plus (la date du suivant est affichée) ; rien avec Léo. La fin du rendez-vous arrive en bonne nouvelle, avec le portrait du banquier et sa réplique selon la confiance atteinte : basse sous 45, haute à partir de 70 (`trust.meetingTone` de `content/credit.json`, répliques `meetingLines` de `content/banques.json`).
+
 ## Les règles du crédit (simplifiées)
 
 - Uniquement des **prêts amortissables à taux fixe**. L'assurance est incluse dans le taux affiché.

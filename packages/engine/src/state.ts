@@ -17,7 +17,7 @@ import type { NewsEvent, StatementLine } from './events.ts';
 import type { LoanDecision, LoanRefusalCode } from './systems/banking.ts';
 
 /** Current version of the serialized game state. Bump it with a migration. */
-export const FORMAT_VERSION = 24;
+export const FORMAT_VERSION = 25;
 
 /** The player's composed avatar: an index into each list of content/avatar.json. */
 export interface Avatar {
@@ -32,6 +32,8 @@ export interface PlayerState {
   avatar: Avatar;
   jobId: string;
   employed: boolean;
+  /** Without a job, the day the player gets his job back after looking for it (format 25). */
+  jobSearchEndDay: number | null;
   /** Current account; negative means overdraft. */
   balance: Cents;
   /** Consecutive days spent in overdraft. */

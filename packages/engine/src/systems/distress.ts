@@ -88,6 +88,7 @@ export function freshStart(
   player.overdraftDays = 0;
   player.overdraftInterestThisMonth = 0;
   player.employed = true;
+  player.jobSearchEndDay = null;
   player.baseCityId = content.start.cityId;
   player.monthlyRent = toCents(content.start.monthlyRent);
   for (const cityId of Object.keys(player.renown)) {

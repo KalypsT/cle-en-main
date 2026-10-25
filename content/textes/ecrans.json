@@ -778,6 +778,7 @@
   },
   "menu": {
     "heading": "Menu",
+    "me": "Moi",
     "bank": "Banque et SCI",
     "statement": "Bilan du mois",
     "taxes": "Impôts",
@@ -1340,6 +1341,11 @@
       "history": "Historique de la relation",
       "empty": "Aucun rendez-vous ni demande de prêt pour l'instant.",
       "meeting": "Rendez-vous : la confiance passe à {trust}",
+      "meetingHeading": "Rendez-vous",
+      "meetingHint": "Une heure de votre temps libre, environ {gain} points de confiance : une meilleure marge, puis des dérogations au-delà de 35 % d'endettement. Un rendez-vous par mois au plus.",
+      "meet": "Prendre rendez-vous (1 h)",
+      "meetingPlanned": "Rendez-vous prévu le {date}.",
+      "meetingNext": "Prochain rendez-vous possible le {date}.",
       "loans": "Crédits chez {bank}",
       "running": "En cours : {amount} restant dû"
     },
@@ -1564,6 +1570,27 @@
     "confirmAll": "Solder le crédit : {amount}",
     "tooSmall": "Au moins {amount}, ou tout le restant dû.",
     "noCash": "Votre compte ne suffit pas : {amount} avec les indemnités."
+  },
+  "me": {
+    "heading": "Moi",
+    "job": "Métier",
+    "salary": "Salaire moyen",
+    "noJob": "Sans emploi",
+    "searching": "En recherche : retour au travail le {date}",
+    "freeTime": "Temps libre aujourd'hui",
+    "livingCosts": "Dépenses de vie",
+    "home": "Logement",
+    "renting": "Locataire, {rent} par mois",
+    "owner": "Chez vous : {property}",
+    "base": "Ville de base",
+    "reputation": "Réputation",
+    "title": "Titre",
+    "work": "Travail",
+    "resign": "Démissionner",
+    "resignHint": "Plus de salaire, mais {hours} de temps libre chaque jour. Les banques ne retiendront plus que {share} de vos loyers, et seulement après {months} mois de loyers encaissés.",
+    "resignConfirm": "Démissionner ? Vous perdez votre salaire tout de suite ; retrouver votre métier prendra {days} jours.",
+    "seek": "Chercher à reprendre mon métier",
+    "seekHint": "Vous retrouverez votre métier et votre salaire dans {days} jours."
   },
   "nextStatement": {
     "heading": "Prochain bilan",

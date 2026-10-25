@@ -76,6 +76,8 @@ const NEWS_CATEGORIES: Record<NewsEventType, Exclude<NewsCategory, 'all'>> = {
   bankMeetingHeld: 'money',
   loanAnswered: 'money',
   resigned: 'money',
+  jobSearchStarted: 'money',
+  jobFound: 'money',
   companyCreated: 'money',
   propertyTaxCharged: 'money',
   taxAssessed: 'money',

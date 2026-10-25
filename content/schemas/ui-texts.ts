@@ -22,25 +22,6 @@ export const uiTextsSchema = z
         back: text,
       })
       .strict(),
-    game: z
-      .object({
-        speedControls: text,
-        pause: text,
-        speed: text,
-        save: text,
-        saved: text,
-        export: text,
-        menu: text,
-        latestEvent: text,
-        situationHeading: text,
-        job: text,
-        balance: text,
-        freeTime: text,
-        marketRate: text,
-        trust: text,
-        meetBanker: text,
-      })
-      .strict(),
     calendar: z
       .object({
         weekdays: z.array(text).length(7),
@@ -67,6 +48,8 @@ export const uiTextsSchema = z
         loanPrepaidFull: text,
         bankMeetingHeld: text,
         resigned: text,
+        jobSearchStarted: text,
+        jobFound: text,
         companyCreated: text,
         worksDelegated: text,
         transformationStarted: text,
@@ -167,6 +150,8 @@ export const uiTextsSchema = z
         'loan.refinancingRefused': text,
         'account.insufficientFunds': text,
         'job.alreadyResigned': text,
+        'job.employed': text,
+        'job.searching': text,
         'company.exists': text,
         'company.none': text,
         'company.leaseType': text,

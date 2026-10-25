@@ -65,7 +65,10 @@ export function GoodNewsToasts({
           ) : shown.length === 1 ? (
             <>
               <Face news={first} size={40} />
-              <span className="toast-text">{first.text}</span>
+              <span className="stack tight">
+                <span className="toast-text">{first.text}</span>
+                {first.detail && <span className="small">{first.detail}</span>}
+              </span>
             </>
           ) : (
             <span className="stack tight grow">

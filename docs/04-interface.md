@@ -32,6 +32,8 @@ Toujours visible en haut de l'écran :
 
 Le Menu donne accès à : Villes, Banque, Agenda, Carnet, Progression, Statistiques, Réglages.
 
+> **Corrections du 25 octobre 2026** : « Moi » s'ajoute en tête du Menu (fiche du personnage, démission, reprise d'emploi, chapitre 3.1).
+
 **Chaque onglet garde son écran.** Changer d'onglet puis revenir remet l'onglet tel qu'on l'a laissé (écrans empilés et position dans la page) ; toucher l'onglet déjà affiché revient à sa racine. Les filtres et le tri de la liste des annonces font partie de l'écran : ouvrir une annonce puis revenir les retrouve, comme la position dans la liste. Ils ne sont pas enregistrés dans la sauvegarde (le temps de la session seulement).
 
 ## 4.5 Inventaire des écrans

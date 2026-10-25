@@ -62,6 +62,8 @@ Chaque métier change trois choses : le **salaire**, le **temps libre** et la **
 - Les banques ne retiennent alors que les revenus locatifs (à 70 %) et exigent un historique solide : démissionner trop tôt bloque le crédit.
 - Reprendre un emploi est possible, avec un délai de recherche.
 
+> **Corrections du 25 octobre 2026** : l'écran **Moi** (en tête du Menu) montre le métier, le salaire moyen, les dépenses de vie, le temps libre du jour, le logement, la ville de base, la réputation et le titre. On y **démissionne** (avec confirmation) et, sans emploi, on **cherche à reprendre son métier** (action `job/seek`) : retour au même métier, au même salaire, **60 jours** plus tard (`jobSearchDays` de `content/metiers.json`), le salaire reprenant au bilan suivant ; pendant la recherche, le temps libre reste celui d'un sans-emploi. Format de sauvegarde 25 (`jobSearchEndDay`).
+
 ## Le train de vie
 
 - Chaque mois, le personnage paie ses **dépenses de vie** (hors loyer) : elles suivent son revenu, si bien que l'**épargne de salaire reste modeste** (environ 230 à 500 € par mois selon le métier).

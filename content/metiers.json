@@ -1,5 +1,6 @@
 {
   "unemployedFreeTimeMinutes": 480,
+  "jobSearchDays": 60,
   "jobs": [
     {
       "id": "civilServant",

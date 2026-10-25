@@ -1,6 +1,6 @@
 {
   "state": {
-    "formatVersion": 24,
+    "formatVersion": 25,
     "seed": 20261018,
     "rng": [
       2720554145,
@@ -34,6 +34,7 @@
       },
       "jobId": "civilServant",
       "employed": true,
+      "jobSearchEndDay": null,
       "balance": 1739710,
       "overdraftDays": 0,
       "overdraftInterestThisMonth": 0,

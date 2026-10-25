@@ -572,6 +572,14 @@ export type BankActionRefusal =
   | 'loan.prepaymentTooSmall'
   | 'account.insufficientFunds';
 
+export type MeetingTone = 'low' | 'medium' | 'high';
+
+/** How the banker sounds at a meeting that ends on `trust` (its line of content/banques.json). */
+export function meetingTone(content: GameContent, trust: number): MeetingTone {
+  const { lowBelow, highFrom } = content.credit.trust.meetingTone;
+  return trust < lowBelow ? 'low' : trust >= highFrom ? 'high' : 'medium';
+}
+
 /** A meeting with a banker: costs free time, builds trust. */
 export function holdMeeting(ctx: SystemContext, bankId: string): BankActionRefusal | null {
   const { content, state } = ctx;
