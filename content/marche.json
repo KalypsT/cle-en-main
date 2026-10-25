@@ -281,7 +281,8 @@
     "competitionPenalty": 0.6,
     "counterBand": 0.05,
     "counterValidityDays": 3,
-    "maxOffersPerListing": 2
+    "maxOffersPerListing": 2,
+    "maxOfferOfAsking": 1.5
   },
   "visit": {
     "minutes": 60,

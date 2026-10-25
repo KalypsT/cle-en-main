@@ -28,6 +28,7 @@ import { purchaseFees } from './purchases.ts';
 import { cashDueAtDeed } from './purchases.ts';
 import {
   letBanDay,
+  lettingBlock,
   monthsToDays,
   ownerInsurance,
   recoverableCharges,
@@ -199,12 +200,14 @@ export function pendingDecisions(content: GameContent, state: GameState): Pendin
     ) {
       list.push({ kind: 'dpeWarning', propertyId, deadlineDay: ban });
     }
+    // A plot of land is never let: it is no « empty home » to decide about.
     if (
       !owned.lease &&
       !owned.rental &&
       !owned.works &&
       !owned.sale &&
-      state.player.homePropertyId !== propertyId
+      state.player.homePropertyId !== propertyId &&
+      lettingBlock(content, owned.property, today) !== 'rent.notLettable'
     ) {
       list.push({ kind: 'vacant', propertyId, deadlineDay: null });
     }

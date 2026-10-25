@@ -88,6 +88,7 @@ const TUTORIAL_EVENTS: Partial<Record<GameEvent['type'], TutorialTrigger>> = {
   loanRequested: 'event:loanRequested',
   deedSigned: 'event:deedSigned',
   monthlyStatement: 'event:monthlyStatement',
+  purchaseCancelled: 'event:purchaseCancelled',
 };
 
 interface Props {
@@ -221,7 +222,8 @@ export function GameShell({
   const nextGoodNews = useCallback(() => setGoodNews(dismissGoodNews), []);
   // The rivals the player had beaten, to tell when one more loses a property.
   const beaten = useRef<Record<string, number>>({});
-  const resumeSpeed = useRef<number | null>(null);
+  // The clock is held while a review or a scene is open (GameSession.hold).
+  const holding = useRef(false);
   const celebrating = overlay !== undefined && FESTIVE.has(overlay.kind);
   useEffect(
     () => audio.setMusic(celebrating ? 'celebration' : music.slotByMoment[ambience.moment]),
@@ -263,19 +265,22 @@ export function GameShell({
       }
       const fresh = overlaysOf(events, state, settings.monthlyReview);
       if (fresh.length === 0) return;
-      // The clock waits while a review or a celebration is open, then goes on at its speed.
-      if (resumeSpeed.current === null) {
-        resumeSpeed.current = session.getSnapshot().speed;
-        session.setSpeed(0);
+      // The clock waits while a review or a celebration is open, then goes on at its speed:
+      // an automatic pause of the same moment, or the player's own speed, is kept.
+      if (!holding.current) {
+        holding.current = true;
+        session.hold();
       }
+      // A fresh start is a moment to think: the clock stays paused after the scene.
+      if (fresh.some((overlay) => overlay.kind === 'freshStart')) session.setSpeed(0);
       setOverlays((queue) => [...queue, ...fresh]);
     });
   }, [session, audio, notify, settings.monthlyReview]);
   const closeOverlay = useCallback(() => {
     setOverlays((queue) => queue.slice(1));
-    if (overlays.length <= 1 && resumeSpeed.current !== null) {
-      if (resumeSpeed.current > 0) session.setSpeed(resumeSpeed.current);
-      resumeSpeed.current = null;
+    if (overlays.length <= 1 && holding.current) {
+      holding.current = false;
+      session.release();
     }
   }, [overlays.length, session]);
 
@@ -442,6 +447,10 @@ export function GameShell({
               onQuit={onQuit}
               onShowChronicle={() => {
                 setOverlays([]);
+                if (holding.current) {
+                  holding.current = false;
+                  session.release();
+                }
                 nav.goTab('menu', { name: 'progression' });
               }}
               onShowProperty={(id) => nav.goTab('assets', { name: 'property', id })}

@@ -489,7 +489,13 @@ function OfferSheet({
   const share = gameContent.market.purchase.depositShare;
   const outlook = amount > 0 ? engine.cashFlowOutlook(state, listing.id, amount) : null;
 
+  const tooHigh = amount > asking * gameContent.market.negotiation.maxOfferOfAsking;
   const send = () => {
+    if (
+      amount > asking &&
+      !window.confirm(format(t.listing.offerAbove, { asking: formatEuros(asking) }))
+    )
+      return;
     if (act({ type: 'market/offer', listingId: listing.id, amount })) onClose();
   };
 
@@ -534,7 +540,8 @@ function OfferSheet({
         </div>
       )}
       <p className="small muted">{format(t.listing.offersLeft, { count: offersLeft })}</p>
-      <button type="button" className="button primary block" onClick={send}>
+      {tooHigh && <p className="small negative">{t.listing.offerTooHigh}</p>}
+      <button type="button" className="button primary block" onClick={send} disabled={tooHigh}>
         {t.listing.send}
       </button>
     </BottomSheet>

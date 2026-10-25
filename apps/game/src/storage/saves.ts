@@ -63,6 +63,20 @@ function checkpointsOf(record: SlotRecord | undefined): Checkpoint[] {
   );
 }
 
+/**
+ * Writes of each slot, one after the other: a save made as the app goes to the background
+ * must not read the slot before the save of the 1st has written its rewind point, then
+ * write it back without it.
+ */
+const writes = new Map<SlotId, Promise<unknown>>();
+
+function queued<T>(slot: SlotId, task: () => Promise<T>): Promise<T> {
+  const previous = writes.get(slot) ?? Promise.resolve();
+  const next = previous.catch(() => undefined).then(task);
+  writes.set(slot, next);
+  return next;
+}
+
 export async function listSlots(): Promise<Map<SlotId, SlotRecord>> {
   const records = await (await db()).getAll('slots');
   return new Map(records.map((record) => [record.slot, record]));
@@ -72,13 +86,22 @@ export async function listSlots(): Promise<Map<SlotId, SlotRecord>> {
  * Saves a game; `checkpoint` also keeps it as a monthly rewind point (the
  * 1st of the month), and a new game (`fresh`) starts without any.
  */
-export async function saveToSlot(
+export function saveToSlot(
   slot: SlotId,
   state: GameState,
   options: { checkpoint?: boolean; fresh?: boolean } = {},
 ): Promise<SlotRecord> {
   // Serialized before any wait: a save made as the page hides must catch this state.
   const game = serializeGame(state);
+  return queued(slot, () => writeSlot(slot, state, game, options));
+}
+
+async function writeSlot(
+  slot: SlotId,
+  state: GameState,
+  game: string,
+  options: { checkpoint?: boolean; fresh?: boolean },
+): Promise<SlotRecord> {
   const database = await db();
   const previous = options.fresh ? undefined : await database.get('slots', slot);
   let checkpoints = checkpointsOf(previous);
@@ -112,7 +135,11 @@ export async function listCheckpoints(slot: SlotId): Promise<Checkpoint[]> {
 }
 
 /** Keeps only the rewind points up to `date` (after a rewind, the later ones are gone). */
-export async function dropCheckpointsFrom(slot: SlotId, date: CalendarDate): Promise<void> {
+export function dropCheckpointsFrom(slot: SlotId, date: CalendarDate): Promise<void> {
+  return queued(slot, () => dropFrom(slot, date));
+}
+
+async function dropFrom(slot: SlotId, date: CalendarDate): Promise<void> {
   const database = await db();
   const record = await database.get('slots', slot);
   if (!record) return;

@@ -1,7 +1,13 @@
 {
   "speakers": {
-    "gerard": { "name": "Gérard Prudhomme", "role": "Banquier, La Tirelire Comtoise" },
-    "yvon": { "name": "Yvon Tableur", "role": "Comptable" }
+    "gerard": {
+      "name": "Gérard Prudhomme",
+      "role": "Banquier, La Tirelire Comtoise"
+    },
+    "yvon": {
+      "name": "Yvon Tableur",
+      "role": "Comptable"
+    }
   },
   "skip": "Passer",
   "disable": "Arrêter le didacticiel",
@@ -55,14 +61,16 @@
       "speaker": "gerard",
       "text": "Compromis signé, bravo ! Vous avez un délai pour obtenir votre prêt. Ouvrez l'achat depuis les Décisions et demandez un prêt : ma porte est grande ouverte.",
       "next": "event:loanRequested",
-      "target": "loan"
+      "target": "loan",
+      "backOnCancel": "spot"
     },
     {
       "id": "deed",
       "speaker": "gerard",
       "text": "Votre dossier est entre de bonnes mains. Acceptez l'offre de prêt quand elle arrive ; le notaire s'occupe du reste. Ensuite, il faudra trouver un locataire !",
       "next": "event:deedSigned",
-      "target": "acceptLoan"
+      "target": "acceptLoan",
+      "backOnCancel": "spot"
     },
     {
       "id": "review",

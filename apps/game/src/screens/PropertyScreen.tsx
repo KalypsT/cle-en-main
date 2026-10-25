@@ -94,7 +94,10 @@ function Overview({ owned }: { owned: OwnedProperty }) {
   const estimate = engine.estimate(state, property.id);
   const summary = engine.portfolio(state).properties.find((p) => p.propertyId === property.id);
   const isHome = state.player.homePropertyId === property.id;
-  const canRent = !isHome && !owned.lease && !owned.sale?.agreement;
+  // A plot is never let; a parking space or a shop has no works of its own.
+  const lettable = engine.leaseOptions(state, property.id).length > 0;
+  const canRent = lettable && !isHome && !owned.lease && !owned.sale?.agreement;
+  const renovatable = (engine.worksCatalog(state, property.id) ?? []).some((item) => item.trade);
   // Why the player cannot live here yet (the engine refuses it the same way).
   const moveInBlock: 'home.forSale' | 'home.works' | 'home.indecent' | null = owned.sale
     ? 'home.forSale'
@@ -151,7 +154,7 @@ function Overview({ owned }: { owned: OwnedProperty }) {
                 : t.property.rent}
             </button>
           )}
-          {!owned.works?.transformation && (
+          {!owned.works?.transformation && (owned.works || renovatable) && (
             <button
               type="button"
               className="button block"

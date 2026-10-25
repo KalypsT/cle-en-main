@@ -32,6 +32,7 @@ export const TUTORIAL_TRIGGERS = [
   'event:loanRequested',
   'event:deedSigned',
   'event:monthlyStatement',
+  'event:purchaseCancelled',
 ] as const;
 
 /**
@@ -69,12 +70,23 @@ export const tutorialSchema = z
             showOn: z.enum(TUTORIAL_TRIGGERS).optional(),
             next: z.enum(TUTORIAL_TRIGGERS),
             target: z.enum(TUTORIAL_TARGETS).optional(),
+            /** The purchase it follows fell through: back to this step (another listing). */
+            backOnCancel: z.string().optional(),
           })
           .strict(),
       )
       .min(1),
   })
-  .strict();
+  .strict()
+  .refine(
+    (tutorial) =>
+      tutorial.steps.every(
+        (step) =>
+          step.backOnCancel === undefined ||
+          tutorial.steps.some((other) => other.id === step.backOnCancel),
+      ),
+    { message: 'backOnCancel must name a step' },
+  );
 
 export type Tutorial = z.infer<typeof tutorialSchema>;
 export type TutorialTrigger = (typeof TUTORIAL_TRIGGERS)[number];
