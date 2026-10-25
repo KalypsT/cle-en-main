@@ -200,3 +200,18 @@ Branche proposée : `impots-carnet-rivaux`.
 ## Après ces cinq PR
 
 Relancer une série complète (100 parties de 10 ans par bot, puis 300 parties de 25 ans pour le Chasseur et le Promoteur) et reprendre l'équilibrage : densité de décisions, faillites du Levier, Promoteur trop rapide, Marchand de biens trop faible, réputation qui plafonne.
+
+## Suivi
+
+### PR 1 : série de bots (100 parties de 10 ans, mêmes graines que l'analyse)
+
+Rapport : [2026-10-25-rapport-bots-pr1.md](2026-10-25-rapport-bots-pr1.md). Les écarts viennent surtout des indemnités à la vente (B3), plus basses, et de la fin des frais de gestion à distance sur les biens vides ; les bots n'emménageaient jamais dans leurs biens, L1 et L2 ne les touchent pas.
+
+| Bot | Avant (médiane à 10 ans) | Après | Remarque |
+|---|---|---|---|
+| Prudent | 130,0 k€ | 130,0 k€ | inchangé (ne revend pas) |
+| Chasseur | 172,2 k€, faillites 2 % | 172,2 k€, faillites 1 % | 1er décile de 91 à 104 k€ |
+| Chasseur à Dijon | 166,0 k€, Investisseur aguerri 33 % | 171,2 k€, 32 % | L3 ne change rien : il achète des logements |
+| Marchand de biens | 62,6 k€, 18 723 € d'impôt sur les plus-values | 64,7 k€, 17 486 € | indemnités de vente plus basses |
+| Levier maximal | 71,8 k€, faillites 20 % | 77,9 k€, faillites 13 % | ventes forcées moins chères : encore plus loin de la cible (plus de 40 %), à reprendre avec l'équilibrage |
+| Promoteur | 228,2 k€ | 216,1 k€ | dans le bruit d'une série de 100 parties |
