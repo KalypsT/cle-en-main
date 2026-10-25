@@ -130,7 +130,34 @@ Le reste des jalons 0 à 8 est en place : villes, déplacements, notoriété, SC
 
 ## 7. Équilibrage
 
-SERIES_PLACEHOLDER
+Série de contrôle : 100 parties de 10 ans par bot, 11 bots, départ au 1er janvier 2027 (rapport complet : [2026-10-25-rapport-bots-100-parties.md](2026-10-25-rapport-bots-100-parties.md)). Les chiffres sont identiques à ceux du rapport `progression-etape-4` pour le Chasseur et le Prudent : rien n'a bougé depuis.
+
+**4 cibles manquées sur les repères jugés.**
+
+| Repère | Cible | Mesure | Verdict |
+|---|---|---|---|
+| Premier achat (Chasseur) | 2e à 6e mois | 1,1 mois | atteint (même un peu tôt) |
+| Titre Bailleur (Chasseur) | 2 à 4 ans | 2 ans, 92 % des parties | atteint |
+| Investisseur aguerri (Chasseur à Dijon) | 6 à 10 ans | 33 % des parties en 10 ans | **manqué** (écart connu) |
+| Densité de décisions | 30 à 60 s | Chasseur 28 s, Prudent 20,6 s, Promoteur 15,8 s | **manqué** : décision de Thibaud attendue depuis l'étape 4 (×8 avec 18 h, ou 24 h) |
+| Faillites du Levier | plus de 40 % | **20 %** (37 % à l'étape 2) | **manqué** |
+| Expansion à Dijon viable, avec un vrai effort | voir 8.2 | 96 % de la médiane du Chasseur ; 1er achat au 31e mois, 47 % y achètent | atteint (mais voir L3) |
+| L'Inactif ne s'enrichit jamais | ≤ apport + 650 €/mois | 81 739 € pour le meilleur métier (plafond 93 000 €) | atteint, de justesse |
+| Le Naïf stagne | ≤ Inactif | 5 000 € (92 % de faillites) | atteint |
+
+**Patrimoine net médian à 10 ans** : Promoteur 228 k€ (9e décile 815 k€), Chasseur 172 k€, Chasseur à Dijon 166 k€, Chalon 157 k€, Besançon 151 k€, Prudent 130 k€, Levier 72 k€, Marchand de biens 63 k€, Rénovateur premium 58 k€, Inactif 56 k€, Naïf 5 k€.
+
+Ce que j'en retiens :
+
+1. **Le Promoteur domine désormais.** Meilleure médiane, titre Promoteur dans 68 % des parties en **6,9 ans** (cible révisée au jalon 8 : 10 à 15 ans en médiane), 15 biens dans sa SCI et 7 400 € de loyers par mois au bout de 10 ans. Les étapes 1 et 2 de la progression (épargne, loyers +10 %, bonnes nouvelles) l'ont fait passer de 45 k€ à 228 k€. La règle « aucune stratégie ne domine » est à revérifier sur 25 ans (Magnat, IFI, SCI Horizon).
+2. **Marchand de biens et Rénovateur premium dépassent à peine l'Inactif** (63 k€ et 58 k€ contre 56 k€). Acheter, rénover et revendre ne paie pas : 18 700 € d'impôt sur les plus-values par partie, frais de notaire et d'agence, indemnités (gonflées par B3). La faille L2 renverserait ce constat du jour au lendemain.
+3. **L'Inactif gagne 40 000 € en 10 ans sans rien faire** (épargne de salaire, primes, héritage). Le test anti-idle passe, mais la marge est mince (82 k€ contre 93 k€ de plafond pour le meilleur métier).
+4. **Le Levier n'est plus assez risqué** : 20 % de faillites (cible plus de 40 %). Avec les loyers relevés, emprunter au maximum est devenu presque sans danger.
+5. **La réputation plafonne trop vite** : médiane finale de 91,5 pour le Chasseur en 10 ans. Le seuil de 90 du Baron ne pèse rien (point ouvert 14, toujours ouvert).
+6. **La SCI arrive très tôt** : le Chasseur la crée dans 97 % des parties, après 2,3 ans (81 % en 8,9 ans au jalon 8).
+7. **Biais de mesure** : les bots prennent rendez-vous avec leur banquier tous les mois, le joueur ne le peut pas (section 4). Les bots profitent aussi d'une meilleure marge et d'une dérogation plus précoce.
+8. **Rythme réel** : environ 30 minutes réelles par année de jeu (99 % du temps accéléré). Bailleur en 1 h de jeu, Promoteur en 3 à 4 h : la progression est rapide pour un jeu « sans fin ».
+
 
 ## 8. Priorités proposées
 
@@ -142,4 +169,5 @@ SERIES_PLACEHOLDER
 6. **L4** et **L5** : confirmation et solde à prévoir pour une transformation, solde de la transformation dans la prévision de trésorerie, alerte si une vente laisse le compte négatif.
 7. **B4** : refuser (ou avertir) une demande de prêt dont la réponse tomberait après la condition de prêt.
 8. **L3** : ne compter que les logements dans la condition des villes.
+10. Équilibrage : trancher la densité de décisions, recalibrer le Levier et le Promoteur, et relancer une série de 25 ans une fois L1, L2, B3 et le rendez-vous banquier corrigés (ils changent tous les chiffres ci-dessus).
 9. Écrans : impôt par régime sur la fiche du bien, démission (si on la garde), Carnet.
