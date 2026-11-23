@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:domothib": "vite build --mode domothib",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json",
     "test:e2e": "playwright test",

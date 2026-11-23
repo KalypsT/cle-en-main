@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "pnpm --filter @cle/game dev",
     "build": "pnpm --filter @cle/game build",
+    "build:domothib": "pnpm --filter @cle/game build:domothib",
     "preview": "pnpm --filter @cle/game preview",
     "test": "pnpm -r --if-present test",
     "test:e2e": "pnpm --filter @cle/game test:e2e",

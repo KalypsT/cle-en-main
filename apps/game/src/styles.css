@@ -2356,6 +2356,21 @@ button.status-stat {
   transform: none;
 }
 
+/*
+ * DomoThib Games (html.domothib): its handle sits in the bottom-left corner (public/domothib.json,
+ * 40 px at 8 px from the edges). Where the tab bar or a sheet reaches that corner, they leave it
+ * free; on wider screens the corner shows the street or the margin.
+ */
+@media (max-width: 591px) {
+  .domothib .tab-bar {
+    padding-left: 56px;
+  }
+
+  .domothib .sheet {
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--gap) + 56px);
+  }
+}
+
 /* Panorama: a phone held sideways shows the street only (docs/04, 4.1). */
 .app:has(.shell.panorama),
 .app:has(.shell.rotate) {

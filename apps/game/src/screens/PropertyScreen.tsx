@@ -46,6 +46,7 @@ import { ItemsList, ValueWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { LineChart } from '../ui/LineChart.tsx';
 import { FormerTenants, History } from './PropertyHistory.tsx';
+import { askConfirm } from '../ui/confirm.tsx';
 
 /** « Fiche d'un bien » (docs/04): overview, rooms, letting, finances. */
 export function PropertyScreen({
@@ -197,8 +198,10 @@ function Overview({ owned }: { owned: OwnedProperty }) {
                   className="button block"
                   disabled={moveInBlock !== null}
                   onClick={() =>
-                    window.confirm(t.property.moveInConfirm) &&
-                    act({ type: 'home/moveIn', propertyId: property.id })
+                    void askConfirm(t.property.moveInConfirm).then(
+                      (confirmed) =>
+                        confirmed && act({ type: 'home/moveIn', propertyId: property.id }),
+                    )
                   }
                 >
                   {t.property.moveIn}

@@ -7,7 +7,8 @@
   "title": {
     "tagline": "Bâtissez votre patrimoine, un bien après l'autre.",
     "newGame": "Nouvelle partie",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "quit": "Quitter"
   },
   "slots": {
     "newGameHeading": "Où ranger cette partie ?",

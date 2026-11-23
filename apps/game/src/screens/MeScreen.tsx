@@ -16,6 +16,7 @@ import {
 } from '../texts.ts';
 import { Card, KeyValues, ScreenHeader } from '../ui/components.tsx';
 import { Avatar } from '../ui/Avatar.tsx';
+import { askConfirm } from '../ui/confirm.tsx';
 
 /**
  * « Moi » (docs/03-systemes/01, « la fiche du personnage »): the job and its salary, the free
@@ -29,8 +30,8 @@ export function MeScreen() {
   const home = state.properties.find((owned) => owned.property.id === player.homePropertyId);
   const title = engine.progression(state).currentTitleId;
   const credit = gameContent.credit;
-  const resign = () => {
-    if (window.confirm(format(texts.resignConfirm, { days: gameContent.jobSearchDays }))) {
+  const resign = async () => {
+    if (await askConfirm(format(texts.resignConfirm, { days: gameContent.jobSearchDays }))) {
       act({ type: 'job/resign' });
     }
   };

@@ -2,6 +2,8 @@ import { timeSettings } from '@cle/content';
 import { type GameEvent, type GameState, toIsoDate } from '@cle/engine';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AudioMixer } from './audio/mixer.ts';
+import type { DomoThib } from './domothib/domothib-games.ts';
+import { DOMOTHIB_BUILD } from './domothib/mode.ts';
 import { engine } from './engine.ts';
 import { GameShell } from './game/GameShell.tsx';
 import { PwaStatus } from './PwaStatus.tsx';
@@ -18,6 +20,7 @@ import {
   dropCheckpointsFrom,
   type JournalEntry,
   lastSlot,
+  loadCheckpoint,
   loadFromSlot,
   rememberSlot,
   saveToSlot,
@@ -25,6 +28,7 @@ import {
 } from './storage/saves.ts';
 import { t, texts } from './texts.ts';
 import { useTheme } from './theme.ts';
+import { ConfirmHost } from './ui/confirm.tsx';
 
 type Screen =
   /** At launch, while the last game played is reopened. */
@@ -70,7 +74,11 @@ function randomSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 0;
 }
 
-export function App() {
+/**
+ * `domothib`: the bridge to DomoThib Games (docs/domothib.md), null outside DomoThib. Its
+ * pause stops the clock and the sound, and saves the game being played.
+ */
+export function App({ domothib = null }: { domothib?: DomoThib | null }) {
   const [screen, setScreen] = useState<Screen>(() => {
     const slot = RESUME ? lastSlot() : null;
     return slot === null ? { name: 'title' } : { name: 'resuming', slot };
@@ -92,6 +100,19 @@ export function App() {
       window.removeEventListener('keydown', unlock);
     };
   }, [audio]);
+
+  // DomoThib paused the game: its menu is open, the app is in the background, the tablet sleeps…
+  const [hostPaused, setHostPaused] = useState(false);
+  useEffect(() => {
+    if (!domothib) return;
+    const offPause = domothib.onPause(() => setHostPaused(true));
+    const offResume = domothib.onResume(() => setHostPaused(false));
+    return () => {
+      offPause();
+      offResume();
+    };
+  }, [domothib]);
+  useEffect(() => audio.setPaused(hostPaused), [audio, hostPaused]);
 
   const notify = useCallback((message: string) => setNotice(message), []);
 
@@ -184,14 +205,28 @@ export function App() {
     };
     document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('pagehide', store);
+    // DomoThib's pause: its menu, the game left, the tablet's standby screen…
+    const offHostPause = domothib?.onPause(() => {
+      flushJournal.current();
+      store();
+    });
     // An update reloads the page: the save is awaited first.
     const forgetUpdateSave = saveBeforeUpdate(() => save(slot, session.getSnapshot().state, true));
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('pagehide', store);
+      offHostPause?.();
       forgetUpdateSave();
     };
-  }, [screen, save]);
+  }, [screen, save, domothib]);
+
+  // While DomoThib pauses the game, the clock waits (the game is saved as the pause starts).
+  useEffect(() => {
+    if (screen.name !== 'game' || !hostPaused) return;
+    const { session } = screen;
+    session.hold();
+    return () => session.release();
+  }, [screen, hostPaused]);
 
   const quit = (slot: SlotId, state: GameState) => {
     flushJournal.current();
@@ -203,8 +238,9 @@ export function App() {
   /** Goes back to a monthly point (docs/02, section 2.7); later points are dropped. */
   const rewind = async (slot: SlotId, current: GameState, checkpoint: Checkpoint) => {
     try {
-      const result = engine.rewind(current, engine.loadGame(checkpoint.game));
-      if (!result.ok) {
+      const point = await loadCheckpoint(slot, checkpoint);
+      const result = point ? engine.rewind(current, point) : null;
+      if (!result?.ok) {
         notify(texts.errors.loadFailed);
         return;
       }
@@ -252,6 +288,7 @@ export function App() {
         <TitleScreen
           onNewGame={() => setScreen({ name: 'slots', mode: 'new' })}
           onContinue={() => setScreen({ name: 'slots', mode: 'continue' })}
+          onQuit={domothib ? () => domothib.quit() : undefined}
         />
       )}
       {screen.name === 'slots' && (
@@ -285,12 +322,14 @@ export function App() {
           onSettings={setSettings}
           onNight={setGameNight}
           audio={audio}
+          paused={hostPaused}
         />
       )}
       <div className="notice" role="status" aria-live="polite">
         {notice}
       </div>
-      <PwaStatus />
+      <ConfirmHost />
+      {!DOMOTHIB_BUILD && <PwaStatus />}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import type { GameState } from '@cle/engine';
 import { useEffect, useRef, useState } from 'react';
 import { importGame } from '../storage/files.ts';
-import { listSlots, SLOT_IDS, type SlotId, type SlotRecord } from '../storage/saves.ts';
+import { listSlots, SLOT_IDS, type SlotId, type SlotSummary } from '../storage/saves.ts';
 import { format, formatGameDate, formatGameTime, formatRealTimestamp, texts } from '../texts.ts';
+import { askConfirm } from '../ui/confirm.tsx';
 
 interface Props {
   mode: 'new' | 'continue';
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function SlotsScreen({ mode, onNewGame, onLoad, onImport, onBack, notify }: Props) {
-  const [slots, setSlots] = useState<Map<SlotId, SlotRecord> | null>(null);
+  const [slots, setSlots] = useState<Map<SlotId, SlotSummary> | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const importTarget = useRef<SlotId>(1);
 
@@ -27,11 +28,11 @@ export function SlotsScreen({ mode, onNewGame, onLoad, onImport, onBack, notify 
       });
   }, [notify]);
 
-  const confirmOverwrite = (slot: SlotId) =>
-    !slots?.has(slot) || window.confirm(format(texts.slots.confirmOverwrite, { number: slot }));
+  const confirmOverwrite = async (slot: SlotId) =>
+    !slots?.has(slot) || askConfirm(format(texts.slots.confirmOverwrite, { number: slot }));
 
-  const startImport = (slot: SlotId) => {
-    if (!confirmOverwrite(slot)) return;
+  const startImport = async (slot: SlotId) => {
+    if (!(await confirmOverwrite(slot))) return;
     importTarget.current = slot;
     fileInput.current?.click();
   };
@@ -77,7 +78,9 @@ export function SlotsScreen({ mode, onNewGame, onLoad, onImport, onBack, notify 
                     type="button"
                     className="button primary"
                     disabled={!slots}
-                    onClick={() => confirmOverwrite(slot) && onNewGame(slot)}
+                    onClick={() =>
+                      void confirmOverwrite(slot).then((confirmed) => confirmed && onNewGame(slot))
+                    }
                   >
                     {texts.slots.start}
                   </button>
@@ -95,7 +98,7 @@ export function SlotsScreen({ mode, onNewGame, onLoad, onImport, onBack, notify 
                       type="button"
                       className="button"
                       disabled={!slots}
-                      onClick={() => startImport(slot)}
+                      onClick={() => void startImport(slot)}
                     >
                       {texts.slots.import}
                     </button>

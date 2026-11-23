@@ -26,14 +26,17 @@ export class BotApi {
   private readonly rng: RngState;
   private readonly queue: GameEvent[] = [];
   private readonly onEvents: (events: GameEvent[], state: GameState) => void;
+  private readonly onAction: ((action: GameAction, state: GameState) => void) | undefined;
 
   constructor(
     state: GameState,
     seed: number,
     onEvents: (events: GameEvent[], state: GameState) => void,
+    onAction?: (action: GameAction, state: GameState) => void,
   ) {
     this.state = state;
     this.onEvents = onEvents;
+    this.onAction = onAction;
     this.rng = seedRng((seed ^ 0x5bd1e995) >>> 0);
   }
 
@@ -50,6 +53,7 @@ export class BotApi {
     const result = engine.dispatch(this.state, action);
     if (!result.ok) return false;
     this.state = result.state;
+    this.onAction?.(action, this.state);
     this.onEvents(result.events, this.state);
     this.queue.push(...result.events);
     return true;
@@ -82,6 +86,13 @@ export interface GameOptions {
   jobId: string;
   /** Hour of the daily decisions (after work). */
   decisionHour?: number;
+  /** Told of every engine event and accepted action, as the game's log is (save sizes). */
+  observer?: GameObserver;
+}
+
+export interface GameObserver {
+  events?(events: GameEvent[], state: GameState): void;
+  action?(action: GameAction, state: GameState): void;
 }
 
 const DEFAULT_DECISION_HOUR = 18;
@@ -139,7 +150,16 @@ export function playGame(strategy: Strategy, options: GameOptions): GameMetrics 
     jobId: options.jobId,
   });
   const metrics = new MetricsRecorder(engine, state, strategy.id, options);
-  const api = new BotApi(state, options.seed, (events, current) => metrics.record(events, current));
+  const observer = options.observer;
+  const api = new BotApi(
+    state,
+    options.seed,
+    (events, current) => {
+      metrics.record(events, current);
+      observer?.events?.(events, current);
+    },
+    observer?.action ? (action, current) => observer.action?.(action, current) : undefined,
+  );
   const decisionHour = options.decisionHour ?? DEFAULT_DECISION_HOUR;
   const react = (events: GameEvent[]) => {
     let pending = events;
@@ -157,6 +177,7 @@ export function playGame(strategy: Strategy, options: GameOptions): GameMetrics 
     if (result.events.some((event) => event.type === 'dayStarted'))
       metrics.addTime(HOURS_PER_DAY, calm);
     metrics.record(result.events, api.state);
+    observer?.events?.(result.events, api.state);
     if (result.events.some((event) => event.type === 'dayStarted')) {
       metrics.observeDecisions(api.state);
       calm = engine.pace(api.state).calm;

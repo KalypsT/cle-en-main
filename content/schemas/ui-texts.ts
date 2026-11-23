@@ -6,7 +6,7 @@ const text = z.string().min(1);
 export const uiTextsSchema = z
   .object({
     app: z.object({ name: text, shortName: text, description: text }).strict(),
-    title: z.object({ tagline: text, newGame: text, continue: text }).strict(),
+    title: z.object({ tagline: text, newGame: text, continue: text, quit: text }).strict(),
     slots: z
       .object({
         newGameHeading: text,

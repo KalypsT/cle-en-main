@@ -106,6 +106,8 @@ interface Props {
   /** Tells whether it is night in the game (the « Automatique » theme). */
   onNight: (night: boolean) => void;
   audio: AudioMixer;
+  /** DomoThib paused the game: the street stops drawing too. */
+  paused?: boolean;
 }
 
 /** Interface effects of some engine events (docs/05, 5.8). */
@@ -169,6 +171,7 @@ export function GameShell({
   onSettings,
   onNight,
   audio,
+  paused = false,
 }: Props) {
   const snapshot = useSyncExternalStore(session.subscribe, session.getSnapshot);
   const [tab, setTab] = useState<TabId>('street');
@@ -431,7 +434,7 @@ export function GameShell({
           {/* The news wait while a review or a scene is open over the game. */}
           <GoodNewsToasts shown={overlay ? null : goodNews.shown} onDismiss={nextGoodNews} />
           <div className="street-stage" hidden={!showStreet}>
-            <StreetWorld active={showStreet} held={overlay !== undefined} />
+            <StreetWorld active={showStreet && !paused} held={overlay !== undefined} />
           </div>
           <main className="content" key={`${tab}-${stack.length}`}>
             {route ? <RouteScreen route={route} /> : <TabRoot tab={tab} wide={wide} />}

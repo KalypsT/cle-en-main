@@ -8,7 +8,8 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # A pull request's older run is cancelled; on main, a deployment is never cut halfway.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -70,6 +71,20 @@ jobs:
         with:
           path: apps/game/dist
 
+      # The DomoThib Games build (docs/domothib.md), in the same dist/ once the Pages one is kept:
+      # no second install for the deployment job.
+      - name: Build for DomoThib Games
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: pnpm build:domothib
+
+      - name: Upload DomoThib build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: domothib
+          path: apps/game/dist
+          retention-days: 1
+
   deploy:
     needs: check
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -87,3 +102,40 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # Host of DomoThib Games (docs/domothib.md, §7): a merge into main is online in DomoThib at once.
+  domothib:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: domothib-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Download DomoThib build
+        uses: actions/download-artifact@v4
+        with:
+          name: domothib
+          path: apps/game/dist
+
+      - name: Check the manifest
+        env:
+          GAME_ID: cle-en-main
+        run: |
+          node -e '
+            const m = JSON.parse(require("fs").readFileSync("apps/game/dist/domothib.json", "utf8"));
+            if (m.protocole !== 1 || m.id !== process.env.GAME_ID) { console.error("domothib.json invalide"); process.exit(1); }
+          '
+
+      - name: Send to the games host
+        env:
+          SSH_KEY: ${{ secrets.JEUX_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/jeux && chmod 600 ~/.ssh/jeux
+          rsync -rlz --delete-after --delay-updates --chmod=D755,F644 \
+            -e "ssh -i ~/.ssh/jeux" apps/game/dist/ "jeux-deploy@$VPS_HOST:./"

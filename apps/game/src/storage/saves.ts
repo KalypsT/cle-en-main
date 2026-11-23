@@ -1,164 +1,91 @@
 import { gameContent } from '@cle/content';
-import { type CalendarDate, type Cents, type GameState, serializeGame } from '@cle/engine';
-import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
+import { type CalendarDate, type GameState, serializeGame } from '@cle/engine';
 import { engine } from '../engine.ts';
+import { IndexedDbSaveStorage } from './indexeddb-storage.ts';
+import {
+  type Checkpoint,
+  type JournalEntry,
+  type SaveLimits,
+  type SaveStorage,
+  SLOT_IDS,
+  type SlotId,
+  type SlotSummary,
+} from './save-storage.ts';
 
-/** Three save slots (docs/07-architecture.md, section 7.5). */
-export const SLOT_IDS = [1, 2, 3] as const;
-export type SlotId = (typeof SLOT_IDS)[number];
+export { SLOT_IDS };
+export type { Checkpoint, JournalEntry, SlotId, SlotSummary } from './save-storage.ts';
 
-/** A monthly rewind point (docs/02, section 2.7). */
-export interface Checkpoint {
-  date: CalendarDate;
-  netWorth: Cents;
-  /** Serialized engine state; migrated on load. */
-  game: string;
+/** How many rewind points and log lines each slot keeps. */
+export const SAVE_LIMITS: SaveLimits = {
+  rewindPoints: gameContent.rhythm.rewindPoints,
+  journalEntries: gameContent.rhythm.journalEntries,
+};
+
+/** IndexedDB, unless the game runs in DomoThib with its saves on the server (main.tsx). */
+let storage: SaveStorage = new IndexedDbSaveStorage(SAVE_LIMITS);
+
+/** Chooses where the games are kept; called once at launch, before any slot is read. */
+export function setSaveStorage(next: SaveStorage): void {
+  storage = next;
 }
 
-export interface SlotRecord {
-  slot: SlotId;
-  /** Real-world time of the save, in milliseconds since the Unix epoch. */
-  savedAt: number;
-  gameDate: CalendarDate;
-  gameHour: number;
-  /** Serialized engine state; migrated on load. */
-  game: string;
-  /** The last monthly rewind points, oldest first. */
-  checkpoints: Checkpoint[];
-}
-
-/** One line of the game log (docs/08, 8.5): an engine event or a player action. */
-export interface JournalEntry {
-  /** Game hours since the start, then the game date for reading. */
-  hour: number;
-  date: string;
-  kind: 'event' | 'action';
-  data: unknown;
-}
-
-interface SavesDb extends DBSchema {
-  slots: { key: SlotId; value: SlotRecord };
-  journal: { key: SlotId; value: { slot: SlotId; entries: JournalEntry[] } };
-}
-
-const DB_NAME = 'cle-en-main';
-const DB_VERSION = 2;
-
-let dbPromise: Promise<IDBPDatabase<SavesDb>> | undefined;
-
-function db(): Promise<IDBPDatabase<SavesDb>> {
-  dbPromise ??= openDB<SavesDb>(DB_NAME, DB_VERSION, {
-    upgrade(database, oldVersion) {
-      if (oldVersion < 1) database.createObjectStore('slots', { keyPath: 'slot' });
-      if (oldVersion < 2) database.createObjectStore('journal', { keyPath: 'slot' });
-    },
-  });
-  return dbPromise;
-}
-
-/** Points saved before milestone 6 were plain strings (always empty in practice). */
-function checkpointsOf(record: SlotRecord | undefined): Checkpoint[] {
-  return (record?.checkpoints ?? []).filter(
-    (point): point is Checkpoint => typeof point === 'object' && point !== null,
-  );
-}
-
-/**
- * Writes of each slot, one after the other: a save made as the app goes to the background
- * must not read the slot before the save of the 1st has written its rewind point, then
- * write it back without it.
- */
-const writes = new Map<SlotId, Promise<unknown>>();
-
-function queued<T>(slot: SlotId, task: () => Promise<T>): Promise<T> {
-  const previous = writes.get(slot) ?? Promise.resolve();
-  const next = previous.catch(() => undefined).then(task);
-  writes.set(slot, next);
-  return next;
-}
-
-export async function listSlots(): Promise<Map<SlotId, SlotRecord>> {
-  const records = await (await db()).getAll('slots');
-  return new Map(records.map((record) => [record.slot, record]));
+export function listSlots(): Promise<Map<SlotId, SlotSummary>> {
+  return storage.listSlots();
 }
 
 /**
  * Saves a game; `checkpoint` also keeps it as a monthly rewind point (the
  * 1st of the month), and a new game (`fresh`) starts without any.
  */
-export function saveToSlot(
+export async function saveToSlot(
   slot: SlotId,
   state: GameState,
   options: { checkpoint?: boolean; fresh?: boolean } = {},
-): Promise<SlotRecord> {
+): Promise<void> {
   // Serialized before any wait: a save made as the page hides must catch this state.
   const game = serializeGame(state);
-  return queued(slot, () => writeSlot(slot, state, game, options));
-}
-
-async function writeSlot(
-  slot: SlotId,
-  state: GameState,
-  game: string,
-  options: { checkpoint?: boolean; fresh?: boolean },
-): Promise<SlotRecord> {
-  const database = await db();
-  const previous = options.fresh ? undefined : await database.get('slots', slot);
-  let checkpoints = checkpointsOf(previous);
-  if (options.checkpoint) {
-    checkpoints = [
-      ...checkpoints,
-      { date: state.clock.date, netWorth: engine.netWorth(state), game },
-    ].slice(-gameContent.rhythm.rewindPoints);
-  }
-  const record: SlotRecord = {
+  const summary: SlotSummary = {
     slot,
     savedAt: Date.now(),
     gameDate: state.clock.date,
     gameHour: state.clock.hour,
-    game,
-    checkpoints,
   };
-  await database.put('slots', record);
-  if (options.fresh) await database.delete('journal', slot);
-  return record;
+  await storage.writeGame(summary, game, {
+    ...(options.checkpoint
+      ? { checkpoint: { date: state.clock.date, netWorth: engine.netWorth(state) } }
+      : {}),
+    ...(options.fresh ? { fresh: true } : {}),
+  });
 }
 
 /** Loads a slot; throws SaveFormatError when the stored game is invalid. */
 export async function loadFromSlot(slot: SlotId): Promise<GameState | null> {
-  const record = await (await db()).get('slots', slot);
-  return record ? engine.loadGame(record.game) : null;
+  const game = await storage.readGame(slot);
+  return game === null ? null : engine.loadGame(game);
 }
 
-export async function listCheckpoints(slot: SlotId): Promise<Checkpoint[]> {
-  return checkpointsOf(await (await db()).get('slots', slot));
+export function listCheckpoints(slot: SlotId): Promise<Checkpoint[]> {
+  return storage.listCheckpoints(slot);
+}
+
+/** The game of a rewind point, migrated; throws SaveFormatError when invalid. */
+export async function loadCheckpoint(slot: SlotId, point: Checkpoint): Promise<GameState | null> {
+  const game = await storage.readCheckpoint(slot, point.date);
+  return game === null ? null : engine.loadGame(game);
 }
 
 /** Keeps only the rewind points up to `date` (after a rewind, the later ones are gone). */
 export function dropCheckpointsFrom(slot: SlotId, date: CalendarDate): Promise<void> {
-  return queued(slot, () => dropFrom(slot, date));
+  return storage.dropCheckpointsFrom(slot, date);
 }
 
-async function dropFrom(slot: SlotId, date: CalendarDate): Promise<void> {
-  const database = await db();
-  const record = await database.get('slots', slot);
-  if (!record) return;
-  const key = (d: CalendarDate) => d.year * 10_000 + d.month * 100 + d.day;
-  record.checkpoints = checkpointsOf(record).filter((point) => key(point.date) <= key(date));
-  await database.put('slots', record);
-}
-
-export async function readJournal(slot: SlotId): Promise<JournalEntry[]> {
-  return (await (await db()).get('journal', slot))?.entries ?? [];
+export function readJournal(slot: SlotId): Promise<JournalEntry[]> {
+  return storage.readJournal(slot);
 }
 
 /** Appends lines to the slot's log, keeping the most recent ones (content/rythme.json). */
-export async function appendJournal(slot: SlotId, entries: JournalEntry[]): Promise<void> {
-  if (entries.length === 0) return;
-  const database = await db();
-  const previous = (await database.get('journal', slot))?.entries ?? [];
-  const kept = [...previous, ...entries].slice(-gameContent.rhythm.journalEntries);
-  await database.put('journal', { slot, entries: kept });
+export function appendJournal(slot: SlotId, entries: JournalEntry[]): Promise<void> {
+  return storage.appendJournal(slot, entries);
 }
 
 const LAST_SLOT_KEY = 'cle-en-main.lastSlot';
