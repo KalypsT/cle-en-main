@@ -43,8 +43,7 @@ export const MAX_VALUE_BYTES = 2 * 1024 * 1024;
 
 export type SaveState = 'saved' | 'pending';
 
-export type DomoThibErrorCode =
-  'invalid_key' | 'too_large' | 'quota' | 'unavailable' | 'closed' | 'invalid_request';
+export type DomoThibErrorCode = 'invalid_key' | 'too_large' | 'quota' | 'unavailable' | 'closed' | 'invalid_request';
 
 /** Error of a request of saves (contract §4.2). */
 export class DomoThibError extends Error {
@@ -101,21 +100,11 @@ export interface DomoThibEnvironment {
   parent: { postMessage(message: unknown, targetOrigin: string): void } | null;
   /** Origin of DomoThib kept by the launcher, `null` when unknown. */
   parentOrigin: string | null;
-  addEventListener(
-    type: string,
-    listener: (event: Event) => void,
-    options?: AddEventListenerOptions,
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: (event: Event) => void,
-    options?: EventListenerOptions,
-  ): void;
+  addEventListener(type: string, listener: (event: Event) => void, options?: AddEventListenerOptions): void;
+  removeEventListener(type: string, listener: (event: Event) => void, options?: EventListenerOptions): void;
 }
 
-type Port = Pick<MessagePort, 'postMessage' | 'close'> & {
-  onmessage: ((event: MessageEvent) => void) | null;
-};
+type Port = Pick<MessagePort, 'postMessage' | 'close'> & { onmessage: ((event: MessageEvent) => void) | null };
 
 function browserEnvironment(): DomoThibEnvironment {
   let parentOrigin: string | null;
@@ -208,14 +197,7 @@ function checkSave(key: string, value: string | null): DomoThibError | null {
   return size > MAX_VALUE_BYTES ? new DomoThibError('too_large') : null;
 }
 
-const ERROR_CODES: readonly string[] = [
-  'invalid_key',
-  'too_large',
-  'quota',
-  'unavailable',
-  'closed',
-  'invalid_request',
-];
+const ERROR_CODES: readonly string[] = ['invalid_key', 'too_large', 'quota', 'unavailable', 'closed', 'invalid_request'];
 
 type Answer = { resolve: (result: unknown) => void; reject: (error: DomoThibError) => void };
 
@@ -232,9 +214,7 @@ function savesOver(port: Port, answers: Map<number, Answer>): DomoThibSaves {
   const saves: DomoThibSaves = {
     async list() {
       const result = await request({ type: 'saves.list' });
-      return Array.isArray(result)
-        ? (result as { key: string; revision: number; size: number; modifiedAt: string }[])
-        : [];
+      return Array.isArray(result) ? (result as { key: string; revision: number; size: number; modifiedAt: string }[]) : [];
     },
     async read(key) {
       const refused = checkSave(key, null);
@@ -320,10 +300,7 @@ function connected(env: DomoThibEnvironment, data: Record<string, unknown>, port
         if (message.ok) {
           answer.resolve(message.result);
         } else {
-          const code =
-            typeof message.error === 'string' && ERROR_CODES.includes(message.error)
-              ? message.error
-              : 'unavailable';
+          const code = typeof message.error === 'string' && ERROR_CODES.includes(message.error) ? message.error : 'unavailable';
           answer.reject(new DomoThibError(code as DomoThibErrorCode));
         }
       }
@@ -333,10 +310,7 @@ function connected(env: DomoThibEnvironment, data: Record<string, unknown>, port
       pause.emit();
     } else if (message.type === 'resume') {
       resume.emit();
-    } else if (
-      message.type === 'saveState' &&
-      (message.state === 'saved' || message.state === 'pending')
-    ) {
+    } else if (message.type === 'saveState' && (message.state === 'saved' || message.state === 'pending')) {
       saveState.emit(message.state);
     }
   };
@@ -366,16 +340,8 @@ function connected(env: DomoThibEnvironment, data: Record<string, unknown>, port
   };
 }
 
-function isConnectMessage(
-  data: unknown,
-  ports: readonly MessagePort[],
-): data is Record<string, unknown> {
-  if (
-    !isRecord(data) ||
-    data.type !== 'domothib:connect' ||
-    data.protocol !== PROTOCOL ||
-    ports.length === 0
-  ) {
+function isConnectMessage(data: unknown, ports: readonly MessagePort[]): data is Record<string, unknown> {
+  if (!isRecord(data) || data.type !== 'domothib:connect' || data.protocol !== PROTOCOL || ports.length === 0) {
     return false;
   }
   const player = data.player;
@@ -391,10 +357,7 @@ function isConnectMessage(
  * Connects the game to DomoThib with a given environment (the tests of DomoThib use it; a game calls
  * `connectDomoThib`).
  */
-export function connectDomoThibIn(
-  env: DomoThibEnvironment,
-  options: ConnectOptions = {},
-): Promise<DomoThib | null> {
+export function connectDomoThibIn(env: DomoThibEnvironment, options: ConnectOptions = {}): Promise<DomoThib | null> {
   const parent = env.parent;
   const parentOrigin = env.parentOrigin;
   // Outside a frame (local development), or not opened by the launcher of DomoThib: the game runs alone.
