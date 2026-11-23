@@ -1,3 +1,4 @@
+import { CAN_DOWNLOAD } from '../domothib/mode.ts';
 import { useGame, useNav, type Route } from '../game/context.tsx';
 import { t } from '../texts.ts';
 import { Badge, ListRow, ScreenHeader } from '../ui/components.tsx';
@@ -45,9 +46,11 @@ export function MenuTab() {
         <button type="button" className="button primary block" onClick={save}>
           {t.menu.save}
         </button>
-        <button type="button" className="button block" onClick={exportGame}>
-          {t.menu.export}
-        </button>
+        {CAN_DOWNLOAD && (
+          <button type="button" className="button block" onClick={exportGame}>
+            {t.menu.export}
+          </button>
+        )}
         <button type="button" className="button block" onClick={quit}>
           {t.menu.quit}
         </button>

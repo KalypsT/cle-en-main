@@ -6,9 +6,11 @@ const LOGO = `${import.meta.env.BASE_URL}logo/logo`;
 interface Props {
   onNewGame: () => void;
   onContinue: () => void;
+  /** In DomoThib Games: back to its page of games. */
+  onQuit?: (() => void) | undefined;
 }
 
-export function TitleScreen({ onNewGame, onContinue }: Props) {
+export function TitleScreen({ onNewGame, onContinue, onQuit }: Props) {
   return (
     <main className="screen title-screen">
       <div className="title-block">
@@ -32,6 +34,11 @@ export function TitleScreen({ onNewGame, onContinue }: Props) {
         <button type="button" className="button" onClick={onContinue}>
           {texts.title.continue}
         </button>
+        {onQuit && (
+          <button type="button" className="button" onClick={onQuit}>
+            {texts.title.quit}
+          </button>
+        )}
       </div>
     </main>
   );

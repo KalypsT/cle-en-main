@@ -17,12 +17,13 @@ test('meets the banker, then resigns and looks for the job again', async ({ page
   await expect(meeting).toContainText(/Prochain rendez-vous possible/);
   await expect(page.getByTestId('bank-log')).toContainText(/Rendez-vous/);
 
-  page.on('dialog', (dialog) => void dialog.accept());
   await rootTab(page, 'menu');
   // « Moi » alone: other buttons say « Moi-même ».
   await page.getByRole('button', { name: t.menu.me, exact: true }).click();
   const work = page.getByTestId('me-work');
   await work.getByRole('button', { name: t.me.resign }).click();
+  // Confirmed in the game: DomoThib's frame blocks window.confirm.
+  await page.getByTestId('confirm-yes').click();
   await expect(page.getByTestId('me')).toContainText(t.me.noJob);
   await work.getByRole('button', { name: t.me.seek }).click();
   await expect(work).toContainText(/retour au travail le/);

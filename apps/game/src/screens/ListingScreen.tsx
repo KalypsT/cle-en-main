@@ -45,6 +45,7 @@ import { CashFlowOutlookCard, outlookAdvice, outlookTone } from '../ui/CashFlowO
 import { FinancingPanel } from '../ui/FinancingPanel.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { DpeCard } from '../ui/DpeCard.tsx';
+import { askConfirm } from '../ui/confirm.tsx';
 
 /** Step of the offer slider, in cents (presentation only). */
 const OFFER_STEP = 500_00;
@@ -498,10 +499,10 @@ function OfferSheet({
   const outlook = amount > 0 ? engine.cashFlowOutlook(state, listing.id, amount) : null;
 
   const tooHigh = amount > asking * gameContent.market.negotiation.maxOfferOfAsking;
-  const send = () => {
+  const send = async () => {
     if (
       amount > asking &&
-      !window.confirm(format(t.listing.offerAbove, { asking: formatEuros(asking) }))
+      !(await askConfirm(format(t.listing.offerAbove, { asking: formatEuros(asking) })))
     )
       return;
     if (act({ type: 'market/offer', listingId: listing.id, amount })) onClose();

@@ -1,0 +1,14 @@
+{
+  "protocole": 1,
+  "id": "cle-en-main",
+  "nom": "Clé en main !",
+  "description": "Jeu de gestion immobilière en temps réel, à Dole et ailleurs.",
+  "version": "0.8.0",
+  "jaquette": "jaquette.webp",
+  "orientation": "libre",
+  "ecrans": ["telephone", "tablette"],
+  "commandes": ["tactile"],
+  "sauvegarde": "domothib",
+  "poignee": "bas-gauche",
+  "pleinEcran": true
+}

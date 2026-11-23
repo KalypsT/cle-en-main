@@ -23,6 +23,8 @@ export class AudioMixer {
   private slot: MusicSlot | null = null;
   private track: { element: HTMLAudioElement; gain: GainNode } | null = null;
   private trackIndex = 0;
+  /** DomoThib paused the game: silence until it resumes. */
+  private paused = false;
 
   constructor(volumes: Volumes) {
     this.volumes = volumes;
@@ -31,7 +33,7 @@ export class AudioMixer {
   /** Starts the sound on a user gesture (call it from a pointer or key event). */
   unlock(): void {
     if (this.context) {
-      if (this.context.state === 'suspended') void this.context.resume();
+      if (this.context.state === 'suspended' && !this.paused) void this.context.resume();
       return;
     }
     const Context =
@@ -52,6 +54,16 @@ export class AudioMixer {
     this.ambience = new Ambience(context, this.buses.ambience);
     if (this.scene) this.ambience.update(this.scene);
     if (this.slot) this.playSlot(this.slot, true);
+  }
+
+  /** Silences everything (DomoThib's pause), then lets it play again. */
+  setPaused(paused: boolean): void {
+    if (paused === this.paused) return;
+    this.paused = paused;
+    if (paused) this.track?.element.pause();
+    else void this.track?.element.play().catch(() => undefined);
+    if (!this.context) return;
+    void (paused ? this.context.suspend() : this.context.resume()).catch(() => undefined);
   }
 
   get started(): boolean {

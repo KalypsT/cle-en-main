@@ -7,6 +7,7 @@ import { QUALITIES, THEMES, type Volumes } from '../settings.ts';
 import { canVibrate } from '../audio/haptics.ts';
 import { useGame, useNav } from '../game/context.tsx';
 import { BUILD } from '../build-info.ts';
+import { CAN_DOWNLOAD, DOMOTHIB_BUILD } from '../domothib/mode.ts';
 import { applyUpdate, checkForUpdate, useUpdates } from '../pwa-updates.ts';
 import { format, formatBuildDate, t } from '../texts.ts';
 import { Card, Chip, ScreenHeader, Segmented, Switch } from '../ui/components.tsx';
@@ -19,6 +20,7 @@ export function SettingsScreen() {
   const nav = useNav();
   const [journal, setJournal] = useState<JournalEntry[] | null>(null);
   useEffect(() => {
+    if (!CAN_DOWNLOAD) return;
     let live = true;
     readJournal(slot as SlotId)
       .then((entries) => live && setJournal(entries))
@@ -36,10 +38,14 @@ export function SettingsScreen() {
         <button type="button" className="button primary" onClick={save}>
           {t.settings.saveNow}
         </button>
-        <button type="button" className="button" onClick={exportGame}>
-          {t.settings.export}
-        </button>
-        <p className="small muted">{t.settings.exportHint}</p>
+        {CAN_DOWNLOAD && (
+          <>
+            <button type="button" className="button" onClick={exportGame}>
+              {t.settings.export}
+            </button>
+            <p className="small muted">{t.settings.exportHint}</p>
+          </>
+        )}
         <button type="button" className="button" onClick={() => nav.push({ name: 'rewind' })}>
           {t.settings.rewind}
         </button>
@@ -147,17 +153,19 @@ export function SettingsScreen() {
           <p className="small muted">{t.settings.noMusic}</p>
         )}
       </Card>
-      <Card title={t.settings.journal}>
-        <p className="small muted">{t.settings.journalHint}</p>
-        <button
-          type="button"
-          className="button"
-          disabled={!journal || journal.length === 0}
-          onClick={() => journal && exportJournal(state, journal)}
-        >
-          {format(t.settings.exportJournal, { count: journal?.length ?? 0 })}
-        </button>
-      </Card>
+      {CAN_DOWNLOAD && (
+        <Card title={t.settings.journal}>
+          <p className="small muted">{t.settings.journalHint}</p>
+          <button
+            type="button"
+            className="button"
+            disabled={!journal || journal.length === 0}
+            onClick={() => journal && exportJournal(state, journal)}
+          >
+            {format(t.settings.exportJournal, { count: journal?.length ?? 0 })}
+          </button>
+        </Card>
+      )}
       <VersionCard />
     </div>
   );
@@ -178,7 +186,8 @@ function VersionCard() {
       <p className="tiny muted">
         {format(texts.buildDetails, { commit: BUILD.commit ?? '—', format: FORMAT_VERSION })}
       </p>
-      {available ? (
+      {/* In DomoThib Games, each opening loads the version deployed: nothing to look for. */}
+      {DOMOTHIB_BUILD ? null : available ? (
         <>
           <p className="small">{texts.updateAvailable}</p>
           <button type="button" className="button primary block" onClick={applyUpdate}>

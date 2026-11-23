@@ -15,6 +15,7 @@ import {
   t,
 } from '../texts.ts';
 import { Card, Empty, KeyValues, ScreenHeader, Segmented } from '../ui/components.tsx';
+import { askConfirm } from '../ui/confirm.tsx';
 
 const PRICE_STEP = 500_00;
 const MODES: readonly SaleMode[] = ['agency', 'self'];
@@ -230,8 +231,11 @@ function OfferRow({ propertyId, offer }: { propertyId: string; offer: SaleOffer 
   const { act, state } = useGame();
   // Accepting an offer below the loan costs money: the player confirms it.
   const net = engine.saleProceeds(state, propertyId, offer.amount)?.net ?? 0;
-  const accept = () => {
-    if (net < 0 && !window.confirm(format(t.sale.shortfallConfirm, { amount: formatEuros(-net) })))
+  const accept = async () => {
+    if (
+      net < 0 &&
+      !(await askConfirm(format(t.sale.shortfallConfirm, { amount: formatEuros(-net) })))
+    )
       return;
     act({ type: 'sale/acceptOffer', propertyId, offerId: offer.id });
   };

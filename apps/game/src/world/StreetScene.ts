@@ -16,6 +16,7 @@ import {
   forSalePanel,
   GARLAND_COLORS,
 } from './decor.ts';
+import { DOMOTHIB_BUILD } from '../domothib/mode.ts';
 import { mix, shade } from './facade.ts';
 import { blendLight, type Light, lightOf, litShare } from './light.ts';
 import { type Crowd, crowdOf } from './crowd.ts';
@@ -215,6 +216,9 @@ export class StreetScene {
     this.autoQuality = quality === 'auto';
     this.quality = quality === 'auto' ? 2 : quality;
     this.reducedMotion = reducedMotion;
+    // The host of DomoThib Games forbids `new Function`, which PixiJS uses for its shaders'
+    // uniforms by default: its replacement functions are loaded there (docs/domothib.md, §6).
+    if (DOMOTHIB_BUILD) await import('pixi.js/unsafe-eval');
     const app = new Application();
     const rect = host.getBoundingClientRect();
     await app.init({

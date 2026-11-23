@@ -26,6 +26,7 @@ import {
 import { RateWhy } from '../ui/explain.tsx';
 import { Facade } from '../ui/Facade.tsx';
 import { durationChoices, loanVerdict } from '../ui/FinancingPanel.tsx';
+import { askConfirm } from '../ui/confirm.tsx';
 
 /** A purchase under compromis: loan applications, then the deed (docs/03-systemes/03). */
 export function PurchaseScreen({ id }: { id: string }) {
@@ -49,15 +50,15 @@ export function PurchaseScreen({ id }: { id: string }) {
   const waiting = purchase.applications.some((a) => a.decision === null);
   const due = engine.cashDueAtDeed(state, purchase.id) ?? 0;
 
-  const withdraw = () => {
-    if (window.confirm(t.purchase.withdrawConfirm)) {
+  const withdraw = async () => {
+    if (await askConfirm(t.purchase.withdrawConfirm)) {
       if (act({ type: 'purchase/withdraw', purchaseId: purchase.id }, t.purchase.withdrawn))
         nav.pop();
     }
   };
-  const payCash = () => {
+  const payCash = async () => {
     // Without a chosen loan, the engine's cash due is the price and notary fees, deposit deducted.
-    if (window.confirm(format(t.purchase.payCashConfirm, { amount: formatEuros(due) }))) {
+    if (await askConfirm(format(t.purchase.payCashConfirm, { amount: formatEuros(due) }))) {
       act({ type: 'purchase/payCash', purchaseId: purchase.id });
     }
   };

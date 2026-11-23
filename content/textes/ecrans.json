@@ -4,6 +4,7 @@
     "close": "Fermer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
+    "confirmTitle": "À confirmer",
     "why": "Pourquoi ce montant ?",
     "whyShort": "?",
     "perMonth": "{amount} / mois",

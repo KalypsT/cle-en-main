@@ -44,6 +44,7 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 | `pnpm install` | Installer les dépendances de tout le monorepo |
 | `pnpm dev` | Lancer le jeu en développement (http://localhost:5173/cle-en-main/) |
 | `pnpm build` | Construire la PWA dans `apps/game/dist` |
+| `pnpm build:domothib` | Construire pour DomoThib Games dans `apps/game/dist` (sans PWA ; voir `docs/domothib.md`) |
 | `pnpm preview` | Servir le build (http://localhost:4173/cle-en-main/), service worker compris |
 | `pnpm test` | Tests Vitest de tous les paquets (moteur, contenu, bots, session du jeu) |
 | `pnpm test:e2e` | Tests Playwright de fumée (construit puis sert le jeu) |
@@ -55,6 +56,7 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 | `pnpm bots:series --games 1000 --years 10 --out rapport.md` | Rapport d'équilibrage : chaque bot joue la série (parallèle sur les cœurs), comparé aux cibles du chapitre 08 |
 | `pnpm bots:series --bots chasseur --games 1000 --raw chasseur.json` | Série d'un seul bot, avec les mesures de chaque partie écrites dans `chasseur.json` ; utile quand une série complète dépasse 2 heures |
 | `pnpm bots:series --from a.json,b.json --out rapport.md` | Fusionner des séries `--raw` en un rapport, sans simuler |
+| `pnpm --filter @cle/bots save-sizes --bot chasseur --years 25` | Mesurer ce que pèsent la partie, un point de retour et le journal d'une longue partie, tels que sauvegardés (taille sur le serveur de DomoThib comprise) |
 | `pnpm --filter @cle/data-tools build-city dole` | Régénérer `data/cities/dole.json` depuis les sources publiques (téléchargements en cache dans `tools/data/.cache/`) |
 
 - **Rapport d'équilibrage** : une partie de bot de 10 ans prend 7 à 9 s (le moteur seul, 3,8 s) ; 100 parties d'un bot prennent environ 3 minutes et demie sur 4 cœurs, 1 000 parties environ 22 à 35 minutes par bot (11 bots depuis le jalon 8) ; une partie de 25 ans prend environ 15 s pour le Chasseur et 27 s pour le Promoteur (300 parties : 19 et 34 minutes) : découper par bot (`--bots`, `--raw`) puis fusionner (`--from`, en redonnant `--years` : sans lui, la fusion juge des parties de 10 ans). `--games 100` suffit pour un premier coup d'œil. Le dernier rapport complet est rangé dans `packages/bots/rapports/`.
@@ -62,6 +64,7 @@ Prérequis : Node 22 LTS (`.nvmrc`) et pnpm 10 (`corepack enable` suffit, la ver
 - **Nouveau fichier de contenu** : écrire son schéma dans `content/schemas/`, le déclarer dans `content/registry.ts` (sinon `validate-content` échoue), l'exporter depuis `content/index.ts`.
 - **Format de sauvegarde** : incrémenter `FORMAT_VERSION` (`packages/engine/src/state.ts`), ajouter la migration dans `MIGRATIONS` (`serialization.ts`) et son test.
 - **Playwright avec un Chromium déjà installé** : `PW_CHROMIUM_PATH=/chemin/vers/chrome pnpm test:e2e`.
+- **DomoThib Games** : `docs/domothib.md` (contrat) et `apps/game/src/domothib/domothib-games.ts` (bibliothèque du pont) sont copiés **sans changement** depuis `KalypsT/DomoThibv3` ; pour les mettre à jour, recopier les deux. Le jeu y tourne sans `window.confirm`/`alert`/`prompt`, sans `window.open`, sans téléchargement, sans `new Function` et sans aucune ressource extérieure (politique de sécurité de l'hôte).
 - **Icônes provisoires** : modifier `apps/game/public/icons/icon.svg`, puis `pnpm --filter @cle/game exec tsx scripts/generate-icons.ts`.
 
 ## Façon de travailler
